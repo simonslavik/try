@@ -70,6 +70,10 @@ const proxyOptions = {
   },
 };
 
+app.use('/v1', proxy(process.env.IDENTITY_SERVICE_URL, proxyOptions));
+
+
+
 
 app.use(errorHandler);
 
