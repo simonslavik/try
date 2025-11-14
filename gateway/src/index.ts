@@ -7,7 +7,10 @@ import errorHandler from './middleware/errorHandler.js';
 import rateLimit from 'express-rate-limit';
 import RedisStore from 'rate-limit-redis';
 import { createClient } from 'redis';
-import proxy from 'express-http-proxy';
+import { randomUUID } from 'crypto';
+import { setupProxyRoutes } from './routes/proxyRoutes.js';
+
+dotenv.config();
 
 const redisClient = createClient({
   url: process.env.REDIS_URL || 'redis://localhost:6379',
@@ -17,12 +20,16 @@ redisClient.connect().catch((err) => {
   logger.error('Could not connect to Redis', err);
 });
 
-
-
-dotenv.config();
-
 const app: Express = express();
 const PORT: number = Number(process.env.PORT) || 3000;
+
+// Add request ID middleware
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const requestId = req.headers['x-request-id'] as string || randomUUID();
+  (req as any).id = requestId;
+  res.setHeader('X-Request-ID', requestId);
+  next();
+});
 
 app.use(helmet());
 app.use(cors());
@@ -51,29 +58,26 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   delete sanitizedBody.creditCard;
   delete sanitizedBody.token;
   
-  logger.info(`Received ${req.method} request to ${req.url}`);
-  logger.info(`Request body, ${JSON.stringify(sanitizedBody)}`);
+  const requestId = (req as any).id || 'unknown';
+  logger.info(`[${requestId}] ${req.method} ${req.url}`);
+  if (Object.keys(sanitizedBody).length > 0) {
+    logger.info(`[${requestId}] Body: ${JSON.stringify(sanitizedBody)}`);
+  }
   next();
 });
 
+// Health check endpoint
+app.get('/health', (req: Request, res: Response) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    service: 'api-gateway'
+  });
+});
 
-const proxyOptions = {
-  proxyReqPathResolver: (req: Request) => {
-    return req.originalUrl.replace(/^\/v1/, "/api");
-  },
-  proxyErrorHandler: (err: Error, res: Response, next: NextFunction) => {
-    logger.error(`Proxy error: ${err.message}`);
-    res.status(500).json({
-      message: `Internal server error`,
-      error: err.message,
-    });
-  },
-};
-
-app.use('/v1', proxy(process.env.IDENTITY_SERVICE_URL, proxyOptions));
-
-
-
+// Setup proxy routes for all microservices
+setupProxyRoutes(app);
 
 app.use(errorHandler);
 
