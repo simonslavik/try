@@ -2,6 +2,7 @@ import proxy from 'express-http-proxy';
 import { Express, Request, Response } from 'express';
 import logger from '../utils/logger.js';
 import { randomUUID } from 'crypto';
+import authHandler from '../middleware/authHandler.js';
 
 interface ProxyConfig {
   proxyReqPathResolver: (req: Request) => string;
@@ -31,6 +32,17 @@ const createProxyConfig = (serviceName: string): ProxyConfig => ({
       proxyReqOpts.headers['Authorization'] = srcReq.headers.authorization;
     }
     
+    // Forward user context headers (set by authHandler)
+    if (srcReq.headers['x-user-id']) {
+      proxyReqOpts.headers['X-User-Id'] = srcReq.headers['x-user-id'];
+    }
+    if (srcReq.headers['x-user-email']) {
+      proxyReqOpts.headers['X-User-Email'] = srcReq.headers['x-user-email'];
+    }
+    if (srcReq.headers['x-user-role']) {
+      proxyReqOpts.headers['X-User-Role'] = srcReq.headers['x-user-role'];
+    }
+    
     logger.info(`[${requestId}] Proxying ${srcReq.method} ${srcReq.url} to ${serviceName}`);
     return proxyReqOpts;
   },
@@ -56,15 +68,11 @@ const createProxyConfig = (serviceName: string): ProxyConfig => ({
 
 export const setupProxyRoutes = (app: Express): void => {
   const services = [
-    { envVar: 'USER_SERVICE_URL', route: '/v1/users', name: 'User Service' },
-    { envVar: 'USER_SERVICE_URL', route: '/v1/auth', name: 'Auth Service' },
-    { envVar: 'PRODUCT_SERVICE_URL', route: '/v1/products', name: 'Product Service' },
-    { envVar: 'ORDER_SERVICE_URL', route: '/v1/orders', name: 'Order Service' },
-    { envVar: 'PAYMENT_SERVICE_URL', route: '/v1/payments', name: 'Payment Service' },
-    { envVar: 'NOTIFICATION_SERVICE_URL', route: '/v1/notifications', name: 'Notification Service' }
+    { envVar: 'USER_SERVICE_URL', route: '/v1/users', name: 'User Service', requireAuth: true },
+    { envVar: 'USER_SERVICE_URL', route: '/v1/auth', name: 'Auth Service', requireAuth: false },
   ];
   
-  services.forEach(({ envVar, route, name }) => {
+  services.forEach(({ envVar, route, name, requireAuth }) => {
     const serviceUrl = process.env[envVar];
     
     if (!serviceUrl) {
@@ -72,7 +80,13 @@ export const setupProxyRoutes = (app: Express): void => {
       return;
     }
     
-    app.use(route, proxy(serviceUrl, createProxyConfig(name)));
-    logger.info(`✓ Proxy configured: ${route} → ${serviceUrl}`);
+    // Apply auth middleware only to protected routes
+    if (requireAuth) {
+      app.use(route, authHandler, proxy(serviceUrl, createProxyConfig(name)));
+      logger.info(`✓ Proxy configured (protected): ${route} → ${serviceUrl}`);
+    } else {
+      app.use(route, proxy(serviceUrl, createProxyConfig(name)));
+      logger.info(`✓ Proxy configured (public): ${route} → ${serviceUrl}`);
+    }
   });
 };

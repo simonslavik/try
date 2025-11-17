@@ -29,7 +29,7 @@ const authHandler = (req: Request, res: Response, next: NextFunction) => {
         return res.status(500).json({ message: 'Server configuration error', success: false });
     }
 
-    jwt.verify(token, jwtSecret, (err, user) => {
+    jwt.verify(token, jwtSecret, (err, decoded: any) => {
         if (err) {
             logger.warn("Invalid token!");
             return res.status(403).json({
@@ -38,7 +38,15 @@ const authHandler = (req: Request, res: Response, next: NextFunction) => {
             });
         }
 
-        req.user = user;
+        // Attach user to request for potential use
+        req.user = decoded;
+        
+        // Add user info to headers for downstream services
+        req.headers['x-user-id'] = decoded.id || decoded.userId;
+        req.headers['x-user-email'] = decoded.email;
+        req.headers['x-user-role'] = decoded.role;
+        
+        logger.info(`Authenticated user ${decoded.id || decoded.userId} for ${req.method} ${req.url}`);
         next();
     });
 };

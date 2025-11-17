@@ -3,3 +3,62 @@
 {"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-12T13:36:30.138Z"}
 {"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-12T13:37:16.970Z"}
 {"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-12T13:38:10.780Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/users → http://localhost:4001","service":"api-gateway","timestamp":"2025-11-17T10:06:29.057Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/auth → http://localhost:4001","service":"api-gateway","timestamp":"2025-11-17T10:06:29.059Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/products → http://localhost:4002","service":"api-gateway","timestamp":"2025-11-17T10:06:29.059Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/orders → http://localhost:4003","service":"api-gateway","timestamp":"2025-11-17T10:06:29.059Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/payments → http://localhost:4004","service":"api-gateway","timestamp":"2025-11-17T10:06:29.059Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/notifications → http://localhost:4005","service":"api-gateway","timestamp":"2025-11-17T10:06:29.059Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-17T10:06:29.061Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/users → http://localhost:4001","service":"api-gateway","timestamp":"2025-11-17T10:06:37.687Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/auth → http://localhost:4001","service":"api-gateway","timestamp":"2025-11-17T10:06:37.688Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/products → http://localhost:4002","service":"api-gateway","timestamp":"2025-11-17T10:06:37.689Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/orders → http://localhost:4003","service":"api-gateway","timestamp":"2025-11-17T10:06:37.689Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/payments → http://localhost:4004","service":"api-gateway","timestamp":"2025-11-17T10:06:37.689Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/notifications → http://localhost:4005","service":"api-gateway","timestamp":"2025-11-17T10:06:37.689Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-17T10:06:37.690Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/users → http://localhost:4001","service":"api-gateway","timestamp":"2025-11-17T10:07:07.728Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/users → http://localhost:4001","service":"api-gateway","timestamp":"2025-11-17T10:07:07.729Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/auth → http://localhost:4001","service":"api-gateway","timestamp":"2025-11-17T10:07:07.732Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/products → http://localhost:4002","service":"api-gateway","timestamp":"2025-11-17T10:07:07.732Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/orders → http://localhost:4003","service":"api-gateway","timestamp":"2025-11-17T10:07:07.732Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/payments → http://localhost:4004","service":"api-gateway","timestamp":"2025-11-17T10:07:07.733Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/notifications → http://localhost:4005","service":"api-gateway","timestamp":"2025-11-17T10:07:07.733Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-17T10:07:07.735Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/auth → http://localhost:4001","service":"api-gateway","timestamp":"2025-11-17T10:07:07.732Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/products → http://localhost:4002","service":"api-gateway","timestamp":"2025-11-17T10:07:07.732Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/orders → http://localhost:4003","service":"api-gateway","timestamp":"2025-11-17T10:07:07.733Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/payments → http://localhost:4004","service":"api-gateway","timestamp":"2025-11-17T10:07:07.733Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/notifications → http://localhost:4005","service":"api-gateway","timestamp":"2025-11-17T10:07:07.733Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-17T10:07:07.735Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/users → http://localhost:4001","service":"api-gateway","timestamp":"2025-11-17T10:08:14.402Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/users → http://localhost:4001","service":"api-gateway","timestamp":"2025-11-17T10:08:14.401Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/auth → http://localhost:4001","service":"api-gateway","timestamp":"2025-11-17T10:08:14.404Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-17T10:08:14.406Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/auth → http://localhost:4001","service":"api-gateway","timestamp":"2025-11-17T10:08:14.404Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-17T10:08:14.406Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/users → http://localhost:3001","service":"api-gateway","timestamp":"2025-11-17T10:12:29.944Z"}
+{"level":"info","message":"✓ Proxy configured: /v1/users → http://localhost:3001","service":"api-gateway","timestamp":"2025-11-17T10:12:29.944Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-17T10:12:29.947Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-17T10:12:29.947Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://localhost:3001","service":"api-gateway","timestamp":"2025-11-17T10:17:05.533Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://localhost:3001","service":"api-gateway","timestamp":"2025-11-17T10:17:05.538Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-17T10:17:05.540Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://localhost:3001","service":"api-gateway","timestamp":"2025-11-17T10:17:05.537Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://localhost:3001","service":"api-gateway","timestamp":"2025-11-17T10:17:05.540Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-17T10:17:05.544Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://localhost:3001","service":"api-gateway","timestamp":"2025-11-17T10:17:11.331Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://localhost:3001","service":"api-gateway","timestamp":"2025-11-17T10:17:11.332Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://localhost:3001","service":"api-gateway","timestamp":"2025-11-17T10:17:11.334Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-17T10:17:11.336Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://localhost:3001","service":"api-gateway","timestamp":"2025-11-17T10:17:11.334Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-17T10:17:11.336Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://localhost:3001","service":"api-gateway","timestamp":"2025-11-17T10:17:12.947Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://localhost:3001","service":"api-gateway","timestamp":"2025-11-17T10:17:12.947Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://localhost:3001","service":"api-gateway","timestamp":"2025-11-17T10:17:12.948Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-17T10:17:12.950Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://localhost:3001","service":"api-gateway","timestamp":"2025-11-17T10:17:12.948Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-17T10:17:12.950Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://localhost:3001","service":"api-gateway","timestamp":"2025-11-17T10:19:14.630Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://localhost:3001","service":"api-gateway","timestamp":"2025-11-17T10:19:14.631Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-17T10:19:14.634Z"}

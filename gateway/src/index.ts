@@ -45,7 +45,7 @@ const ratelimitOptions = rateLimit({
     res.status(429).json({ success: false, message: "Too many requests" });
   },
   store: new RedisStore({
-    sendCommand: (...args) => redisClient.call(...args) as Promise<any>,
+    sendCommand: (...args: string[]) => redisClient.sendCommand(args) as any,
   }),
 });
 
