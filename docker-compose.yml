@@ -8,20 +8,78 @@ services:
       - redis-data:/data
     command: redis-server --appendonly yes
     restart: unless-stopped
+    networks:
+      - microservices-network
 
-  # postgres:
-  #   image: postgres:15
-  #   container_name: postgres-db
-  #   ports:
-  #     - "5432:5432"
-  #   environment:
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: postgres
-  #     POSTGRES_DB: microservices
-  #   volumes:
-  #     - postgres-data:/var/lib/postgresql/data
-  #   restart: unless-stopped
+  postgres:
+    image: postgres:15
+    container_name: postgres-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: microservices
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/microservices
+      JWT_SECRET: your_jwt_secret_key_change_this_in_production
+      NODE_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - microservices-network
+    volumes:
+      - ./user-service:/app
+      - /app/node_modules
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      JWT_SECRET: your_jwt_secret_key_change_this_in_production
+      REDIS_URL: redis://redis:6379
+      USER_SERVICE_URL: http://user-service:3001
+      NODE_ENV: development
+    depends_on:
+      - redis
+      - user-service
+    restart: unless-stopped
+    networks:
+      - microservices-network
+    volumes:
+      - ./gateway:/app
+      - /app/node_modules
 
 volumes:
   redis-data:
-  # postgres-data:
+  postgres-data:
+
+networks:
+  microservices-network:
+    driver: bridge

@@ -3,6 +3,7 @@
 ## Overview
 
 This project implements a **hybrid authentication approach** with defense-in-depth security:
+
 - **Gateway**: Performs initial JWT verification and adds user context to headers
 - **Services**: Can trust gateway headers OR verify JWT again for direct access
 
@@ -27,6 +28,7 @@ POST http://localhost:3000/v1/auth/login
 ```
 
 **Flow**:
+
 ```
 Client → Gateway (no auth check) → User Service → Response
 ```
@@ -41,6 +43,7 @@ Authorization: Bearer <access_token>
 ```
 
 **Flow**:
+
 ```
 Client with JWT
     ↓
@@ -81,14 +84,15 @@ Authorization: Bearer <admin_access_token>
 
 ```typescript
 const services = [
-  { route: '/v1/users', requireAuth: true },   // Protected
-  { route: '/v1/auth', requireAuth: false },   // Public
+  { route: "/v1/users", requireAuth: true }, // Protected
+  { route: "/v1/auth", requireAuth: false }, // Public
 ];
 ```
 
 ### Auth Middleware (`authHandler.ts`)
 
 **What it does**:
+
 1. ✅ Extracts JWT from `Authorization: Bearer <token>`
 2. ✅ Verifies JWT signature with `JWT_SECRET`
 3. ✅ Decodes user info (userId, email, role)
@@ -99,6 +103,7 @@ const services = [
 5. ✅ Forwards request to service
 
 **Returns**:
+
 - `401` if no token provided
 - `403` if token invalid/expired
 - `next()` if valid
@@ -110,10 +115,11 @@ const services = [
 #### Option 1: `trustGatewayAuth` (Recommended when behind gateway)
 
 ```typescript
-router.get('/profile', trustGatewayAuth, getProfile);
+router.get("/profile", trustGatewayAuth, getProfile);
 ```
 
 **What it does**:
+
 1. Checks if request has `X-Gateway-Source: api-gateway` header
 2. If YES: Trusts `X-User-*` headers (gateway already verified)
 3. If NO: Falls back to full JWT verification (direct call)
@@ -123,10 +129,11 @@ router.get('/profile', trustGatewayAuth, getProfile);
 #### Option 2: `authMiddleware` (Direct JWT verification)
 
 ```typescript
-router.get('/profile', authMiddleware, getProfile);
+router.get("/profile", authMiddleware, getProfile);
 ```
 
 **What it does**:
+
 1. Always extracts and verifies JWT from `Authorization` header
 2. Ignores gateway headers completely
 
@@ -135,10 +142,11 @@ router.get('/profile', authMiddleware, getProfile);
 #### Option 3: `requireRole` (Role-based access)
 
 ```typescript
-router.get('/admin/users', trustGatewayAuth, requireRole(['ADMIN']), listUsers);
+router.get("/admin/users", trustGatewayAuth, requireRole(["ADMIN"]), listUsers);
 ```
 
 **What it does**:
+
 1. Checks `req.user.role` matches allowed roles
 2. Returns `403` if insufficient permissions
 3. Must be used AFTER `authMiddleware` or `trustGatewayAuth`
@@ -166,6 +174,7 @@ Attacker → Directly to user-service:3001 (bypass gateway)
 ## Testing
 
 ### Test public route (no auth)
+
 ```bash
 curl -X POST http://localhost:3000/v1/auth/register \
   -H "Content-Type: application/json" \
@@ -173,6 +182,7 @@ curl -X POST http://localhost:3000/v1/auth/register \
 ```
 
 ### Test protected route (with auth)
+
 ```bash
 # 1. Login to get token
 curl -X POST http://localhost:3000/v1/auth/login \
@@ -187,6 +197,7 @@ curl -X GET http://localhost:3000/v1/users/profile \
 ```
 
 ### Test admin route (requires ADMIN role)
+
 ```bash
 # Use admin account token
 curl -X GET http://localhost:3000/v1/users/users \
@@ -196,6 +207,7 @@ curl -X GET http://localhost:3000/v1/users/users \
 ## Environment Variables
 
 ### Gateway (`.env`)
+
 ```env
 PORT=3000
 JWT_SECRET=your_jwt_secret_key
@@ -204,6 +216,7 @@ USER_SERVICE_URL=http://localhost:3001
 ```
 
 ### User Service (`.env`)
+
 ```env
 PORT=3001
 JWT_SECRET=your_jwt_secret_key  # Must match gateway!
@@ -215,38 +228,51 @@ DATABASE_URL=postgresql://user:pass@localhost:5432/db
 ## API Endpoints
 
 ### Public (No Auth)
+
 - `POST /v1/auth/register` - Register new user
 - `POST /v1/auth/login` - Login and get tokens
 - `POST /v1/auth/refresh` - Refresh access token
 
 ### Protected (Auth Required)
+
 - `POST /v1/auth/logout` - Logout current session
 - `POST /v1/auth/logout-all` - Logout all devices
 - `GET /v1/users/profile` - Get my profile
 - `PUT /v1/users/profile` - Update my profile
 
 ### Admin Only (Auth + ADMIN role)
+
 - `GET /v1/users/users` - List all users
 - `GET /v1/users/users/:id` - Get user by ID
 
 ## Common Errors
 
 ### 401 Unauthorized
+
 ```json
 { "message": "No authorization token provided" }
 ```
+
 **Fix**: Add `Authorization: Bearer <token>` header
 
 ### 403 Forbidden
+
 ```json
 { "message": "Invalid token" }
 ```
+
 **Fix**: Token expired or invalid, login again
 
 ### 403 Insufficient Permissions
+
 ```json
-{ "message": "Insufficient permissions", "required": ["ADMIN"], "current": "USER" }
+{
+  "message": "Insufficient permissions",
+  "required": ["ADMIN"],
+  "current": "USER"
+}
 ```
+
 **Fix**: Route requires ADMIN role, your account is USER
 
 ## Best Practices

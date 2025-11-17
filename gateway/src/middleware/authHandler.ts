@@ -38,13 +38,8 @@ const authHandler = (req: Request, res: Response, next: NextFunction) => {
             });
         }
 
-        // Attach user to request for potential use
+        // Attach user to request
         req.user = decoded;
-        
-        // Add user info to headers for downstream services
-        req.headers['x-user-id'] = decoded.id || decoded.userId;
-        req.headers['x-user-email'] = decoded.email;
-        req.headers['x-user-role'] = decoded.role;
         
         logger.info(`Authenticated user ${decoded.id || decoded.userId} for ${req.method} ${req.url}`);
         next();

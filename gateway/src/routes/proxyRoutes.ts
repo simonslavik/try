@@ -27,20 +27,9 @@ const createProxyConfig = (serviceName: string): ProxyConfig => ({
     proxyReqOpts.headers['X-Forwarded-For'] = srcReq.ip;
     proxyReqOpts.headers['X-Service-Name'] = serviceName;
     
-    // Forward authorization header
+    // Forward authorization header (services will verify JWT)
     if (srcReq.headers.authorization) {
       proxyReqOpts.headers['Authorization'] = srcReq.headers.authorization;
-    }
-    
-    // Forward user context headers (set by authHandler)
-    if (srcReq.headers['x-user-id']) {
-      proxyReqOpts.headers['X-User-Id'] = srcReq.headers['x-user-id'];
-    }
-    if (srcReq.headers['x-user-email']) {
-      proxyReqOpts.headers['X-User-Email'] = srcReq.headers['x-user-email'];
-    }
-    if (srcReq.headers['x-user-role']) {
-      proxyReqOpts.headers['X-User-Role'] = srcReq.headers['x-user-role'];
     }
     
     logger.info(`[${requestId}] Proxying ${srcReq.method} ${srcReq.url} to ${serviceName}`);
@@ -68,6 +57,7 @@ const createProxyConfig = (serviceName: string): ProxyConfig => ({
 
 export const setupProxyRoutes = (app: Express): void => {
   const services = [
+    { envVar: 'USER_SERVICE_URL', route: '/v1/profile', name: 'Profile Service', requireAuth: true },
     { envVar: 'USER_SERVICE_URL', route: '/v1/users', name: 'User Service', requireAuth: true },
     { envVar: 'USER_SERVICE_URL', route: '/v1/auth', name: 'Auth Service', requireAuth: false },
   ];

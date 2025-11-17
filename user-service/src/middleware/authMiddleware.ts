@@ -82,39 +82,6 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     }
 };
 
-/**
- * Middleware to trust user info from API Gateway headers
- * Use this when request comes through gateway (defense in depth: still verify JWT)
- * Falls back to full JWT verification if gateway headers missing
- */
-export const trustGatewayAuth = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        // Check if request comes from gateway
-        const fromGateway = req.headers['x-gateway-source'] === 'api-gateway';
-        const userId = req.headers['x-user-id'] as string;
-        const userEmail = req.headers['x-user-email'] as string;
-        const userRole = req.headers['x-user-role'] as string;
-
-        // If from gateway and has user headers, trust them (gateway already verified JWT)
-        if (fromGateway && userId) {
-            req.user = {
-                userId: userId,
-                email: userEmail || '',
-                role: userRole || 'USER'
-            };
-            return next();
-        }
-
-        // Otherwise, fall back to standard JWT verification (direct request)
-        return authMiddleware(req, res, next);
-    } catch (error: any) {
-        console.error('Gateway auth error:', error);
-        return res.status(500).json({ 
-            message: 'Authentication error',
-            error: error.message 
-        });
-    }
-};
 
 /**
  * Middleware to check if user has specific role(s)

@@ -1,0 +1,24 @@
+{"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2025-11-17T13:55:33.051Z"}
+{"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2025-11-17T13:55:33.054Z"}
+{"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2025-11-17T13:55:33.054Z"}
+{"ip":"::1","level":"info","message":"GET /health","service":"user-service","timestamp":"2025-11-17T13:56:22.637Z","userAgent":"curl/8.7.1"}
+{"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2025-11-17T13:57:40.662Z"}
+{"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2025-11-17T13:57:40.664Z"}
+{"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2025-11-17T13:57:40.664Z"}
+{"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2025-11-17T13:59:43.952Z"}
+{"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2025-11-17T13:59:43.954Z"}
+{"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2025-11-17T13:59:43.954Z"}
+{"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2025-11-17T14:03:40.162Z"}
+{"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2025-11-17T14:03:40.163Z"}
+{"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2025-11-17T14:03:40.164Z"}
+{"ip":"::ffff:192.168.65.1","level":"info","message":"GET /health","service":"user-service","timestamp":"2025-11-17T14:06:34.077Z","userAgent":"curl/8.7.1"}
+{"ip":"::ffff:172.19.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-17T14:06:45.793Z","userAgent":"curl/8.7.1"}
+{"ip":"::ffff:172.19.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-17T14:06:57.634Z","userAgent":"curl/8.7.1"}
+{"ip":"::ffff:172.19.0.5","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2025-11-17T14:07:35.563Z","userAgent":"curl/8.7.1"}
+{"ip":"::ffff:172.19.0.5","level":"info","message":"GET /api/users/profile","service":"user-service","timestamp":"2025-11-17T14:07:51.206Z","userAgent":"curl/8.7.1"}
+{"ip":"::ffff:192.168.65.1","level":"info","message":"GET /api/profile","service":"user-service","timestamp":"2025-11-17T14:08:11.457Z","userAgent":"curl/8.7.1"}
+{"ip":"::ffff:172.19.0.5","level":"info","message":"GET /api/profile","service":"user-service","timestamp":"2025-11-17T14:09:13.265Z","userAgent":"curl/8.7.1"}
+{"ip":"::ffff:172.19.0.5","level":"info","message":"POST /api/auth/refresh","service":"user-service","timestamp":"2025-11-17T14:09:23.453Z","userAgent":"curl/8.7.1"}
+{"ip":"::ffff:172.19.0.5","level":"info","message":"POST /api/auth/logout","service":"user-service","timestamp":"2025-11-17T14:09:34.089Z","userAgent":"curl/8.7.1"}
+{"ip":"::ffff:172.19.0.5","level":"info","message":"POST /api/auth/logout","service":"user-service","timestamp":"2025-11-17T14:09:43.790Z","userAgent":"curl/8.7.1"}
+{"ip":"::ffff:172.19.0.5","level":"info","message":"GET /api/profile","service":"user-service","timestamp":"2025-11-17T14:09:53.346Z","userAgent":"curl/8.7.1"}
