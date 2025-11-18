@@ -97,6 +97,27 @@ services:
       - ./collab-editor:/app
       - /app/node_modules
 
+  frontend-react:
+    build:
+      context: ./frontend-react
+      dockerfile: Dockerfile
+    container_name: frontend-react
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_GATEWAY_URL: http://localhost:3000
+      VITE_EDITOR_WS_URL: ws://localhost:4000
+      VITE_EDITOR_API_URL: http://localhost:4000
+    depends_on:
+      - gateway
+      - collab-editor
+    restart: unless-stopped
+    networks:
+      - microservices-network
+    volumes:
+      - ./frontend-react:/app
+      - /app/node_modules
+
 volumes:
   redis-data:
   postgres-data:
