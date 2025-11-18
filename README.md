@@ -5,28 +5,33 @@ Microservices architecture with API Gateway, JWT authentication, and PostgreSQL.
 ## 🚀 Quick Start for Team Members
 
 ### Prerequisites
+
 - Docker & Docker Compose
 - Git
 
 ### Setup Instructions
 
 1. **Clone the repository**
+
 ```bash
 git clone https://github.com/simonslavik/try.git
 cd try
 ```
 
 2. **Copy environment variables**
+
 ```bash
 cp .env.example .env
 ```
 
 3. **Generate a strong JWT secret**
+
 ```bash
 openssl rand -base64 32
 ```
 
 4. **Edit `.env` and add your generated JWT secret**
+
 ```env
 JWT_SECRET=<paste-your-generated-secret-here>
 POSTGRES_USER=postgres
@@ -35,16 +40,19 @@ POSTGRES_DB=microservices
 ```
 
 5. **Start all services**
+
 ```bash
 docker-compose up -d
 ```
 
 6. **Verify services are running**
+
 ```bash
 docker-compose ps
 ```
 
 You should see:
+
 - `postgres-db` (PostgreSQL)
 - `redis-cache` (Redis)
 - `user-service` (Port 3001)
@@ -98,18 +106,21 @@ curl -X POST http://localhost:3000/v1/auth/login \
 ## 📦 Services
 
 ### API Gateway (Port 3000)
+
 - Routes requests to microservices
 - JWT authentication
 - Rate limiting (Redis)
 - Request logging
 
 ### User Service (Port 3001)
+
 - User registration & authentication
 - JWT token management
 - Profile management
 - Prisma ORM + PostgreSQL
 
 ### Infrastructure
+
 - **PostgreSQL 15**: User data storage
 - **Redis**: Rate limiting & caching
 
@@ -123,28 +134,33 @@ curl -X POST http://localhost:3000/v1/auth/login \
 ## 📝 Development
 
 ### View logs
+
 ```bash
 docker-compose logs -f gateway
 docker-compose logs -f user-service
 ```
 
 ### Restart a service
+
 ```bash
 docker-compose restart gateway
 ```
 
 ### Stop all services
+
 ```bash
 docker-compose down
 ```
 
 ### Reset database (removes all data!)
+
 ```bash
 docker-compose down -v
 docker-compose up -d
 ```
 
 ### Run Prisma migrations
+
 ```bash
 docker exec -it user-service npx prisma migrate dev
 ```
