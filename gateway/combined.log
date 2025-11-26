@@ -147,3 +147,75 @@
 {"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://localhost:3001","service":"api-gateway","timestamp":"2025-11-17T14:14:45.808Z"}
 {"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://localhost:3001","service":"api-gateway","timestamp":"2025-11-17T14:14:45.808Z"}
 {"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-17T14:14:45.809Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2025-11-26T14:02:56.222Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2025-11-26T14:02:56.224Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2025-11-26T14:02:56.225Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-26T14:02:56.227Z"}
+{"level":"info","message":"[b98e8a79-56bc-434f-80bc-707250e10aa1] POST /v1/auth/register","service":"api-gateway","timestamp":"2025-11-26T14:03:22.331Z"}
+{"level":"info","message":"[b98e8a79-56bc-434f-80bc-707250e10aa1] Body: {\"username\":\"testuser861\",\"email\":\"testuser999@example.com\"}","service":"api-gateway","timestamp":"2025-11-26T14:03:22.333Z"}
+{"level":"info","message":"[b98e8a79-56bc-434f-80bc-707250e10aa1] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2025-11-26T14:03:22.340Z"}
+{"level":"info","message":"[b98e8a79-56bc-434f-80bc-707250e10aa1] Auth Service responded with 400 for /register","service":"api-gateway","timestamp":"2025-11-26T14:03:22.400Z"}
+{"level":"info","message":"[b4f309d4-4cba-4fb8-8d99-65de80a1ccf2] POST /v1/auth/register","service":"api-gateway","timestamp":"2025-11-26T14:03:36.709Z"}
+{"level":"info","message":"[b4f309d4-4cba-4fb8-8d99-65de80a1ccf2] Body: {\"username\":\"testuser436\",\"email\":\"testuser901@example.com\"}","service":"api-gateway","timestamp":"2025-11-26T14:03:36.712Z"}
+{"level":"info","message":"[b4f309d4-4cba-4fb8-8d99-65de80a1ccf2] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2025-11-26T14:03:36.714Z"}
+{"level":"info","message":"[b4f309d4-4cba-4fb8-8d99-65de80a1ccf2] Auth Service responded with 400 for /register","service":"api-gateway","timestamp":"2025-11-26T14:03:36.738Z"}
+{"level":"info","message":"[9e74afbc-eb82-4e0a-bd2a-48e4ee078945] POST /v1/auth/register","service":"api-gateway","timestamp":"2025-11-26T14:03:39.954Z"}
+{"level":"info","message":"[9e74afbc-eb82-4e0a-bd2a-48e4ee078945] Body: {\"username\":\"testdfsfsuser908\",\"email\":\"testuser210@example.com\"}","service":"api-gateway","timestamp":"2025-11-26T14:03:39.955Z"}
+{"level":"info","message":"[9e74afbc-eb82-4e0a-bd2a-48e4ee078945] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2025-11-26T14:03:39.957Z"}
+{"level":"info","message":"[9e74afbc-eb82-4e0a-bd2a-48e4ee078945] Auth Service responded with 400 for /register","service":"api-gateway","timestamp":"2025-11-26T14:03:39.964Z"}
+{"level":"info","message":"[b3f92933-740f-4f74-81c0-5c0b124ccfd2] POST /v1/auth/register","service":"api-gateway","timestamp":"2025-11-26T14:05:16.722Z"}
+{"level":"info","message":"[b3f92933-740f-4f74-81c0-5c0b124ccfd2] Body: {\"name\":\"Jane Developer\",\"email\":\"jane@example.com\",\"role\":\"CUSTOMER\"}","service":"api-gateway","timestamp":"2025-11-26T14:05:16.725Z"}
+{"level":"info","message":"[b3f92933-740f-4f74-81c0-5c0b124ccfd2] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2025-11-26T14:05:16.727Z"}
+{"level":"info","message":"[b3f92933-740f-4f74-81c0-5c0b124ccfd2] Auth Service responded with 201 for /register","service":"api-gateway","timestamp":"2025-11-26T14:05:17.097Z"}
+{"level":"info","message":"[73cdc3ca-24a4-4699-b3ec-40571b4da099] POST /v1/auth/login","service":"api-gateway","timestamp":"2025-11-26T14:09:15.175Z"}
+{"level":"info","message":"[73cdc3ca-24a4-4699-b3ec-40571b4da099] Body: {\"email\":\"testuser1@example.com\"}","service":"api-gateway","timestamp":"2025-11-26T14:09:15.183Z"}
+{"level":"info","message":"[73cdc3ca-24a4-4699-b3ec-40571b4da099] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2025-11-26T14:09:15.184Z"}
+{"level":"info","message":"[73cdc3ca-24a4-4699-b3ec-40571b4da099] Auth Service responded with 401 for /login","service":"api-gateway","timestamp":"2025-11-26T14:09:15.210Z"}
+{"level":"info","message":"[7f6a9291-fad3-4e1f-8019-ecd783bba988] POST /v1/auth/login","service":"api-gateway","timestamp":"2025-11-26T14:09:47.511Z"}
+{"level":"info","message":"[7f6a9291-fad3-4e1f-8019-ecd783bba988] Body: {\"email\":\"jane@example.com\"}","service":"api-gateway","timestamp":"2025-11-26T14:09:47.512Z"}
+{"level":"info","message":"[7f6a9291-fad3-4e1f-8019-ecd783bba988] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2025-11-26T14:09:47.513Z"}
+{"level":"info","message":"[7f6a9291-fad3-4e1f-8019-ecd783bba988] Auth Service responded with 200 for /login","service":"api-gateway","timestamp":"2025-11-26T14:09:47.800Z"}
+{"level":"info","message":"[209cde88-f037-45c7-b36d-f0ee913e12d2] POST /v1/auth/refresh-token","service":"api-gateway","timestamp":"2025-11-26T14:10:10.101Z"}
+{"level":"info","message":"[209cde88-f037-45c7-b36d-f0ee913e12d2] Body: {\"refreshToken\":\"{{refreshToken}}\"}","service":"api-gateway","timestamp":"2025-11-26T14:10:10.102Z"}
+{"level":"info","message":"[209cde88-f037-45c7-b36d-f0ee913e12d2] Proxying POST /refresh-token to Auth Service","service":"api-gateway","timestamp":"2025-11-26T14:10:10.102Z"}
+{"level":"info","message":"[209cde88-f037-45c7-b36d-f0ee913e12d2] Auth Service responded with 404 for /refresh-token","service":"api-gateway","timestamp":"2025-11-26T14:10:10.124Z"}
+{"level":"info","message":"[c5d9007d-c51b-41dc-9d71-686feb14949d] POST /v1/auth/refresh-token","service":"api-gateway","timestamp":"2025-11-26T14:10:24.722Z"}
+{"level":"info","message":"[c5d9007d-c51b-41dc-9d71-686feb14949d] Body: {\"refreshToken\":\"f466d174205ed398009bc91e972d30f04023edf8cd50ec28d67cb0a545405bd0b23e5cdd7784329c\"}","service":"api-gateway","timestamp":"2025-11-26T14:10:24.724Z"}
+{"level":"info","message":"[c5d9007d-c51b-41dc-9d71-686feb14949d] Proxying POST /refresh-token to Auth Service","service":"api-gateway","timestamp":"2025-11-26T14:10:24.725Z"}
+{"level":"info","message":"[c5d9007d-c51b-41dc-9d71-686feb14949d] Auth Service responded with 404 for /refresh-token","service":"api-gateway","timestamp":"2025-11-26T14:10:24.737Z"}
+{"level":"info","message":"[5f884756-c773-4ab9-96a3-4f574b676a2b] POST /v1/auth/logout","service":"api-gateway","timestamp":"2025-11-26T14:10:45.806Z"}
+{"level":"info","message":"[5f884756-c773-4ab9-96a3-4f574b676a2b] Body: {\"refreshToken\":\"f466d174205ed398009bc91e972d30f04023edf8cd50ec28d67cb0a545405bd0b23e5cdd7784329c\"}","service":"api-gateway","timestamp":"2025-11-26T14:10:45.808Z"}
+{"level":"info","message":"[5f884756-c773-4ab9-96a3-4f574b676a2b] Proxying POST /logout to Auth Service","service":"api-gateway","timestamp":"2025-11-26T14:10:45.811Z"}
+{"level":"info","message":"[5f884756-c773-4ab9-96a3-4f574b676a2b] Auth Service responded with 401 for /logout","service":"api-gateway","timestamp":"2025-11-26T14:10:45.829Z"}
+{"level":"info","message":"[8b53ee4a-bb85-438b-941c-5199da1559b8] GET /health","service":"api-gateway","timestamp":"2025-11-26T14:11:22.940Z"}
+{"level":"info","message":"[254a9edf-fbc8-45f6-b758-87649a895d3b] GET /v1/api","service":"api-gateway","timestamp":"2025-11-26T14:13:57.364Z"}
+{"level":"info","message":"[9abd68ee-3d3d-4d52-9380-d0a8af7abacc] GET /v1/api/","service":"api-gateway","timestamp":"2025-11-26T14:14:01.067Z"}
+{"level":"info","message":"[fe02cc55-2c1a-4b5b-8ff5-5370fc8af6a5] GET /v1/api/healh","service":"api-gateway","timestamp":"2025-11-26T14:14:07.678Z"}
+{"level":"info","message":"[c5db1562-2c4d-4d4f-bb42-6c3a7d963ebc] GET /v1/","service":"api-gateway","timestamp":"2025-11-26T14:14:21.915Z"}
+{"level":"info","message":"[180aeacf-87a0-4055-948b-ba0c722db468] GET /v1/health","service":"api-gateway","timestamp":"2025-11-26T14:14:42.258Z"}
+{"level":"info","message":"[f5b5efae-361e-402b-ba70-c5b9a9377263] GET /health","service":"api-gateway","timestamp":"2025-11-26T14:15:27.996Z"}
+{"level":"info","message":"[811b339f-b6aa-4066-b8b5-f4014207473f] GET /api/health","service":"api-gateway","timestamp":"2025-11-26T14:16:11.103Z"}
+{"level":"info","message":"[2e13ec7f-1e33-42f4-9eb6-f6dd86c206ca] GET /api/health","service":"api-gateway","timestamp":"2025-11-26T14:16:33.336Z"}
+{"level":"info","message":"[19850940-0047-4d0b-a7da-4ebb0526bf89] GET /health","service":"api-gateway","timestamp":"2025-11-26T14:16:37.517Z"}
+{"level":"info","message":"[1a2a58ca-4b33-495b-be8b-4825a5c55dbc] GET /health","service":"api-gateway","timestamp":"2025-11-26T14:17:04.603Z"}
+{"level":"info","message":"[70415a0b-89ab-4df2-8692-5b6e0519359e] GET /v1/health","service":"api-gateway","timestamp":"2025-11-26T14:19:52.196Z"}
+{"level":"info","message":"[6664aa51-8e1f-4077-bab5-312fd799fc00] GET /health","service":"api-gateway","timestamp":"2025-11-26T14:20:36.410Z"}
+{"level":"info","message":"[17b6dde4-b604-4548-9818-b6c6f636b6e1] GET /","service":"api-gateway","timestamp":"2025-11-26T14:20:41.986Z"}
+{"level":"info","message":"[b280001e-2856-4559-a18e-1a3d6c9be612] GET /","service":"api-gateway","timestamp":"2025-11-26T14:20:44.161Z"}
+{"level":"info","message":"[bf2c1fdf-d1d0-4af9-97ba-bea6cf1663ac] GET /api/health","service":"api-gateway","timestamp":"2025-11-26T14:20:50.722Z"}
+{"level":"info","message":"[7448fb70-1796-494f-abc5-9a7a55e74701] GET /api/health","service":"api-gateway","timestamp":"2025-11-26T14:20:55.485Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2025-11-26T14:24:17.781Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2025-11-26T14:24:17.784Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2025-11-26T14:24:17.784Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2025-11-26T14:24:17.787Z"}
+{"level":"info","message":"[b3db04c8-b4a8-4bc4-bcd9-83d80193028d] GET /v1/health","service":"api-gateway","timestamp":"2025-11-26T14:25:14.370Z"}
+{"level":"info","message":"[ab48767b-c9db-4f0f-814c-d94a1ada49c4] GET /v1/users","service":"api-gateway","timestamp":"2025-11-26T14:25:26.459Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2025-11-26T14:25:26.462Z"}
+{"level":"info","message":"[458cb0d7-5483-48cb-9f92-10bc3a31cfe1] GET /v1/users","service":"api-gateway","timestamp":"2025-11-26T14:26:30.430Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2025-11-26T14:26:30.440Z"}
+{"level":"info","message":"[0b466311-ac59-493f-8e6d-40f2557f340b] GET /v1/users","service":"api-gateway","timestamp":"2025-11-26T14:26:37.197Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2025-11-26T14:26:37.198Z"}
+{"level":"info","message":"[fc387fde-4cf1-4bc4-9695-9d2ad998cada] GET /v1/users","service":"api-gateway","timestamp":"2025-11-26T14:26:41.280Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2025-11-26T14:26:41.294Z"}
+{"level":"info","message":"[fda4f982-7ab8-4fbd-938b-314db8fa6be7] GET /v1/users","service":"api-gateway","timestamp":"2025-11-26T14:26:42.189Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2025-11-26T14:26:42.189Z"}

@@ -76,27 +76,6 @@ services:
       - ./gateway:/app
       - /app/node_modules
 
-  collab-editor:
-    build:
-      context: ./collab-editor
-      dockerfile: Dockerfile
-    container_name: collab-editor
-    ports:
-      - "4000:4000"
-    environment:
-      PORT: 4000
-      NODE_ENV: development
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-    depends_on:
-      postgres:
-        condition: service_healthy
-    restart: unless-stopped
-    networks:
-      - microservices-network
-    volumes:
-      - ./collab-editor:/app
-      - /app/node_modules
-
 volumes:
   redis-data:
   postgres-data:
