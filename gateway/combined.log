@@ -219,3 +219,5 @@
 {"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2025-11-26T14:26:41.294Z"}
 {"level":"info","message":"[fda4f982-7ab8-4fbd-938b-314db8fa6be7] GET /v1/users","service":"api-gateway","timestamp":"2025-11-26T14:26:42.189Z"}
 {"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2025-11-26T14:26:42.189Z"}
+{"level":"info","message":"[8a19cf0d-5a0c-4f61-bd44-36a11afbe74a] GET /v1/users","service":"api-gateway","timestamp":"2025-11-26T14:34:33.885Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2025-11-26T14:34:33.885Z"}
