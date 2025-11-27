@@ -70,3 +70,5 @@
 {"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T12:52:39.667Z","userAgent":"PostmanRuntime/7.39.1"}
 {"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2025-11-27T12:53:14.279Z","userAgent":"PostmanRuntime/7.39.1"}
 {"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2025-11-27T12:53:36.243Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:145.0) Gecko/20100101 Firefox/145.0"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2025-11-27T13:26:11.375Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:145.0) Gecko/20100101 Firefox/145.0"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T13:35:07.620Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:145.0) Gecko/20100101 Firefox/145.0"}

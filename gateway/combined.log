@@ -330,3 +330,11 @@
 {"level":"info","message":"[f38d0b30-3835-4467-b0b3-6762afee94b7] Body: {\"email\":\"alex@example.com\"}","service":"api-gateway","timestamp":"2025-11-27T12:53:36.233Z"}
 {"level":"info","message":"[f38d0b30-3835-4467-b0b3-6762afee94b7] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2025-11-27T12:53:36.234Z"}
 {"level":"info","message":"[f38d0b30-3835-4467-b0b3-6762afee94b7] Auth Service responded with 200 for /login","service":"api-gateway","timestamp":"2025-11-27T12:53:36.513Z"}
+{"level":"info","message":"[5c481eaf-6013-4d5d-930a-8945ef17d295] POST /v1/auth/login","service":"api-gateway","timestamp":"2025-11-27T13:26:11.305Z"}
+{"level":"info","message":"[5c481eaf-6013-4d5d-930a-8945ef17d295] Body: {\"email\":\"alex@example.com\"}","service":"api-gateway","timestamp":"2025-11-27T13:26:11.311Z"}
+{"level":"info","message":"[5c481eaf-6013-4d5d-930a-8945ef17d295] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2025-11-27T13:26:11.314Z"}
+{"level":"info","message":"[5c481eaf-6013-4d5d-930a-8945ef17d295] Auth Service responded with 200 for /login","service":"api-gateway","timestamp":"2025-11-27T13:26:11.716Z"}
+{"level":"info","message":"[fa199c87-ad65-4203-a328-430c0a723205] POST /v1/auth/register","service":"api-gateway","timestamp":"2025-11-27T13:35:07.602Z"}
+{"level":"info","message":"[fa199c87-ad65-4203-a328-430c0a723205] Body: {\"name\":\"fdasfsad\",\"email\":\"slaviso12@gmail.com\",\"role\":\"CUSTOMER\"}","service":"api-gateway","timestamp":"2025-11-27T13:35:07.603Z"}
+{"level":"info","message":"[fa199c87-ad65-4203-a328-430c0a723205] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2025-11-27T13:35:07.604Z"}
+{"level":"info","message":"[fa199c87-ad65-4203-a328-430c0a723205] Auth Service responded with 201 for /register","service":"api-gateway","timestamp":"2025-11-27T13:35:07.903Z"}
