@@ -41,3 +41,32 @@
 {"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2025-11-26T14:24:18.774Z"}
 {"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2025-11-26T14:24:18.774Z"}
 {"ip":"::ffff:172.18.0.1","level":"info","message":"GET /health","service":"user-service","timestamp":"2025-11-26T14:24:31.283Z","userAgent":"PostmanRuntime/7.39.1"}
+{"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2025-11-27T11:06:14.393Z"}
+{"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2025-11-27T11:06:14.395Z"}
+{"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2025-11-27T11:06:14.395Z"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T11:07:07.396Z","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T11:07:18.253Z","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T11:07:24.486Z","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T11:08:18.257Z","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T11:12:30.197Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:145.0) Gecko/20100101 Firefox/145.0"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T11:12:59.356Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:145.0) Gecko/20100101 Firefox/145.0"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T11:16:15.866Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:145.0) Gecko/20100101 Firefox/145.0"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T11:16:25.260Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:145.0) Gecko/20100101 Firefox/145.0"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T11:18:54.527Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:145.0) Gecko/20100101 Firefox/145.0"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T11:36:28.751Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:145.0) Gecko/20100101 Firefox/145.0"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T11:54:49.155Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:145.0) Gecko/20100101 Firefox/145.0"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2025-11-27T12:17:07.378Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:145.0) Gecko/20100101 Firefox/145.0"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2025-11-27T12:20:39.268Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:145.0) Gecko/20100101 Firefox/145.0"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2025-11-27T12:20:45.590Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:145.0) Gecko/20100101 Firefox/145.0"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2025-11-27T12:50:23.707Z","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T12:50:47.402Z","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T12:50:54.965Z","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T12:50:55.802Z","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T12:50:56.885Z","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T12:51:01.892Z","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T12:51:14.039Z","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T12:51:21.354Z","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T12:52:34.125Z","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2025-11-27T12:52:39.667Z","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2025-11-27T12:53:14.279Z","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2025-11-27T12:53:36.243Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:145.0) Gecko/20100101 Firefox/145.0"}

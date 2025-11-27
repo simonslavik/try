@@ -1,16 +1,35 @@
-import React, { useState } from 'react';
-import SignIn from '../../components/SignComponents/SignIn.jsx';
-import SignUp from '../../components/SignComponents/SignUp.jsx';
+
+import { useNavigate } from 'react-router-dom';
+
 
 function AuthPage() {
-
-    const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate();
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div>
-            {isLogin ? <SignIn /> : <SignUp />}
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 flex-col">
+        <div className='flex items-center justify-center'>
+          <div>
+            No account? 
+          </div>
+          <button 
+              className='cursor-pointer border rounded hover:text-gray-500 font-semibold p-1 m-2' 
+              onClick={() => navigate('/register')}
+          >
+              Register
+          </button>
         </div>
+        <div className='flex items-center justify-center'>
+          <div>
+            Have an account?
+          </div>
+          <button 
+              className='cursor-pointer border rounded hover:text-gray-500 font-semibold p-1 m-2' 
+              onClick={() => navigate('/login')}
+          >
+              Login
+          </button>
+        </div>
+        
     </div>
   );
 }
