@@ -16,18 +16,11 @@ model User {
   email         String         @unique
   password      String // Hashed with bcrypt
   name          String
-  role          Role           @default(CUSTOMER)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   refreshTokens RefreshToken[]
 
   @@map("users")
-}
-
-// User roles
-enum Role {
-  CUSTOMER
-  ADMIN
 }
 
 model RefreshToken {

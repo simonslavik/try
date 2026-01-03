@@ -21,7 +21,6 @@ export const getMyProfile = async (req: Request, res: Response) => {
                 id: true,
                 name: true,
                 email: true,
-                role: true,
                 createdAt: true,
                 updatedAt: true
             }
@@ -75,7 +74,6 @@ export const updateMyProfile = async (req: Request, res: Response) => {
                 id: true,
                 name: true,
                 email: true,
-                role: true,
                 updatedAt: true
             }
         });
@@ -108,7 +106,6 @@ export const getUserById = async (req: Request, res: Response) => {
                 id: true,
                 name: true,
                 email: true,
-                role: true,
                 createdAt: true,
                 updatedAt: true
             }
@@ -144,7 +141,6 @@ export const listUsers = async (req: Request, res: Response) => {
                 id: true,
                 name: true,
                 email: true,
-                role: true,
                 createdAt: true
             },
             orderBy: {

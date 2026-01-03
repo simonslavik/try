@@ -1,5 +1,3 @@
-
-
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
@@ -8,7 +6,7 @@ import AuthContext from '../../context';
 const Login = () => {
     const navigate = useNavigate();
     const { setAuth } = useContext(AuthContext);
-    const [form, setForm] = useState({ name: '', email: '', password: '', role: 'CUSTOMER' });
+    const [form, setForm] = useState({ name: '', email: '', password: '' });
     const [errors, setErrors] = useState([]);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
@@ -18,7 +16,6 @@ const Login = () => {
         if (!form.name || form.name.trim().length < 3) errs.push('Name must be at least 3 characters');
         if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.push('Valid email is required');
         if (!form.password || form.password.length < 8) errs.push('Password must be at least 8 characters');
-        if (!['CUSTOMER', 'ADMIN'].includes(form.role)) errs.push('Role must be either CUSTOMER or ADMIN');
         return errs;
     };
 
@@ -51,7 +48,7 @@ const Login = () => {
                 return;
             }
             setMessage(res.data?.message || 'Registered');
-            setForm({ name: '', email: '', password: '', role: 'CUSTOMER' });
+            setForm({ name: '', email: '', password: '' });
         } catch (err) {
             const respMsg = err?.response?.data?.message;
             const respErrors = err?.response?.data?.errors;
@@ -98,13 +95,6 @@ const Login = () => {
 
                         <div className='p-3'>
                             <input name="password" type="password" value={form.password} onChange={handleChange} placeholder="choose a strong password" style={{ width: '100%' }} />
-                        </div>
-
-                        <div className='p-3'>
-                            <select name="role" value={form.role} onChange={handleChange} >
-                                <option value="CUSTOMER">customer</option>
-                                <option value="ADMIN">admin</option>
-                            </select>
                         </div>
 
                         <button type="submit" disabled={loading} className='cursor-pointer border rounded hover:text-gray-500 font-semibold p-1 m-2'>

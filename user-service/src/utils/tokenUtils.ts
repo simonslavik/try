@@ -6,13 +6,11 @@ interface User {
     id: string;
     email: string;
     name: string;
-    role: string;
 }
 
 interface TokenPayload {
     userId: string;
     email: string;
-    role: string;
 }
 
 interface Tokens {
@@ -30,8 +28,7 @@ export const generateTokens = async (user: User): Promise<Tokens> => {
     const accessToken = jwt.sign(
         {
             userId: user.id,
-            email: user.email,
-            role: user.role
+            email: user.email
         } as TokenPayload,
         process.env.JWT_SECRET!,
         { expiresIn: '15m' } // 15 minutes - change to '60m' if you prefer
@@ -86,8 +83,7 @@ export const verifyRefreshToken = async (token: string): Promise<User | null> =>
         return {
             id: refreshToken.user.id,
             email: refreshToken.user.email,
-            name: refreshToken.user.name,
-            role: refreshToken.user.role
+            name: refreshToken.user.name
         };
     } catch (error) {
         console.error('Error verifying refresh token:', error);

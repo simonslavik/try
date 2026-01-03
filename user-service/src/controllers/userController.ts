@@ -19,7 +19,7 @@ export const registerUser = async (req: Request, res: Response) => {
             });
         }
 
-        const { name, email, password, role } = value;
+        const { name, email, password } = value;
 
         // Check if user already exists
         const existingUser = await prisma.user.findUnique({
@@ -41,13 +41,11 @@ export const registerUser = async (req: Request, res: Response) => {
                 name,
                 email,
                 password: hashedPassword,
-                role: role || 'CUSTOMER'
             },  
             select: {
                 id: true,
                 name: true,
                 email: true,
-                role: true,
                 createdAt: true
             }
         });
@@ -56,8 +54,7 @@ export const registerUser = async (req: Request, res: Response) => {
         const { accessToken, refreshToken } = await generateTokens({
             id: newUser.id,
             email: newUser.email,
-            name: newUser.name,
-            role: newUser.role
+            name: newUser.name
         });
 
         res.status(201).json({ 
@@ -116,8 +113,7 @@ export const loginUser = async (req: Request, res: Response) => {
         const { accessToken, refreshToken } = await generateTokens({
             id: user.id,
             email: user.email,
-            name: user.name,
-            role: user.role
+            name: user.name
         });
 
         res.status(200).json({ 
@@ -125,8 +121,7 @@ export const loginUser = async (req: Request, res: Response) => {
             user: {
                 id: user.id,
                 name: user.name,
-                email: user.email,
-                role: user.role
+                email: user.email
             },
             accessToken,
             refreshToken

@@ -19,10 +19,7 @@ export const registerSchema = joi.object({
             'string.min': 'Password must be at least 8 characters long',
             'string.pattern.base': 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
             'any.required': 'Password is required'
-        }),
-    role: joi.string().valid('CUSTOMER', 'SELLER').default('CUSTOMER').messages({
-        'any.only': 'Role must be either CUSTOMER or SELLER'
-    })
+        })
 });
 
 export const loginSchema = joi.object({

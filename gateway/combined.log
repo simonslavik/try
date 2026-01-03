@@ -338,3 +338,87 @@
 {"level":"info","message":"[fa199c87-ad65-4203-a328-430c0a723205] Body: {\"name\":\"fdasfsad\",\"email\":\"slaviso12@gmail.com\",\"role\":\"CUSTOMER\"}","service":"api-gateway","timestamp":"2025-11-27T13:35:07.603Z"}
 {"level":"info","message":"[fa199c87-ad65-4203-a328-430c0a723205] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2025-11-27T13:35:07.604Z"}
 {"level":"info","message":"[fa199c87-ad65-4203-a328-430c0a723205] Auth Service responded with 201 for /register","service":"api-gateway","timestamp":"2025-11-27T13:35:07.903Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T13:49:54.484Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T13:49:54.486Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T13:49:54.487Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-03T13:49:54.490Z"}
+{"level":"info","message":"[54d618eb-97ec-458d-b262-bdfacc7b64cd] POST /v1/auth/login","service":"api-gateway","timestamp":"2026-01-03T14:06:16.351Z"}
+{"level":"info","message":"[54d618eb-97ec-458d-b262-bdfacc7b64cd] Body: {\"email\":\"simonslavik007@gmail.com\"}","service":"api-gateway","timestamp":"2026-01-03T14:06:16.353Z"}
+{"level":"info","message":"[54d618eb-97ec-458d-b262-bdfacc7b64cd] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2026-01-03T14:06:16.356Z"}
+{"level":"error","message":"Proxy error for Auth Service: getaddrinfo ENOTFOUND user-service","service":"api-gateway","timestamp":"2026-01-03T14:06:16.745Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:07:43.747Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:07:43.753Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:07:43.753Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-03T14:07:43.759Z"}
+{"level":"info","message":"[c990f139-8367-4105-ae78-0bbe6b985291] POST /v1/auth/login","service":"api-gateway","timestamp":"2026-01-03T14:07:55.834Z"}
+{"level":"info","message":"[c990f139-8367-4105-ae78-0bbe6b985291] Body: {\"email\":\"simonslavik007@gmail.com\"}","service":"api-gateway","timestamp":"2026-01-03T14:07:55.835Z"}
+{"level":"info","message":"[c990f139-8367-4105-ae78-0bbe6b985291] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2026-01-03T14:07:55.841Z"}
+{"level":"error","message":"Proxy error for Auth Service: getaddrinfo ENOTFOUND user-service","service":"api-gateway","timestamp":"2026-01-03T14:07:55.860Z"}
+{"level":"info","message":"[5da2b354-025f-4a73-8a58-12e30b05ef69] POST /v1/auth/login","service":"api-gateway","timestamp":"2026-01-03T14:07:56.786Z"}
+{"level":"info","message":"[5da2b354-025f-4a73-8a58-12e30b05ef69] Body: {\"email\":\"simonslavik007@gmail.com\"}","service":"api-gateway","timestamp":"2026-01-03T14:07:56.786Z"}
+{"level":"info","message":"[5da2b354-025f-4a73-8a58-12e30b05ef69] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2026-01-03T14:07:56.787Z"}
+{"level":"error","message":"Proxy error for Auth Service: connect ECONNREFUSED 172.18.0.4:3001","service":"api-gateway","timestamp":"2026-01-03T14:07:56.788Z"}
+{"level":"info","message":"[d124f699-06c1-407c-ab98-109c3d177448] POST /v1/auth/login","service":"api-gateway","timestamp":"2026-01-03T14:08:01.398Z"}
+{"level":"info","message":"[d124f699-06c1-407c-ab98-109c3d177448] Body: {\"email\":\"simonslavik007@gmail.com\"}","service":"api-gateway","timestamp":"2026-01-03T14:08:01.400Z"}
+{"level":"info","message":"[d124f699-06c1-407c-ab98-109c3d177448] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2026-01-03T14:08:01.402Z"}
+{"level":"error","message":"Proxy error for Auth Service: getaddrinfo ENOTFOUND user-service","service":"api-gateway","timestamp":"2026-01-03T14:08:01.414Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:11:27.690Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:11:27.692Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:11:27.692Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-03T14:11:27.697Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:13:56.907Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:13:56.909Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:13:56.909Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-03T14:13:56.912Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:14:54.217Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:14:54.219Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:14:54.219Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-03T14:14:54.222Z"}
+{"level":"info","message":"[04a8087b-4ef2-424e-9dfe-28a0c8cd5abd] POST /v1/auth/login","service":"api-gateway","timestamp":"2026-01-03T14:15:07.462Z"}
+{"level":"info","message":"[04a8087b-4ef2-424e-9dfe-28a0c8cd5abd] Body: {\"email\":\"simonslavik007@gmail.com\"}","service":"api-gateway","timestamp":"2026-01-03T14:15:07.463Z"}
+{"level":"info","message":"[04a8087b-4ef2-424e-9dfe-28a0c8cd5abd] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2026-01-03T14:15:07.466Z"}
+{"level":"info","message":"[04a8087b-4ef2-424e-9dfe-28a0c8cd5abd] Auth Service responded with 401 for /login","service":"api-gateway","timestamp":"2026-01-03T14:15:07.585Z"}
+{"level":"info","message":"[14b8ad23-d0f2-4f1e-8e3b-42705751dbaa] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T14:15:31.485Z"}
+{"level":"info","message":"[14b8ad23-d0f2-4f1e-8e3b-42705751dbaa] Body: {\"name\":\"slaviso\",\"email\":\"slaviso1@gmail.com\",\"role\":\"CUSTOMER\"}","service":"api-gateway","timestamp":"2026-01-03T14:15:31.487Z"}
+{"level":"info","message":"[14b8ad23-d0f2-4f1e-8e3b-42705751dbaa] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T14:15:31.490Z"}
+{"level":"info","message":"[14b8ad23-d0f2-4f1e-8e3b-42705751dbaa] Auth Service responded with 400 for /register","service":"api-gateway","timestamp":"2026-01-03T14:15:31.519Z"}
+{"level":"info","message":"[58b7b2c7-43d0-4a38-ba96-24dc3e873d6c] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T14:15:40.018Z"}
+{"level":"info","message":"[58b7b2c7-43d0-4a38-ba96-24dc3e873d6c] Body: {\"name\":\"slaviso\",\"email\":\"slaviso1@gmail.com\",\"role\":\"CUSTOMER\"}","service":"api-gateway","timestamp":"2026-01-03T14:15:40.020Z"}
+{"level":"info","message":"[58b7b2c7-43d0-4a38-ba96-24dc3e873d6c] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T14:15:40.022Z"}
+{"level":"info","message":"[58b7b2c7-43d0-4a38-ba96-24dc3e873d6c] Auth Service responded with 500 for /register","service":"api-gateway","timestamp":"2026-01-03T14:15:40.368Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:28:12.343Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:28:12.345Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:28:12.346Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-03T14:28:12.348Z"}
+{"level":"info","message":"[9463188d-c121-40aa-8de4-1930b997a770] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T14:28:38.123Z"}
+{"level":"info","message":"[9463188d-c121-40aa-8de4-1930b997a770] Body: {\"name\":\"simon\",\"email\":\"simonslavik007@gmail.com\"}","service":"api-gateway","timestamp":"2026-01-03T14:28:38.127Z"}
+{"level":"info","message":"[9463188d-c121-40aa-8de4-1930b997a770] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T14:28:38.133Z"}
+{"level":"info","message":"[9463188d-c121-40aa-8de4-1930b997a770] Auth Service responded with 500 for /register","service":"api-gateway","timestamp":"2026-01-03T14:28:38.524Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:30:55.194Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:30:55.196Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:30:55.196Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-03T14:30:55.198Z"}
+{"level":"info","message":"[29fe46e3-4ee6-476c-b663-b5748f294c68] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T14:31:05.627Z"}
+{"level":"info","message":"[29fe46e3-4ee6-476c-b663-b5748f294c68] Body: {\"name\":\"simon\",\"email\":\"simonslavik007@gmail.com\"}","service":"api-gateway","timestamp":"2026-01-03T14:31:05.628Z"}
+{"level":"info","message":"[29fe46e3-4ee6-476c-b663-b5748f294c68] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T14:31:05.631Z"}
+{"level":"info","message":"[29fe46e3-4ee6-476c-b663-b5748f294c68] Auth Service responded with 500 for /register","service":"api-gateway","timestamp":"2026-01-03T14:31:06.005Z"}
+{"level":"info","message":"[6221e34d-1a04-4407-a9fd-62678fa17df4] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T14:31:29.785Z"}
+{"level":"info","message":"[6221e34d-1a04-4407-a9fd-62678fa17df4] Body: {\"name\":\"simon\",\"email\":\"simonslavik007@gmail.com\"}","service":"api-gateway","timestamp":"2026-01-03T14:31:29.786Z"}
+{"level":"info","message":"[6221e34d-1a04-4407-a9fd-62678fa17df4] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T14:31:29.790Z"}
+{"level":"info","message":"[6221e34d-1a04-4407-a9fd-62678fa17df4] Auth Service responded with 500 for /register","service":"api-gateway","timestamp":"2026-01-03T14:31:30.204Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:37:54.784Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:37:54.788Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:37:54.788Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-03T14:37:54.790Z"}
+{"level":"info","message":"[0ec7ad85-cdc9-4a6a-843b-d8c7c2fd7609] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T14:38:06.581Z"}
+{"level":"info","message":"[0ec7ad85-cdc9-4a6a-843b-d8c7c2fd7609] Body: {\"name\":\"simon\",\"email\":\"simonslavik007@gmail.com\"}","service":"api-gateway","timestamp":"2026-01-03T14:38:06.582Z"}
+{"level":"info","message":"[0ec7ad85-cdc9-4a6a-843b-d8c7c2fd7609] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T14:38:06.584Z"}
+{"level":"info","message":"[0ec7ad85-cdc9-4a6a-843b-d8c7c2fd7609] Auth Service responded with 201 for /register","service":"api-gateway","timestamp":"2026-01-03T14:38:06.963Z"}
+{"level":"info","message":"[63d2bafa-27bf-4a56-bb8b-303ef5dbe974] POST /v1/auth/login","service":"api-gateway","timestamp":"2026-01-03T14:38:34.783Z"}
+{"level":"info","message":"[63d2bafa-27bf-4a56-bb8b-303ef5dbe974] Body: {\"email\":\"simonslavik007@gmail.com\"}","service":"api-gateway","timestamp":"2026-01-03T14:38:34.784Z"}
+{"level":"info","message":"[63d2bafa-27bf-4a56-bb8b-303ef5dbe974] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2026-01-03T14:38:34.788Z"}
+{"level":"info","message":"[63d2bafa-27bf-4a56-bb8b-303ef5dbe974] Auth Service responded with 401 for /login","service":"api-gateway","timestamp":"2026-01-03T14:38:35.060Z"}
+{"level":"info","message":"[96541569-efa4-4f64-bea3-8f71b6b2a2ec] POST /v1/auth/login","service":"api-gateway","timestamp":"2026-01-03T14:38:41.658Z"}
+{"level":"info","message":"[96541569-efa4-4f64-bea3-8f71b6b2a2ec] Body: {\"email\":\"simonslavik007@gmail.com\"}","service":"api-gateway","timestamp":"2026-01-03T14:38:41.659Z"}
+{"level":"info","message":"[96541569-efa4-4f64-bea3-8f71b6b2a2ec] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2026-01-03T14:38:41.659Z"}
+{"level":"info","message":"[96541569-efa4-4f64-bea3-8f71b6b2a2ec] Auth Service responded with 200 for /login","service":"api-gateway","timestamp":"2026-01-03T14:38:41.921Z"}
