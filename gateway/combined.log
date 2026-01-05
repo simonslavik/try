@@ -422,3 +422,338 @@
 {"level":"info","message":"[96541569-efa4-4f64-bea3-8f71b6b2a2ec] Body: {\"email\":\"simonslavik007@gmail.com\"}","service":"api-gateway","timestamp":"2026-01-03T14:38:41.659Z"}
 {"level":"info","message":"[96541569-efa4-4f64-bea3-8f71b6b2a2ec] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2026-01-03T14:38:41.659Z"}
 {"level":"info","message":"[96541569-efa4-4f64-bea3-8f71b6b2a2ec] Auth Service responded with 200 for /login","service":"api-gateway","timestamp":"2026-01-03T14:38:41.921Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:44:01.227Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:44:01.230Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:44:01.231Z"}
+{"level":"warn","message":"COLLAB_EDITOR_URL not configured, skipping Collab Editor Service proxy setup","service":"api-gateway","timestamp":"2026-01-03T14:44:01.231Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-03T14:44:01.233Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:47:43.315Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:47:43.317Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T14:47:43.318Z"}
+{"level":"warn","message":"COLLAB_EDITOR_URL not configured, skipping Collab Editor Service proxy setup","service":"api-gateway","timestamp":"2026-01-03T14:47:43.318Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-03T14:47:43.321Z"}
+{"level":"info","message":"[f020bbec-aab4-45f7-9432-82c6f2526ba2] POST /v1/editor/rooms","service":"api-gateway","timestamp":"2026-01-03T14:48:57.319Z"}
+{"level":"info","message":"[f020bbec-aab4-45f7-9432-82c6f2526ba2] Body: {\"name\":\"simon's Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-03T14:48:57.320Z"}
+{"level":"info","message":"[1ac497e5-b4db-4c3c-99b5-7fb0afd2eeca] POST /v1/editor/rooms","service":"api-gateway","timestamp":"2026-01-03T14:49:17.752Z"}
+{"level":"info","message":"[1ac497e5-b4db-4c3c-99b5-7fb0afd2eeca] Body: {\"name\":\"simon's Room\",\"language\":\"java\"}","service":"api-gateway","timestamp":"2026-01-03T14:49:17.753Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T15:11:00.041Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T15:11:00.046Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-03T15:11:00.046Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-03T15:11:00.047Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-03T15:11:00.051Z"}
+{"level":"info","message":"[b354f193-7bc5-4338-ae1e-2d50b1ce7497] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T15:11:51.483Z"}
+{"level":"info","message":"[b354f193-7bc5-4338-ae1e-2d50b1ce7497] Body: {\"name\":\"simon\",\"email\":\"simonslavik007@gmail.com\"}","service":"api-gateway","timestamp":"2026-01-03T15:11:51.485Z"}
+{"level":"info","message":"[b354f193-7bc5-4338-ae1e-2d50b1ce7497] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:11:51.488Z"}
+{"level":"info","message":"[b354f193-7bc5-4338-ae1e-2d50b1ce7497] Auth Service responded with 201 for /register","service":"api-gateway","timestamp":"2026-01-03T15:11:51.903Z"}
+{"level":"info","message":"[9cfa3ba0-96b5-432e-af7a-62940bc88577] POST /v1/editor/rooms","service":"api-gateway","timestamp":"2026-01-03T15:12:03.552Z"}
+{"level":"info","message":"[9cfa3ba0-96b5-432e-af7a-62940bc88577] Body: {\"name\":\"Simon's Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-03T15:12:03.554Z"}
+{"level":"info","message":"[9cfa3ba0-96b5-432e-af7a-62940bc88577] Proxying POST /rooms to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-03T15:12:03.557Z"}
+{"level":"info","message":"[9cfa3ba0-96b5-432e-af7a-62940bc88577] Collab Editor Service responded with 404 for /rooms","service":"api-gateway","timestamp":"2026-01-03T15:12:03.603Z"}
+{"level":"info","message":"[a66ba913-405c-432c-94a5-33bf6f292b36] POST /v1/editor/rooms","service":"api-gateway","timestamp":"2026-01-03T15:12:10.902Z"}
+{"level":"info","message":"[a66ba913-405c-432c-94a5-33bf6f292b36] Body: {\"name\":\"Simon's Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-03T15:12:10.902Z"}
+{"level":"info","message":"[a66ba913-405c-432c-94a5-33bf6f292b36] Proxying POST /rooms to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-03T15:12:10.904Z"}
+{"level":"info","message":"[a66ba913-405c-432c-94a5-33bf6f292b36] Collab Editor Service responded with 404 for /rooms","service":"api-gateway","timestamp":"2026-01-03T15:12:10.919Z"}
+{"level":"info","message":"[e82df72d-a53a-495d-8a1f-4283481fe309] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T15:14:56.730Z"}
+{"level":"info","message":"[e82df72d-a53a-495d-8a1f-4283481fe309] Body: {\"email\":\"john.doe@example.com\",\"username\":\"johndoe\"}","service":"api-gateway","timestamp":"2026-01-03T15:14:56.731Z"}
+{"level":"info","message":"[e82df72d-a53a-495d-8a1f-4283481fe309] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:14:56.733Z"}
+{"level":"info","message":"[e82df72d-a53a-495d-8a1f-4283481fe309] Auth Service responded with 400 for /register","service":"api-gateway","timestamp":"2026-01-03T15:14:56.771Z"}
+{"level":"info","message":"[56c119ce-d933-4142-9e1d-fd4a07691b0e] POST /v1/v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T15:17:13.085Z"}
+{"level":"info","message":"[56c119ce-d933-4142-9e1d-fd4a07691b0e] Body: {\"email\":\"john.doe@example.com\",\"username\":\"johndoe\"}","service":"api-gateway","timestamp":"2026-01-03T15:17:13.087Z"}
+{"level":"info","message":"[65b13b17-4591-4d04-8d57-675ee750a190] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T15:17:29.087Z"}
+{"level":"info","message":"[65b13b17-4591-4d04-8d57-675ee750a190] Body: {\"email\":\"john.doe@example.com\",\"username\":\"johndoe\"}","service":"api-gateway","timestamp":"2026-01-03T15:17:29.087Z"}
+{"level":"info","message":"[65b13b17-4591-4d04-8d57-675ee750a190] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:17:29.088Z"}
+{"level":"info","message":"[65b13b17-4591-4d04-8d57-675ee750a190] Auth Service responded with 400 for /register","service":"api-gateway","timestamp":"2026-01-03T15:17:29.103Z"}
+{"level":"info","message":"[d3fd3c3c-4521-4d8f-bf05-373ef7673b60] POST /v1/v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T15:17:43.113Z"}
+{"level":"info","message":"[d3fd3c3c-4521-4d8f-bf05-373ef7673b60] Body: {\"email\":\"john.doe@example.com\",\"username\":\"johndoe\"}","service":"api-gateway","timestamp":"2026-01-03T15:17:43.115Z"}
+{"level":"info","message":"[fe63b1b7-2765-45e9-b897-3c9de88c09b8] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T15:17:59.603Z"}
+{"level":"info","message":"[fe63b1b7-2765-45e9-b897-3c9de88c09b8] Body: {\"email\":\"john.doe@example.com\",\"username\":\"johndoe\"}","service":"api-gateway","timestamp":"2026-01-03T15:17:59.604Z"}
+{"level":"info","message":"[fe63b1b7-2765-45e9-b897-3c9de88c09b8] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:17:59.604Z"}
+{"level":"info","message":"[fe63b1b7-2765-45e9-b897-3c9de88c09b8] Auth Service responded with 400 for /register","service":"api-gateway","timestamp":"2026-01-03T15:17:59.621Z"}
+{"level":"info","message":"[15ae28f7-a24a-447f-b418-d82d0e9470de] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T15:18:54.200Z"}
+{"level":"info","message":"[15ae28f7-a24a-447f-b418-d82d0e9470de] Body: {\"email\":\"john.doe@example.com\",\"username\":\"simon\"}","service":"api-gateway","timestamp":"2026-01-03T15:18:54.200Z"}
+{"level":"info","message":"[15ae28f7-a24a-447f-b418-d82d0e9470de] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:18:54.201Z"}
+{"level":"info","message":"[15ae28f7-a24a-447f-b418-d82d0e9470de] Auth Service responded with 400 for /register","service":"api-gateway","timestamp":"2026-01-03T15:18:54.216Z"}
+{"level":"info","message":"[8fbebfcb-71e0-467c-828f-f8fba8b527c2] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T15:19:12.829Z"}
+{"level":"info","message":"[8fbebfcb-71e0-467c-828f-f8fba8b527c2] Body: {\"email\":\"john.doe@example.com\",\"name\":\"johndoe\"}","service":"api-gateway","timestamp":"2026-01-03T15:19:12.830Z"}
+{"level":"info","message":"[8fbebfcb-71e0-467c-828f-f8fba8b527c2] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:19:12.830Z"}
+{"level":"info","message":"[8fbebfcb-71e0-467c-828f-f8fba8b527c2] Auth Service responded with 201 for /register","service":"api-gateway","timestamp":"2026-01-03T15:19:13.135Z"}
+{"level":"info","message":"[2af9222e-ff2c-4373-8c2f-6e538ece320f] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T15:25:50.551Z"}
+{"level":"info","message":"[2af9222e-ff2c-4373-8c2f-6e538ece320f] Body: {\"email\":\"johndoe+1767453950533@example.com\",\"name\":\"boldtester3358\"}","service":"api-gateway","timestamp":"2026-01-03T15:25:50.554Z"}
+{"level":"info","message":"[2af9222e-ff2c-4373-8c2f-6e538ece320f] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:25:50.555Z"}
+{"level":"info","message":"[2af9222e-ff2c-4373-8c2f-6e538ece320f] Auth Service responded with 400 for /register","service":"api-gateway","timestamp":"2026-01-03T15:25:50.577Z"}
+{"level":"info","message":"[41e55f10-95c3-48ba-becb-47f383f94ec4] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T15:26:37.565Z"}
+{"level":"info","message":"[41e55f10-95c3-48ba-becb-47f383f94ec4] Body: {\"email\":\"johndoe+1767453997532@example.com\",\"name\":\"cooldev3836\"}","service":"api-gateway","timestamp":"2026-01-03T15:26:37.566Z"}
+{"level":"info","message":"[41e55f10-95c3-48ba-becb-47f383f94ec4] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:26:37.567Z"}
+{"level":"info","message":"[41e55f10-95c3-48ba-becb-47f383f94ec4] Auth Service responded with 201 for /register","service":"api-gateway","timestamp":"2026-01-03T15:26:37.863Z"}
+{"level":"info","message":"[574af512-f98c-46aa-a504-51c4aa4596a9] POST /v1/auth/login","service":"api-gateway","timestamp":"2026-01-03T15:27:29.774Z"}
+{"level":"info","message":"[574af512-f98c-46aa-a504-51c4aa4596a9] Body: {\"email\":\"johndoe+1767453997532@example.com\"}","service":"api-gateway","timestamp":"2026-01-03T15:27:29.775Z"}
+{"level":"info","message":"[574af512-f98c-46aa-a504-51c4aa4596a9] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:27:29.777Z"}
+{"level":"info","message":"[574af512-f98c-46aa-a504-51c4aa4596a9] Auth Service responded with 200 for /login","service":"api-gateway","timestamp":"2026-01-03T15:27:30.071Z"}
+{"level":"info","message":"[a81a78b7-b53f-45f0-adab-557272bf9682] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T15:28:51.434Z"}
+{"level":"info","message":"[a81a78b7-b53f-45f0-adab-557272bf9682] Body: {\"email\":\"johndoe+1767454131407@example.com\",\"name\":\"smartdev5451\"}","service":"api-gateway","timestamp":"2026-01-03T15:28:51.435Z"}
+{"level":"info","message":"[a81a78b7-b53f-45f0-adab-557272bf9682] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:28:51.436Z"}
+{"level":"info","message":"[a81a78b7-b53f-45f0-adab-557272bf9682] Auth Service responded with 400 for /register","service":"api-gateway","timestamp":"2026-01-03T15:28:51.456Z"}
+{"level":"info","message":"[573d507d-5b94-4e4a-a55e-3f6a4e4ce3f2] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T15:28:54.564Z"}
+{"level":"info","message":"[573d507d-5b94-4e4a-a55e-3f6a4e4ce3f2] Body: {\"email\":\"johndoe+1767454134540@example.com\",\"name\":\"brighthero4526\"}","service":"api-gateway","timestamp":"2026-01-03T15:28:54.564Z"}
+{"level":"info","message":"[573d507d-5b94-4e4a-a55e-3f6a4e4ce3f2] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:28:54.565Z"}
+{"level":"info","message":"[573d507d-5b94-4e4a-a55e-3f6a4e4ce3f2] Auth Service responded with 400 for /register","service":"api-gateway","timestamp":"2026-01-03T15:28:54.579Z"}
+{"level":"info","message":"[919d7e8e-d780-4ca0-b52f-65f1f4c4f37e] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T15:28:55.628Z"}
+{"level":"info","message":"[919d7e8e-d780-4ca0-b52f-65f1f4c4f37e] Body: {\"email\":\"johndoe+1767454135608@example.com\",\"name\":\"smartcoder5429\"}","service":"api-gateway","timestamp":"2026-01-03T15:28:55.629Z"}
+{"level":"info","message":"[919d7e8e-d780-4ca0-b52f-65f1f4c4f37e] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:28:55.630Z"}
+{"level":"info","message":"[919d7e8e-d780-4ca0-b52f-65f1f4c4f37e] Auth Service responded with 201 for /register","service":"api-gateway","timestamp":"2026-01-03T15:28:55.913Z"}
+{"level":"info","message":"[3de20cb0-6c31-4037-9c63-74fec415ad59] POST /v1/auth/login","service":"api-gateway","timestamp":"2026-01-03T15:29:00.004Z"}
+{"level":"info","message":"[3de20cb0-6c31-4037-9c63-74fec415ad59] Body: {\"email\":\"johndoe+1767454135608@example.com\"}","service":"api-gateway","timestamp":"2026-01-03T15:29:00.008Z"}
+{"level":"info","message":"[3de20cb0-6c31-4037-9c63-74fec415ad59] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:29:00.009Z"}
+{"level":"info","message":"[3de20cb0-6c31-4037-9c63-74fec415ad59] Auth Service responded with 200 for /login","service":"api-gateway","timestamp":"2026-01-03T15:29:00.306Z"}
+{"level":"info","message":"[23a56a07-0207-4849-92f9-268544206e79] GET /v1/v1/profile/me","service":"api-gateway","timestamp":"2026-01-03T15:30:56.637Z"}
+{"level":"info","message":"[5ce35c4a-0144-4907-9a4d-c4326da060af] POST /v1/auth/refresh","service":"api-gateway","timestamp":"2026-01-03T15:36:11.496Z"}
+{"level":"info","message":"[5ce35c4a-0144-4907-9a4d-c4326da060af] Proxying POST /refresh to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:36:11.504Z"}
+{"level":"info","message":"[5ce35c4a-0144-4907-9a4d-c4326da060af] Auth Service responded with 400 for /refresh","service":"api-gateway","timestamp":"2026-01-03T15:36:11.525Z"}
+{"level":"info","message":"[797b57bf-19ca-43af-b710-d70e58c51990] POST /v1/auth/refresh","service":"api-gateway","timestamp":"2026-01-03T15:36:39.183Z"}
+{"level":"info","message":"[797b57bf-19ca-43af-b710-d70e58c51990] Proxying POST /refresh to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:36:39.184Z"}
+{"level":"info","message":"[797b57bf-19ca-43af-b710-d70e58c51990] Auth Service responded with 400 for /refresh","service":"api-gateway","timestamp":"2026-01-03T15:36:39.192Z"}
+{"level":"info","message":"[68c97225-b8b2-4278-a8a0-79d6cb133352] POST /v1/auth/refresh","service":"api-gateway","timestamp":"2026-01-03T15:36:56.019Z"}
+{"level":"info","message":"[68c97225-b8b2-4278-a8a0-79d6cb133352] Proxying POST /refresh to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:36:56.020Z"}
+{"level":"info","message":"[68c97225-b8b2-4278-a8a0-79d6cb133352] Auth Service responded with 400 for /refresh","service":"api-gateway","timestamp":"2026-01-03T15:36:56.025Z"}
+{"level":"info","message":"[5e9db7b0-7009-4aa5-a3f8-ed948c807684] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T15:38:31.996Z"}
+{"level":"info","message":"[5e9db7b0-7009-4aa5-a3f8-ed948c807684] Body: {\"email\":\"johndoe+1767454711966@example.com\",\"name\":\"happydev3163\"}","service":"api-gateway","timestamp":"2026-01-03T15:38:31.997Z"}
+{"level":"info","message":"[5e9db7b0-7009-4aa5-a3f8-ed948c807684] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:38:31.997Z"}
+{"level":"info","message":"[5e9db7b0-7009-4aa5-a3f8-ed948c807684] Auth Service responded with 201 for /register","service":"api-gateway","timestamp":"2026-01-03T15:38:32.288Z"}
+{"level":"info","message":"[6850871a-1691-4236-bdf4-90a7694a0c84] POST /v1/auth/login","service":"api-gateway","timestamp":"2026-01-03T15:38:35.511Z"}
+{"level":"info","message":"[6850871a-1691-4236-bdf4-90a7694a0c84] Body: {\"email\":\"johndoe+1767454711966@example.com\"}","service":"api-gateway","timestamp":"2026-01-03T15:38:35.512Z"}
+{"level":"info","message":"[6850871a-1691-4236-bdf4-90a7694a0c84] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:38:35.513Z"}
+{"level":"info","message":"[6850871a-1691-4236-bdf4-90a7694a0c84] Auth Service responded with 200 for /login","service":"api-gateway","timestamp":"2026-01-03T15:38:35.786Z"}
+{"level":"info","message":"[7c865584-a554-4cd0-a18d-ba9581aff031] POST /v1/auth/refresh","service":"api-gateway","timestamp":"2026-01-03T15:38:45.423Z"}
+{"level":"info","message":"[7c865584-a554-4cd0-a18d-ba9581aff031] Proxying POST /refresh to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:38:45.424Z"}
+{"level":"info","message":"[7c865584-a554-4cd0-a18d-ba9581aff031] Auth Service responded with 400 for /refresh","service":"api-gateway","timestamp":"2026-01-03T15:38:45.436Z"}
+{"level":"info","message":"[1ae2d66a-97f9-4dc8-8f30-acbdbfd115dc] POST /v1/auth/refresh","service":"api-gateway","timestamp":"2026-01-03T15:41:45.264Z"}
+{"level":"info","message":"[1ae2d66a-97f9-4dc8-8f30-acbdbfd115dc] Proxying POST /refresh to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:41:45.267Z"}
+{"level":"info","message":"[1ae2d66a-97f9-4dc8-8f30-acbdbfd115dc] Auth Service responded with 400 for /refresh","service":"api-gateway","timestamp":"2026-01-03T15:41:45.285Z"}
+{"level":"info","message":"[b5db0050-bec9-4802-b716-04d7dc8f0bb0] POST /v1/auth/refresh","service":"api-gateway","timestamp":"2026-01-03T15:41:46.985Z"}
+{"level":"info","message":"[b5db0050-bec9-4802-b716-04d7dc8f0bb0] Proxying POST /refresh to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:41:46.985Z"}
+{"level":"info","message":"[b5db0050-bec9-4802-b716-04d7dc8f0bb0] Auth Service responded with 400 for /refresh","service":"api-gateway","timestamp":"2026-01-03T15:41:46.988Z"}
+{"level":"info","message":"[acb1f9b9-6de6-48bf-868a-5486c4193d48] POST /v1/auth/refresh","service":"api-gateway","timestamp":"2026-01-03T15:43:12.571Z"}
+{"level":"info","message":"[acb1f9b9-6de6-48bf-868a-5486c4193d48] Proxying POST /refresh to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:43:12.574Z"}
+{"level":"info","message":"[acb1f9b9-6de6-48bf-868a-5486c4193d48] Auth Service responded with 400 for /refresh","service":"api-gateway","timestamp":"2026-01-03T15:43:12.587Z"}
+{"level":"info","message":"[a859b1da-f396-4950-8de0-08457ee65025] POST /v1/auth/refresh","service":"api-gateway","timestamp":"2026-01-03T15:43:13.541Z"}
+{"level":"info","message":"[a859b1da-f396-4950-8de0-08457ee65025] Proxying POST /refresh to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:43:13.541Z"}
+{"level":"info","message":"[a859b1da-f396-4950-8de0-08457ee65025] Auth Service responded with 400 for /refresh","service":"api-gateway","timestamp":"2026-01-03T15:43:13.545Z"}
+{"level":"info","message":"[d50f16cd-8f4a-4fd2-9aa7-f7db8acd09e8] POST /v1/auth/refresh","service":"api-gateway","timestamp":"2026-01-03T15:43:14.412Z"}
+{"level":"info","message":"[d50f16cd-8f4a-4fd2-9aa7-f7db8acd09e8] Proxying POST /refresh to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:43:14.413Z"}
+{"level":"info","message":"[d50f16cd-8f4a-4fd2-9aa7-f7db8acd09e8] Auth Service responded with 400 for /refresh","service":"api-gateway","timestamp":"2026-01-03T15:43:14.418Z"}
+{"level":"error","message":"SyntaxError: Unexpected token 'j', ...\" \"email\": johndoe+17\"... is not valid JSON\n    at JSON.parse (<anonymous>)\n    at parse (/app/node_modules/body-parser/lib/types/json.js:77:19)\n    at /app/node_modules/body-parser/lib/read.js:123:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)\n    at invokeCallback (/app/node_modules/raw-body/index.js:238:16)\n    at done (/app/node_modules/raw-body/index.js:227:7)\n    at IncomingMessage.onEnd (/app/node_modules/raw-body/index.js:287:7)\n    at IncomingMessage.emit (node:events:524:28)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)","service":"api-gateway","timestamp":"2026-01-03T15:43:23.580Z"}
+{"level":"info","message":"[582250a5-d3b0-4683-a036-8f44687d6b36] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T15:43:47.032Z"}
+{"level":"info","message":"[582250a5-d3b0-4683-a036-8f44687d6b36] Body: {\"email\":\"johndoe+1767455027007@example.com\",\"name\":\"coolninja4841\"}","service":"api-gateway","timestamp":"2026-01-03T15:43:47.033Z"}
+{"level":"info","message":"[582250a5-d3b0-4683-a036-8f44687d6b36] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:43:47.034Z"}
+{"level":"info","message":"[582250a5-d3b0-4683-a036-8f44687d6b36] Auth Service responded with 201 for /register","service":"api-gateway","timestamp":"2026-01-03T15:43:47.341Z"}
+{"level":"error","message":"SyntaxError: Unexpected token 'j', ...\" \"email\": johndoe+17\"... is not valid JSON\n    at JSON.parse (<anonymous>)\n    at parse (/app/node_modules/body-parser/lib/types/json.js:77:19)\n    at /app/node_modules/body-parser/lib/read.js:123:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)\n    at invokeCallback (/app/node_modules/raw-body/index.js:238:16)\n    at done (/app/node_modules/raw-body/index.js:227:7)\n    at IncomingMessage.onEnd (/app/node_modules/raw-body/index.js:287:7)\n    at IncomingMessage.emit (node:events:524:28)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)","service":"api-gateway","timestamp":"2026-01-03T15:43:50.096Z"}
+{"level":"error","message":"SyntaxError: Unexpected token 'j', ...\" \"email\": johndoe+17\"... is not valid JSON\n    at JSON.parse (<anonymous>)\n    at parse (/app/node_modules/body-parser/lib/types/json.js:77:19)\n    at /app/node_modules/body-parser/lib/read.js:123:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)\n    at invokeCallback (/app/node_modules/raw-body/index.js:238:16)\n    at done (/app/node_modules/raw-body/index.js:227:7)\n    at IncomingMessage.onEnd (/app/node_modules/raw-body/index.js:287:7)\n    at IncomingMessage.emit (node:events:524:28)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)","service":"api-gateway","timestamp":"2026-01-03T15:43:51.701Z"}
+{"level":"error","message":"SyntaxError: Unexpected token 'j', ...\" \"email\": johndoe+17\"... is not valid JSON\n    at JSON.parse (<anonymous>)\n    at parse (/app/node_modules/body-parser/lib/types/json.js:77:19)\n    at /app/node_modules/body-parser/lib/read.js:123:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)\n    at invokeCallback (/app/node_modules/raw-body/index.js:238:16)\n    at done (/app/node_modules/raw-body/index.js:227:7)\n    at IncomingMessage.onEnd (/app/node_modules/raw-body/index.js:287:7)\n    at IncomingMessage.emit (node:events:524:28)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)","service":"api-gateway","timestamp":"2026-01-03T15:45:30.449Z"}
+{"level":"error","message":"SyntaxError: Unexpected token 'j', ...\" \"email\": johndoe+17\"... is not valid JSON\n    at JSON.parse (<anonymous>)\n    at parse (/app/node_modules/body-parser/lib/types/json.js:77:19)\n    at /app/node_modules/body-parser/lib/read.js:123:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)\n    at invokeCallback (/app/node_modules/raw-body/index.js:238:16)\n    at done (/app/node_modules/raw-body/index.js:227:7)\n    at IncomingMessage.onEnd (/app/node_modules/raw-body/index.js:287:7)\n    at IncomingMessage.emit (node:events:524:28)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)","service":"api-gateway","timestamp":"2026-01-03T15:45:31.416Z"}
+{"level":"error","message":"SyntaxError: Unexpected token 'j', ...\" \"email\": johndoe+17\"... is not valid JSON\n    at JSON.parse (<anonymous>)\n    at parse (/app/node_modules/body-parser/lib/types/json.js:77:19)\n    at /app/node_modules/body-parser/lib/read.js:123:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)\n    at invokeCallback (/app/node_modules/raw-body/index.js:238:16)\n    at done (/app/node_modules/raw-body/index.js:227:7)\n    at IncomingMessage.onEnd (/app/node_modules/raw-body/index.js:287:7)\n    at IncomingMessage.emit (node:events:524:28)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)","service":"api-gateway","timestamp":"2026-01-03T15:45:32.226Z"}
+{"level":"info","message":"[09970b99-9ba7-4361-be7a-3e009c5adf95] POST /v1/auth/login","service":"api-gateway","timestamp":"2026-01-03T15:45:55.359Z"}
+{"level":"info","message":"[09970b99-9ba7-4361-be7a-3e009c5adf95] Body: {\"email\":\"johndoe+1767455027007@example.com\"}","service":"api-gateway","timestamp":"2026-01-03T15:45:55.361Z"}
+{"level":"info","message":"[09970b99-9ba7-4361-be7a-3e009c5adf95] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:45:55.363Z"}
+{"level":"info","message":"[09970b99-9ba7-4361-be7a-3e009c5adf95] Auth Service responded with 200 for /login","service":"api-gateway","timestamp":"2026-01-03T15:45:55.651Z"}
+{"level":"error","message":"SyntaxError: Unexpected token 'd', ...\"shToken\": dcb6778ff0\"... is not valid JSON\n    at JSON.parse (<anonymous>)\n    at parse (/app/node_modules/body-parser/lib/types/json.js:77:19)\n    at /app/node_modules/body-parser/lib/read.js:123:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)\n    at invokeCallback (/app/node_modules/raw-body/index.js:238:16)\n    at done (/app/node_modules/raw-body/index.js:227:7)\n    at IncomingMessage.onEnd (/app/node_modules/raw-body/index.js:287:7)\n    at IncomingMessage.emit (node:events:524:28)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)","service":"api-gateway","timestamp":"2026-01-03T15:45:58.885Z"}
+{"level":"error","message":"SyntaxError: Unexpected token 'd', ...\"shToken\": dcb6778ff0\"... is not valid JSON\n    at JSON.parse (<anonymous>)\n    at parse (/app/node_modules/body-parser/lib/types/json.js:77:19)\n    at /app/node_modules/body-parser/lib/read.js:123:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)\n    at invokeCallback (/app/node_modules/raw-body/index.js:238:16)\n    at done (/app/node_modules/raw-body/index.js:227:7)\n    at IncomingMessage.onEnd (/app/node_modules/raw-body/index.js:287:7)\n    at IncomingMessage.emit (node:events:524:28)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)","service":"api-gateway","timestamp":"2026-01-03T15:46:03.422Z"}
+{"level":"error","message":"SyntaxError: Unexpected token 'd', ...\"shToken\": dcb6778ff0\"... is not valid JSON\n    at JSON.parse (<anonymous>)\n    at parse (/app/node_modules/body-parser/lib/types/json.js:77:19)\n    at /app/node_modules/body-parser/lib/read.js:123:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)\n    at invokeCallback (/app/node_modules/raw-body/index.js:238:16)\n    at done (/app/node_modules/raw-body/index.js:227:7)\n    at IncomingMessage.onEnd (/app/node_modules/raw-body/index.js:287:7)\n    at IncomingMessage.emit (node:events:524:28)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)","service":"api-gateway","timestamp":"2026-01-03T15:46:04.481Z"}
+{"level":"info","message":"[3f856b8a-1e1a-4c58-801d-aa294611a74d] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-03T15:46:07.062Z"}
+{"level":"info","message":"[3f856b8a-1e1a-4c58-801d-aa294611a74d] Body: {\"email\":\"johndoe+1767455167042@example.com\",\"name\":\"smartninja8988\"}","service":"api-gateway","timestamp":"2026-01-03T15:46:07.063Z"}
+{"level":"info","message":"[3f856b8a-1e1a-4c58-801d-aa294611a74d] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:46:07.063Z"}
+{"level":"info","message":"[3f856b8a-1e1a-4c58-801d-aa294611a74d] Auth Service responded with 201 for /register","service":"api-gateway","timestamp":"2026-01-03T15:46:07.335Z"}
+{"level":"info","message":"[b06f21b5-8f4e-4ddc-b287-fede0845a061] POST /v1/auth/login","service":"api-gateway","timestamp":"2026-01-03T15:46:09.993Z"}
+{"level":"info","message":"[b06f21b5-8f4e-4ddc-b287-fede0845a061] Body: {\"email\":\"johndoe+1767455167042@example.com\"}","service":"api-gateway","timestamp":"2026-01-03T15:46:09.994Z"}
+{"level":"info","message":"[b06f21b5-8f4e-4ddc-b287-fede0845a061] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:46:09.994Z"}
+{"level":"info","message":"[b06f21b5-8f4e-4ddc-b287-fede0845a061] Auth Service responded with 200 for /login","service":"api-gateway","timestamp":"2026-01-03T15:46:10.268Z"}
+{"level":"error","message":"SyntaxError: Expected ',' or '}' after property value in JSON at position 21\n    at JSON.parse (<anonymous>)\n    at parse (/app/node_modules/body-parser/lib/types/json.js:77:19)\n    at /app/node_modules/body-parser/lib/read.js:123:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)\n    at invokeCallback (/app/node_modules/raw-body/index.js:238:16)\n    at done (/app/node_modules/raw-body/index.js:227:7)\n    at IncomingMessage.onEnd (/app/node_modules/raw-body/index.js:287:7)\n    at IncomingMessage.emit (node:events:524:28)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)","service":"api-gateway","timestamp":"2026-01-03T15:46:13.928Z"}
+{"level":"info","message":"[b95eb76d-02e6-4686-8822-5be5cb6ede49] POST /v1/auth/refresh","service":"api-gateway","timestamp":"2026-01-03T15:46:47.475Z"}
+{"level":"info","message":"[b95eb76d-02e6-4686-8822-5be5cb6ede49] Body: {\"refreshToken\":\"3c2f4650b2d6efcf7d83e084bba59a96d396da416fe5c89be2a39c6147859b1096aa27112ad491fe\"}","service":"api-gateway","timestamp":"2026-01-03T15:46:47.477Z"}
+{"level":"info","message":"[b95eb76d-02e6-4686-8822-5be5cb6ede49] Proxying POST /refresh to Auth Service","service":"api-gateway","timestamp":"2026-01-03T15:46:47.478Z"}
+{"level":"info","message":"[b95eb76d-02e6-4686-8822-5be5cb6ede49] Auth Service responded with 200 for /refresh","service":"api-gateway","timestamp":"2026-01-03T15:46:47.521Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T12:41:52.919Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T12:41:52.922Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T12:41:52.923Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-04T12:41:52.923Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-04T12:41:52.925Z"}
+{"level":"info","message":"[a09b073b-152d-481f-9321-e3417e2b7a3c] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-04T12:41:56.733Z"}
+{"level":"info","message":"[a09b073b-152d-481f-9321-e3417e2b7a3c] Body: {\"email\":\"johndoe+1767530516670@example.com\",\"name\":\"clevertester7215\"}","service":"api-gateway","timestamp":"2026-01-04T12:41:56.734Z"}
+{"level":"info","message":"[a09b073b-152d-481f-9321-e3417e2b7a3c] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-04T12:41:56.736Z"}
+{"level":"info","message":"[a09b073b-152d-481f-9321-e3417e2b7a3c] Auth Service responded with 201 for /register","service":"api-gateway","timestamp":"2026-01-04T12:41:57.105Z"}
+{"level":"info","message":"[895cb630-621d-4453-9ee9-f792849149e4] POST /v1/auth/login","service":"api-gateway","timestamp":"2026-01-04T12:42:00.850Z"}
+{"level":"info","message":"[895cb630-621d-4453-9ee9-f792849149e4] Body: {\"email\":\"johndoe+1767530516670@example.com\"}","service":"api-gateway","timestamp":"2026-01-04T12:42:00.852Z"}
+{"level":"info","message":"[895cb630-621d-4453-9ee9-f792849149e4] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2026-01-04T12:42:00.859Z"}
+{"level":"info","message":"[895cb630-621d-4453-9ee9-f792849149e4] Auth Service responded with 200 for /login","service":"api-gateway","timestamp":"2026-01-04T12:42:01.145Z"}
+{"level":"info","message":"[47be1f64-fcf3-4694-8936-19f279bf9a6d] POST /v1/auth/logout","service":"api-gateway","timestamp":"2026-01-04T12:42:24.968Z"}
+{"level":"info","message":"[47be1f64-fcf3-4694-8936-19f279bf9a6d] Body: {\"refreshToken\":\"5ca709684d2225bf10457584bc6e580a6911dcb94fef838b539d7f9e3dfc1652eaaeb5e37cc3cee9\"}","service":"api-gateway","timestamp":"2026-01-04T12:42:24.969Z"}
+{"level":"info","message":"[47be1f64-fcf3-4694-8936-19f279bf9a6d] Proxying POST /logout to Auth Service","service":"api-gateway","timestamp":"2026-01-04T12:42:24.971Z"}
+{"level":"info","message":"[47be1f64-fcf3-4694-8936-19f279bf9a6d] Auth Service responded with 200 for /logout","service":"api-gateway","timestamp":"2026-01-04T12:42:25.005Z"}
+{"level":"info","message":"[343cc8b7-4b3e-442d-aea8-de6420db6079] GET /v1/editor/health","service":"api-gateway","timestamp":"2026-01-04T12:48:00.663Z"}
+{"level":"info","message":"[343cc8b7-4b3e-442d-aea8-de6420db6079] Proxying GET /health to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T12:48:00.670Z"}
+{"level":"info","message":"[343cc8b7-4b3e-442d-aea8-de6420db6079] Collab Editor Service responded with 404 for /health","service":"api-gateway","timestamp":"2026-01-04T12:48:00.715Z"}
+{"level":"info","message":"[0e4c6738-3edd-4fc5-817f-05a2b28042a9] GET /v1/editor/health","service":"api-gateway","timestamp":"2026-01-04T12:48:18.269Z"}
+{"level":"info","message":"[0e4c6738-3edd-4fc5-817f-05a2b28042a9] Proxying GET /health to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T12:48:18.272Z"}
+{"level":"info","message":"[0e4c6738-3edd-4fc5-817f-05a2b28042a9] Collab Editor Service responded with 404 for /health","service":"api-gateway","timestamp":"2026-01-04T12:48:18.285Z"}
+{"level":"info","message":"[b1f1d39a-a657-4439-9c6a-cd6872dc457e] GET /v1/editor/health","service":"api-gateway","timestamp":"2026-01-04T12:48:19.478Z"}
+{"level":"info","message":"[b1f1d39a-a657-4439-9c6a-cd6872dc457e] Proxying GET /health to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T12:48:19.479Z"}
+{"level":"info","message":"[b1f1d39a-a657-4439-9c6a-cd6872dc457e] Collab Editor Service responded with 404 for /health","service":"api-gateway","timestamp":"2026-01-04T12:48:19.485Z"}
+{"level":"info","message":"[6b7f0a8c-4b46-4510-b539-ba07027adda0] GET /v1/health","service":"api-gateway","timestamp":"2026-01-04T12:50:05.959Z"}
+{"level":"info","message":"[99f51dc8-ccb9-427c-b1fb-8fb475e11590] GET /v1/health","service":"api-gateway","timestamp":"2026-01-04T12:51:37.185Z"}
+{"level":"info","message":"[48e23b89-11ca-4881-9a3f-870e50d8fa2f] GET /v1/health","service":"api-gateway","timestamp":"2026-01-04T12:51:38.078Z"}
+{"level":"info","message":"[b7dc0870-141d-4f21-9aad-9efbd9378cdf] GET /v1/health","service":"api-gateway","timestamp":"2026-01-04T12:51:38.991Z"}
+{"level":"info","message":"[49fec861-1b90-46c3-a3b0-97f9370b6054] GET /v1/health","service":"api-gateway","timestamp":"2026-01-04T12:51:39.992Z"}
+{"level":"info","message":"[fb48f963-7083-435b-8e4e-72017b733cae] GET /health","service":"api-gateway","timestamp":"2026-01-04T12:52:03.103Z"}
+{"level":"info","message":"[33804bf9-79fd-4744-8a33-ddf6e291010f] GET /v1/editor/health","service":"api-gateway","timestamp":"2026-01-04T12:52:28.834Z"}
+{"level":"info","message":"[33804bf9-79fd-4744-8a33-ddf6e291010f] Proxying GET /health to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T12:52:28.836Z"}
+{"level":"info","message":"[33804bf9-79fd-4744-8a33-ddf6e291010f] Collab Editor Service responded with 404 for /health","service":"api-gateway","timestamp":"2026-01-04T12:52:28.849Z"}
+{"level":"info","message":"[8fc0590c-6af6-4d3b-86b9-4249f303d2b5] GET /v1/editor/health","service":"api-gateway","timestamp":"2026-01-04T12:53:44.404Z"}
+{"level":"info","message":"[8fc0590c-6af6-4d3b-86b9-4249f303d2b5] Proxying GET /health to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T12:53:44.406Z"}
+{"level":"info","message":"[8fc0590c-6af6-4d3b-86b9-4249f303d2b5] Collab Editor Service responded with 404 for /health","service":"api-gateway","timestamp":"2026-01-04T12:53:44.417Z"}
+{"level":"info","message":"[c9666d7f-d887-4edf-8691-17b4c4972b76] GET /v1/editor/health","service":"api-gateway","timestamp":"2026-01-04T12:53:45.543Z"}
+{"level":"info","message":"[c9666d7f-d887-4edf-8691-17b4c4972b76] Proxying GET /health to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T12:53:45.545Z"}
+{"level":"info","message":"[c9666d7f-d887-4edf-8691-17b4c4972b76] Collab Editor Service responded with 404 for /health","service":"api-gateway","timestamp":"2026-01-04T12:53:45.550Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T12:54:28.318Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T12:54:28.320Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T12:54:28.320Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-04T12:54:28.320Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-04T12:54:28.323Z"}
+{"level":"info","message":"[708538a0-a702-4c0b-8cf0-91dc1c8451b2] GET /v1/health","service":"api-gateway","timestamp":"2026-01-04T12:55:44.689Z"}
+{"level":"info","message":"[48628b9b-0c8f-4d23-96c6-bb39731d3eb0] GET /v1/health","service":"api-gateway","timestamp":"2026-01-04T12:55:45.800Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T12:56:59.659Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T12:56:59.662Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T12:56:59.662Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-04T12:56:59.662Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-04T12:56:59.664Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T12:58:10.207Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T12:58:10.209Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T12:58:10.210Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-04T12:58:10.210Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-04T12:58:10.212Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T12:58:11.758Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T12:58:11.759Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T12:58:11.759Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-04T12:58:11.760Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-04T12:58:11.761Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T12:58:18.373Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T12:58:18.375Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T12:58:18.375Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-04T12:58:18.375Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-04T12:58:18.377Z"}
+{"code":"ENOTFOUND","errno":-3008,"hostname":"redis","level":"error","message":"Could not connect to Redis getaddrinfo ENOTFOUND redis","service":"api-gateway","stack":"Error: getaddrinfo ENOTFOUND redis\n    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)","syscall":"getaddrinfo","timestamp":"2026-01-04T12:58:18.394Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T13:02:30.633Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T13:02:30.637Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T13:02:30.638Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-04T13:02:30.639Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-04T13:02:30.642Z"}
+{"level":"info","message":"[ac3edb2c-8f05-46ed-855c-608d421752fe] GET /health","service":"api-gateway","timestamp":"2026-01-04T13:03:38.389Z"}
+{"level":"info","message":"[b37230b4-43b9-42d0-a332-d5d8d1703e37] GET /v1/editor/health","service":"api-gateway","timestamp":"2026-01-04T13:03:41.550Z"}
+{"level":"info","message":"[b37230b4-43b9-42d0-a332-d5d8d1703e37] Proxying GET /health to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T13:03:41.554Z"}
+{"level":"info","message":"[b37230b4-43b9-42d0-a332-d5d8d1703e37] Collab Editor Service responded with 200 for /health","service":"api-gateway","timestamp":"2026-01-04T13:03:41.675Z"}
+{"level":"error","message":"SyntaxError: Unexpected non-whitespace character after JSON at position 44\n    at JSON.parse (<anonymous>)\n    at parse (/app/node_modules/body-parser/lib/types/json.js:77:19)\n    at /app/node_modules/body-parser/lib/read.js:123:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)\n    at invokeCallback (/app/node_modules/raw-body/index.js:238:16)\n    at done (/app/node_modules/raw-body/index.js:227:7)\n    at IncomingMessage.onEnd (/app/node_modules/raw-body/index.js:287:7)\n    at IncomingMessage.emit (node:events:524:28)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)","service":"api-gateway","timestamp":"2026-01-04T13:04:47.787Z"}
+{"level":"info","message":"[2c04c36d-e7f0-4e86-ab23-c65eb0ecde2a] POST /v1/editor/rooms","service":"api-gateway","timestamp":"2026-01-04T13:05:08.345Z"}
+{"level":"info","message":"[2c04c36d-e7f0-4e86-ab23-c65eb0ecde2a] Body: {\"name\":\"Test Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-04T13:05:08.346Z"}
+{"level":"info","message":"[2c04c36d-e7f0-4e86-ab23-c65eb0ecde2a] Proxying POST /rooms to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T13:05:08.348Z"}
+{"level":"info","message":"[2c04c36d-e7f0-4e86-ab23-c65eb0ecde2a] Collab Editor Service responded with 200 for /rooms","service":"api-gateway","timestamp":"2026-01-04T13:05:08.374Z"}
+{"level":"info","message":"[78ff9e11-48c4-4260-9498-3b36baeb53f5] POST /v1/editor/rooms","service":"api-gateway","timestamp":"2026-01-04T13:07:06.696Z"}
+{"level":"info","message":"[78ff9e11-48c4-4260-9498-3b36baeb53f5] Body: {\"name\":\"Test Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-04T13:07:06.697Z"}
+{"level":"info","message":"[78ff9e11-48c4-4260-9498-3b36baeb53f5] Proxying POST /rooms to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T13:07:06.699Z"}
+{"level":"info","message":"[78ff9e11-48c4-4260-9498-3b36baeb53f5] Collab Editor Service responded with 200 for /rooms","service":"api-gateway","timestamp":"2026-01-04T13:07:06.741Z"}
+{"level":"info","message":"[b370f90a-83dd-4b99-ae5c-39e909b1c186] GET /v1/editor/44650cc7-a3fa-4471-a6c5-4ad9acae2cd9","service":"api-gateway","timestamp":"2026-01-04T13:07:27.971Z"}
+{"level":"info","message":"[b370f90a-83dd-4b99-ae5c-39e909b1c186] Body: {\"name\":\"Test Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-04T13:07:27.974Z"}
+{"level":"info","message":"[b370f90a-83dd-4b99-ae5c-39e909b1c186] Proxying GET /44650cc7-a3fa-4471-a6c5-4ad9acae2cd9 to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T13:07:27.975Z"}
+{"level":"info","message":"[b370f90a-83dd-4b99-ae5c-39e909b1c186] Collab Editor Service responded with 404 for /44650cc7-a3fa-4471-a6c5-4ad9acae2cd9","service":"api-gateway","timestamp":"2026-01-04T13:07:27.993Z"}
+{"level":"info","message":"[ec1d6eca-8127-4b09-a56e-9b6b533c62ca] GET /v1/editor/44650cc7-a3fa-4471-a6c5-4ad9acae2cd9","service":"api-gateway","timestamp":"2026-01-04T13:07:30.145Z"}
+{"level":"info","message":"[ec1d6eca-8127-4b09-a56e-9b6b533c62ca] Body: {\"name\":\"Test Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-04T13:07:30.146Z"}
+{"level":"info","message":"[ec1d6eca-8127-4b09-a56e-9b6b533c62ca] Proxying GET /44650cc7-a3fa-4471-a6c5-4ad9acae2cd9 to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T13:07:30.146Z"}
+{"level":"info","message":"[ec1d6eca-8127-4b09-a56e-9b6b533c62ca] Collab Editor Service responded with 404 for /44650cc7-a3fa-4471-a6c5-4ad9acae2cd9","service":"api-gateway","timestamp":"2026-01-04T13:07:30.159Z"}
+{"level":"info","message":"[02c17f6c-ee0e-4d1f-bdb8-ef2df66b230d] GET /v1/editor/44650cc7-a3fa-4471-a6c5-4ad9acae2cd9","service":"api-gateway","timestamp":"2026-01-04T13:07:31.125Z"}
+{"level":"info","message":"[02c17f6c-ee0e-4d1f-bdb8-ef2df66b230d] Body: {\"name\":\"Test Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-04T13:07:31.125Z"}
+{"level":"info","message":"[02c17f6c-ee0e-4d1f-bdb8-ef2df66b230d] Proxying GET /44650cc7-a3fa-4471-a6c5-4ad9acae2cd9 to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T13:07:31.126Z"}
+{"level":"info","message":"[02c17f6c-ee0e-4d1f-bdb8-ef2df66b230d] Collab Editor Service responded with 404 for /44650cc7-a3fa-4471-a6c5-4ad9acae2cd9","service":"api-gateway","timestamp":"2026-01-04T13:07:31.130Z"}
+{"level":"info","message":"[b31d6548-9460-41b9-8de4-d4b6979766d1] GET /v1/editor/rooms/44650cc7-a3fa-4471-a6c5-4ad9acae2cd9","service":"api-gateway","timestamp":"2026-01-04T13:07:43.077Z"}
+{"level":"info","message":"[b31d6548-9460-41b9-8de4-d4b6979766d1] Body: {\"name\":\"Test Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-04T13:07:43.078Z"}
+{"level":"info","message":"[b31d6548-9460-41b9-8de4-d4b6979766d1] Proxying GET /rooms/44650cc7-a3fa-4471-a6c5-4ad9acae2cd9 to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T13:07:43.078Z"}
+{"level":"info","message":"[b31d6548-9460-41b9-8de4-d4b6979766d1] Collab Editor Service responded with 200 for /rooms/44650cc7-a3fa-4471-a6c5-4ad9acae2cd9","service":"api-gateway","timestamp":"2026-01-04T13:07:43.117Z"}
+{"level":"info","message":"[8cf3cf88-c93e-46b3-999b-a8fc92a2632f] GET /v1/editor/ws","service":"api-gateway","timestamp":"2026-01-04T13:17:17.923Z"}
+{"level":"info","message":"[8cf3cf88-c93e-46b3-999b-a8fc92a2632f] Proxying GET /ws to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T13:17:17.926Z"}
+{"level":"info","message":"[8cf3cf88-c93e-46b3-999b-a8fc92a2632f] Collab Editor Service responded with 404 for /ws","service":"api-gateway","timestamp":"2026-01-04T13:17:17.945Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T13:30:11.756Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T13:30:11.759Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T13:30:11.760Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-04T13:30:11.761Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-04T13:30:11.766Z"}
+{"level":"info","message":"[a5a7dc8c-29d9-4fbd-941d-2af555e72e1a] POST /v1/editor/rooms","service":"api-gateway","timestamp":"2026-01-04T13:48:28.290Z"}
+{"level":"info","message":"[a5a7dc8c-29d9-4fbd-941d-2af555e72e1a] Body: {\"name\":\"simon's Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-04T13:48:28.291Z"}
+{"level":"info","message":"[a5a7dc8c-29d9-4fbd-941d-2af555e72e1a] Proxying POST /rooms to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T13:48:28.293Z"}
+{"level":"info","message":"[a5a7dc8c-29d9-4fbd-941d-2af555e72e1a] Collab Editor Service responded with 200 for /rooms","service":"api-gateway","timestamp":"2026-01-04T13:48:28.380Z"}
+{"level":"info","message":"[8821b6c2-3e2e-45bd-bdee-5cd92ae3025b] POST /v1/editor/rooms","service":"api-gateway","timestamp":"2026-01-04T13:57:38.450Z"}
+{"level":"info","message":"[8821b6c2-3e2e-45bd-bdee-5cd92ae3025b] Body: {\"name\":\"simon's Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-04T13:57:38.452Z"}
+{"level":"info","message":"[8821b6c2-3e2e-45bd-bdee-5cd92ae3025b] Proxying POST /rooms to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T13:57:38.454Z"}
+{"level":"info","message":"[8821b6c2-3e2e-45bd-bdee-5cd92ae3025b] Collab Editor Service responded with 200 for /rooms","service":"api-gateway","timestamp":"2026-01-04T13:57:38.577Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:00:36.400Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:00:36.402Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:00:36.402Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-04T14:00:36.402Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-04T14:00:36.404Z"}
+{"level":"info","message":"[22fb7fc7-981d-493c-b69a-4e292044b0f1] POST /v1/editor/rooms","service":"api-gateway","timestamp":"2026-01-04T14:00:40.925Z"}
+{"level":"info","message":"[22fb7fc7-981d-493c-b69a-4e292044b0f1] Body: {\"name\":\"simon's Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-04T14:00:40.926Z"}
+{"level":"info","message":"[22fb7fc7-981d-493c-b69a-4e292044b0f1] Proxying POST /rooms to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T14:00:40.929Z"}
+{"level":"error","message":"Proxy error for Collab Editor Service: getaddrinfo ENOTFOUND collab-editor","service":"api-gateway","timestamp":"2026-01-04T14:00:40.955Z"}
+{"level":"info","message":"[7abf5e0c-b77d-4b60-95b0-6207244d81c7] POST /v1/editor/rooms","service":"api-gateway","timestamp":"2026-01-04T14:00:49.442Z"}
+{"level":"info","message":"[7abf5e0c-b77d-4b60-95b0-6207244d81c7] Body: {\"name\":\"simon's Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-04T14:00:49.444Z"}
+{"level":"info","message":"[7abf5e0c-b77d-4b60-95b0-6207244d81c7] Proxying POST /rooms to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T14:00:49.446Z"}
+{"level":"error","message":"Proxy error for Collab Editor Service: getaddrinfo ENOTFOUND collab-editor","service":"api-gateway","timestamp":"2026-01-04T14:00:49.461Z"}
+{"level":"info","message":"[be31161e-6913-4de0-b1ad-b8d031516702] POST /v1/editor/rooms","service":"api-gateway","timestamp":"2026-01-04T14:01:02.469Z"}
+{"level":"info","message":"[be31161e-6913-4de0-b1ad-b8d031516702] Body: {\"name\":\"simon's Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-04T14:01:02.472Z"}
+{"level":"info","message":"[be31161e-6913-4de0-b1ad-b8d031516702] Proxying POST /rooms to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T14:01:02.475Z"}
+{"level":"error","message":"Proxy error for Collab Editor Service: getaddrinfo ENOTFOUND collab-editor","service":"api-gateway","timestamp":"2026-01-04T14:01:02.492Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:01:57.321Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:01:57.323Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:01:57.324Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-04T14:01:57.325Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-04T14:01:57.327Z"}
+{"level":"info","message":"[61df1a0c-e02f-45c3-b482-e76b45eecdc0] POST /v1/editor/rooms","service":"api-gateway","timestamp":"2026-01-04T14:02:10.488Z"}
+{"level":"info","message":"[61df1a0c-e02f-45c3-b482-e76b45eecdc0] Body: {\"name\":\"simon's Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-04T14:02:10.489Z"}
+{"level":"info","message":"[61df1a0c-e02f-45c3-b482-e76b45eecdc0] Proxying POST /rooms to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T14:02:10.492Z"}
+{"level":"info","message":"[61df1a0c-e02f-45c3-b482-e76b45eecdc0] Collab Editor Service responded with 200 for /rooms","service":"api-gateway","timestamp":"2026-01-04T14:02:10.600Z"}
+{"level":"info","message":"[0bb79da1-7eb0-4cf5-8ecb-a6e52b8b63dc] POST /v1/editor/rooms","service":"api-gateway","timestamp":"2026-01-04T14:05:54.182Z"}
+{"level":"info","message":"[0bb79da1-7eb0-4cf5-8ecb-a6e52b8b63dc] Body: {\"name\":\"simon's Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-04T14:05:54.185Z"}
+{"level":"info","message":"[0bb79da1-7eb0-4cf5-8ecb-a6e52b8b63dc] Proxying POST /rooms to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T14:05:54.187Z"}
+{"level":"error","message":"Proxy error for Collab Editor Service: connect ECONNREFUSED 172.18.0.5:4000","service":"api-gateway","timestamp":"2026-01-04T14:05:54.199Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:06:26.938Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:06:26.941Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:06:26.942Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-04T14:06:26.942Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-04T14:06:26.944Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:07:34.089Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:07:34.096Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:07:34.097Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-04T14:07:34.098Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-04T14:07:34.102Z"}
+{"level":"info","message":"[4ebef819-b93c-42ff-a8e3-4a691db13435] POST /v1/editor/rooms","service":"api-gateway","timestamp":"2026-01-04T14:09:07.023Z"}
+{"level":"info","message":"[4ebef819-b93c-42ff-a8e3-4a691db13435] Body: {\"name\":\"simon's Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-04T14:09:07.024Z"}
+{"level":"info","message":"[4ebef819-b93c-42ff-a8e3-4a691db13435] Proxying POST /rooms to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T14:09:07.026Z"}
+{"level":"info","message":"[4ebef819-b93c-42ff-a8e3-4a691db13435] Collab Editor Service responded with 200 for /rooms","service":"api-gateway","timestamp":"2026-01-04T14:09:07.147Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:13:08.303Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:13:08.305Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:13:08.305Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-04T14:13:08.305Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-04T14:13:08.308Z"}
+{"level":"info","message":"[95076c04-cd77-4677-8f3d-0b450954cfb4] POST /v1/editor/rooms","service":"api-gateway","timestamp":"2026-01-04T14:13:22.005Z"}
+{"level":"info","message":"[95076c04-cd77-4677-8f3d-0b450954cfb4] Body: {\"name\":\"simon's Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-04T14:13:22.006Z"}
+{"level":"info","message":"[95076c04-cd77-4677-8f3d-0b450954cfb4] Proxying POST /rooms to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T14:13:22.013Z"}
+{"level":"info","message":"[95076c04-cd77-4677-8f3d-0b450954cfb4] Collab Editor Service responded with 200 for /rooms","service":"api-gateway","timestamp":"2026-01-04T14:13:22.206Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:18:52.256Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:18:52.258Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:18:52.258Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-04T14:18:52.259Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-04T14:18:52.262Z"}
+{"level":"info","message":"[62d64518-0482-4e53-a3e9-a5a17db08811] POST /v1/editor/rooms","service":"api-gateway","timestamp":"2026-01-04T14:19:06.537Z"}
+{"level":"info","message":"[62d64518-0482-4e53-a3e9-a5a17db08811] Body: {\"name\":\"simon's Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-04T14:19:06.538Z"}
+{"level":"info","message":"[62d64518-0482-4e53-a3e9-a5a17db08811] Proxying POST /rooms to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-04T14:19:06.545Z"}
+{"level":"info","message":"[62d64518-0482-4e53-a3e9-a5a17db08811] Collab Editor Service responded with 200 for /rooms","service":"api-gateway","timestamp":"2026-01-04T14:19:06.665Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:25:17.213Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:25:17.216Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:25:17.218Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-04T14:25:17.218Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-04T14:25:17.225Z"}

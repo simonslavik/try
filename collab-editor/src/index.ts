@@ -6,6 +6,10 @@ import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { PrismaClient } from '@prisma/client';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execPromise = promisify(exec);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -120,6 +124,10 @@ wss.on('connection', (ws: WebSocket) => {
           handleCursorMove(message);
           break;
         
+        case 'run-code':
+          handleRunCode(message);
+          break;
+        
         default:
           console.log('Unknown message type:', message.type);
       }
@@ -218,8 +226,26 @@ wss.on('connection', (ws: WebSocket) => {
         code: message.code,
         updatedAt: new Date()
       }
-    }).catch((error) => {
+    })
+    .then(() => {
+      // Send acknowledgment to sender
+      if (currentClient && currentClient.ws.readyState === WebSocket.OPEN) {
+        currentClient.ws.send(JSON.stringify({
+          type: 'code-saved',
+          timestamp: new Date().toISOString(),
+          codeLength: message.code.length
+        }));
+      }
+    })
+    .catch((error) => {
       console.error('Error updating room code:', error);
+      // Send error to sender
+      if (currentClient && currentClient.ws.readyState === WebSocket.OPEN) {
+        currentClient.ws.send(JSON.stringify({
+          type: 'error',
+          message: 'Failed to save code changes'
+        }));
+      }
     });
 
     // Broadcast to all other users in the room
@@ -269,7 +295,131 @@ wss.on('connection', (ws: WebSocket) => {
       console.log(`🧹 Active room ${client.roomId} cleaned up (no connected users)`);
     }
   }
+
+  async function handleRunCode(message: any) {
+    if (!currentClient) return;
+
+    const activeRoom = activeRooms.get(currentClient.roomId);
+    if (!activeRoom) return;
+
+    const { code, language } = message;
+    
+    // Validate code is not empty
+    if (!code || code.trim() === '') {
+      broadcastToRoom(activeRoom, {
+        type: 'code-result',
+        output: '',
+        error: 'No code to execute. Please write some code first.',
+        executionTime: 0,
+        language: language,
+        executedBy: currentClient.username,
+        userId: currentClient.id
+      });
+      return;
+    }
+    
+    console.log(`🚀 ${currentClient.username} running ${language} code in room ${currentClient.roomId}`);
+
+    try {
+      const result = await executeCode(code, language || 'javascript');
+      
+      // Broadcast execution result to all users in the room
+      broadcastToRoom(activeRoom, {
+        type: 'code-result',
+        output: result.output,
+        error: result.error,
+        executionTime: result.executionTime,
+        language: language,
+        executedBy: currentClient.username,
+        userId: currentClient.id
+      });
+    } catch (error: any) {
+      // Send error to all users
+      broadcastToRoom(activeRoom, {
+        type: 'code-result',
+        output: '',
+        error: error.message,
+        executionTime: 0,
+        language: language,
+        executedBy: currentClient.username,
+        userId: currentClient.id
+      });
+    }
+  }
 });
+
+// Execute code safely with timeout
+async function executeCode(code: string, language: string): Promise<{ output: string; error: string | null; executionTime: number }> {
+  const startTime = Date.now();
+  const timeout = 5000; // 5 second timeout
+
+  try {
+    let command: string;
+    let output = '';
+    let error = null;
+
+    switch (language.toLowerCase()) {
+      case 'javascript':
+      case 'js':
+        // Use Node.js to execute JavaScript
+        command = `node -e ${JSON.stringify(code)}`;
+        break;
+      
+      case 'python':
+      case 'python3':
+        command = `python3 -c ${JSON.stringify(code)}`;
+        break;
+      
+      case 'typescript':
+      case 'ts':
+        command = `ts-node -e ${JSON.stringify(code)}`;
+        break;
+      
+      default:
+        throw new Error(`Unsupported language: ${language}`);
+    }
+
+    // Execute with timeout
+    const { stdout, stderr } = await Promise.race([
+      execPromise(command, {
+        timeout: timeout,
+        maxBuffer: 1024 * 1024, // 1MB max output
+      }),
+      new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Execution timeout (5s)')), timeout)
+      )
+    ]);
+
+    output = stdout || '';
+    error = stderr || null;
+
+    const executionTime = Date.now() - startTime;
+
+    // If there's stderr content, treat it as an error
+    if (stderr && stderr.trim()) {
+      return {
+        output: stdout.trim() || '',
+        error: stderr.trim(),
+        executionTime
+      };
+    }
+
+    return {
+      output: output.trim(),
+      error: null,
+      executionTime
+    };
+
+  } catch (err: any) {
+    const executionTime = Date.now() - startTime;
+    
+    return {
+      output: '',
+      error: err.message || 'Execution failed',
+      executionTime
+    };
+  }
+}
 
 // Broadcast message to all clients in an active room except sender
 function broadcastToRoom(activeRoom: ActiveRoom, message: any, excludeClientId?: string) {

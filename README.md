@@ -56,7 +56,9 @@ You should see:
 - `postgres-db` (PostgreSQL)
 - `redis-cache` (Redis)
 - `user-service` (Port 3001)
+- `collab-editor` (Port 4000)
 - `api-gateway` (Port 3000)
+- `react-project` (Port 5173 - if running)
 
 ### Test the API
 
@@ -81,41 +83,91 @@ curl -X POST http://localhost:3000/v1/auth/login \
     "email": "test@example.com",
     "password": "SecurePass123!"
   }'
+
+# Create a collaborative editor room
+curl -X POST http://localhost:3000/v1/editor/rooms \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My Coding Room",
+    "language": "javascript"
+  }'
+
+# Get room info (replace {roomId} with actual ID)
+curl http://localhost:3000/v1/editor/rooms/{roomId}
 ```
+
+### Access the Frontend
+
+1. **Navigate to the react-project directory**
+
+```bash
+cd react-project
+npm install
+npm run dev
+```
+
+2. **Open browser** at `http://localhost:5173`
+
+3. **Register/Login** and navigate to the Collaborative Editor from the home page
+
+4. **Share the Room ID** with teammates to code together!
 
 ## 🏗️ Architecture
 
 ```
 ┌─────────────┐
 │   Client    │
+│  (React)    │
 └──────┬──────┘
        │
        ▼
 ┌─────────────────┐      ┌──────────────┐
 │   API Gateway   │◄────►│    Redis     │
 │   (Port 3000)   │      │  (Cache)     │
-└────────┬────────┘      └──────────────┘
-         │
-         ▼
-┌─────────────────┐      ┌──────────────┐
-│  User Service   │◄────►│  PostgreSQL  │
-│   (Port 3001)   │      │  (Database)  │
-└─────────────────┘      └──────────────┘
+└────┬───────┬────┘      └──────────────┘
+     │       │
+     │       └──────────────┐
+     ▼                      ▼
+┌─────────────────┐   ┌─────────────────┐      ┌──────────────┐
+│  User Service   │   │ Collab Editor   │◄────►│  PostgreSQL  │
+│   (Port 3001)   │   │   (Port 4000)   │      │  (Database)  │
+└─────────────────┘   └─────────────────┘      └──────────────┘
+         │                     │
+         └─────────┬───────────┘
+                   ▼
+              PostgreSQL
 ```
 
 ## 📦 Services
 
-### API Gateway (Port 3000)
-
-- Routes requests to microservices
-- JWT authentication
-- Rate limiting (Redis)
-- Request logging
+- Proxies to User Service & Collab Editor
 
 ### User Service (Port 3001)
 
 - User registration & authentication
 - JWT token management
+- Profile management
+- Prisma ORM + PostgreSQL
+
+### Collaborative Editor (Port 4000)
+
+- Real-time collaborative code editing
+- WebSocket-based communication
+- Room management
+- Multi-user presence tracking
+- Code persistence with PostgreSQL
+- See [collab-editor/README.md](./collab-editor/README.md) for details
+
+### Frontend (React + Vite)
+
+- User authentication UI
+- Collaborative editor interface
+- Protected routes
+- Real-time updates
+
+### Infrastructure
+
+- **PostgreSQL 15**: User data & collaborative sessions
 - Profile management
 - Prisma ORM + PostgreSQL
 

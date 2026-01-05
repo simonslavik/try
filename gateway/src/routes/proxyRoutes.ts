@@ -12,9 +12,13 @@ interface ProxyConfig {
   timeout: number;
 }
 
-const createProxyConfig = (serviceName: string): ProxyConfig => ({
+const createProxyConfig = (serviceName: string, pathTransform?: (path: string) => string): ProxyConfig => ({
   proxyReqPathResolver: (req: Request) => {
-    // Transform /v1/users -> /api/users
+    // Use custom path transform if provided, otherwise default transformation
+    if (pathTransform) {
+      return pathTransform(req.originalUrl);
+    }
+    // Default: Transform /v1/users -> /api/users
     return req.originalUrl.replace(/^\/v1/, "/api");
   },
   
@@ -60,9 +64,16 @@ export const setupProxyRoutes = (app: Express): void => {
     { envVar: 'USER_SERVICE_URL', route: '/v1/profile', name: 'Profile Service', requireAuth: true },
     { envVar: 'USER_SERVICE_URL', route: '/v1/users', name: 'User Service', requireAuth: true },
     { envVar: 'USER_SERVICE_URL', route: '/v1/auth', name: 'Auth Service', requireAuth: false },
+    { 
+      envVar: 'COLLAB_EDITOR_URL', 
+      route: '/v1/editor', 
+      name: 'Collab Editor Service', 
+      requireAuth: false,
+      pathTransform: (path: string) => path.replace(/^\/v1\/editor/, '') // /v1/editor/health -> /health
+    },
   ];
   
-  services.forEach(({ envVar, route, name, requireAuth }) => {
+  services.forEach(({ envVar, route, name, requireAuth, pathTransform }: any) => {
     const serviceUrl = process.env[envVar];
     
     if (!serviceUrl) {
@@ -72,10 +83,10 @@ export const setupProxyRoutes = (app: Express): void => {
     
     // Apply auth middleware only to protected routes
     if (requireAuth) {
-      app.use(route, authHandler, proxy(serviceUrl, createProxyConfig(name)));
+      app.use(route, authHandler, proxy(serviceUrl, createProxyConfig(name, pathTransform)));
       logger.info(`✓ Proxy configured (protected): ${route} → ${serviceUrl}`);
     } else {
-      app.use(route, proxy(serviceUrl, createProxyConfig(name)));
+      app.use(route, proxy(serviceUrl, createProxyConfig(name, pathTransform)));
       logger.info(`✓ Proxy configured (public): ${route} → ${serviceUrl}`);
     }
   });

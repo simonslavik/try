@@ -65,15 +65,38 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       REDIS_URL: redis://redis:6379
       USER_SERVICE_URL: http://user-service:3001
+      COLLAB_EDITOR_URL: http://collab-editor:4000
       NODE_ENV: development
     depends_on:
       - redis
       - user-service
+      - collab-editor
     restart: unless-stopped
     networks:
       - microservices-network
     volumes:
       - ./gateway:/app
+      - /app/node_modules
+
+  collab-editor:
+    build:
+      context: ./collab-editor
+      dockerfile: Dockerfile
+    container_name: collab-editor
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/collab_editor
+      NODE_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - microservices-network
+    volumes:
+      - ./collab-editor:/app
       - /app/node_modules
 
 volumes:

@@ -90,22 +90,3 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
  * Usage: 
  * router.delete('/users/:id', authMiddleware, requireRole(['ADMIN']), deleteUser)
  */
-export const requireRole = (allowedRoles: string[]) => {
-    return (req: Request, res: Response, next: NextFunction) => {
-        if (!req.user) {
-            return res.status(401).json({ 
-                message: 'Authentication required' 
-            });
-        }
-
-        if (!allowedRoles.includes(req.user.role)) {
-            return res.status(403).json({ 
-                message: 'Insufficient permissions',
-                required: allowedRoles,
-                current: req.user.role
-            });
-        }
-
-        next();
-    };
-};

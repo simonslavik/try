@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { registerUser, loginUser, refreshAccessToken, logoutUser, logoutAllDevices } from '../controllers/userController.js';
 import { getMyProfile, updateMyProfile, getUserById, listUsers } from '../controllers/profileController.js';
-import { authMiddleware, requireRole } from '../middleware/authMiddleware.js';
+import { authMiddleware } from '../middleware/authMiddleware.js';
 
 const userRoutes = Router();
 
@@ -19,8 +19,8 @@ userRoutes.post('/auth/logout-all', authMiddleware, logoutAllDevices);
 userRoutes.get('/profile', authMiddleware, getMyProfile);
 userRoutes.put('/profile', authMiddleware, updateMyProfile);
 
-// Admin routes (requires authentication + ADMIN role)
-userRoutes.get('/users', authMiddleware, requireRole(['ADMIN']), listUsers);
-userRoutes.get('/users/:id', authMiddleware, requireRole(['ADMIN']), getUserById);
+// Admin routes (requires authentication)
+userRoutes.get('/users', authMiddleware, listUsers);
+userRoutes.get('/users/:id', authMiddleware, getUserById);
 
 export default userRoutes;
