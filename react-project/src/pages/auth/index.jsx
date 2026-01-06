@@ -29,6 +29,11 @@ function AuthPage() {
               Login
           </button>
         </div>
+        <div className='flex items-center justify-center mt-4 flex-col'>
+          <div>Without an account, you can only access the collaborative editor.</div>
+          <button className='cursor-pointer border rounded hover:text-gray-500 font-semibold p-1 m-2' onClick={() => navigate('/editor')}>Editor</button>
+          
+        </div>
         
     </div>
   );

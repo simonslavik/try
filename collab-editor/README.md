@@ -9,6 +9,66 @@ A WebSocket-based collaborative code editor where multiple users can edit the sa
 - **User Presence**: See who's online and editing
 - **Cursor Tracking**: Know where other users are typing (optional)
 - **WebSocket Powered**: Low-latency bi-directional communication
+- **Authentication**: Secure room creation with JWT authentication
+- **Persistent Rooms**: Save and return to your created rooms
+
+## 📡 API Endpoints
+
+### Authentication Required
+
+#### Create New Room
+
+```http
+POST /rooms
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{
+  "name": "My Project Room",
+  "language": "javascript"
+}
+```
+
+Response:
+
+```json
+{
+  "roomId": "uuid-here",
+  "message": "Room created successfully"
+}
+```
+
+#### Get My Rooms
+
+```http
+GET /my-rooms
+Authorization: Bearer <access_token>
+```
+
+Returns all rooms created by the authenticated user.
+
+### Public Endpoints
+
+#### Get All Rooms
+
+```http
+GET /rooms
+# Optional: GET /rooms?mine=true (requires auth to filter by user)
+```
+
+#### Get Room Info
+
+```http
+GET /rooms/:roomId
+```
+
+Returns room details, code, creator ID, and currently connected users.
+
+#### Health Check
+
+```http
+GET /health
+```
 
 ## 🎯 How It Works
 

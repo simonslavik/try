@@ -17,6 +17,7 @@ datasource db {
 model Room {
   id           String   @id @default(uuid())
   name         String? // Optional room name
+  creatorId    String // User ID from user-service (no FK due to separate DBs)
   code         String   @default("// Start coding together!\n\n") @db.Text
   language     String   @default("javascript") // Code language
   createdAt    DateTime @default(now())
@@ -26,6 +27,7 @@ model Room {
   // Relations
   snapshots Snapshot[]
 
+  @@index([creatorId]) // Index for filtering rooms by creator
   @@index([lastActiveAt])
   @@map("rooms")
 }

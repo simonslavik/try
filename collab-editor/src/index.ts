@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import { PrismaClient } from '@prisma/client';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { authMiddleware, optionalAuthMiddleware } from './middleware/authMiddleware.js';
 
 const execPromise = promisify(exec);
 
@@ -56,49 +57,121 @@ app.get('/health', async (req, res) => {
   });
 });
 
-// Create new room
-app.post('/rooms', async (req, res) => {
-  const { name, language } = req.body;
-  
-  const room = await prisma.room.create({
-    data: {
-      name: name || null,
-      language: language || 'javascript'
-    }
-  });
-  
-  console.log(`✨ Room created in database: ${room.id}`);
-  res.json({ roomId: room.id, message: 'Room created successfully' });
+// Create new room (requires authentication)
+app.post('/rooms', authMiddleware, async (req, res) => {
+  try {
+    const { name, language } = req.body;
+    const userId = req.user!.userId; // User is guaranteed to exist due to authMiddleware
+    
+    const room = await prisma.room.create({
+      data: {
+        name: name || null,
+        language: language || 'javascript',
+        creatorId: userId
+      }
+    });
+    
+    console.log(`✨ Room created by user ${userId}: ${room.id}`);
+    res.json({ roomId: room.id, message: 'Room created successfully' });
+  } catch (error) {
+    console.error('Error creating room:', error);
+    res.status(500).json({ error: 'Failed to create room' });
+  }
 });
 
 // Get room info
 app.get('/rooms/:roomId', async (req, res) => {
-  const room = await prisma.room.findUnique({
-    where: { id: req.params.roomId },
-    include: { snapshots: { orderBy: { createdAt: 'desc' }, take: 10 } }
-  });
-  
-  if (!room) {
-    return res.status(404).json({ error: 'Room not found' });
+  try {
+    const room = await prisma.room.findUnique({
+      where: { id: req.params.roomId },
+      include: { snapshots: { orderBy: { createdAt: 'desc' }, take: 10 } }
+    });
+    
+    if (!room) {
+      return res.status(404).json({ error: 'Room not found' });
+    }
+    
+    const activeRoom = activeRooms.get(req.params.roomId);
+    
+    res.json({
+      roomId: room.id,
+      name: room.name,
+      code: room.code,
+      language: room.language,
+      creatorId: room.creatorId,
+      createdAt: room.createdAt,
+      updatedAt: room.updatedAt,
+      lastActiveAt: room.lastActiveAt,
+      connectedUsers: activeRoom 
+        ? Array.from(activeRoom.clients.values()).map(c => ({
+            id: c.id,
+            username: c.username,
+            cursor: c.cursor
+          }))
+        : []
+    });
+  } catch (error) {
+    console.error('Error fetching room:', error);
+    res.status(500).json({ error: 'Failed to fetch room' });
   }
-  
-  const activeRoom = activeRooms.get(req.params.roomId);
-  
-  res.json({
-    roomId: room.id,
-    name: room.name,
-    code: room.code,
-    language: room.language,
-    createdAt: room.createdAt,
-    updatedAt: room.updatedAt,
-    connectedUsers: activeRoom 
-      ? Array.from(activeRoom.clients.values()).map(c => ({
-          id: c.id,
-          username: c.username,
-          cursor: c.cursor
-        }))
-      : []
-  });
+});
+
+// Get all rooms (with optional filtering)
+app.get('/rooms', optionalAuthMiddleware, async (req, res) => {
+  try {
+    const { mine } = req.query;
+    
+    // If 'mine' query param is set and user is authenticated, return only user's rooms
+    const where = mine === 'true' && req.user 
+      ? { creatorId: req.user.userId }
+      : {};
+    
+    const rooms = await prisma.room.findMany({
+      where,
+      orderBy: { updatedAt: 'desc' },
+      take: 50 // Limit to 50 most recent rooms
+    });
+    
+    // Add active user count to each room
+    const roomsWithUserCount = rooms.map(room => {
+      const activeRoom = activeRooms.get(room.id);
+      return {
+        ...room,
+        activeUsers: activeRoom ? activeRoom.clients.size : 0
+      };
+    });
+    
+    res.json({ rooms: roomsWithUserCount });
+  } catch (error) {
+    console.error('Error fetching rooms:', error);
+    res.status(500).json({ error: 'Failed to fetch rooms' });
+  }
+});
+
+// Get my rooms (requires authentication)
+app.get('/my-rooms', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user!.userId;
+    
+    const rooms = await prisma.room.findMany({
+      where: { creatorId: userId },
+      orderBy: { updatedAt: 'desc' }
+    });
+    
+    // Add active user count to each room
+    const roomsWithUserCount = rooms.map(room => {
+      const activeRoom = activeRooms.get(room.id);
+      return {
+        ...room,
+        activeUsers: activeRoom ? activeRoom.clients.size : 0
+      };
+    });
+    
+    res.json({ rooms: roomsWithUserCount });
+  } catch (error) {
+    console.error('Error fetching user rooms:', error);
+    res.status(500).json({ error: 'Failed to fetch your rooms' });
+  }
 });
 
 // WebSocket connection handler
