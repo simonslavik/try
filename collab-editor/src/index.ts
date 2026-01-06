@@ -128,6 +128,10 @@ wss.on('connection', (ws: WebSocket) => {
           handleRunCode(message);
           break;
         
+        case 'chat-message':
+          handleChatMessage(message);
+          break;
+        
         default:
           console.log('Unknown message type:', message.type);
       }
@@ -272,6 +276,30 @@ wss.on('connection', (ws: WebSocket) => {
       username: currentClient.username,
       cursor: message.cursor
     }, currentClient.id);
+  }
+
+  function handleChatMessage(message: any) {
+    if (!currentClient) return;
+
+    const activeRoom = activeRooms.get(currentClient.roomId);
+    if (!activeRoom) return;
+
+    // Broadcast chat message to all users in the room (including sender)
+    const chatData = {
+      type: 'chat-message',
+      username: currentClient.username,
+      message: message.message,
+      timestamp: Date.now()
+    };
+
+    // Send to everyone including sender
+    activeRoom.clients.forEach((client) => {
+      if (client.ws.readyState === WebSocket.OPEN) {
+        client.ws.send(JSON.stringify(chatData));
+      }
+    });
+
+    console.log(`💬 ${currentClient.username} in ${currentClient.roomId}: ${message.message}`);
   }
 
   function handleDisconnect(client: Client) {

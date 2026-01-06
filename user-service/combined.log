@@ -194,3 +194,6 @@
 {"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2026-01-04T14:25:18.251Z"}
 {"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2026-01-04T14:25:18.253Z"}
 {"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2026-01-04T14:25:18.253Z"}
+{"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2026-01-06T13:13:24.662Z"}
+{"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2026-01-06T13:13:24.665Z"}
+{"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2026-01-06T13:13:24.666Z"}

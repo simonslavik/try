@@ -757,3 +757,16 @@
 {"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-04T14:25:17.218Z"}
 {"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-04T14:25:17.218Z"}
 {"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-04T14:25:17.225Z"}
+{"level":"info","message":"[99c1d49d-3df9-448c-ade6-a1ed45b8c14c] POST /v1/editor/rooms","service":"api-gateway","timestamp":"2026-01-06T12:57:39.205Z"}
+{"level":"info","message":"[99c1d49d-3df9-448c-ade6-a1ed45b8c14c] Body: {\"name\":\"simon's Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-06T12:57:39.212Z"}
+{"level":"info","message":"[99c1d49d-3df9-448c-ade6-a1ed45b8c14c] Proxying POST /rooms to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-06T12:57:39.218Z"}
+{"level":"info","message":"[99c1d49d-3df9-448c-ade6-a1ed45b8c14c] Collab Editor Service responded with 200 for /rooms","service":"api-gateway","timestamp":"2026-01-06T12:57:39.586Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-06T13:13:20.411Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-06T13:13:20.415Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-06T13:13:20.415Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-06T13:13:20.416Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-06T13:13:20.421Z"}
+{"level":"info","message":"[beafb282-decf-4c0f-a040-1de2266d5f19] POST /v1/editor/rooms","service":"api-gateway","timestamp":"2026-01-06T13:13:33.267Z"}
+{"level":"info","message":"[beafb282-decf-4c0f-a040-1de2266d5f19] Body: {\"name\":\"simon's Room\",\"language\":\"javascript\"}","service":"api-gateway","timestamp":"2026-01-06T13:13:33.268Z"}
+{"level":"info","message":"[beafb282-decf-4c0f-a040-1de2266d5f19] Proxying POST /rooms to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-06T13:13:33.270Z"}
+{"level":"info","message":"[beafb282-decf-4c0f-a040-1de2266d5f19] Collab Editor Service responded with 200 for /rooms","service":"api-gateway","timestamp":"2026-01-06T13:13:33.375Z"}

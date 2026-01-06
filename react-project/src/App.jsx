@@ -4,7 +4,7 @@ import AuthPage from "./pages/auth";
 import Register from "./pages/register";
 import Login from "./pages/login";
 import Home from "./pages/home";
-import CollaborativeEditor from "./pages/editor";
+import CollaborativeEditor from "./pages/editor/enhanced";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {

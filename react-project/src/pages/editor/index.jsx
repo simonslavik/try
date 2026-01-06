@@ -1,4 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import Editor from '@monaco-editor/react';
+import { 
+  FiPlay, FiCopy, FiCheck, FiShare2, FiUsers, 
+  FiTerminal, FiCode, FiLogOut 
+} from 'react-icons/fi';
+import ChatSidebar from '../../components/ChatSidebar';
+import FileExplorer from '../../components/FileExplorer';
+import UserPresence from '../../components/UserPresence';
 
 const GATEWAY_URL = 'http://localhost:3000';
 const WS_URL = 'ws://localhost:4000';
@@ -13,9 +21,15 @@ export default function CollaborativeEditor() {
   const [language, setLanguage] = useState('javascript');
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [files, setFiles] = useState([{ id: '1', name: 'main.js', content: '', language: 'javascript' }]);
+  const [currentFile, setCurrentFile] = useState(null);
+  const [showChat, setShowChat] = useState(true);
+  const [showFiles, setShowFiles] = useState(true);
+  const [copied, setCopied] = useState(false);
   
   const wsRef = useRef(null);
-  const editorRef = useRef(null);
+  const monacoRef = useRef(null);
   const isRemoteUpdateRef = useRef(false);
 
   // Create a new room
