@@ -1,6 +1,9 @@
 import AuthContext from '../../context';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import HomePageHeader from '../../components/HomePageHeader';
+import axios from 'axios';
 
 
     
@@ -8,47 +11,128 @@ import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
     const { auth, logout } = useContext(AuthContext);
+    const [bookClubs, setBookClubs] = useState([]);
+    const [myBookClubs, setMyBookClubs] = useState([]);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const headers = auth?.token 
+            ? { Authorization: `Bearer ${auth.token}` }
+            : {};
+
+        // Fetch my bookclubs (only if authenticated)
+        if (auth?.user) {
+            fetch('http://localhost:3000/v1/editor/bookclubs?mine=true', { headers })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('My Bookclubs response:', data);
+                    setMyBookClubs(data.bookClubs || []);
+                })
+                .catch(error => console.error('Error fetching my book clubs:', error));
+        }
+        
+        // Always fetch all public bookclubs
+        fetch('http://localhost:3000/v1/editor/bookclubs', { headers })
+            .then(response => response.json())
+            .then(data => {
+                console.log('All Bookclubs response:', data);
+                setBookClubs(data.bookClubs || []);
+            })
+            .catch(error => console.error('Error fetching all book clubs:', error));
+    }, [auth]);
     
+    const createNewBookClub = () => {
+        if (!auth?.token) {
+            alert('Please login to create a book club');
+            return;
+        }
+        
+        console.log('Creating bookclub with token:', auth.token);
+        
+        // axios already has Authorization header set by auth context
+        axios.post('http://localhost:3000/v1/editor/bookclubs', {
+            name: 'New Book Club',
+            isPublic: true,
+        })
+        .then(response => {
+            console.log('Created Bookclub:', response.data);
+            // Refresh my book clubs list
+            setMyBookClubs(prev => [...prev, response.data.bookClub]);
+            setBookClubs(prev => [...prev, response.data.bookClub]);
+        })
+        .catch(error => {
+            alert('Failed to create book club. Please try again.');
+            console.error('Error creating book club:', error);
+            console.error('Error response:', error.response?.data);
+        });
+    };
+
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
-            <div className="max-w-4xl mx-auto">
-                {auth.user ? (
-                    <div className="bg-white rounded-2xl shadow-xl p-8">
-                        <div className="mb-8">
-                            <h1 className="text-4xl font-bold text-gray-800 mb-2">
-                                Welcome, {auth.user.name}! 👋
-                            </h1>
-                            <p className="text-gray-600">Your role: <span className="font-semibold text-indigo-600">{auth.user.role}</span></p>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                            <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl p-6 text-white cursor-pointer hover:scale-105 transition-transform shadow-lg"
-                                 onClick={() => navigate('/editor')}>
-                                <div className="text-4xl mb-3">👥</div>
-                                <h2 className="text-2xl font-bold mb-2">Collaborative Editor</h2>
-                                <p className="text-purple-100">Code together in real-time with your team</p>
+        <div>
+            <HomePageHeader />
+            <div className="flex flex-col p-8 w-full min-h-screen gap-4">
+                {auth?.user && (
+                    <div className="flex flex-col  bg-gray-100 p-4 rounded w-full">
+                        <h1 className='font-semibold text-xl mb-4 '>My Book Clubs</h1>
+                        {myBookClubs.length === 0 ? (
+                            <button onClick={createNewBookClub}>
+                                <div className="p-4 border rounded hover:bg-gray-50 cursor-pointer w-17 h-17 flex items-center justify-center">
+                                    <h3 className="font-medium text-2xl">+</h3>
+                                </div>
+                            </button>
+                        ) : (
+                            <div className="flex gap-4 overflow-x-auto">
+                                {myBookClubs.map(bookClub => (
+                                    <div 
+                                        key={bookClub.id}
+                                        className="p-4 border rounded hover:bg-gray-50 cursor-pointer flex-shrink-0 min-w-[200px]"
+                                    >
+                                        <h3 className="font-medium">{bookClub.name}</h3>
+                                        <p className="text-sm text-gray-600">
+                                            {bookClub.activeUsers || 0} users online
+                                        </p>
+                                    </div>
+                                    
+                                ))}
+                                <button onClick={createNewBookClub}>
+                                    <div className="p-4 border rounded hover:bg-gray-50 cursor-pointer w-20 h-20 flex items-center justify-center">
+                                        <h3 className="font-medium text-2xl">+</h3>
+                                    </div>
+                                </button>
                             </div>
-                            
-                            <div className="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl p-6 text-white opacity-60">
-                                <div className="text-4xl mb-3">🚀</div>
-                                <h2 className="text-2xl font-bold mb-2">More Services</h2>
-                                <p className="text-blue-100">Coming soon...</p>
-                            </div>
-                        </div>
-                        
-                        <button 
-                            className='w-full md:w-auto bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors shadow-md' 
-                            onClick={() => logout()}
-                        >
-                            🚪 Logout
-                        </button>
-                    </div>
-                ) : (
-                    <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
-                        <h1 className="text-3xl font-bold text-gray-800">Welcome to the Home Page!</h1>
+                        )}
                     </div>
                 )}
+                
+                <div className="flex flex-col  bg-gray-100 p-4 rounded w-full">
+                    <h1 className='font-semibold text-xl mb-4 '>All Book Clubs</h1>
+                    {bookClubs.length === 0 ? (
+                        <button onClick={createNewBookClub}>
+                                <div className="p-4 border rounded hover:bg-gray-50 cursor-pointer w-20 h-20 flex items-center justify-center">
+                                    <h3 className="font-medium text-2xl">+</h3>
+                                </div>
+                            </button>
+                    ) : (
+                        <div className="flex gap-4 overflow-x-auto">
+                            {bookClubs.map(bookClub => (
+                                <div 
+                                    key={bookClub.id}
+                                    className="p-4 border rounded hover:bg-gray-50 cursor-pointer flex-shrink-0 min-w-[200px]"
+                                >
+                                    <h3 className="font-medium">{bookClub.name}</h3>
+                                    <p className="text-sm text-gray-600">
+                                        {bookClub.activeUsers || 0} users online
+                                    </p>
+                                </div>
+                            ))}
+                            <button onClick={createNewBookClub}>
+                                <div className="p-4 border rounded hover:bg-gray-50 cursor-pointer w-20 h-20 flex items-center justify-center">
+                                    <h3 className="font-medium text-2xl">+</h3>
+                                </div>
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
