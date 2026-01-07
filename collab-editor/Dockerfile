@@ -16,4 +16,4 @@ RUN npx prisma generate
 EXPOSE 4000
 
 # Run migrations and start dev server (real DATABASE_URL from docker-compose)
-CMD npx prisma migrate deploy && npm run dev
+CMD npx prisma migrate deploy && echo "Migrations complete, starting service..." && npm run dev

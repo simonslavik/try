@@ -233,3 +233,25 @@
 {"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2026-01-06T16:43:31.967Z"}
 {"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2026-01-06T16:43:31.969Z"}
 {"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2026-01-06T16:43:31.969Z"}
+{"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2026-01-06T17:01:32.102Z"}
+{"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2026-01-06T17:01:32.104Z"}
+{"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2026-01-06T17:01:32.104Z"}
+{"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2026-01-07T12:03:42.820Z"}
+{"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2026-01-07T12:03:42.822Z"}
+{"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2026-01-07T12:03:42.822Z"}
+{"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2026-01-07T12:16:19.025Z"}
+{"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2026-01-07T12:16:19.029Z"}
+{"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2026-01-07T12:16:19.029Z"}
+{"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2026-01-07T12:16:27.311Z"}
+{"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2026-01-07T12:16:27.313Z"}
+{"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2026-01-07T12:16:27.313Z"}
+{"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2026-01-07T13:04:30.987Z"}
+{"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2026-01-07T13:04:30.988Z"}
+{"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2026-01-07T13:04:30.989Z"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2026-01-07T13:07:18.018Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2026-01-07T13:07:24.112Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2026-01-07T14:10:06.644Z","userAgent":"PostmanRuntime/7.51.0"}
+{"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2026-01-07T14:15:12.091Z"}
+{"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2026-01-07T14:15:12.092Z"}
+{"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2026-01-07T14:15:12.093Z"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2026-01-07T14:29:02.304Z","userAgent":"PostmanRuntime/7.51.0"}

@@ -8,13 +8,12 @@ import { useState } from 'react';
 
 
 const HomePageHeader = () => {
-    const { logout } = useContext(AuthContext);
+    const { auth, logout } = useContext(AuthContext);
     const navigate = useNavigate();
     const [showDropdown, setShowDropdown] = useState(false);
     
     const handleLogout = () => {
         logout();
-        navigate('/login');
     };
 
     const handleProfileClick = () => {
@@ -22,14 +21,15 @@ const HomePageHeader = () => {
     };
     
     return (
-        <div className='flex items-center p-4 border-b border-gray-300 '>
-            <h1 className='absolute left-1/2 -translate-x-1/2'>CodeCollab.com</h1>
+        <div className='flex items-center p-4 '>
+            <h1 className='absolute left-1/2 -translate-x-1/2'>YourBookClub.com</h1>
+            {auth && (
             <div className='ml-auto'>
                 <button onClick={handleProfileClick}>
                     <div>
                         <img src="public/images/IMG_2650.jpg" 
                             alt="Profile" 
-                            className="h-13 w-13 rounded-full object-cover border-2 border-gray-200 cursor-pointer"/>
+                            className="h-11 w-11 rounded-full object-cover border-2 border-gray-200 cursor-pointer"/>
                     </div>
                 </button>
                 {showDropdown && (
@@ -45,7 +45,14 @@ const HomePageHeader = () => {
                         </button>
                     </div>
                 )}
-            </div>
+            </div>  )}
+            {!auth && (
+                <div className='ml-auto'>
+                    <button onClick={handleProfileClick}>
+                        Login
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

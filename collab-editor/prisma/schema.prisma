@@ -13,34 +13,52 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Room model - stores collaborative editing rooms
-model Room {
+// BookClub model - stores book clubs where users discuss books
+model BookClub {
   id           String   @id @default(uuid())
-  name         String? // Optional room name
+  name         String   @default("Untitled Book Club")
+  isPublic     Boolean  @default(true)
+  members      String[] // List of User IDs from user-service (no FK due to separate DBs)
   creatorId    String // User ID from user-service (no FK due to separate DBs)
-  code         String   @default("// Start coding together!\n\n") @db.Text
-  language     String   @default("javascript") // Code language
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   lastActiveAt DateTime @default(now())
 
   // Relations
-  snapshots Snapshot[]
+  rooms Room[]
 
-  @@index([creatorId]) // Index for filtering rooms by creator
+  @@index([creatorId])
   @@index([lastActiveAt])
+  @@index([isPublic])
+  @@map("bookclubs")
+}
+
+// Room model - channels within a BookClub (like Discord channels)
+model Room {
+  id         String   @id @default(uuid())
+  bookClubId String
+  bookClub   BookClub @relation(fields: [bookClubId], references: [id], onDelete: Cascade)
+  name       String   @default("general")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  messages Message[]
+
+  @@index([bookClubId])
   @@map("rooms")
 }
 
-// Snapshot model - save code history every few minutes
-model Snapshot {
+// Message model - stores chat messages in rooms (like Discord messages)
+model Message {
   id        String   @id @default(uuid())
   roomId    String
   room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  code      String   @db.Text
-  createdBy String? // Username who triggered save
+  userId    String // User ID from user-service
+  username  String // Cached username for display
+  content   String
   createdAt DateTime @default(now())
 
   @@index([roomId, createdAt])
-  @@map("snapshots")
+  @@map("messages")
 }

@@ -1,31 +1,30 @@
-# 🚀 Real-Time Collaborative Code Editor
+# � Real-Time BookClub Service
 
-A WebSocket-based collaborative code editor where multiple users can edit the same code simultaneously in real-time!
+A WebSocket-based book club platform where users can join clubs, discuss books, and chat in real-time!
 
 ## ✨ Features
 
-- **Real-time Collaboration**: See changes from other users instantly
-- **Room-based**: Create private rooms or join existing ones
-- **User Presence**: See who's online and editing
-- **Cursor Tracking**: Know where other users are typing (optional)
+- **Real-time Chat**: Discuss books with other members instantly
+- **Book Clubs**: Create public/private clubs for your favorite books
+- **User Presence**: See who's online in your club
 - **WebSocket Powered**: Low-latency bi-directional communication
-- **Authentication**: Secure room creation with JWT authentication
-- **Persistent Rooms**: Save and return to your created rooms
+- **Authentication**: Secure club creation with JWT authentication
+- **Persistent Clubs**: Save and return to your book clubs
 
 ## 📡 API Endpoints
 
 ### Authentication Required
 
-#### Create New Room
+#### Create New Book Club
 
 ```http
-POST /rooms
+POST /bookclubs
 Authorization: Bearer <access_token>
 Content-Type: application/json
 
 {
-  "name": "My Project Room",
-  "language": "javascript"
+  "name": "Classic Literature Club",
+  "isPublic": true
 }
 ```
 
