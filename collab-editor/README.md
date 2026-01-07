@@ -1,14 +1,73 @@
-# 🚀 Real-Time Collaborative Code Editor
+# � Real-Time BookClub Service
 
-A WebSocket-based collaborative code editor where multiple users can edit the same code simultaneously in real-time!
+A WebSocket-based book club platform where users can join clubs, discuss books, and chat in real-time!
 
 ## ✨ Features
 
-- **Real-time Collaboration**: See changes from other users instantly
-- **Room-based**: Create private rooms or join existing ones
-- **User Presence**: See who's online and editing
-- **Cursor Tracking**: Know where other users are typing (optional)
+- **Real-time Chat**: Discuss books with other members instantly
+- **Book Clubs**: Create public/private clubs for your favorite books
+- **User Presence**: See who's online in your club
 - **WebSocket Powered**: Low-latency bi-directional communication
+- **Authentication**: Secure club creation with JWT authentication
+- **Persistent Clubs**: Save and return to your book clubs
+
+## 📡 API Endpoints
+
+### Authentication Required
+
+#### Create New Book Club
+
+```http
+POST /bookclubs
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{
+  "name": "Classic Literature Club",
+  "isPublic": true
+}
+```
+
+Response:
+
+```json
+{
+  "roomId": "uuid-here",
+  "message": "Room created successfully"
+}
+```
+
+#### Get My Rooms
+
+```http
+GET /my-rooms
+Authorization: Bearer <access_token>
+```
+
+Returns all rooms created by the authenticated user.
+
+### Public Endpoints
+
+#### Get All Rooms
+
+```http
+GET /rooms
+# Optional: GET /rooms?mine=true (requires auth to filter by user)
+```
+
+#### Get Room Info
+
+```http
+GET /rooms/:roomId
+```
+
+Returns room details, code, creator ID, and currently connected users.
+
+#### Health Check
+
+```http
+GET /health
+```
 
 ## 🎯 How It Works
 

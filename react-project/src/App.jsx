@@ -10,10 +10,10 @@ import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
     <Routes>
+      <Route path="/" element={<Home />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/register" element={<Register />}/>
       <Route path="/login" element={<Login />}/>
-      <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
       <Route path="/editor" element={<CollaborativeEditor />} />
     </Routes>
   );
