@@ -12,8 +12,14 @@ const HomePageHeader = () => {
     const navigate = useNavigate();
     const [showDropdown, setShowDropdown] = useState(false);
     
+    // Debug: Check what auth contains
+    console.log('Auth state:', auth);
+    console.log('Has user?', auth?.user);
+    
     const handleLogout = () => {
+        setShowDropdown(false);
         logout();
+        navigate('/');
     };
 
     const handleProfileClick = () => {
@@ -23,7 +29,7 @@ const HomePageHeader = () => {
     return (
         <div className='flex items-center p-4 '>
             <h1 className='absolute left-1/2 -translate-x-1/2'>YourBookClub.com</h1>
-            {auth && (
+            {auth?.user && (
             <div className='ml-auto'>
                 <button onClick={handleProfileClick}>
                     <div>
@@ -45,13 +51,24 @@ const HomePageHeader = () => {
                         </button>
                     </div>
                 )}
-            </div>  )}
-            {!auth && (
-                <div className='ml-auto'>
-                    <button onClick={handleProfileClick}>
-                        Login
-                    </button>
-                </div>
+            </div>  
+            )}
+            {!auth?.user && (
+            <div className='ml-auto'>
+                <button 
+                    onClick={() => navigate('/login')}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition mr-1"
+                >
+                    Login
+                </button>
+                <button 
+                    onClick={() => navigate('/register')}
+                    className="px-4 py-2 bg-blue-950 text-white rounded hover:bg-blue-700 transition"
+                >
+                    Register
+                </button>
+            </div>
+            
             )}
         </div>
     );
