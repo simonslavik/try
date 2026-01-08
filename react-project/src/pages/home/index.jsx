@@ -42,29 +42,7 @@ const Home = () => {
     }, [auth]);
     
     const createNewBookClub = () => {
-        if (!auth?.token) {
-            alert('Please login to create a book club');
-            return;
-        }
-        
-        console.log('Creating bookclub with token:', auth.token);
-        
-        // axios already has Authorization header set by auth context
-        axios.post('http://localhost:3000/v1/editor/bookclubs', {
-            name: 'New Book Club',
-            isPublic: true,
-        })
-        .then(response => {
-            console.log('Created Bookclub:', response.data);
-            // Refresh my book clubs list
-            setMyBookClubs(prev => [...prev, response.data.bookClub]);
-            setBookClubs(prev => [...prev, response.data.bookClub]);
-        })
-        .catch(error => {
-            alert('Failed to create book club. Please try again.');
-            console.error('Error creating book club:', error);
-            console.error('Error response:', error.response?.data);
-        });
+        navigate('/create-bookclub');
     };
 
 
@@ -103,14 +81,16 @@ const Home = () => {
                                     </div>
                                     
                                 ))}
-                                <button onClick={createNewBookClub}>
-                                    <div className="p-4 border rounded hover:bg-gray-50 cursor-pointer w-20 h-20 flex items-center justify-center">
-                                        <h3 className="font-medium text-2xl">+</h3>
-                                    </div>
-                                </button>
                             </div>
                         )}
                     </div>
+                )}
+                {auth?.user && (
+                <div className='flex justify-center'>
+                    <button className='border rounded p-2 bg-blue-500 text-white hover:bg-blue-600' onClick={createNewBookClub}>
+                        Create New Book Club
+                    </button>
+                </div>
                 )}
                 
                 <div className="flex flex-col  bg-gray-100 p-4 rounded w-full">
@@ -141,11 +121,6 @@ const Home = () => {
                                     </p>
                                 </div>
                             ))}
-                            <button onClick={createNewBookClub}>
-                                <div className="p-4 border rounded hover:bg-gray-50 cursor-pointer w-20 h-20 flex items-center justify-center">
-                                    <h3 className="font-medium text-2xl">+</h3>
-                                </div>
-                            </button>
                         </div>
                     )}
                 </div>

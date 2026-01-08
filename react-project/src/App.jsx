@@ -7,6 +7,7 @@ import Home from "./pages/home";
 import CollaborativeEditor from "./pages/editor/enhanced";
 import BookClub from "./pages/bookclub/:id";
 import ProtectedRoute from "./components/ProtectedRoute";
+import NewBookClubPage from "./pages/createbookclub";
 
 function App() {
   return (
@@ -17,6 +18,12 @@ function App() {
       <Route path="/login" element={<Login />}/>
       <Route path="/editor" element={<CollaborativeEditor />} />
       <Route path="/bookclub/:id" element={<BookClub />} />
+      <Route path="/create-bookclub" element={
+        <ProtectedRoute>
+          <NewBookClubPage />
+        </ProtectedRoute>
+      }/>
+
     </Routes>
   );
 }
