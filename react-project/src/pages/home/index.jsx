@@ -67,6 +67,8 @@ const Home = () => {
         });
     };
 
+
+
     return (
         <div>
             <HomePageHeader />
@@ -85,8 +87,15 @@ const Home = () => {
                                 {myBookClubs.map(bookClub => (
                                     <div 
                                         key={bookClub.id}
+                                        onClick={() => navigate(`/bookclub/${bookClub.id}`)}
                                         className="p-4 border rounded hover:bg-gray-50 cursor-pointer flex-shrink-0 min-w-[200px]"
                                     >
+                                        <img 
+                                            src={bookClub.imageUrl ? `http://localhost:4000${bookClub.imageUrl}` : '/images/default.webp'} 
+                                            alt={bookClub.name}
+                                            className="w-full h-32 object-cover mb-2 rounded"
+                                            onError={(e) => { e.target.src = '/images/default.webp'; }}
+                                        />
                                         <h3 className="font-medium">{bookClub.name}</h3>
                                         <p className="text-sm text-gray-600">
                                             {bookClub.activeUsers || 0} users online
@@ -119,7 +128,14 @@ const Home = () => {
                                     key={bookClub.id}
                                     className="p-4 border rounded hover:bg-gray-50 cursor-pointer flex-shrink-0 min-w-[200px]"
                                 >
+                                    <img 
+                                        src={bookClub.imageUrl ? `http://localhost:4000${bookClub.imageUrl}` : '/images/default.webp'} 
+                                        alt={bookClub.name}
+                                        className="w-full h-32 object-cover mb-2 rounded"
+                                        onError={(e) => { e.target.src = '/images/default.webp'; }}
+                                    />
                                     <h3 className="font-medium">{bookClub.name}</h3>
+                                    <button onClick={() => navigate(`/bookclub/${bookClub.id}`)} className='border rounded p-2 bg-gray-100 hover:bg-gray-200'>Join</button>
                                     <p className="text-sm text-gray-600">
                                         {bookClub.activeUsers || 0} users online
                                     </p>

@@ -5,6 +5,7 @@ import Register from "./pages/register";
 import Login from "./pages/login";
 import Home from "./pages/home";
 import CollaborativeEditor from "./pages/editor/enhanced";
+import BookClub from "./pages/bookclub/:id";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
       <Route path="/register" element={<Register />}/>
       <Route path="/login" element={<Login />}/>
       <Route path="/editor" element={<CollaborativeEditor />} />
+      <Route path="/bookclub/:id" element={<BookClub />} />
     </Routes>
   );
 }

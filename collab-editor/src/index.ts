@@ -7,6 +7,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware, optionalAuthMiddleware } from './middleware/authMiddleware.js';
+import multer from 'multer';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,6 +20,40 @@ const prisma = new PrismaClient();
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
+
+// Serve uploaded images
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, '../uploads/bookclub-images');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = `${uuidv4()}${path.extname(file.originalname)}`;
+    cb(null, uniqueName);
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    
+    if (extname && mimetype) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed (jpeg, jpg, png, gif, webp)'));
+    }
+  }
+});
 
 // HTTP server
 const server = createServer(app);
@@ -176,6 +212,101 @@ app.get('/my-bookclubs', authMiddleware, async (req, res) => {
   } catch (error) {
     console.error('Error fetching user bookclubs:', error);
     res.status(500).json({ error: 'Failed to fetch your bookclubs' });
+  }
+});
+
+// Upload bookclub image (requires authentication and ownership)
+app.post('/bookclubs/:bookClubId/image', authMiddleware, upload.single('image'), async (req, res) => {
+  try {
+    const { bookClubId } = req.params;
+    const userId = req.user!.userId;
+    
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+    
+    const bookClub = await prisma.bookClub.findUnique({
+      where: { id: bookClubId }
+    });
+    
+    if (!bookClub) {
+      // Delete uploaded file if bookclub doesn't exist
+      fs.unlinkSync(req.file.path);
+      return res.status(404).json({ error: 'Book club not found' });
+    }
+    
+    if (bookClub.creatorId !== userId) {
+      // Delete uploaded file if user is not the creator
+      fs.unlinkSync(req.file.path);
+      return res.status(403).json({ error: 'Only the book club creator can upload images' });
+    }
+    
+    // Delete old image if exists
+    if (bookClub.imageUrl) {
+      const oldImagePath = path.join(__dirname, '..', bookClub.imageUrl);
+      if (fs.existsSync(oldImagePath)) {
+        fs.unlinkSync(oldImagePath);
+      }
+    }
+    
+    // Update bookclub with new image URL
+    const imageUrl = `/uploads/bookclub-images/${req.file.filename}`;
+    const updatedBookClub = await prisma.bookClub.update({
+      where: { id: bookClubId },
+      data: { imageUrl }
+    });
+    
+    console.log(`📷 Image uploaded for book club ${bookClubId}`);
+    res.json({ message: 'Image uploaded successfully', imageUrl: updatedBookClub.imageUrl });
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    // Clean up uploaded file on error
+    if (req.file) {
+      fs.unlinkSync(req.file.path);
+    }
+    res.status(500).json({ error: 'Failed to upload image' });
+  }
+});
+
+// Delete bookclub image (requires authentication and ownership)
+app.delete('/bookclubs/:bookClubId/image', authMiddleware, async (req, res) => {
+  try {
+    const { bookClubId } = req.params;
+    const userId = req.user!.userId;
+    
+    const bookClub = await prisma.bookClub.findUnique({
+      where: { id: bookClubId }
+    });
+    
+    if (!bookClub) {
+      return res.status(404).json({ error: 'Book club not found' });
+    }
+    
+    if (bookClub.creatorId !== userId) {
+      return res.status(403).json({ error: 'Only the book club creator can delete images' });
+    }
+    
+    if (!bookClub.imageUrl) {
+      return res.status(400).json({ error: 'Book club has no image to delete' });
+    }
+    
+    // Delete image file
+    const imagePath = path.join(__dirname, '..', bookClub.imageUrl);
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
+    }
+    
+    // Update bookclub to remove image URL
+    await prisma.bookClub.update({
+      where: { id: bookClubId },
+      data: { imageUrl: null }
+    });
+    
+    console.log(`🗑️  Image deleted for book club ${bookClubId}`);
+    res.json({ message: 'Image deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting image:', error);
+    res.status(500).json({ error: 'Failed to delete image' });
   }
 });
 
