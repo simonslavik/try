@@ -55,8 +55,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         // Attach user info to request object
         req.user = {
             userId: decoded.userId,
-            email: decoded.email,
-            role: decoded.role
+            email: decoded.email
         };
 
         // Continue to next middleware/controller

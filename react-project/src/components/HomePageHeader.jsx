@@ -13,8 +13,12 @@ const HomePageHeader = () => {
     const [showDropdown, setShowDropdown] = useState(false);
     
     // Debug: Check what auth contains
-    console.log('Auth state:', auth);
+    console.log('=== AUTH DEBUG ===');
+    console.log('Full auth object:', JSON.stringify(auth, null, 2));
     console.log('Has user?', auth?.user);
+    console.log('Profile image value:', auth?.user?.profileImage);
+    console.log('Profile image type:', typeof auth?.user?.profileImage);
+    console.log('==================');
     
     const handleLogout = () => {
         setShowDropdown(false);
@@ -33,14 +37,18 @@ const HomePageHeader = () => {
             <div className='ml-auto'>
                 <button onClick={handleProfileClick}>
                     <div>
-                        <img src="public/images/IMG_2650.jpg" 
+                        <img src={auth.user.profileImage 
+                                ? `http://localhost:3001${auth.user.profileImage}` 
+                                : "/images/default.webp"}
                             alt="Profile" 
-                            className="h-11 w-11 rounded-full object-cover border-2 border-gray-200 cursor-pointer"/>
+                            className="h-11 w-11 rounded-full object-cover border-2 border-gray-200 cursor-pointer"
+                            onError={(e) => { e.target.src = '/images/default.webp'; }}
+                        />
                     </div>
                 </button>
                 {showDropdown && (
                     <div className="absolute right-4 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg z-10">
-                        <button className="px-4 py-2 border-b border-gray-300 text-sm hover:bg-gray-100">
+                        <button onClick={() => navigate('/change-profile')} className="px-4 py-2 border-b border-gray-300 text-sm hover:bg-gray-100">
                             Change Profile Settings
                         </button>
                         <button

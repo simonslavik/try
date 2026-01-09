@@ -157,6 +157,40 @@ app.get('/bookclubs/:bookClubId', async (req, res) => {
   }
 });
 
+app.put('/bookclubs/:bookClubId', authMiddleware, async (req, res) => {
+  try {
+    const { bookClubId } = req.params;
+    const { name, isPublic } = req.body;
+    const userId = req.user!.userId;
+    
+    const bookClub = await prisma.bookClub.findUnique({
+      where: { id: bookClubId }
+    });
+    
+    if (!bookClub) {
+      return res.status(404).json({ error: 'Book club not found' });
+    }
+    
+    if (bookClub.creatorId !== userId) {
+      return res.status(403).json({ error: 'Only the book club creator can update the book club' });
+    }
+    
+    const updatedBookClub = await prisma.bookClub.update({
+      where: { id: bookClubId },
+      data: {
+        name: name !== undefined ? name.trim() : bookClub.name,
+        isPublic: isPublic !== undefined ? isPublic : bookClub.isPublic
+      }
+    });
+    
+    console.log(`✏️ Book club ${bookClubId} updated by user ${userId}`);
+    res.json({ message: 'Book club updated successfully', bookClub: updatedBookClub });
+  } catch (error) {
+    console.error('Error updating book club:', error);
+    res.status(500).json({ error: 'Failed to update book club' });
+  }
+});
+
 // Get all bookclubs (with optional filtering)
 app.get('/bookclubs', optionalAuthMiddleware, async (req, res) => {
   try {

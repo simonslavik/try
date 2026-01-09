@@ -4,15 +4,27 @@ import helmet from 'helmet';
 import userRoutes from './routes/userRoutes.js';
 import errorHandler from './middleware/errorHandler.js';
 import logger from './utils/logger.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(helmet()); // Security headers
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: false // Disable CSP for now to allow image loading
+})); // Security headers
 app.use(cors()); // Enable CORS
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+
+// Serve uploaded images
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Request logging middleware
 app.use((req, res, next) => {

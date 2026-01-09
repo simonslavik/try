@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../config/database.js';
 
+
 /**
  * Get current user's profile
  * Requires authentication
@@ -22,7 +23,8 @@ export const getMyProfile = async (req: Request, res: Response) => {
                 name: true,
                 email: true,
                 createdAt: true,
-                updatedAt: true
+                updatedAt: true,
+                profileImage: true
             }
         });
 
@@ -74,7 +76,8 @@ export const updateMyProfile = async (req: Request, res: Response) => {
                 id: true,
                 name: true,
                 email: true,
-                updatedAt: true
+                updatedAt: true,
+                profileImage: true
             }
         });
 
@@ -107,7 +110,8 @@ export const getUserById = async (req: Request, res: Response) => {
                 name: true,
                 email: true,
                 createdAt: true,
-                updatedAt: true
+                updatedAt: true,
+                profileImage: true
             }
         });
 
@@ -141,7 +145,8 @@ export const listUsers = async (req: Request, res: Response) => {
                 id: true,
                 name: true,
                 email: true,
-                createdAt: true
+                createdAt: true,
+                profileImage: true
             },
             orderBy: {
                 createdAt: 'desc'

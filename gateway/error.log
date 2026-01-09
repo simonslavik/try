@@ -53,3 +53,4 @@
 {"level":"error","message":"Proxy error for Collab Editor Service: request entity too large","service":"api-gateway","timestamp":"2026-01-08T12:41:12.506Z"}
 {"level":"error","message":"Proxy error for Collab Editor Service: request entity too large","service":"api-gateway","timestamp":"2026-01-08T12:50:42.470Z"}
 {"level":"error","message":"Proxy error for Collab Editor Service: request entity too large","service":"api-gateway","timestamp":"2026-01-08T12:50:49.516Z"}
+{"level":"error","message":"Proxy error for Collab Editor Service: request entity too large","service":"api-gateway","timestamp":"2026-01-08T16:24:46.436Z"}

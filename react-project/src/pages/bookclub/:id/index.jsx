@@ -17,10 +17,17 @@ const BookClub = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [editingDisplayName, setEditingDisplayName] = useState(false);
+  const [displayName, setDisplayName] = useState('');
+  const [myBookClubs, setMyBookClubs] = useState([]);
   
   const ws = useRef(null);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
+  const nameInputRef = useRef(null);
+  const displayNameInputRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -64,6 +71,31 @@ const BookClub = () => {
     if (bookClubId) {
       fetchBookClub();
     }
+    
+    // Initialize display name from localStorage or auth
+    const savedName = localStorage.getItem(`bookclub_${bookClubId}_displayName`);
+    if (savedName) {
+      setDisplayName(savedName);
+    } else if (auth?.user?.name) {
+      setDisplayName(auth.user.name);
+    }
+
+    // Fetch my bookclubs (only if authenticated)
+    if (auth?.user) {
+        const headers = auth?.token 
+          ? { Authorization: `Bearer ${auth.token}` }
+          : {};
+        
+        fetch('http://localhost:3000/v1/editor/bookclubs?mine=true', { headers })
+            .then(response => response.json())
+            .then(data => {
+                console.log('My Bookclubs response:', data);
+                setMyBookClubs(data.bookClubs || []);
+            })
+            .catch(error => console.error('Error fetching my book clubs:', error));
+    }
+        
+
   }, [bookClubId, auth]);
 
   // WebSocket connection
@@ -78,12 +110,13 @@ const BookClub = () => {
     ws.current.onopen = () => {
       console.log('WebSocket connected to room:', currentRoom.name);
       
-      // Send join message
+      // Send join message with display name
+      const username = displayName || auth.user.name || auth.user.email || 'Anonymous';
       ws.current.send(JSON.stringify({
         type: 'join',
         bookClubId: bookClubId,
         userId: auth.user.id,
-        username: auth.user.username,
+        username: username,
         roomId: currentRoom.id
       }));
     };
@@ -288,6 +321,64 @@ const BookClub = () => {
     }
   };
 
+  const handleNameDoubleClick = () => {
+    if (auth?.user && auth.user.id === bookClub?.creatorId) {
+      setEditingName(true);
+      setNewName(bookClub.name);
+      setTimeout(() => nameInputRef.current?.focus(), 0);
+    }
+  };
+
+  const handleNameChange = (e) => {
+    setNewName(e.target.value);
+  };
+
+  const handleNameBlur = async () => {
+    if (!newName.trim() || newName === bookClub.name) {
+      setEditingName(false);
+      setNewName('');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/v1/editor/bookclubs/${bookClubId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth.token}`
+        },
+        body: JSON.stringify({ name: newName.trim() })
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        setBookClub(prev => ({ ...prev, name: data.bookClub.name }));
+        setEditingName(false);
+        setNewName('');
+      } else {
+        alert(data.error || 'Failed to update book club name');
+        setEditingName(false);
+      }
+    } catch (err) {
+      console.error('Error updating book club name:', err);
+      alert('Failed to update book club name');
+      setEditingName(false);
+    }
+  };
+
+  const handleNameKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleNameBlur();
+    } else if (e.key === 'Escape') {
+      setEditingName(false);
+      setNewName('');
+    }
+  };
+
+  
+
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-900">
@@ -312,6 +403,58 @@ const BookClub = () => {
 
   return (
     <div className="flex h-screen bg-gray-900">
+
+      {/* My Bookclubs Sidebar */}
+      {auth?.user && (
+        <div className="w-20 bg-gray-900 border-r border-gray-700 flex flex-col items-center py-4 gap-3 overflow-y-auto">
+          {/* Home Button */}
+          <button
+            onClick={() => navigate('/')}
+            className="w-12 h-12 rounded-full bg-gray-700 hover:bg-purple-600 flex items-center justify-center text-white transition-colors flex-shrink-0"
+            title="Home"
+          >
+            <FiHome size={20} />
+          </button>
+          
+          {/* Separator */}
+          <div className="w-10 h-px bg-gray-700"></div>
+          
+          {/* My Bookclubs */}
+          {myBookClubs.map((club) => (
+            <button
+              key={club.id}
+              onClick={() => navigate(`/bookclub/${club.id}`)}
+              className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm transition-all flex-shrink-0 ${
+                club.id === bookClubId
+                  ? 'bg-purple-600 ring-2 ring-purple-400'
+                  : 'bg-gray-700 hover:bg-purple-600 hover:rounded-2xl'
+              }`}
+              title={club.name}
+            >
+              {club.imageUrl ? (
+                <img
+                  src={`http://localhost:4000${club.imageUrl}`}
+                  alt={club.name}
+                  className="w-full h-full rounded-full object-cover"
+                  onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                />
+              ) : (
+                <span>{club.name.substring(0, 2).toUpperCase()}</span>
+              )}
+            </button>
+          ))}
+          
+          {/* Add Bookclub Button */}
+          <button
+            onClick={() => navigate('/create-bookclub')}
+            className="w-12 h-12 rounded-full bg-gray-700 hover:bg-green-600 flex items-center justify-center text-white text-2xl transition-colors flex-shrink-0"
+            title="Create Bookclub"
+          >
+            +
+          </button>
+        </div>
+      )}
+      
       {/* Sidebar - Rooms */}
       <div className="w-64 bg-gray-800 border-r border-gray-700 flex flex-col">
         {/* Bookclub Header with Image */}
@@ -354,7 +497,29 @@ const BookClub = () => {
             />
           </div>
           
-          <h2 className="text-white font-bold text-lg truncate">{bookClub?.name}</h2>
+          {editingName ? (
+            <input
+              ref={nameInputRef}
+              type="text"
+              value={newName}
+              onChange={handleNameChange}
+              onBlur={handleNameBlur}
+              onKeyDown={handleNameKeyDown}
+              className="text-white font-bold text-lg bg-gray-700 px-2 py-1 rounded border border-purple-500 focus:outline-none w-full"
+            />
+          ) : (
+            <h2 
+              className={`text-white font-bold text-lg truncate ${
+                auth?.user && auth.user.id === bookClub?.creatorId 
+                  ? 'cursor-pointer hover:text-purple-400' 
+                  : ''
+              }`}
+              onDoubleClick={handleNameDoubleClick}
+              title={auth?.user && auth.user.id === bookClub?.creatorId ? 'Double-click to edit' : ''}
+            >
+              {bookClub?.name}
+            </h2>
+          )}
           <button 
             onClick={() => navigate('/')}
             className="mt-2 flex items-center gap-2 text-gray-400 hover:text-white text-sm"
@@ -446,20 +611,28 @@ const BookClub = () => {
                     <span className="text-xs text-gray-500 italic">{msg.text}</span>
                   </div>
                 ) : (
-                  <div className="flex gap-3">
-                    <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
-                      {msg.username?.[0]?.toUpperCase()}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-baseline gap-2">
-                        <span className="font-semibold text-white">{msg.username}</span>
-                        <span className="text-xs text-gray-500">
-                          {new Date(msg.timestamp).toLocaleTimeString()}
-                        </span>
+                  msg.userId === auth?.user?.id ? (
+                    <div className="flex gap-3 justify-end">
+                      <div className=" text-right bg-blue-400 rounded-2xl px-4 py-2 max-w-xs break-words self-end">
+                        <p className="text-gray-300 break-words">{msg.text}</p>
                       </div>
-                      <p className="text-gray-300 break-words">{msg.text}</p>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="flex gap-3">
+                      <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
+                        {msg.username?.[0]?.toUpperCase()}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-baseline gap-2">
+                          <span className="font-semibold text-white">{msg.username}</span>
+                          <span className="text-xs text-gray-500">
+                            {new Date(msg.timestamp).toLocaleTimeString()}
+                          </span>
+                        </div>
+                        <p className="text-gray-300 break-words">{msg.text}</p>
+                      </div>
+                    </div>
+                  )
                 )}
               </div>
             ))
@@ -490,7 +663,7 @@ const BookClub = () => {
         ) : (
           <div className="bg-gray-800 border-t border-gray-700 p-4 text-center">
             <p className="text-gray-400">
-              Please <button onClick={() => navigate('/login')} className="text-purple-400 hover:underline">log in</button> to chat
+              Please <button onClick={() => navigate('/login', { state: { from: `/bookclub/${bookClubId}` } })} className="text-purple-400 hover:underline">log in</button> to chat
             </p>
           </div>
         )}
