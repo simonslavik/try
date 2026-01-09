@@ -2,6 +2,8 @@ import { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AuthContext from '../../../context';
 import { FiHash, FiUsers, FiPlus, FiSettings, FiHome, FiImage, FiTrash2 } from 'react-icons/fi';
+import MyBookClubsSidebar from '../../../components/MyBookClubsSidebar';
+import BookClubImage from '../../../components/BookClubImage';
 
 const BookClub = () => {
   const { id: bookClubId } = useParams();
@@ -17,17 +19,12 @@ const BookClub = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [editingName, setEditingName] = useState(false);
-  const [newName, setNewName] = useState('');
-  const [editingDisplayName, setEditingDisplayName] = useState(false);
-  const [displayName, setDisplayName] = useState('');
   const [myBookClubs, setMyBookClubs] = useState([]);
   
   const ws = useRef(null);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const nameInputRef = useRef(null);
-  const displayNameInputRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -71,14 +68,6 @@ const BookClub = () => {
     if (bookClubId) {
       fetchBookClub();
     }
-    
-    // Initialize display name from localStorage or auth
-    const savedName = localStorage.getItem(`bookclub_${bookClubId}_displayName`);
-    if (savedName) {
-      setDisplayName(savedName);
-    } else if (auth?.user?.name) {
-      setDisplayName(auth.user.name);
-    }
 
     // Fetch my bookclubs (only if authenticated)
     if (auth?.user) {
@@ -111,7 +100,7 @@ const BookClub = () => {
       console.log('WebSocket connected to room:', currentRoom.name);
       
       // Send join message with display name
-      const username = displayName || auth.user.name || auth.user.email || 'Anonymous';
+      const username = auth.user.name || 'Anonymous';
       ws.current.send(JSON.stringify({
         type: 'join',
         bookClubId: bookClubId,
@@ -321,61 +310,9 @@ const BookClub = () => {
     }
   };
 
-  const handleNameDoubleClick = () => {
-    if (auth?.user && auth.user.id === bookClub?.creatorId) {
-      setEditingName(true);
-      setNewName(bookClub.name);
-      setTimeout(() => nameInputRef.current?.focus(), 0);
-    }
-  };
 
-  const handleNameChange = (e) => {
-    setNewName(e.target.value);
-  };
 
-  const handleNameBlur = async () => {
-    if (!newName.trim() || newName === bookClub.name) {
-      setEditingName(false);
-      setNewName('');
-      return;
-    }
-
-    try {
-      const response = await fetch(`http://localhost:3000/v1/editor/bookclubs/${bookClubId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth.token}`
-        },
-        body: JSON.stringify({ name: newName.trim() })
-      });
-
-      const data = await response.json();
-      
-      if (response.ok) {
-        setBookClub(prev => ({ ...prev, name: data.bookClub.name }));
-        setEditingName(false);
-        setNewName('');
-      } else {
-        alert(data.error || 'Failed to update book club name');
-        setEditingName(false);
-      }
-    } catch (err) {
-      console.error('Error updating book club name:', err);
-      alert('Failed to update book club name');
-      setEditingName(false);
-    }
-  };
-
-  const handleNameKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleNameBlur();
-    } else if (e.key === 'Escape') {
-      setEditingName(false);
-      setNewName('');
-    }
-  };
-
+  
   
 
 
@@ -403,173 +340,193 @@ const BookClub = () => {
 
   return (
     <div className="flex h-screen bg-gray-900">
-
-      {/* My Bookclubs Sidebar */}
-      {auth?.user && (
-        <div className="w-20 bg-gray-900 border-r border-gray-700 flex flex-col items-center py-4 gap-3 overflow-y-auto">
-          {/* Home Button */}
-          <button
-            onClick={() => navigate('/')}
-            className="w-12 h-12 rounded-full bg-gray-700 hover:bg-purple-600 flex items-center justify-center text-white transition-colors flex-shrink-0"
-            title="Home"
-          >
-            <FiHome size={20} />
-          </button>
-          
-          {/* Separator */}
-          <div className="w-10 h-px bg-gray-700"></div>
-          
-          {/* My Bookclubs */}
-          {myBookClubs.map((club) => (
-            <button
-              key={club.id}
-              onClick={() => navigate(`/bookclub/${club.id}`)}
-              className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm transition-all flex-shrink-0 ${
-                club.id === bookClubId
-                  ? 'bg-purple-600 ring-2 ring-purple-400'
-                  : 'bg-gray-700 hover:bg-purple-600 hover:rounded-2xl'
-              }`}
-              title={club.name}
-            >
-              {club.imageUrl ? (
-                <img
-                  src={`http://localhost:4000${club.imageUrl}`}
-                  alt={club.name}
-                  className="w-full h-full rounded-full object-cover"
-                  onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                />
-              ) : (
-                <span>{club.name.substring(0, 2).toUpperCase()}</span>
-              )}
-            </button>
-          ))}
-          
-          {/* Add Bookclub Button */}
-          <button
-            onClick={() => navigate('/create-bookclub')}
-            className="w-12 h-12 rounded-full bg-gray-700 hover:bg-green-600 flex items-center justify-center text-white text-2xl transition-colors flex-shrink-0"
-            title="Create Bookclub"
-          >
-            +
-          </button>
-        </div>
-      )}
+      <div className='flex'>
+        {/* My Bookclubs Sidebar */}
+        {auth?.user && (
+          <MyBookClubsSidebar 
+            bookClubs={myBookClubs} 
+            currentBookClubId={bookClubId}
+            onSelectBookClub={(id) => navigate(`/bookclub/${id}`)}
+          />
+        )}
       
-      {/* Sidebar - Rooms */}
-      <div className="w-64 bg-gray-800 border-r border-gray-700 flex flex-col">
-        {/* Bookclub Header with Image */}
-        <div className="p-4 border-b border-gray-700">
-          {/* Bookclub Image */}
-          <div className="relative mb-3 group">
-            <img 
-              src={bookClub?.imageUrl ? `http://localhost:4000${bookClub.imageUrl}` : '/images/default.webp'}
-              alt={bookClub?.name}
-              className="w-full h-32 object-cover rounded"
-              onError={(e) => { e.target.src = '/images/IMG_2650.jpg'; }}
+        {/* Sidebar - Rooms */}
+        <div className="w-64 bg-gray-800 border-r border-gray-700 flex flex-col">
+          {/* Bookclub Header with Image */}
+          <div className="p-4 border-b border-gray-700">
+            {/* Bookclub Image */}
+            <BookClubImage 
+              bookClub={bookClub} 
+              auth={auth} 
+              uploadingImage={uploadingImage} 
+              fileInputRef={fileInputRef} 
+              handleImageUpload={handleImageUpload} 
+              handleDeleteImage={handleDeleteImage}
             />
-            {auth?.user && auth.user.id === bookClub?.creatorId && (
-              <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 rounded">
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploadingImage}
-                  className="p-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
-                  title="Change Image"
-                >
-                  <FiImage />
-                </button>
-                {bookClub?.imageUrl && (
-                  <button
-                    onClick={handleDeleteImage}
-                    className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg"
-                    title="Delete Image"
+            
+            <h2 className="text-white font-bold text-lg truncate">
+              {bookClub?.name}
+            </h2>
+            
+            <button 
+              onClick={() => navigate('/')}
+              className="mt-2 flex items-center gap-2 text-gray-400 hover:text-white text-sm"
+            >
+              <FiHome /> Back to Home
+            </button>
+          </div>
+
+          {/* Rooms List */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-2">
+              <div className="flex items-center justify-between px-2 py-1 mb-2">
+                <h3 className="text-gray-400 text-xs font-semibold uppercase">Rooms</h3>
+                {auth?.user && (
+                  <button 
+                    onClick={handleCreateRoom}
+                    className="text-gray-400 hover:text-white"
+                    title="Create Room"
                   >
-                    <FiTrash2 />
+                    <FiPlus size={14} />
                   </button>
                 )}
               </div>
-            )}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
-          </div>
-          
-          {editingName ? (
-            <input
-              ref={nameInputRef}
-              type="text"
-              value={newName}
-              onChange={handleNameChange}
-              onBlur={handleNameBlur}
-              onKeyDown={handleNameKeyDown}
-              className="text-white font-bold text-lg bg-gray-700 px-2 py-1 rounded border border-purple-500 focus:outline-none w-full"
-            />
-          ) : (
-            <h2 
-              className={`text-white font-bold text-lg truncate ${
-                auth?.user && auth.user.id === bookClub?.creatorId 
-                  ? 'cursor-pointer hover:text-purple-400' 
-                  : ''
-              }`}
-              onDoubleClick={handleNameDoubleClick}
-              title={auth?.user && auth.user.id === bookClub?.creatorId ? 'Double-click to edit' : ''}
-            >
-              {bookClub?.name}
-            </h2>
-          )}
-          <button 
-            onClick={() => navigate('/')}
-            className="mt-2 flex items-center gap-2 text-gray-400 hover:text-white text-sm"
-          >
-            <FiHome /> Back to Home
-          </button>
-        </div>
-
-        {/* Rooms List */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="p-2">
-            <div className="flex items-center justify-between px-2 py-1 mb-2">
-              <h3 className="text-gray-400 text-xs font-semibold uppercase">Rooms</h3>
-              {auth?.user && (
-                <button 
-                  onClick={handleCreateRoom}
-                  className="text-gray-400 hover:text-white"
-                  title="Create Room"
+              
+              {rooms.map(room => (
+                <button
+                  key={room.id}
+                  onClick={() => switchRoom(room)}
+                  className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-colors ${
+                    currentRoom?.id === room.id
+                      ? 'bg-gray-700 text-white'
+                      : 'text-gray-400 hover:bg-gray-700 hover:text-white'
+                  }`}
                 >
-                  <FiPlus size={14} />
+                  <FiHash size={16} />
+                  <span className="truncate">{room.name}</span>
                 </button>
-              )}
+              ))}
             </div>
-            
-            {rooms.map(room => (
-              <button
-                key={room.id}
-                onClick={() => switchRoom(room)}
-                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-colors ${
-                  currentRoom?.id === room.id
-                    ? 'bg-gray-700 text-white'
-                    : 'text-gray-400 hover:bg-gray-700 hover:text-white'
-                }`}
-              >
-                <FiHash size={16} />
-                <span className="truncate">{room.name}</span>
-              </button>
-            ))}
           </div>
         </div>
+        <div className='absolute bottom-0 flex justify-center pointer-events-none'> 
+          {auth?.user && (
+            <div className="p-2 bg-gray-800 rounded-2xl flex items-center gap-2 shadow-lg pointer-events-auto w-64">
+                <img 
+                  src={auth.user.profileImage 
+                    ? `http://localhost:3001${auth.user.profileImage}` 
+                    : '/images/default.webp'
+                  } 
+                  alt={auth.user.name} 
+                  className="w-10 h-10 rounded-full object-cover"
+                  onError={(e) => { e.target.src = '/images/default.webp'; }}
+                />
+                <span className="text-white font-medium truncate">
+                  {auth.user.name}
+                </span>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="flex flex-1">
+      {/* Main Chat Area */}
+        <div className="flex flex-col flex-1">
+          {/* Room Header */}
+          <div className="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <FiHash className="text-gray-400" />
+              <h2 className="text-white font-semibold">{currentRoom?.name}</h2>
+            </div>
+            {auth?.user && (
+              <button className="text-gray-400 hover:text-white">
+                <FiSettings />
+              </button>
+            )}
+          </div>
 
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {messages.length === 0 ? (
+              <div className="text-center text-gray-500 mt-8">
+                <FiHash className="mx-auto text-4xl mb-2 opacity-30" />
+                <p className="text-sm">Welcome to #{currentRoom?.name}</p>
+                <p className="text-xs mt-1">Start a conversation!</p>
+              </div>
+            ) : (
+              messages.map((msg, idx) => (
+                <div key={msg.id || idx} className="flex flex-col">
+                  {msg.type === 'system' ? (
+                    <div className="text-center">
+                      <span className="text-xs text-gray-500 italic">{msg.text}</span>
+                    </div>
+                  ) : (
+                    msg.userId === auth?.user?.id ? (
+                      <div className="flex gap-3 justify-end">
+                        <div className=" text-right bg-blue-400 rounded-2xl px-4 py-2 max-w-xs break-words self-end">
+                          <p className="text-gray-300 break-words">{msg.text}</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex gap-3">
+                        <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
+                          {msg.username?.[0]?.toUpperCase()}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-baseline gap-2">
+                            <span className="font-semibold text-white">{msg.username}</span>
+                            <span className="text-xs text-gray-500">
+                              {new Date(msg.timestamp).toLocaleTimeString()}
+                            </span>
+                          </div>
+                          <p className="text-gray-300 break-words">{msg.text}</p>
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+              ))
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Message Input */}
+          {auth?.user ? (
+            <form onSubmit={handleSendMessage} className="bg-gray-800 border-t border-gray-700 p-4">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder={`Message #${currentRoom?.name}`}
+                  className="flex-1 px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+                <button
+                  type="submit"
+                  disabled={!newMessage.trim()}
+                  className="px-6 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium"
+                >
+                  Send
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className="bg-gray-800 border-t border-gray-700 p-4 text-center">
+              <p className="text-gray-400">
+                Please <button onClick={() => navigate('/login', { state: { from: `/bookclub/${bookClubId}` } })} className="text-purple-400 hover:underline">log in</button> to chat
+              </p>
+            </div>
+          )}
+
+        </div>
         {/* Connected Users */}
-        <div className="border-t border-gray-700 p-2">
+        <div className="w-34 bg-gray-800 border-l border-gray-700 p-2">
           <div className="flex items-center gap-2 px-2 py-1 mb-2">
             <FiUsers className="text-gray-400" size={14} />
             <h3 className="text-gray-400 text-xs font-semibold uppercase">
               Online ({connectedUsers.length})
             </h3>
           </div>
-          <div className="max-h-32 overflow-y-auto">
+          <div className="max-h-screen overflow-y-auto">
             {connectedUsers.map(user => (
               <div key={user.id} className="px-2 py-1 text-sm text-gray-300 flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -578,95 +535,6 @@ const BookClub = () => {
             ))}
           </div>
         </div>
-      </div>
-
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Room Header */}
-        <div className="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <FiHash className="text-gray-400" />
-            <h2 className="text-white font-semibold">{currentRoom?.name}</h2>
-          </div>
-          {auth?.user && (
-            <button className="text-gray-400 hover:text-white">
-              <FiSettings />
-            </button>
-          )}
-        </div>
-
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          {messages.length === 0 ? (
-            <div className="text-center text-gray-500 mt-8">
-              <FiHash className="mx-auto text-4xl mb-2 opacity-30" />
-              <p className="text-sm">Welcome to #{currentRoom?.name}</p>
-              <p className="text-xs mt-1">Start a conversation!</p>
-            </div>
-          ) : (
-            messages.map((msg, idx) => (
-              <div key={msg.id || idx} className="flex flex-col">
-                {msg.type === 'system' ? (
-                  <div className="text-center">
-                    <span className="text-xs text-gray-500 italic">{msg.text}</span>
-                  </div>
-                ) : (
-                  msg.userId === auth?.user?.id ? (
-                    <div className="flex gap-3 justify-end">
-                      <div className=" text-right bg-blue-400 rounded-2xl px-4 py-2 max-w-xs break-words self-end">
-                        <p className="text-gray-300 break-words">{msg.text}</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex gap-3">
-                      <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
-                        {msg.username?.[0]?.toUpperCase()}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-baseline gap-2">
-                          <span className="font-semibold text-white">{msg.username}</span>
-                          <span className="text-xs text-gray-500">
-                            {new Date(msg.timestamp).toLocaleTimeString()}
-                          </span>
-                        </div>
-                        <p className="text-gray-300 break-words">{msg.text}</p>
-                      </div>
-                    </div>
-                  )
-                )}
-              </div>
-            ))
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Message Input */}
-        {auth?.user ? (
-          <form onSubmit={handleSendMessage} className="bg-gray-800 border-t border-gray-700 p-4">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder={`Message #${currentRoom?.name}`}
-                className="flex-1 px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-              <button
-                type="submit"
-                disabled={!newMessage.trim()}
-                className="px-6 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium"
-              >
-                Send
-              </button>
-            </div>
-          </form>
-        ) : (
-          <div className="bg-gray-800 border-t border-gray-700 p-4 text-center">
-            <p className="text-gray-400">
-              Please <button onClick={() => navigate('/login', { state: { from: `/bookclub/${bookClubId}` } })} className="text-purple-400 hover:underline">log in</button> to chat
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
