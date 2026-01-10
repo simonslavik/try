@@ -13,6 +13,7 @@ const ProfilePage = () => {
   const [bookClubs, setBookClubs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [friendRequestLoading, setFriendRequestLoading] = useState(false);
   
   const isOwnProfile = auth?.user?.id === id;
 
@@ -21,8 +22,12 @@ const ProfilePage = () => {
       try {
         setLoading(true);
         
-        // Fetch user profile
-        const profileResponse = await fetch(`http://localhost:3000/v1/profile/${id}`);
+        // Fetch user profile with optional auth for friendship status
+        const headers = auth?.token 
+          ? { Authorization: `Bearer ${auth.token}` }
+          : {};
+          
+        const profileResponse = await fetch(`http://localhost:3000/v1/profile/${id}`, { headers });
         const profileData = await profileResponse.json();
         
         if (profileResponse.ok && profileData.success) {
@@ -33,10 +38,6 @@ const ProfilePage = () => {
         }
         
         // Fetch user's bookclubs
-        const headers = auth?.token 
-          ? { Authorization: `Bearer ${auth.token}` }
-          : {};
-          
         const bookClubsResponse = await fetch('http://localhost:3000/v1/editor/bookclubs', { headers });
         const bookClubsData = await bookClubsResponse.json();
         
@@ -131,6 +132,69 @@ const ProfilePage = () => {
                     Edit Profile
                   </button>
                 )}
+                {!isOwnProfile && (
+                  <>
+                    {profile.friendshipStatus === 'friends' ? (
+                      <button
+                        className="px-4 py-2 bg-gray-500 text-white rounded-lg cursor-not-allowed"
+                        disabled
+                      >
+                        Already Friends
+                      </button>
+                    ) : profile.friendshipStatus === 'request_sent' ? (
+                      <button
+                        className="px-4 py-2 bg-yellow-500 text-white rounded-lg cursor-not-allowed"
+                        disabled
+                      >
+                        Request Pending
+                      </button>
+                    ) : profile.friendshipStatus === 'request_received' ? (
+                      <button
+                        onClick={() => navigate('/')}
+                        className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                      >
+                        Respond to Request
+                      </button>
+                    ) : (
+                      <button
+                        onClick={async () => {
+                          if (!auth?.token) {
+                            navigate('/login');
+                            return;
+                          }
+                          
+                          setFriendRequestLoading(true);
+                          try {
+                            const response = await fetch('http://localhost:3000/v1/friends/request', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${auth.token}`
+                              },
+                              body: JSON.stringify({ recipientId: id })
+                            });
+                            
+                            if (response.ok) {
+                              setProfile(prev => ({ ...prev, friendshipStatus: 'request_sent' }));
+                            } else {
+                              const data = await response.json();
+                              alert(data.message || 'Failed to send friend request');
+                            }
+                          } catch (err) {
+                            console.error('Error sending friend request:', err);
+                            alert('Failed to send friend request');
+                          } finally {
+                            setFriendRequestLoading(false);
+                          }
+                        }}
+                        disabled={friendRequestLoading}
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      >
+                        {friendRequestLoading ? 'Sending...' : 'Add Friend'}
+                      </button>
+                    )}
+                  </>
+                )}
               </div>
               
               <div className="mt-6 flex gap-8">
@@ -140,9 +204,9 @@ const ProfilePage = () => {
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-purple-600">
-                    {bookClubs.reduce((sum, club) => sum + (club.members?.length || 0), 0)}
+                    {profile.numberOfFriends || 0}
                   </div>
-                  <div className="text-sm text-gray-600">Connections</div>
+                  <div className="text-sm text-gray-600">Friends</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-purple-600">{joinDate}</div>

@@ -9,6 +9,7 @@ import prisma from '../config/database.js';
 export const getProfileById = async (req: Request, res: Response) => {
     try {
         const { userId } = req.params;
+        const currentUserId = req.user?.userId; // Get the logged-in user ID if available
 
         if (!userId) {
             return res.status(400).json({ 
@@ -34,9 +35,47 @@ export const getProfileById = async (req: Request, res: Response) => {
             });
         }
 
+        // If there's a logged-in user and they're viewing someone else's profile, check friendship status
+        let friendshipStatus = null;
+        if (currentUserId && currentUserId !== userId) {
+            const friendship = await prisma.friendship.findFirst({
+                where: {
+                    OR: [
+                        { userId: currentUserId, friendId: userId },
+                        { userId: userId, friendId: currentUserId }
+                    ]
+                }
+            });
+
+            if (friendship) {
+                // Determine the relationship from current user's perspective
+                if (friendship.status === 'ACCEPTED') {
+                    friendshipStatus = 'friends';
+                } else if (friendship.userId === currentUserId) {
+                    friendshipStatus = 'request_sent'; // Current user sent the request
+                } else {
+                    friendshipStatus = 'request_received'; // Current user received the request
+                }
+            }
+        }
+
+        let numberOfFriends = await prisma.friendship.count({
+            where: {
+                OR: [
+                    { userId: userId },
+                    { friendId: userId }
+                ],
+                status: 'ACCEPTED'
+            }
+        });
+
         return res.status(200).json({
             success: true,
-            data: user
+            data: {
+                ...user,
+                friendshipStatus,
+                numberOfFriends
+            }
         });
     } catch (error: any) {
         console.error('Get profile error:', error);

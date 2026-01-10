@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { registerUser, loginUser, refreshAccessToken, logoutUser, logoutAllDevices } from '../controllers/userController.js';
 import { getProfileById, updateMyProfile, getUserById, listUsers, getUsersByIds } from '../controllers/profileController.js';
-import { authMiddleware } from '../middleware/authMiddleware.js';
+import { authMiddleware, optionalAuthMiddleware } from '../middleware/authMiddleware.js';
 import { addProfileImage, deleteProfileImage, upload } from '../controllers/profileImageController.js';
 import { sendFriendRequest, acceptFriendRequest, rejectFriendRequest, removeFriend, listFriends, listFriendRequests} from '../controllers/friendsController.js';
 const userRoutes = Router();
@@ -20,7 +20,7 @@ userRoutes.post('/auth/logout', authMiddleware, logoutUser);
 userRoutes.post('/auth/logout-all', authMiddleware, logoutAllDevices);
 
 // User profile routes (requires authentication)
-userRoutes.get('/profile/:userId', getProfileById);
+userRoutes.get('/profile/:userId', optionalAuthMiddleware, getProfileById);
 userRoutes.put('/profile', authMiddleware, updateMyProfile);
 userRoutes.post('/profile/image', authMiddleware, upload.single('image'), addProfileImage);
 userRoutes.delete('/profile/image', authMiddleware, deleteProfileImage);
