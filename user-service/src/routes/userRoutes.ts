@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { registerUser, loginUser, refreshAccessToken, logoutUser, logoutAllDevices } from '../controllers/userController.js';
-import { getMyProfile, updateMyProfile, getUserById, listUsers, getUsersByIds } from '../controllers/profileController.js';
+import { getProfileById, updateMyProfile, getUserById, listUsers, getUsersByIds } from '../controllers/profileController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import { addProfileImage, deleteProfileImage, upload } from '../controllers/profileImageController.js';
 
@@ -20,7 +20,7 @@ userRoutes.post('/auth/logout', authMiddleware, logoutUser);
 userRoutes.post('/auth/logout-all', authMiddleware, logoutAllDevices);
 
 // User profile routes (requires authentication)
-userRoutes.get('/profile', authMiddleware, getMyProfile);
+userRoutes.get('/profile/:userId', getProfileById);
 userRoutes.put('/profile', authMiddleware, updateMyProfile);
 userRoutes.post('/profile/image', authMiddleware, upload.single('image'), addProfileImage);
 userRoutes.delete('/profile/image', authMiddleware, deleteProfileImage);

@@ -4016,3 +4016,443 @@
 {"level":"info","message":"[c7865848-1bb1-4547-862f-1d512f080711] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T12:44:48.985Z"}
 {"level":"info","message":"[9df8f404-b9b2-447e-8d23-f091faaffeda] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T12:44:48.986Z"}
 {"level":"info","message":"[c7865848-1bb1-4547-862f-1d512f080711] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T12:44:48.986Z"}
+{"level":"info","message":"[f080291c-2245-4e4a-92da-04405dacb2f1] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T13:24:34.171Z"}
+{"level":"info","message":"[1d47f5ea-39ea-4d2c-ba6a-ef146bda3315] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T13:24:34.172Z"}
+{"level":"info","message":"[f080291c-2245-4e4a-92da-04405dacb2f1] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T13:24:34.174Z"}
+{"level":"info","message":"[1d47f5ea-39ea-4d2c-ba6a-ef146bda3315] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T13:24:34.174Z"}
+{"level":"info","message":"[1d47f5ea-39ea-4d2c-ba6a-ef146bda3315] Collab Editor Service responded with 200 for /bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T13:24:34.293Z"}
+{"level":"info","message":"[f080291c-2245-4e4a-92da-04405dacb2f1] Collab Editor Service responded with 200 for /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T13:24:34.295Z"}
+{"level":"info","message":"[ac96b4dc-9a15-4489-acb6-8ce1e8d6282a] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T13:24:34.297Z"}
+{"level":"info","message":"[ac96b4dc-9a15-4489-acb6-8ce1e8d6282a] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T13:24:34.297Z"}
+{"level":"info","message":"[9a2d2e0f-ec94-4bb6-9586-f70988759d0d] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T13:24:34.299Z"}
+{"level":"info","message":"[9a2d2e0f-ec94-4bb6-9586-f70988759d0d] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T13:24:34.299Z"}
+{"level":"info","message":"[ababa273-b1da-4284-9bc1-e1706b1be688] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T13:24:38.375Z"}
+{"level":"info","message":"[ababa273-b1da-4284-9bc1-e1706b1be688] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T13:24:38.376Z"}
+{"level":"info","message":"[9d098f6b-7292-4255-a82e-a36ddd207193] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T13:24:38.383Z"}
+{"level":"info","message":"[9d098f6b-7292-4255-a82e-a36ddd207193] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T13:24:38.384Z"}
+{"level":"info","message":"[ababa273-b1da-4284-9bc1-e1706b1be688] Collab Editor Service responded with 200 for /bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T13:24:38.398Z"}
+{"level":"info","message":"[9d098f6b-7292-4255-a82e-a36ddd207193] Collab Editor Service responded with 200 for /bookclubs","service":"api-gateway","timestamp":"2026-01-10T13:24:38.401Z"}
+{"level":"info","message":"[e25d098c-4b3e-444c-ae65-98bea7d12eda] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T13:24:38.405Z"}
+{"level":"info","message":"[e25d098c-4b3e-444c-ae65-98bea7d12eda] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T13:24:38.406Z"}
+{"level":"info","message":"[287c7dd3-57da-411f-adf9-3316670ad265] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T13:24:38.409Z"}
+{"level":"info","message":"[287c7dd3-57da-411f-adf9-3316670ad265] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T13:24:38.409Z"}
+{"level":"info","message":"[43401f84-d8ba-4925-81b4-d65252132395] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T13:24:51.700Z"}
+{"level":"info","message":"[dde9d6bb-2d7f-4ed3-af3d-a64070bebc25] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T13:24:51.702Z"}
+{"level":"info","message":"[43401f84-d8ba-4925-81b4-d65252132395] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T13:24:51.703Z"}
+{"level":"info","message":"[dde9d6bb-2d7f-4ed3-af3d-a64070bebc25] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T13:24:51.703Z"}
+{"level":"info","message":"[43401f84-d8ba-4925-81b4-d65252132395] Collab Editor Service responded with 200 for /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T13:24:51.752Z"}
+{"level":"info","message":"[4cabb7c5-78a6-4445-a648-ec76c3222acb] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T13:24:51.757Z"}
+{"level":"info","message":"[4cabb7c5-78a6-4445-a648-ec76c3222acb] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T13:24:51.758Z"}
+{"level":"info","message":"[b3930612-a1e7-4675-91c0-08fd13dcc20f] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T13:24:51.758Z"}
+{"level":"info","message":"[b3930612-a1e7-4675-91c0-08fd13dcc20f] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T13:24:51.759Z"}
+{"level":"info","message":"[afdd95f0-264a-49f0-95b3-7f8032be6ef2] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T13:24:54.774Z"}
+{"level":"info","message":"[afdd95f0-264a-49f0-95b3-7f8032be6ef2] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T13:24:54.775Z"}
+{"level":"info","message":"[b787376c-eee7-46cc-a194-b5ef88cdbb9e] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T13:24:54.781Z"}
+{"level":"info","message":"[b787376c-eee7-46cc-a194-b5ef88cdbb9e] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T13:24:54.782Z"}
+{"level":"info","message":"[afdd95f0-264a-49f0-95b3-7f8032be6ef2] Collab Editor Service responded with 200 for /bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T13:24:54.790Z"}
+{"level":"info","message":"[c7f9c496-bd56-43ac-98cf-19fc6060bc2e] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T13:24:54.796Z"}
+{"level":"info","message":"[c7f9c496-bd56-43ac-98cf-19fc6060bc2e] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T13:24:54.796Z"}
+{"level":"info","message":"[b787376c-eee7-46cc-a194-b5ef88cdbb9e] Collab Editor Service responded with 200 for /bookclubs","service":"api-gateway","timestamp":"2026-01-10T13:24:54.799Z"}
+{"level":"info","message":"[d56e1a4c-c632-46ad-830c-4c08b4ad7d2e] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T13:24:54.803Z"}
+{"level":"info","message":"[d56e1a4c-c632-46ad-830c-4c08b4ad7d2e] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T13:24:54.804Z"}
+{"level":"info","message":"[03a56575-5cb0-458f-b000-b245cec42d56] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T13:40:41.066Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:40:41.067Z"}
+{"level":"info","message":"[831718bd-03d1-4fcc-945d-f232b2fc95b9] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T13:41:07.106Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:41:07.107Z"}
+{"level":"info","message":"[5f5579ac-9741-4b9a-8ede-c81c70f59b85] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T13:41:08.200Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:41:08.200Z"}
+{"level":"info","message":"[fb261c8a-864c-4973-8ea6-cd136e835cc1] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T13:41:09.074Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:41:09.074Z"}
+{"level":"info","message":"[bbd0f755-a640-4d55-8638-0b84ce6d9138] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:43:13.284Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:43:13.285Z"}
+{"level":"info","message":"[03651689-003e-48f4-b506-55c103fa91bd] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:43:14.499Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:43:14.499Z"}
+{"level":"info","message":"[81b78dda-a79d-4267-9bd9-281bb39450dc] GET /v1/profile/:b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:43:33.815Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:43:33.815Z"}
+{"level":"info","message":"[22aae61e-4732-478d-a59e-b3ca4c3c4510] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:43:59.925Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:43:59.926Z"}
+{"level":"info","message":"[b55e23f9-b6fc-4d4a-a496-092b038f37d9] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:45:20.904Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:45:20.908Z"}
+{"level":"info","message":"[4db4b31f-031e-4310-8ffa-57fb11eddc73] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:45:21.835Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:45:21.835Z"}
+{"level":"info","message":"[fd458849-8318-4641-b74b-2b32751001d5] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:45:22.715Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:45:22.715Z"}
+{"level":"info","message":"[4532eb9e-0ec6-42fe-940c-b127be823b45] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:47:17.025Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:47:17.028Z"}
+{"level":"info","message":"[e76dbce6-ec9f-406f-b77c-f0dda4c7c04e] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:47:18.176Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:47:18.177Z"}
+{"level":"info","message":"[491b58cc-5899-4f91-b38f-e6939211ea23] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:47:25.422Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:47:25.423Z"}
+{"level":"info","message":"[c4e4b055-5fa8-4b78-88ad-9e503ac019f5] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:47:26.426Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:47:26.426Z"}
+{"level":"info","message":"[f4392e4d-3736-43c8-8171-a677caa9ee10] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:47:27.466Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:47:27.466Z"}
+{"level":"info","message":"[5a6e5973-4fed-41c2-9325-5183b2adaecb] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:47:38.109Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:47:38.109Z"}
+{"level":"info","message":"[e7d813f8-bae7-4139-bb7a-96919d91a7af] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:47:39.009Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:47:39.009Z"}
+{"level":"info","message":"[a1141165-e1b1-412a-8a18-730c42137249] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:47:39.758Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:47:39.758Z"}
+{"level":"info","message":"[3c727a5c-bf2f-4050-9335-ba2d386476fd] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:48:46.389Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:48:46.391Z"}
+{"level":"info","message":"[e4a3cc3a-8eec-45e3-bb16-4fdfb981b854] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:48:47.165Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:48:47.165Z"}
+{"level":"info","message":"[402cbd45-fd08-4688-9926-eba40c4f68d1] GET /v1/profile/:b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:48:53.058Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:48:53.059Z"}
+{"level":"info","message":"[a4c88194-ff36-46c3-a581-a44f786ec66b] GET /v1/profile/:b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:48:53.896Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:48:53.896Z"}
+{"level":"info","message":"[9dc887f2-5f4d-42b5-a847-4e6c865d5502] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:49:08.155Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:49:08.156Z"}
+{"level":"info","message":"[b1a5bc7d-906f-4878-8bcc-9a4af31b6414] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:49:22.101Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:49:22.102Z"}
+{"level":"info","message":"[b3f60b67-c4dc-43a7-9656-c0c4393e2256] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T13:49:22.866Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:49:22.866Z"}
+{"level":"info","message":"[a2d12ff3-7c30-457b-83c9-21ab79767ec0] POST /v1/auth/register","service":"api-gateway","timestamp":"2026-01-10T13:49:45.516Z"}
+{"level":"info","message":"[a2d12ff3-7c30-457b-83c9-21ab79767ec0] Body: {\"name\":\"Parker Brown\",\"email\":\"user17680529854902276@testmail.com\"}","service":"api-gateway","timestamp":"2026-01-10T13:49:45.517Z"}
+{"level":"info","message":"[a2d12ff3-7c30-457b-83c9-21ab79767ec0] Proxying POST /register to Auth Service","service":"api-gateway","timestamp":"2026-01-10T13:49:45.518Z"}
+{"level":"info","message":"[a2d12ff3-7c30-457b-83c9-21ab79767ec0] Auth Service responded with 201 for /register","service":"api-gateway","timestamp":"2026-01-10T13:49:45.881Z"}
+{"level":"info","message":"[17de739c-9663-49b3-bbcb-4b0bff41e518] GET /v1/profile/847bfb81-df16-48ef-a601-d1e970e74df5","service":"api-gateway","timestamp":"2026-01-10T13:49:56.685Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:49:56.686Z"}
+{"level":"info","message":"[7bd2bbb2-e26f-42de-96f5-46d58dd284fd] GET /v1/profile/847bfb81-df16-48ef-a601-d1e970e74df5","service":"api-gateway","timestamp":"2026-01-10T13:49:57.635Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:49:57.636Z"}
+{"level":"info","message":"[450ddec0-ac71-433c-95a3-3ce914a031eb] GET /v1/profile/847bfb81-df16-48ef-a601-d1e970e74df5","service":"api-gateway","timestamp":"2026-01-10T13:50:01.171Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T13:50:01.171Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T13:50:47.161Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T13:50:47.163Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T13:50:47.163Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-10T13:50:47.163Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-10T13:50:47.164Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T13:50:57.533Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T13:50:57.535Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T13:50:57.535Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-10T13:50:57.535Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-10T13:50:57.536Z"}
+{"level":"info","message":"[a2c270e4-a63e-46b1-a2b4-20b1b44597af] GET /v1/profile/847bfb81-df16-48ef-a601-d1e970e74df5","service":"api-gateway","timestamp":"2026-01-10T13:51:23.438Z"}
+{"level":"info","message":"[a2c270e4-a63e-46b1-a2b4-20b1b44597af] Proxying GET /847bfb81-df16-48ef-a601-d1e970e74df5 to Profile Service","service":"api-gateway","timestamp":"2026-01-10T13:51:23.442Z"}
+{"level":"info","message":"[a2c270e4-a63e-46b1-a2b4-20b1b44597af] Profile Service responded with 200 for /847bfb81-df16-48ef-a601-d1e970e74df5","service":"api-gateway","timestamp":"2026-01-10T13:51:23.468Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T13:52:26.239Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T13:52:26.240Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T13:52:26.241Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-10T13:52:26.241Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-10T13:52:26.242Z"}
+{"level":"info","message":"[db3b28f6-217d-4311-ba4a-d90888517a81] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T13:58:38.158Z"}
+{"level":"info","message":"[db3b28f6-217d-4311-ba4a-d90888517a81] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T13:58:38.163Z"}
+{"level":"info","message":"[97cfbc68-d713-403d-a3e0-1351b51cf9af] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T13:58:38.169Z"}
+{"level":"info","message":"[97cfbc68-d713-403d-a3e0-1351b51cf9af] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T13:58:38.170Z"}
+{"level":"info","message":"[db3b28f6-217d-4311-ba4a-d90888517a81] Profile Service responded with 200 for /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T13:58:38.214Z"}
+{"level":"info","message":"[97cfbc68-d713-403d-a3e0-1351b51cf9af] Profile Service responded with 200 for /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T13:58:38.217Z"}
+{"level":"info","message":"[d44196a5-9a7b-42a1-b08b-76b34b4a9f6a] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T13:58:38.233Z"}
+{"level":"info","message":"[d44196a5-9a7b-42a1-b08b-76b34b4a9f6a] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T13:58:38.234Z"}
+{"level":"info","message":"[ee5e3724-67a5-4b05-8056-34a4ea4cfbd8] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T13:58:38.278Z"}
+{"level":"info","message":"[ee5e3724-67a5-4b05-8056-34a4ea4cfbd8] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T13:58:38.279Z"}
+{"level":"info","message":"[25c2d2d1-b725-423e-a076-530c32723ac3] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:15:34.245Z"}
+{"level":"info","message":"[b31802f4-5b48-4c00-99be-74fb0731b278] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:15:34.248Z"}
+{"level":"info","message":"[25c2d2d1-b725-423e-a076-530c32723ac3] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:15:34.252Z"}
+{"level":"info","message":"[b31802f4-5b48-4c00-99be-74fb0731b278] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:15:34.252Z"}
+{"level":"info","message":"[a2d5f164-44c9-47cc-84f4-9e852c797a7e] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:15:34.349Z"}
+{"level":"info","message":"[a2d5f164-44c9-47cc-84f4-9e852c797a7e] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:15:34.349Z"}
+{"level":"info","message":"[efde33e6-29fd-4816-949e-8d23c85de9e1] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:15:34.350Z"}
+{"level":"info","message":"[efde33e6-29fd-4816-949e-8d23c85de9e1] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:15:34.350Z"}
+{"level":"info","message":"[8906f4af-4445-46b9-8d8b-dab38eecd69f] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:15:39.272Z"}
+{"level":"info","message":"[8906f4af-4445-46b9-8d8b-dab38eecd69f] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:15:39.274Z"}
+{"level":"info","message":"[f52a0e44-6fbe-4924-8372-dce8f1e82a68] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:15:39.277Z"}
+{"level":"info","message":"[f52a0e44-6fbe-4924-8372-dce8f1e82a68] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:15:39.279Z"}
+{"level":"info","message":"[8906f4af-4445-46b9-8d8b-dab38eecd69f] Profile Service responded with 200 for /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:15:39.290Z"}
+{"level":"info","message":"[30190f1a-44e6-480b-9ce6-7a7e0cc74ba6] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:15:39.300Z"}
+{"level":"info","message":"[30190f1a-44e6-480b-9ce6-7a7e0cc74ba6] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:15:39.301Z"}
+{"level":"info","message":"[6bf95342-78eb-4e41-b684-cd4e86a00437] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:15:39.319Z"}
+{"level":"info","message":"[6bf95342-78eb-4e41-b684-cd4e86a00437] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:15:39.320Z"}
+{"level":"info","message":"[54351155-12b6-4a61-a098-7ed6e843979d] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T14:16:51.257Z"}
+{"level":"info","message":"[54351155-12b6-4a61-a098-7ed6e843979d] Proxying GET / to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:16:51.260Z"}
+{"level":"info","message":"[54351155-12b6-4a61-a098-7ed6e843979d] Profile Service responded with 404 for /","service":"api-gateway","timestamp":"2026-01-10T14:16:51.285Z"}
+{"level":"info","message":"[cf989589-6362-4eb9-b293-ccb70512e8c0] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T14:16:51.290Z"}
+{"level":"info","message":"[cf989589-6362-4eb9-b293-ccb70512e8c0] Proxying GET / to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:16:51.291Z"}
+{"level":"info","message":"[cf989589-6362-4eb9-b293-ccb70512e8c0] Profile Service responded with 404 for /","service":"api-gateway","timestamp":"2026-01-10T14:16:51.294Z"}
+{"level":"info","message":"[b52def86-32f4-447e-99e2-603ca644a262] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:18:19.659Z"}
+{"level":"info","message":"[93e11c37-a78e-4462-8c99-bcb2ada42651] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:18:19.663Z"}
+{"level":"info","message":"[b52def86-32f4-447e-99e2-603ca644a262] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:18:19.664Z"}
+{"level":"info","message":"[93e11c37-a78e-4462-8c99-bcb2ada42651] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:18:19.665Z"}
+{"level":"info","message":"[b52def86-32f4-447e-99e2-603ca644a262] Profile Service responded with 200 for /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:18:19.706Z"}
+{"level":"info","message":"[06498e90-0f0c-4f1f-9b67-e3840c29c132] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:18:19.712Z"}
+{"level":"info","message":"[06498e90-0f0c-4f1f-9b67-e3840c29c132] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:18:19.713Z"}
+{"level":"info","message":"[c460995a-bdcb-4d92-97a0-200c044a6d1d] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:18:19.747Z"}
+{"level":"info","message":"[c460995a-bdcb-4d92-97a0-200c044a6d1d] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:18:19.748Z"}
+{"level":"info","message":"[63910e02-00a1-453a-99f3-40b1311662c8] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T14:21:53.056Z"}
+{"level":"info","message":"[63910e02-00a1-453a-99f3-40b1311662c8] Proxying GET / to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:21:53.058Z"}
+{"level":"info","message":"[eaf647f4-fc88-495c-885e-e191a0466309] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T14:21:53.061Z"}
+{"level":"info","message":"[eaf647f4-fc88-495c-885e-e191a0466309] Proxying GET / to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:21:53.062Z"}
+{"level":"info","message":"[63910e02-00a1-453a-99f3-40b1311662c8] Profile Service responded with 404 for /","service":"api-gateway","timestamp":"2026-01-10T14:21:53.079Z"}
+{"level":"info","message":"[eaf647f4-fc88-495c-885e-e191a0466309] Profile Service responded with 404 for /","service":"api-gateway","timestamp":"2026-01-10T14:21:53.084Z"}
+{"level":"info","message":"[86672b41-6bd4-475c-8f08-7b061467a93a] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T14:21:54.522Z"}
+{"level":"info","message":"[86672b41-6bd4-475c-8f08-7b061467a93a] Proxying GET / to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:21:54.523Z"}
+{"level":"info","message":"[d5a8eef8-cc8b-4dd2-8b48-0f96f62b6bcb] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T14:21:54.524Z"}
+{"level":"info","message":"[d5a8eef8-cc8b-4dd2-8b48-0f96f62b6bcb] Proxying GET / to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:21:54.525Z"}
+{"level":"info","message":"[86672b41-6bd4-475c-8f08-7b061467a93a] Profile Service responded with 404 for /","service":"api-gateway","timestamp":"2026-01-10T14:21:54.527Z"}
+{"level":"info","message":"[d5a8eef8-cc8b-4dd2-8b48-0f96f62b6bcb] Profile Service responded with 404 for /","service":"api-gateway","timestamp":"2026-01-10T14:21:54.529Z"}
+{"level":"info","message":"[a5e5df56-3115-4644-a8fe-44f68df8821d] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T14:21:55.292Z"}
+{"level":"info","message":"[a5e5df56-3115-4644-a8fe-44f68df8821d] Proxying GET / to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:21:55.293Z"}
+{"level":"info","message":"[a6da884e-3fa7-44c2-9a43-2443ba154763] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T14:21:55.294Z"}
+{"level":"info","message":"[a6da884e-3fa7-44c2-9a43-2443ba154763] Proxying GET / to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:21:55.294Z"}
+{"level":"info","message":"[a5e5df56-3115-4644-a8fe-44f68df8821d] Profile Service responded with 404 for /","service":"api-gateway","timestamp":"2026-01-10T14:21:55.300Z"}
+{"level":"info","message":"[a6da884e-3fa7-44c2-9a43-2443ba154763] Profile Service responded with 404 for /","service":"api-gateway","timestamp":"2026-01-10T14:21:55.302Z"}
+{"level":"info","message":"[46312c6a-bcb5-409b-aab4-9e7574361a84] PUT /v1/profile","service":"api-gateway","timestamp":"2026-01-10T14:22:11.772Z"}
+{"level":"info","message":"[46312c6a-bcb5-409b-aab4-9e7574361a84] Body: {\"name\":\"SLAVISO\"}","service":"api-gateway","timestamp":"2026-01-10T14:22:11.773Z"}
+{"level":"info","message":"[46312c6a-bcb5-409b-aab4-9e7574361a84] Proxying PUT / to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:22:11.773Z"}
+{"level":"info","message":"[46312c6a-bcb5-409b-aab4-9e7574361a84] Profile Service responded with 200 for /","service":"api-gateway","timestamp":"2026-01-10T14:22:11.814Z"}
+{"level":"info","message":"[91baab86-88be-4f07-9ced-6cd5d5b73ddd] POST /v1/profile/image","service":"api-gateway","timestamp":"2026-01-10T14:22:11.826Z"}
+{"level":"info","message":"[91baab86-88be-4f07-9ced-6cd5d5b73ddd] Proxying POST /image to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:22:11.832Z"}
+{"level":"info","message":"[91baab86-88be-4f07-9ced-6cd5d5b73ddd] Profile Service responded with 200 for /image","service":"api-gateway","timestamp":"2026-01-10T14:22:11.850Z"}
+{"level":"info","message":"[20ae7596-90c9-48ab-895d-02cebd5e47c1] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:22:11.869Z"}
+{"level":"info","message":"[20ae7596-90c9-48ab-895d-02cebd5e47c1] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:22:11.869Z"}
+{"level":"info","message":"[d35d631d-6f51-47cd-9a9a-c0edab81dfa7] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:22:11.872Z"}
+{"level":"info","message":"[d35d631d-6f51-47cd-9a9a-c0edab81dfa7] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:22:11.872Z"}
+{"level":"info","message":"[d35d631d-6f51-47cd-9a9a-c0edab81dfa7] Collab Editor Service responded with 200 for /bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:22:11.921Z"}
+{"level":"info","message":"[20ae7596-90c9-48ab-895d-02cebd5e47c1] Collab Editor Service responded with 200 for /bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:22:11.922Z"}
+{"level":"info","message":"[6f188e90-e106-4ba4-b26d-8c08c9d8ae13] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:22:11.924Z"}
+{"level":"info","message":"[6f188e90-e106-4ba4-b26d-8c08c9d8ae13] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:22:11.924Z"}
+{"level":"info","message":"[5a770fe7-7f5f-4d28-b695-6977bc9f0707] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:22:11.926Z"}
+{"level":"info","message":"[5a770fe7-7f5f-4d28-b695-6977bc9f0707] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:22:11.927Z"}
+{"level":"info","message":"[0861fbcf-602d-43ea-a75b-358896a99a56] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:22:16.075Z"}
+{"level":"info","message":"[41b5a295-d6a9-4b29-9722-0b7e6512d1bd] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:22:16.076Z"}
+{"level":"info","message":"[0861fbcf-602d-43ea-a75b-358896a99a56] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:22:16.077Z"}
+{"level":"info","message":"[41b5a295-d6a9-4b29-9722-0b7e6512d1bd] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:22:16.077Z"}
+{"level":"info","message":"[0861fbcf-602d-43ea-a75b-358896a99a56] Profile Service responded with 200 for /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:22:16.090Z"}
+{"level":"info","message":"[24285f76-33b0-4b67-a3bb-ad8b0f6c714e] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:22:16.099Z"}
+{"level":"info","message":"[24285f76-33b0-4b67-a3bb-ad8b0f6c714e] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:22:16.099Z"}
+{"level":"info","message":"[41b5a295-d6a9-4b29-9722-0b7e6512d1bd] Profile Service responded with 200 for /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:22:16.117Z"}
+{"level":"info","message":"[d21b5030-6cd3-4790-bfc9-6e614772252b] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:22:16.135Z"}
+{"level":"info","message":"[d21b5030-6cd3-4790-bfc9-6e614772252b] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:22:16.136Z"}
+{"level":"info","message":"[1c3d7705-0c1b-45a3-bd75-9538ad95c2a0] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T14:22:19.176Z"}
+{"level":"info","message":"[1c3d7705-0c1b-45a3-bd75-9538ad95c2a0] Proxying GET / to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:22:19.177Z"}
+{"level":"info","message":"[c9d8c8d4-8b8d-4ef8-8631-474487d0a6d7] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T14:22:19.178Z"}
+{"level":"info","message":"[c9d8c8d4-8b8d-4ef8-8631-474487d0a6d7] Proxying GET / to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:22:19.178Z"}
+{"level":"info","message":"[1c3d7705-0c1b-45a3-bd75-9538ad95c2a0] Profile Service responded with 404 for /","service":"api-gateway","timestamp":"2026-01-10T14:22:19.182Z"}
+{"level":"info","message":"[c9d8c8d4-8b8d-4ef8-8631-474487d0a6d7] Profile Service responded with 404 for /","service":"api-gateway","timestamp":"2026-01-10T14:22:19.185Z"}
+{"level":"info","message":"[a072cca6-f7dd-45db-b98f-a60a60a0e256] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T14:24:57.073Z"}
+{"level":"info","message":"[a072cca6-f7dd-45db-b98f-a60a60a0e256] Proxying GET / to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:24:57.078Z"}
+{"level":"info","message":"[a072cca6-f7dd-45db-b98f-a60a60a0e256] Profile Service responded with 404 for /","service":"api-gateway","timestamp":"2026-01-10T14:24:57.104Z"}
+{"level":"info","message":"[52aab627-ef30-414e-8762-e7748e7de7e4] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T14:24:59.119Z"}
+{"level":"info","message":"[52aab627-ef30-414e-8762-e7748e7de7e4] Proxying GET / to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:24:59.121Z"}
+{"level":"info","message":"[0459ada3-52b0-449a-aed1-62466d558a51] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T14:24:59.123Z"}
+{"level":"info","message":"[0459ada3-52b0-449a-aed1-62466d558a51] Proxying GET / to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:24:59.123Z"}
+{"level":"info","message":"[52aab627-ef30-414e-8762-e7748e7de7e4] Profile Service responded with 404 for /","service":"api-gateway","timestamp":"2026-01-10T14:24:59.125Z"}
+{"level":"info","message":"[0459ada3-52b0-449a-aed1-62466d558a51] Profile Service responded with 404 for /","service":"api-gateway","timestamp":"2026-01-10T14:24:59.128Z"}
+{"level":"info","message":"[6d80e440-cbf1-433a-bc2d-7e19d4764743] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T14:24:59.837Z"}
+{"level":"info","message":"[6d80e440-cbf1-433a-bc2d-7e19d4764743] Proxying GET / to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:24:59.838Z"}
+{"level":"info","message":"[00b24d39-a011-4546-abba-4714d53a1760] GET /v1/profile","service":"api-gateway","timestamp":"2026-01-10T14:24:59.839Z"}
+{"level":"info","message":"[00b24d39-a011-4546-abba-4714d53a1760] Proxying GET / to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:24:59.840Z"}
+{"level":"info","message":"[6d80e440-cbf1-433a-bc2d-7e19d4764743] Profile Service responded with 404 for /","service":"api-gateway","timestamp":"2026-01-10T14:24:59.843Z"}
+{"level":"info","message":"[00b24d39-a011-4546-abba-4714d53a1760] Profile Service responded with 404 for /","service":"api-gateway","timestamp":"2026-01-10T14:24:59.844Z"}
+{"level":"info","message":"[8341ff49-15b8-4384-9d64-adca44e34da1] GET /v1/profile/[object%20Object]","service":"api-gateway","timestamp":"2026-01-10T14:27:31.808Z"}
+{"level":"info","message":"[8341ff49-15b8-4384-9d64-adca44e34da1] Proxying GET /[object%20Object] to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:27:31.810Z"}
+{"level":"info","message":"[8341ff49-15b8-4384-9d64-adca44e34da1] Profile Service responded with 404 for /[object%20Object]","service":"api-gateway","timestamp":"2026-01-10T14:27:31.842Z"}
+{"level":"info","message":"[d5128b8b-ba85-471b-b661-619f5d858569] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:28:40.132Z"}
+{"level":"info","message":"[d5128b8b-ba85-471b-b661-619f5d858569] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:28:40.134Z"}
+{"level":"info","message":"[82e16b78-6f4a-41a4-abbe-c7109353ca7f] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:28:41.997Z"}
+{"level":"info","message":"[82e16b78-6f4a-41a4-abbe-c7109353ca7f] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:28:41.998Z"}
+{"level":"info","message":"[8ecd0c9a-fc7b-48c6-bb14-92aef74d3b3f] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:28:41.998Z"}
+{"level":"info","message":"[8ecd0c9a-fc7b-48c6-bb14-92aef74d3b3f] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:28:41.998Z"}
+{"level":"info","message":"[82e16b78-6f4a-41a4-abbe-c7109353ca7f] Profile Service responded with 200 for /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:28:42.005Z"}
+{"level":"info","message":"[0f944c09-bda8-4d7e-81a9-dfa8560279dc] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:28:42.720Z"}
+{"level":"info","message":"[0f944c09-bda8-4d7e-81a9-dfa8560279dc] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:28:42.721Z"}
+{"level":"info","message":"[97e231e0-a26c-4e54-b427-67fed2550574] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:28:42.722Z"}
+{"level":"info","message":"[97e231e0-a26c-4e54-b427-67fed2550574] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:28:42.722Z"}
+{"level":"info","message":"[97e231e0-a26c-4e54-b427-67fed2550574] Profile Service responded with 200 for /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:28:42.727Z"}
+{"level":"info","message":"[b2bb42b9-2cf1-45bb-910f-760aa9a9c2a1] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:29:58.876Z"}
+{"level":"info","message":"[b2bb42b9-2cf1-45bb-910f-760aa9a9c2a1] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:29:58.879Z"}
+{"level":"info","message":"[20569330-c619-46ad-8eec-bc7e82f68096] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:30:11.763Z"}
+{"level":"info","message":"[20569330-c619-46ad-8eec-bc7e82f68096] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:30:11.765Z"}
+{"level":"info","message":"[99307db6-e22a-436c-a092-201bba8958cc] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:30:17.877Z"}
+{"level":"info","message":"[3b250c83-5c93-48da-a34a-e2322284bf9a] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:30:17.883Z"}
+{"level":"info","message":"[99307db6-e22a-436c-a092-201bba8958cc] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:30:17.884Z"}
+{"level":"info","message":"[3b250c83-5c93-48da-a34a-e2322284bf9a] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:30:17.885Z"}
+{"level":"info","message":"[3b250c83-5c93-48da-a34a-e2322284bf9a] Profile Service responded with 200 for /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:30:17.933Z"}
+{"level":"info","message":"[ba86dc49-06d5-4e13-a915-099a46704aec] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:30:30.019Z"}
+{"level":"info","message":"[927f4457-26cb-4857-993a-069a33c4facd] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:30:30.026Z"}
+{"level":"info","message":"[ba86dc49-06d5-4e13-a915-099a46704aec] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:30:30.027Z"}
+{"level":"info","message":"[927f4457-26cb-4857-993a-069a33c4facd] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:30:30.027Z"}
+{"level":"info","message":"[30067673-39f0-48ee-b7f1-c319fdd7f9c0] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:30:30.123Z"}
+{"level":"info","message":"[30067673-39f0-48ee-b7f1-c319fdd7f9c0] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:30:30.124Z"}
+{"level":"info","message":"[0e481d94-9031-4180-adc8-1efe4df74773] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:30:30.125Z"}
+{"level":"info","message":"[0e481d94-9031-4180-adc8-1efe4df74773] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:30:30.126Z"}
+{"level":"info","message":"[aa9a0f5d-b3b0-4372-b01a-13a296fbac7f] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:30:33.339Z"}
+{"level":"info","message":"[aa9a0f5d-b3b0-4372-b01a-13a296fbac7f] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:30:33.340Z"}
+{"level":"info","message":"[4413e0df-402f-4812-a7ee-2fd514758611] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:30:33.343Z"}
+{"level":"info","message":"[4413e0df-402f-4812-a7ee-2fd514758611] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:30:33.344Z"}
+{"level":"info","message":"[4413e0df-402f-4812-a7ee-2fd514758611] Profile Service responded with 200 for /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:30:33.354Z"}
+{"level":"info","message":"[47d55984-77fa-4642-8581-58504846deb9] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:30:33.360Z"}
+{"level":"info","message":"[47d55984-77fa-4642-8581-58504846deb9] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:30:33.361Z"}
+{"level":"info","message":"[82614339-40b5-48af-a066-787235bc12c3] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:30:33.379Z"}
+{"level":"info","message":"[82614339-40b5-48af-a066-787235bc12c3] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:30:33.379Z"}
+{"level":"info","message":"[f2c364a5-0c28-4567-9490-a750912f2c6f] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:30:37.623Z"}
+{"level":"info","message":"[f2c364a5-0c28-4567-9490-a750912f2c6f] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:30:37.625Z"}
+{"level":"info","message":"[a2e0407e-94ce-492d-851c-62bc653bfd61] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:30:37.626Z"}
+{"level":"info","message":"[a2e0407e-94ce-492d-851c-62bc653bfd61] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:30:37.627Z"}
+{"level":"info","message":"[a2e0407e-94ce-492d-851c-62bc653bfd61] Profile Service responded with 200 for /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:30:37.637Z"}
+{"level":"info","message":"[4181fdd7-b125-4c05-ba06-0c7d3f849aed] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:30:39.283Z"}
+{"level":"info","message":"[4181fdd7-b125-4c05-ba06-0c7d3f849aed] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:30:39.285Z"}
+{"level":"info","message":"[869c481a-ed5c-4a29-98c2-5da4844ea54a] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:30:39.287Z"}
+{"level":"info","message":"[869c481a-ed5c-4a29-98c2-5da4844ea54a] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:30:39.288Z"}
+{"level":"info","message":"[59ae50bf-6493-4059-ba7e-d59876fe80d7] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:30:39.313Z"}
+{"level":"info","message":"[59ae50bf-6493-4059-ba7e-d59876fe80d7] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:30:39.314Z"}
+{"level":"info","message":"[661b77af-52c1-446a-81ee-9eeda3c42625] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:30:39.315Z"}
+{"level":"info","message":"[661b77af-52c1-446a-81ee-9eeda3c42625] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:30:39.315Z"}
+{"level":"info","message":"[b0f8161b-d999-4c07-a6a1-9c0379a9e788] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:30:43.172Z"}
+{"level":"info","message":"[b0f8161b-d999-4c07-a6a1-9c0379a9e788] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:30:43.173Z"}
+{"level":"info","message":"[60d0da58-96b4-41bb-a719-d89cd78f4f60] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:30:43.174Z"}
+{"level":"info","message":"[60d0da58-96b4-41bb-a719-d89cd78f4f60] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:30:43.176Z"}
+{"level":"info","message":"[60d0da58-96b4-41bb-a719-d89cd78f4f60] Profile Service responded with 200 for /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:30:43.186Z"}
+{"level":"info","message":"[9cb90e86-26eb-4970-a18b-336d3b6ed1b2] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:30:43.193Z"}
+{"level":"info","message":"[9cb90e86-26eb-4970-a18b-336d3b6ed1b2] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:30:43.194Z"}
+{"level":"info","message":"[02c2b10b-8d18-4054-bb62-ca22a0fa0668] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:30:43.213Z"}
+{"level":"info","message":"[02c2b10b-8d18-4054-bb62-ca22a0fa0668] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:30:43.214Z"}
+{"level":"info","message":"[e3cb09fa-8902-468a-9f52-8a9a6fb81e2b] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:31:34.663Z"}
+{"level":"info","message":"[e3cb09fa-8902-468a-9f52-8a9a6fb81e2b] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:31:34.664Z"}
+{"level":"info","message":"[6143d253-0c1b-4356-ba84-da72fe325551] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:31:34.667Z"}
+{"level":"info","message":"[6143d253-0c1b-4356-ba84-da72fe325551] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:31:34.668Z"}
+{"level":"info","message":"[e3cb09fa-8902-468a-9f52-8a9a6fb81e2b] Collab Editor Service responded with 200 for /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:31:34.692Z"}
+{"level":"info","message":"[12b591e4-3401-4e3f-be17-14a7058a2226] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:31:34.697Z"}
+{"level":"info","message":"[12b591e4-3401-4e3f-be17-14a7058a2226] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:31:34.699Z"}
+{"level":"info","message":"[1922b91b-3693-4016-8e06-8af181e9c20b] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:31:34.700Z"}
+{"level":"info","message":"[1922b91b-3693-4016-8e06-8af181e9c20b] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:31:34.700Z"}
+{"level":"info","message":"[02895a81-214f-41f6-8a38-3e9074b98d81] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T14:34:33.687Z"}
+{"level":"info","message":"[02895a81-214f-41f6-8a38-3e9074b98d81] Proxying GET /b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:34:33.690Z"}
+{"level":"info","message":"[5590574b-76de-4e7f-b0c6-adbbc2e33b18] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T14:34:33.692Z"}
+{"level":"info","message":"[5590574b-76de-4e7f-b0c6-adbbc2e33b18] Proxying GET /b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:34:33.693Z"}
+{"level":"info","message":"[02895a81-214f-41f6-8a38-3e9074b98d81] Profile Service responded with 200 for /b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T14:34:33.733Z"}
+{"level":"info","message":"[1ceefb8c-5b9c-4873-9b3c-8a20fb3a2ce7] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:34:33.743Z"}
+{"level":"info","message":"[1ceefb8c-5b9c-4873-9b3c-8a20fb3a2ce7] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:34:33.745Z"}
+{"level":"info","message":"[5590574b-76de-4e7f-b0c6-adbbc2e33b18] Profile Service responded with 200 for /b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T14:34:33.751Z"}
+{"level":"info","message":"[1ceefb8c-5b9c-4873-9b3c-8a20fb3a2ce7] Collab Editor Service responded with 200 for /bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:34:33.772Z"}
+{"level":"info","message":"[c12d977a-9b40-42e9-af64-f0a4b58c7afe] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:34:33.775Z"}
+{"level":"info","message":"[c12d977a-9b40-42e9-af64-f0a4b58c7afe] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:34:33.775Z"}
+{"level":"info","message":"[691ef508-7113-413e-8c21-07f57b7c0690] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:34:48.900Z"}
+{"level":"info","message":"[d49fb441-b865-4828-a643-15036f48293a] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:34:48.900Z"}
+{"level":"info","message":"[691ef508-7113-413e-8c21-07f57b7c0690] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:34:48.902Z"}
+{"level":"info","message":"[d49fb441-b865-4828-a643-15036f48293a] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:34:48.902Z"}
+{"level":"info","message":"[691ef508-7113-413e-8c21-07f57b7c0690] Collab Editor Service responded with 200 for /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:34:48.930Z"}
+{"level":"info","message":"[d49fb441-b865-4828-a643-15036f48293a] Collab Editor Service responded with 200 for /bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:34:48.932Z"}
+{"level":"info","message":"[58e50d9a-354a-4edf-9722-9c16a06832b4] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:34:48.937Z"}
+{"level":"info","message":"[58e50d9a-354a-4edf-9722-9c16a06832b4] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:34:48.937Z"}
+{"level":"info","message":"[05130793-8798-4c62-8b97-04baa48c440c] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:34:48.938Z"}
+{"level":"info","message":"[05130793-8798-4c62-8b97-04baa48c440c] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:34:48.938Z"}
+{"level":"info","message":"[5bf52f35-babb-4ba9-8ab0-9392794ff7f6] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:34:50.054Z"}
+{"level":"info","message":"[5bf52f35-babb-4ba9-8ab0-9392794ff7f6] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:34:50.054Z"}
+{"level":"info","message":"[d07e3469-9a05-4a52-a327-59358bc23f60] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:34:50.058Z"}
+{"level":"info","message":"[d07e3469-9a05-4a52-a327-59358bc23f60] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:34:50.059Z"}
+{"level":"info","message":"[d07e3469-9a05-4a52-a327-59358bc23f60] Profile Service responded with 200 for /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:34:50.073Z"}
+{"level":"info","message":"[9e40ac6c-3cb3-4754-b549-64e94bbff446] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:34:50.079Z"}
+{"level":"info","message":"[9e40ac6c-3cb3-4754-b549-64e94bbff446] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:34:50.080Z"}
+{"level":"info","message":"[9e40ac6c-3cb3-4754-b549-64e94bbff446] Collab Editor Service responded with 200 for /bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:34:50.098Z"}
+{"level":"info","message":"[43402eab-9f03-4e5d-b58e-ace9bed858c4] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:34:50.101Z"}
+{"level":"info","message":"[43402eab-9f03-4e5d-b58e-ace9bed858c4] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:34:50.102Z"}
+{"level":"info","message":"[2e690114-fdcd-4b23-bd9e-c9a3c188f935] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:34:51.088Z"}
+{"level":"info","message":"[2e690114-fdcd-4b23-bd9e-c9a3c188f935] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:34:51.089Z"}
+{"level":"info","message":"[fdd596a6-4ee2-45dc-85a3-a69aba268573] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:34:51.090Z"}
+{"level":"info","message":"[fdd596a6-4ee2-45dc-85a3-a69aba268573] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:34:51.090Z"}
+{"level":"info","message":"[2e690114-fdcd-4b23-bd9e-c9a3c188f935] Collab Editor Service responded with 200 for /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:34:51.109Z"}
+{"level":"info","message":"[fdd596a6-4ee2-45dc-85a3-a69aba268573] Collab Editor Service responded with 200 for /bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:34:51.110Z"}
+{"level":"info","message":"[cb630566-9b6f-4115-b9dd-a346a40a7270] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:34:51.114Z"}
+{"level":"info","message":"[cb630566-9b6f-4115-b9dd-a346a40a7270] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:34:51.114Z"}
+{"level":"info","message":"[57ba65f1-74a8-439e-9937-7596d53c0a63] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:34:51.117Z"}
+{"level":"info","message":"[57ba65f1-74a8-439e-9937-7596d53c0a63] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:34:51.117Z"}
+{"level":"info","message":"[e42fa943-2d07-4832-b517-4373abac56bb] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:34:52.857Z"}
+{"level":"info","message":"[e42fa943-2d07-4832-b517-4373abac56bb] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:34:52.858Z"}
+{"level":"info","message":"[58e1f6f3-9508-4d96-9b8d-16b69cf054f1] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:34:52.859Z"}
+{"level":"info","message":"[58e1f6f3-9508-4d96-9b8d-16b69cf054f1] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:34:52.860Z"}
+{"level":"info","message":"[58e1f6f3-9508-4d96-9b8d-16b69cf054f1] Profile Service responded with 200 for /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:34:52.866Z"}
+{"level":"info","message":"[60c8d7c7-3288-4af4-88c0-278a10b320bd] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:34:52.873Z"}
+{"level":"info","message":"[60c8d7c7-3288-4af4-88c0-278a10b320bd] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:34:52.873Z"}
+{"level":"info","message":"[60c8d7c7-3288-4af4-88c0-278a10b320bd] Collab Editor Service responded with 200 for /bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:34:52.884Z"}
+{"level":"info","message":"[8f43f84e-5917-4ffe-8784-89f3bb3b4d6e] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:34:52.887Z"}
+{"level":"info","message":"[8f43f84e-5917-4ffe-8784-89f3bb3b4d6e] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:34:52.888Z"}
+{"level":"info","message":"[ab953161-39ae-41e3-a397-de49b0a804f1] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:37:01.495Z"}
+{"level":"info","message":"[ab953161-39ae-41e3-a397-de49b0a804f1] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:37:01.498Z"}
+{"level":"info","message":"[a641f301-ac8d-4be8-8cb5-0b122f3e397d] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:37:01.502Z"}
+{"level":"info","message":"[a641f301-ac8d-4be8-8cb5-0b122f3e397d] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:37:01.503Z"}
+{"level":"info","message":"[ab953161-39ae-41e3-a397-de49b0a804f1] Collab Editor Service responded with 200 for /bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:37:01.576Z"}
+{"level":"info","message":"[eab911c7-2b78-4838-ac64-a9c33f757942] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:37:01.579Z"}
+{"level":"info","message":"[eab911c7-2b78-4838-ac64-a9c33f757942] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:37:01.579Z"}
+{"level":"info","message":"[a641f301-ac8d-4be8-8cb5-0b122f3e397d] Collab Editor Service responded with 200 for /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:37:01.586Z"}
+{"level":"info","message":"[2cee12bb-b066-422c-8c7e-f96b41829d09] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:37:01.588Z"}
+{"level":"info","message":"[2cee12bb-b066-422c-8c7e-f96b41829d09] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:37:01.588Z"}
+{"level":"info","message":"[be32e03e-5eaa-4138-9bf8-33fdb83f1127] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:37:08.908Z"}
+{"level":"info","message":"[be32e03e-5eaa-4138-9bf8-33fdb83f1127] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:37:08.909Z"}
+{"level":"info","message":"[98243fc6-51ce-4403-8b34-7e6fc56560df] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:37:08.910Z"}
+{"level":"info","message":"[98243fc6-51ce-4403-8b34-7e6fc56560df] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:37:08.911Z"}
+{"level":"info","message":"[be32e03e-5eaa-4138-9bf8-33fdb83f1127] Collab Editor Service responded with 200 for /bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:37:08.926Z"}
+{"level":"info","message":"[98243fc6-51ce-4403-8b34-7e6fc56560df] Collab Editor Service responded with 200 for /bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:37:08.928Z"}
+{"level":"info","message":"[7b58a2a7-0164-4060-b419-757646382e6c] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:37:08.931Z"}
+{"level":"info","message":"[7b58a2a7-0164-4060-b419-757646382e6c] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:37:08.932Z"}
+{"level":"info","message":"[0027ac40-746a-469f-8428-2e2709e485ec] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:37:08.934Z"}
+{"level":"info","message":"[0027ac40-746a-469f-8428-2e2709e485ec] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:37:08.934Z"}
+{"level":"info","message":"[e95dbc4b-e39a-4b05-a663-0b070652fd9e] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:37:25.869Z"}
+{"level":"info","message":"[8417fd8d-de91-41ce-88cb-13324d3730e9] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:37:25.870Z"}
+{"level":"info","message":"[e95dbc4b-e39a-4b05-a663-0b070652fd9e] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:37:25.871Z"}
+{"level":"info","message":"[8417fd8d-de91-41ce-88cb-13324d3730e9] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:37:25.871Z"}
+{"level":"info","message":"[e95dbc4b-e39a-4b05-a663-0b070652fd9e] Profile Service responded with 200 for /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:37:25.877Z"}
+{"level":"info","message":"[7fd40a6d-b326-418d-a39a-56a71b8b356d] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:37:25.883Z"}
+{"level":"info","message":"[7fd40a6d-b326-418d-a39a-56a71b8b356d] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:37:25.883Z"}
+{"level":"info","message":"[46435dca-dd38-4cb6-bba7-c6da8dc03e9c] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:37:25.895Z"}
+{"level":"info","message":"[46435dca-dd38-4cb6-bba7-c6da8dc03e9c] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:37:25.895Z"}
+{"level":"info","message":"[70eb0afe-ceff-4f0b-8862-9542c16f56ed] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:38:05.842Z"}
+{"level":"info","message":"[2b1550b5-a491-4e46-a2ee-02dd0f2f6d7d] GET /v1/profile/a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:38:05.843Z"}
+{"level":"info","message":"[70eb0afe-ceff-4f0b-8862-9542c16f56ed] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:38:05.845Z"}
+{"level":"info","message":"[2b1550b5-a491-4e46-a2ee-02dd0f2f6d7d] Proxying GET /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:38:05.845Z"}
+{"level":"info","message":"[2b1550b5-a491-4e46-a2ee-02dd0f2f6d7d] Profile Service responded with 200 for /a30ec151-9d0f-4de3-8bb7-fa6cfdf2be1f","service":"api-gateway","timestamp":"2026-01-10T14:38:05.860Z"}
+{"level":"info","message":"[7abc9949-e8fe-46cb-a969-265782b719c9] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:38:07.883Z"}
+{"level":"info","message":"[7abc9949-e8fe-46cb-a969-265782b719c9] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:38:07.883Z"}
+{"level":"info","message":"[85ddbc32-d072-4a22-9d91-8aa258bb8f2d] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:38:07.884Z"}
+{"level":"info","message":"[85ddbc32-d072-4a22-9d91-8aa258bb8f2d] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:38:07.885Z"}
+{"level":"info","message":"[40206f2c-eee2-49dc-8d25-fc2b6eceb00a] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:38:07.911Z"}
+{"level":"info","message":"[40206f2c-eee2-49dc-8d25-fc2b6eceb00a] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:38:07.912Z"}
+{"level":"info","message":"[67bff05f-8e25-4f73-99c5-3bb25ca80dba] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:38:07.912Z"}
+{"level":"info","message":"[67bff05f-8e25-4f73-99c5-3bb25ca80dba] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:38:07.912Z"}
+{"level":"info","message":"[dddeb582-9639-4615-8541-b899a85f29e5] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:38:29.424Z"}
+{"level":"info","message":"[dddeb582-9639-4615-8541-b899a85f29e5] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:38:29.424Z"}
+{"level":"info","message":"[a88adf48-348c-4162-b739-e4c92ae58e1d] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:38:29.425Z"}
+{"level":"info","message":"[a88adf48-348c-4162-b739-e4c92ae58e1d] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:38:29.425Z"}
+{"level":"info","message":"[dddeb582-9639-4615-8541-b899a85f29e5] Collab Editor Service responded with 200 for /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:38:29.442Z"}
+{"level":"info","message":"[b3208563-fd31-41fa-830a-c4e6f67f299b] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:38:29.446Z"}
+{"level":"info","message":"[b3208563-fd31-41fa-830a-c4e6f67f299b] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:38:29.446Z"}
+{"level":"info","message":"[0f05e001-eff8-48cf-96c6-b93a5ac0a0d7] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:38:29.448Z"}
+{"level":"info","message":"[0f05e001-eff8-48cf-96c6-b93a5ac0a0d7] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:38:29.449Z"}
+{"level":"info","message":"[4094460a-d71b-47eb-9203-c32e68257332] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:38:32.458Z"}
+{"level":"info","message":"[4094460a-d71b-47eb-9203-c32e68257332] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:38:32.458Z"}
+{"level":"info","message":"[4d577338-bf0f-447c-b0d7-d1be84197929] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:38:32.460Z"}
+{"level":"info","message":"[4d577338-bf0f-447c-b0d7-d1be84197929] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:38:32.461Z"}
+{"level":"info","message":"[4094460a-d71b-47eb-9203-c32e68257332] Collab Editor Service responded with 200 for /bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:38:32.478Z"}
+{"level":"info","message":"[4d577338-bf0f-447c-b0d7-d1be84197929] Collab Editor Service responded with 200 for /bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:38:32.479Z"}
+{"level":"info","message":"[7d9907e7-a421-40a6-bba6-46170f20178b] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:38:32.484Z"}
+{"level":"info","message":"[7d9907e7-a421-40a6-bba6-46170f20178b] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:38:32.484Z"}
+{"level":"info","message":"[ee28b91e-a3ba-40a1-887f-2a70d87d9125] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:38:32.486Z"}
+{"level":"info","message":"[ee28b91e-a3ba-40a1-887f-2a70d87d9125] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:38:32.487Z"}
+{"level":"info","message":"[090b6c88-2d01-4921-afa6-d0a04d9793a2] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:40:07.454Z"}
+{"level":"info","message":"[f65aefe5-0765-4efd-be41-d21976e010cb] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:40:07.456Z"}
+{"level":"info","message":"[090b6c88-2d01-4921-afa6-d0a04d9793a2] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:40:07.458Z"}
+{"level":"info","message":"[f65aefe5-0765-4efd-be41-d21976e010cb] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:40:07.458Z"}
+{"level":"info","message":"[090b6c88-2d01-4921-afa6-d0a04d9793a2] Collab Editor Service responded with 200 for /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:40:07.502Z"}
+{"level":"info","message":"[9c9a8b00-a663-4ffa-9b53-bd4850e84696] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:40:07.506Z"}
+{"level":"info","message":"[9c9a8b00-a663-4ffa-9b53-bd4850e84696] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:40:07.506Z"}
+{"level":"info","message":"[c9716890-2d60-40cc-9634-bc562257e399] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:40:07.514Z"}
+{"level":"info","message":"[c9716890-2d60-40cc-9634-bc562257e399] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:40:07.515Z"}
+{"level":"info","message":"[8d31e1ad-805f-4458-8998-25947fbfb588] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T14:40:13.515Z"}
+{"level":"info","message":"[8d31e1ad-805f-4458-8998-25947fbfb588] Proxying GET /b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:40:13.516Z"}
+{"level":"info","message":"[0314817b-00a2-45e2-9966-25c7b9383fc1] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T14:40:13.518Z"}
+{"level":"info","message":"[0314817b-00a2-45e2-9966-25c7b9383fc1] Proxying GET /b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 to Profile Service","service":"api-gateway","timestamp":"2026-01-10T14:40:13.519Z"}
+{"level":"info","message":"[0314817b-00a2-45e2-9966-25c7b9383fc1] Profile Service responded with 200 for /b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T14:40:13.528Z"}
+{"level":"info","message":"[38595aa5-9fc4-4e2e-86d9-89bdd231c0dd] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:40:13.536Z"}
+{"level":"info","message":"[38595aa5-9fc4-4e2e-86d9-89bdd231c0dd] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:40:13.537Z"}
+{"level":"info","message":"[38595aa5-9fc4-4e2e-86d9-89bdd231c0dd] Collab Editor Service responded with 200 for /bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:40:13.551Z"}
+{"level":"info","message":"[0b048d37-1124-4cf5-b294-178db4813055] GET /v1/editor/bookclubs","service":"api-gateway","timestamp":"2026-01-10T14:40:13.555Z"}
+{"level":"info","message":"[0b048d37-1124-4cf5-b294-178db4813055] Proxying GET /bookclubs to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:40:13.555Z"}
+{"level":"info","message":"[3c4e6af1-269d-46b9-be0c-bf86ec7c9d03] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:40:17.536Z"}
+{"level":"info","message":"[91eadf95-18f7-4086-b2ce-790621845f39] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:40:17.537Z"}
+{"level":"info","message":"[3c4e6af1-269d-46b9-be0c-bf86ec7c9d03] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:40:17.537Z"}
+{"level":"info","message":"[91eadf95-18f7-4086-b2ce-790621845f39] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:40:17.537Z"}
+{"level":"info","message":"[91eadf95-18f7-4086-b2ce-790621845f39] Collab Editor Service responded with 200 for /bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:40:17.552Z"}
+{"level":"info","message":"[3c4e6af1-269d-46b9-be0c-bf86ec7c9d03] Collab Editor Service responded with 200 for /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:40:17.554Z"}
+{"level":"info","message":"[9e4cedc9-4926-4952-9d3b-b5c636276b64] GET /v1/editor/bookclubs?mine=true","service":"api-gateway","timestamp":"2026-01-10T14:40:17.556Z"}
+{"level":"info","message":"[9e4cedc9-4926-4952-9d3b-b5c636276b64] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:40:17.557Z"}
+{"level":"info","message":"[c04606fb-0a0c-41a0-b779-09e734dda153] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:40:17.558Z"}
+{"level":"info","message":"[c04606fb-0a0c-41a0-b779-09e734dda153] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:40:17.558Z"}

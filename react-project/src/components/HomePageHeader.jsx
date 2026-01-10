@@ -32,7 +32,9 @@ const HomePageHeader = () => {
     
     return (
         <div className='flex items-center p-4 '>
-            <h1 className='absolute left-1/2 -translate-x-1/2'>YourBookClub.com</h1>
+            <button onClick={() => navigate('/')}>
+                <h1 className='absolute left-1/2 -translate-x-1/2'>YourBookClub.com</h1>
+            </button>
             {auth?.user && (
             <div className='ml-auto'>
                 <button onClick={handleProfileClick}>
@@ -48,12 +50,15 @@ const HomePageHeader = () => {
                 </button>
                 {showDropdown && (
                     <div className="absolute right-4 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg z-10">
-                        <button onClick={() => navigate('/change-profile')} className="px-4 py-2 border-b border-gray-300 text-sm hover:bg-gray-100">
+                        <button onClick={() => { navigate(`/profile/${auth.user.id}`); setShowDropdown(false); }} className="px-4 py-2 border-b border-gray-300 text-sm hover:bg-gray-100 w-full text-left">
+                            View Profile
+                        </button>
+                        <button onClick={() => navigate('/change-profile')} className="px-4 py-2 border-b border-gray-300 text-sm hover:bg-gray-100 w-full text-left">
                             Change Profile Settings
                         </button>
                         <button
                             onClick={handleLogout}
-                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full"
                         >
                             Logout
                         </button>

@@ -29,13 +29,14 @@ const ChangeProfilePage = () => {
             }
 
             try {
-                const response = await axios.get('http://localhost:3000/v1/profile', {
-                    headers: {
-                        'Authorization': `Bearer ${auth.token}`
-                    }
-                });
+                const response = await fetch(`http://localhost:3000/v1/profile/${auth.user.id}`);
+                const data = await response.json();
+                
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Failed to fetch profile');
+                }
 
-                const userData = response.data.data;
+                const userData = data.data;
                 setForm({ name: userData.name });
                 if (userData.profileImage) {
                     setCurrentProfileImage(userData.profileImage); // Store just the path

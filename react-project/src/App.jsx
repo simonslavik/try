@@ -8,6 +8,7 @@ import BookClub from "./pages/bookclub/:id";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NewBookClubPage from "./pages/createbookclub";
 import ChangeProfilePage from "./pages/changeProfile";
+import ProfilePage from "./pages/profilePage/:id";
 
 function App() {
   return (
@@ -27,7 +28,7 @@ function App() {
           <NewBookClubPage />
         </ProtectedRoute>
       }/>
-
+      <Route path="/profile/:id" element={<ProfilePage />}/>
     </Routes>
   );
 }

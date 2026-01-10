@@ -617,7 +617,7 @@ const BookClub = () => {
             {bookClubMembers.map(user => {
               const isOnline = connectedUsers.filter(connectedUser => connectedUser.id === user.id);
               return (
-                <div key={user.id} className="px-2 py-1 text-sm text-gray-300 flex items-center gap-2">
+                <div onClick={() => navigate(`/profile/${user.id}`)} key={user.id} className="px-2 py-1 text-sm text-gray-300 flex items-center gap-2 hover:bg-gray-700 rounded cursor-pointer">
                   <div className="relative">
                     <img 
                       src={user.profileImage 

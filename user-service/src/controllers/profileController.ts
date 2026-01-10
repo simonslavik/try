@@ -6,13 +6,13 @@ import prisma from '../config/database.js';
  * Get current user's profile
  * Requires authentication
  */
-export const getMyProfile = async (req: Request, res: Response) => {
+export const getProfileById = async (req: Request, res: Response) => {
     try {
-        const userId = req.user?.userId;
+        const { userId } = req.params;
 
         if (!userId) {
-            return res.status(401).json({ 
-                message: 'User not authenticated' 
+            return res.status(400).json({ 
+                message: 'User ID is required' 
             });
         }
 
