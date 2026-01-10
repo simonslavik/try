@@ -13,6 +13,7 @@ const Home = () => {
     const { auth, logout } = useContext(AuthContext);
     const [bookClubs, setBookClubs] = useState([]);
     const [myBookClubs, setMyBookClubs] = useState([]);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -74,9 +75,37 @@ const Home = () => {
                                             className="w-full h-32 object-cover mb-2 rounded"
                                             onError={(e) => { e.target.src = '/images/default.webp'; }}
                                         />
-                                        <h3 className="font-medium">{bookClub.name}</h3>
-                                        <p className="text-sm text-gray-600">
-                                            {bookClub.activeUsers || 0} users online
+                                        <h3 className="font-medium truncate">{bookClub.name}</h3>
+                                        {bookClub.members && bookClub.members.length > 0 && (
+                                            <div className="mt-2">
+                                                <p className="text-sm text-gray-600 mb-1">
+                                                    {bookClub.members.length} {bookClub.members.length === 1 ? 'member' : 'members'}
+                                                </p>
+                                                <div className="flex -space-x-2">
+                                                    {bookClub.members.slice(0, 5).map(member => (
+                                                        <img 
+                                                            key={member.id} 
+                                                            src={member.profileImage 
+                                                                ? `http://localhost:3001${member.profileImage}` 
+                                                                : '/images/default.webp'
+                                                            } 
+                                                            alt={member.username} 
+                                                            className="w-8 h-8 rounded-full border-2 border-white object-cover"
+                                                            title={member.username}
+                                                            onError={(e) => { e.target.src = '/images/default.webp'; }}
+                                                        />
+                                                    ))}
+                                                    {bookClub.members.length > 5 && (
+                                                        <div className="w-8 h-8 rounded-full border-2 border-white bg-gray-300 flex items-center justify-center text-xs font-semibold text-gray-700">
+                                                            +{bookClub.members.length - 5}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                        <p className="text-sm text-gray-600 mt-2">
+                                            <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                                            {bookClub.activeUsers || 0} online
                                         </p>
                                     </div>
                                     
@@ -106,6 +135,7 @@ const Home = () => {
                             {bookClubs.map(bookClub => (
                                 <div 
                                     key={bookClub.id}
+                                    onClick={() => navigate(`/bookclub/${bookClub.id}`)}
                                     className="p-4 border rounded hover:bg-gray-50 cursor-pointer flex-shrink-0 min-w-[200px]"
                                 >
                                     <img 
@@ -114,14 +144,42 @@ const Home = () => {
                                         className="w-full h-32 object-cover mb-2 rounded"
                                         onError={(e) => { e.target.src = '/images/default.webp'; }}
                                     />
-                                    <h3 className="font-medium">{bookClub.name}</h3>
-                                    <button onClick={() => navigate(`/bookclub/${bookClub.id}`)} className='border rounded p-2 bg-gray-100 hover:bg-gray-200'>Join</button>
-                                    <p className="text-sm text-gray-600">
-                                        {bookClub.activeUsers || 0} users online
+                                    <h3 className="font-medium truncate">{bookClub.name}</h3>
+                                    {bookClub.members && bookClub.members.length > 0 && (
+                                        <div className="mt-2">
+                                            <p className="text-sm text-gray-600 mb-1">
+                                                {bookClub.members.length} {bookClub.members.length === 1 ? 'member' : 'members'}
+                                            </p>
+                                            <div className="flex -space-x-2">
+                                                {bookClub.members.slice(0, 5).map(member => (
+                                                    <img 
+                                                        key={member.id} 
+                                                        src={member.profileImage 
+                                                            ? `http://localhost:3001${member.profileImage}` 
+                                                            : '/images/default.webp'
+                                                        } 
+                                                        alt={member.username} 
+                                                        className="w-8 h-8 rounded-full border-2 border-white object-cover"
+                                                        title={member.username}
+                                                        onError={(e) => { e.target.src = '/images/default.webp'; }}
+                                                    />
+                                                ))}
+                                                {bookClub.members.length > 5 && (
+                                                    <div className="w-8 h-8 rounded-full border-2 border-white bg-gray-300 flex items-center justify-center text-xs font-semibold text-gray-700">
+                                                        +{bookClub.members.length - 5}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                    <p className="text-sm text-gray-600 mt-2">
+                                        <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                                        {bookClub.activeUsers || 0} online
                                     </p>
                                 </div>
                             ))}
                         </div>
+                        
                     )}
                 </div>
             </div>

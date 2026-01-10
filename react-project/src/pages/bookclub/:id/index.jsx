@@ -16,10 +16,13 @@ const BookClub = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [connectedUsers, setConnectedUsers] = useState([]);
+  const [bookClubMembers, setBookClubMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [myBookClubs, setMyBookClubs] = useState([]);
+  const [editingName, setEditingName] = useState(false);
+  const [newName, setNewName] = useState('');
   
   const ws = useRef(null);
   const messagesEndRef = useRef(null);
@@ -49,6 +52,7 @@ const BookClub = () => {
           setBookClub(data);
           setRooms(data.rooms || []);
           setConnectedUsers(data.connectedUsers || []);
+          setBookClubMembers(data.members || []);
           
           // Select first room by default
           if (data.rooms && data.rooms.length > 0) {
@@ -124,6 +128,10 @@ const BookClub = () => {
               userId: msg.userId
             })));
             setConnectedUsers(data.users || []);
+            // Update members if provided
+            if (data.members) {
+              setBookClubMembers(data.members);
+            }
             break;
           
           case 'chat-message':
@@ -143,6 +151,10 @@ const BookClub = () => {
               }
               return prev;
             });
+            // Update members list if a new member joined
+            if (data.members) {
+              setBookClubMembers(data.members);
+            }
             setMessages(prev => [...prev, {
               type: 'system',
               text: `${data.user.username} joined the room`,
@@ -310,6 +322,61 @@ const BookClub = () => {
     }
   };
 
+  const handleNameDoubleClick = () => {
+    if (auth?.user && auth.user.id === bookClub?.creatorId) {
+      setEditingName(true);
+      setNewName(bookClub.name);
+      setTimeout(() => nameInputRef.current?.focus(), 0);
+    }
+  };
+
+  const handleNameChange = (e) => {
+    setNewName(e.target.value);
+  };
+
+  const handleNameBlur = async () => {
+    if (!newName.trim() || newName === bookClub.name) {
+      setEditingName(false);
+      setNewName('');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/v1/editor/bookclubs/${bookClubId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth.token}`
+        },
+        body: JSON.stringify({ name: newName.trim() })
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        setBookClub(prev => ({ ...prev, name: data.bookClub.name }));
+        setEditingName(false);
+        setNewName('');
+      } else {
+        alert(data.error || 'Failed to update book club name');
+        setEditingName(false);
+      }
+    } catch (err) {
+      console.error('Error updating book club name:', err);
+      alert('Failed to update book club name');
+      setEditingName(false);
+    }
+  };
+
+  const handleNameKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleNameBlur();
+    } else if (e.key === 'Escape') {
+      setEditingName(false);
+      setNewName('');
+    }
+  };
+
 
 
   
@@ -340,7 +407,7 @@ const BookClub = () => {
 
   return (
     <div className="flex h-screen bg-gray-900">
-      <div className='flex'>
+      <div className='flex justify-center'>
         {/* My Bookclubs Sidebar */}
         {auth?.user && (
           <MyBookClubsSidebar 
@@ -364,9 +431,29 @@ const BookClub = () => {
               handleDeleteImage={handleDeleteImage}
             />
             
-            <h2 className="text-white font-bold text-lg truncate">
-              {bookClub?.name}
-            </h2>
+            {editingName ? (
+              <input
+                ref={nameInputRef}
+                type="text"
+                value={newName}
+                onChange={handleNameChange}
+                onBlur={handleNameBlur}
+                onKeyDown={handleNameKeyDown}
+                className="text-white font-bold text-lg bg-gray-700 px-2 py-1 rounded border border-purple-500 focus:outline-none w-full"
+              />
+            ) : (
+              <h2 
+                className={`text-white font-bold text-lg truncate ${
+                  auth?.user && auth.user.id === bookClub?.creatorId 
+                    ? 'cursor-pointer hover:text-purple-400' 
+                    : ''
+                }`}
+                onDoubleClick={handleNameDoubleClick}
+                title={auth?.user && auth.user.id === bookClub?.creatorId ? 'Double-click to edit' : ''}
+              >
+                {bookClub?.name}
+              </h2>
+            )}
             
             <button 
               onClick={() => navigate('/')}
@@ -409,9 +496,9 @@ const BookClub = () => {
             </div>
           </div>
         </div>
-        <div className='absolute bottom-0 flex justify-center pointer-events-none'> 
+        <div className='absolute bottom-0 flex justify-center pointer-events-none  '> 
           {auth?.user && (
-            <div className="p-2 bg-gray-800 rounded-2xl flex items-center gap-2 shadow-lg pointer-events-auto w-64">
+            <div className="p-2 bg-gray-800 rounded-2xl flex items-center gap-2 shadow-lg pointer-events-auto w-78">
                 <img 
                   src={auth.user.profileImage 
                     ? `http://localhost:3001${auth.user.profileImage}` 
@@ -527,12 +614,28 @@ const BookClub = () => {
             </h3>
           </div>
           <div className="max-h-screen overflow-y-auto">
-            {connectedUsers.map(user => (
-              <div key={user.id} className="px-2 py-1 text-sm text-gray-300 flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="truncate">{user.username}</span>
-              </div>
-            ))}
+            {bookClubMembers.map(user => {
+              const isOnline = connectedUsers.filter(connectedUser => connectedUser.id === user.id);
+              return (
+                <div key={user.id} className="px-2 py-1 text-sm text-gray-300 flex items-center gap-2">
+                  <div className="relative">
+                    <img 
+                      src={user.profileImage 
+                        ? `http://localhost:3001${user.profileImage}` 
+                        : '/images/default.webp'
+                      } 
+                      alt={user.username} 
+                      className="w-8 h-8 rounded-full object-cover"
+                      onError={(e) => { e.target.src = '/images/default.webp'; }}
+                    />
+                    <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-800 ${
+                      isOnline ? 'bg-green-500' : 'bg-gray-500'
+                    }`}></div>
+                  </div>
+                  <span className="truncate">{user.username}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

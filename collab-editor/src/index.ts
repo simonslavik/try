@@ -141,8 +141,34 @@ app.get('/bookclubs/:bookClubId', async (req, res) => {
     
     const activeClub = activeBookClubs.get(req.params.bookClubId);
     
+    // Fetch full user details for all members from user-service
+    let members = bookClub.members; // Keep original member IDs as fallback
+    if (bookClub.members && bookClub.members.length > 0) {
+      try {
+        const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:3001/api';
+        const response = await fetch(`${userServiceUrl}/users/batch`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userIds: bookClub.members })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.users && data.users.length > 0) {
+            members = data.users;
+          }
+        } else {
+          const errorText = await response.text();
+          console.error('Failed to fetch user details from user-service:', response.status, errorText);
+        }
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    }
+    
     res.json({
       ...bookClub,
+      members,
       connectedUsers: activeClub 
         ? Array.from(activeClub.clients.values()).map(c => ({
             id: c.id,
@@ -206,15 +232,57 @@ app.get('/bookclubs', optionalAuthMiddleware, async (req, res) => {
       orderBy: { updatedAt: 'desc' },
       take: 50
     });
+
+    // Collect all unique user IDs from all bookclubs
+    const allUserIds = new Set<string>();
+    bookClubs.forEach(club => {
+      club.members.forEach(memberId => allUserIds.add(memberId));
+    });
+
+    // Fetch full user details for all members from user-service
+    let userDetailsMap = new Map<string, any>();
+    if (allUserIds.size > 0) {
+      try {
+        const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:3001/api';
+        const response = await fetch(`${userServiceUrl}/users/batch`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userIds: Array.from(allUserIds) })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.users && data.users.length > 0) {
+            data.users.forEach((user: any) => {
+              userDetailsMap.set(user.id, user);
+            });
+          }
+        } else {
+          const errorText = await response.text();
+          console.error('Failed to fetch user details from user-service:', response.status, errorText);
+        }
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    }
     
-    // Add active user count to each bookclub
+    // Add active user count and member details to each bookclub
     const bookClubsWithUserCount = bookClubs.map(club => {
       const activeClub = activeBookClubs.get(club.id);
+      
+      // Map member IDs to full user objects
+      const memberDetails = club.members
+        .map(memberId => userDetailsMap.get(memberId))
+        .filter(user => user !== undefined);
+      
       return {
         ...club,
+        members: memberDetails.length > 0 ? memberDetails : club.members,
         activeUsers: activeClub ? activeClub.clients.size : 0
       };
     });
+
+    
     
     res.json({ bookClubs: bookClubsWithUserCount });
   } catch (error) {
@@ -556,6 +624,7 @@ wss.on('connection', (ws: WebSocket) => {
         activeClub.clients.set(clientId, currentClient);
 
         // Add user to members if not already
+        let wasNewMember = false;
         if (!bookClub.members.includes(userId)) {
           await prisma.bookClub.update({
             where: { id: bookClubId },
@@ -564,6 +633,7 @@ wss.on('connection', (ws: WebSocket) => {
               lastActiveAt: new Date()
             }
           });
+          wasNewMember = true;
         } else {
           await prisma.bookClub.update({
             where: { id: bookClubId },
@@ -578,6 +648,28 @@ wss.on('connection', (ws: WebSocket) => {
           take: 100
         });
 
+        // Fetch all member details from user service
+        const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:3001/api';
+        let memberDetails = [];
+        const allMembers = wasNewMember ? [...bookClub.members, userId] : bookClub.members;
+        
+        try {
+          const response = await fetch(`${userServiceUrl}/users/batch`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userIds: allMembers })
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            memberDetails = data.users || [];
+          } else {
+            console.error('Failed to fetch member details:', response.status);
+          }
+        } catch (error) {
+          console.error('Error fetching member details:', error);
+        }
+
         // Send initial data to new user
         ws.send(JSON.stringify({
           type: 'init',
@@ -585,6 +677,7 @@ wss.on('connection', (ws: WebSocket) => {
           bookClub,
           currentRoomId: targetRoomId,
           messages: recentMessages,
+          members: memberDetails,
           users: Array.from(activeClub.clients.values()).map(c => ({
             id: c.id,
             userId: c.userId,
@@ -593,16 +686,29 @@ wss.on('connection', (ws: WebSocket) => {
           }))
         }));
 
-        // Notify others that someone joined
-        broadcastToBookClub(activeClub, {
-          type: 'user-joined',
-          user: {
-            id: clientId,
-            userId: currentClient.userId,
-            username: currentClient.username,
-            roomId: currentClient.roomId
-          }
-        }, clientId);
+        // Notify others that someone joined (including updated members if new)
+        if (wasNewMember) {
+          broadcastToBookClub(activeClub, {
+            type: 'user-joined',
+            user: {
+              id: clientId,
+              userId: currentClient.userId,
+              username: currentClient.username,
+              roomId: currentClient.roomId
+            },
+            members: memberDetails
+          }, clientId);
+        } else {
+          broadcastToBookClub(activeClub, {
+            type: 'user-joined',
+            user: {
+              id: clientId,
+              userId: currentClient.userId,
+              username: currentClient.username,
+              roomId: currentClient.roomId
+            }
+          }, clientId);
+        }
 
         console.log(`👥 ${username} joined book club ${bookClubId} in room ${targetRoomId} (${activeClub.clients.size} users)`);
       })

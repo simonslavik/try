@@ -166,3 +166,47 @@ export const listUsers = async (req: Request, res: Response) => {
         });
     }
 };
+
+/**
+ * Get multiple users by IDs (batch endpoint)
+ * No authentication required - used by other services
+ */
+export const getUsersByIds = async (req: Request, res: Response) => {
+    try {
+        const { userIds } = req.body;
+
+        if (!Array.isArray(userIds) || userIds.length === 0) {
+            return res.status(400).json({ 
+                message: 'userIds must be a non-empty array' 
+            });
+        }
+
+        const users = await prisma.user.findMany({
+            where: {
+                id: { in: userIds }
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                profileImage: true
+            }
+        });
+
+        return res.status(200).json({
+            success: true,
+            users: users.map(user => ({
+                id: user.id,
+                username: user.name,
+                email: user.email,
+                profileImage: user.profileImage
+            }))
+        });
+    } catch (error: any) {
+        console.error('Batch get users error:', error);
+        return res.status(500).json({ 
+            message: 'Failed to fetch users',
+            error: error.message 
+        });
+    }
+};

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { registerUser, loginUser, refreshAccessToken, logoutUser, logoutAllDevices } from '../controllers/userController.js';
-import { getMyProfile, updateMyProfile, getUserById, listUsers } from '../controllers/profileController.js';
+import { getMyProfile, updateMyProfile, getUserById, listUsers, getUsersByIds } from '../controllers/profileController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import { addProfileImage, deleteProfileImage, upload } from '../controllers/profileImageController.js';
 
@@ -10,6 +10,9 @@ const userRoutes = Router();
 userRoutes.post('/auth/register', registerUser);
 userRoutes.post('/auth/login', loginUser);
 userRoutes.post('/auth/refresh', refreshAccessToken);
+
+// Batch endpoint for fetching multiple users (used by other services)
+userRoutes.post('/users/batch', getUsersByIds);
 
 // Protected routes (authentication required)
 // Use trustGatewayAuth when behind gateway, falls back to authMiddleware for direct calls
