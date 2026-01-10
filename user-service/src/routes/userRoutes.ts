@@ -3,7 +3,7 @@ import { registerUser, loginUser, refreshAccessToken, logoutUser, logoutAllDevic
 import { getProfileById, updateMyProfile, getUserById, listUsers, getUsersByIds } from '../controllers/profileController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import { addProfileImage, deleteProfileImage, upload } from '../controllers/profileImageController.js';
-
+import { sendFriendRequest, acceptFriendRequest, rejectFriendRequest, removeFriend, listFriends, listFriendRequests} from '../controllers/friendsController.js';
 const userRoutes = Router();
 
 // Public routes (no authentication required)
@@ -28,5 +28,14 @@ userRoutes.delete('/profile/image', authMiddleware, deleteProfileImage);
 // Admin routes (requires authentication)
 userRoutes.get('/users', authMiddleware, listUsers);
 userRoutes.get('/users/:id', authMiddleware, getUserById);
+
+
+// Friendship and social features
+userRoutes.post('/friends/request', authMiddleware, sendFriendRequest);
+userRoutes.post('/friends/accept', authMiddleware, acceptFriendRequest );
+userRoutes.post('/friends/reject', authMiddleware, rejectFriendRequest );
+userRoutes.delete('/friends/remove', authMiddleware, removeFriend);
+userRoutes.get('/friends/list', authMiddleware, listFriends);
+userRoutes.get('/friends/requests', authMiddleware, listFriendRequests);
 
 export default userRoutes;

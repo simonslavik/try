@@ -4456,3 +4456,151 @@
 {"level":"info","message":"[9e4cedc9-4926-4952-9d3b-b5c636276b64] Proxying GET /bookclubs?mine=true to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:40:17.557Z"}
 {"level":"info","message":"[c04606fb-0a0c-41a0-b779-09e734dda153] GET /v1/editor/bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b","service":"api-gateway","timestamp":"2026-01-10T14:40:17.558Z"}
 {"level":"info","message":"[c04606fb-0a0c-41a0-b779-09e734dda153] Proxying GET /bookclubs/f0707d5c-6252-4163-ae8a-2d287674c78b to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T14:40:17.558Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T16:39:46.951Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T16:39:46.952Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T16:39:46.953Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-10T16:39:46.953Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-10T16:39:46.955Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T16:43:30.600Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T16:43:30.603Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T16:43:30.603Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-10T16:43:30.604Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-10T16:43:30.609Z"}
+{"level":"info","message":"[61d22114-2896-4316-b57e-137bf3d41351] GET /v1/editor/health","service":"api-gateway","timestamp":"2026-01-10T16:45:16.558Z"}
+{"level":"info","message":"[61d22114-2896-4316-b57e-137bf3d41351] Proxying GET /health to Collab Editor Service","service":"api-gateway","timestamp":"2026-01-10T16:45:16.563Z"}
+{"level":"info","message":"[61d22114-2896-4316-b57e-137bf3d41351] Collab Editor Service responded with 200 for /health","service":"api-gateway","timestamp":"2026-01-10T16:45:16.701Z"}
+{"level":"info","message":"[65087da5-81a1-49ec-8fcf-b064cf5fa799] GET /v1/friends/list","service":"api-gateway","timestamp":"2026-01-10T16:47:02.055Z"}
+{"level":"info","message":"[c2438c41-32dd-46d7-bd3d-e33fa58f56a8] GET /v1/friends/list","service":"api-gateway","timestamp":"2026-01-10T16:47:34.488Z"}
+{"level":"info","message":"[7a83f8ea-1d09-4f70-b7e0-df6b59881b84] GET /v1/friends/list","service":"api-gateway","timestamp":"2026-01-10T16:47:35.623Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T16:48:13.621Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/friends → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T16:48:13.622Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T16:48:13.622Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T16:48:13.623Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-10T16:48:13.623Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-10T16:48:13.624Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T16:49:50.797Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/friends → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T16:49:50.799Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T16:49:50.800Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T16:49:50.800Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-10T16:49:50.800Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-10T16:49:50.802Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/profile → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T16:49:53.775Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/friends → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T16:49:53.776Z"}
+{"level":"info","message":"✓ Proxy configured (protected): /v1/users → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T16:49:53.776Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/auth → http://user-service:3001","service":"api-gateway","timestamp":"2026-01-10T16:49:53.777Z"}
+{"level":"info","message":"✓ Proxy configured (public): /v1/editor → http://collab-editor:4000","service":"api-gateway","timestamp":"2026-01-10T16:49:53.777Z"}
+{"level":"info","message":"Gateway is running on port 3000","service":"api-gateway","timestamp":"2026-01-10T16:49:53.778Z"}
+{"level":"info","message":"[faae16b1-b9a3-43e1-b703-52d8553bb5ac] GET /v1/friends/list","service":"api-gateway","timestamp":"2026-01-10T16:49:58.395Z"}
+{"level":"warn","message":"No authorization token provided while requesting protected route","service":"api-gateway","timestamp":"2026-01-10T16:49:58.397Z"}
+{"level":"info","message":"[adad4a7e-0573-4c19-a6ee-959c3fb702b8] GET /v1/friends/list","service":"api-gateway","timestamp":"2026-01-10T16:50:05.719Z"}
+{"level":"info","message":"Authenticated user 847bfb81-df16-48ef-a601-d1e970e74df5 for GET /list","service":"api-gateway","timestamp":"2026-01-10T16:50:05.724Z"}
+{"level":"info","message":"[adad4a7e-0573-4c19-a6ee-959c3fb702b8] Proxying GET /list to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:50:05.730Z"}
+{"level":"info","message":"[adad4a7e-0573-4c19-a6ee-959c3fb702b8] Friends Service responded with 500 for /list","service":"api-gateway","timestamp":"2026-01-10T16:50:05.876Z"}
+{"level":"info","message":"[662001ad-b6f0-40cb-99df-75c15b3530d2] GET /v1/friends/list","service":"api-gateway","timestamp":"2026-01-10T16:51:45.479Z"}
+{"level":"info","message":"Authenticated user 847bfb81-df16-48ef-a601-d1e970e74df5 for GET /list","service":"api-gateway","timestamp":"2026-01-10T16:51:45.487Z"}
+{"level":"info","message":"[662001ad-b6f0-40cb-99df-75c15b3530d2] Proxying GET /list to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:51:45.490Z"}
+{"level":"info","message":"[662001ad-b6f0-40cb-99df-75c15b3530d2] Friends Service responded with 500 for /list","service":"api-gateway","timestamp":"2026-01-10T16:51:45.647Z"}
+{"level":"info","message":"[90d0fe0c-2acc-4f54-b264-0a501f92f53c] GET /v1/friends/list","service":"api-gateway","timestamp":"2026-01-10T16:51:47.001Z"}
+{"level":"info","message":"Authenticated user 847bfb81-df16-48ef-a601-d1e970e74df5 for GET /list","service":"api-gateway","timestamp":"2026-01-10T16:51:47.003Z"}
+{"level":"info","message":"[90d0fe0c-2acc-4f54-b264-0a501f92f53c] Proxying GET /list to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:51:47.004Z"}
+{"level":"info","message":"[90d0fe0c-2acc-4f54-b264-0a501f92f53c] Friends Service responded with 500 for /list","service":"api-gateway","timestamp":"2026-01-10T16:51:47.015Z"}
+{"level":"info","message":"[0e1ce673-c989-484d-9c7d-806aca337861] GET /v1/friends/list","service":"api-gateway","timestamp":"2026-01-10T16:52:04.679Z"}
+{"level":"info","message":"Authenticated user 847bfb81-df16-48ef-a601-d1e970e74df5 for GET /list","service":"api-gateway","timestamp":"2026-01-10T16:52:04.685Z"}
+{"level":"info","message":"[0e1ce673-c989-484d-9c7d-806aca337861] Proxying GET /list to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:52:04.686Z"}
+{"level":"info","message":"[0e1ce673-c989-484d-9c7d-806aca337861] Friends Service responded with 500 for /list","service":"api-gateway","timestamp":"2026-01-10T16:52:04.721Z"}
+{"level":"info","message":"[68d2da27-224d-4cd6-80ab-38732705f317] GET /v1/friends/list","service":"api-gateway","timestamp":"2026-01-10T16:52:05.664Z"}
+{"level":"info","message":"Authenticated user 847bfb81-df16-48ef-a601-d1e970e74df5 for GET /list","service":"api-gateway","timestamp":"2026-01-10T16:52:05.665Z"}
+{"level":"info","message":"[68d2da27-224d-4cd6-80ab-38732705f317] Proxying GET /list to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:52:05.665Z"}
+{"level":"info","message":"[68d2da27-224d-4cd6-80ab-38732705f317] Friends Service responded with 500 for /list","service":"api-gateway","timestamp":"2026-01-10T16:52:05.671Z"}
+{"level":"info","message":"[67a508e9-00e0-4e81-99af-1565fefa19c3] POST /v1/auth/login","service":"api-gateway","timestamp":"2026-01-10T16:53:14.940Z"}
+{"level":"info","message":"[67a508e9-00e0-4e81-99af-1565fefa19c3] Body: {\"email\":\"simonslavik007@gmail.com\"}","service":"api-gateway","timestamp":"2026-01-10T16:53:14.941Z"}
+{"level":"info","message":"[67a508e9-00e0-4e81-99af-1565fefa19c3] Proxying POST /login to Auth Service","service":"api-gateway","timestamp":"2026-01-10T16:53:14.942Z"}
+{"level":"info","message":"[67a508e9-00e0-4e81-99af-1565fefa19c3] Auth Service responded with 200 for /login","service":"api-gateway","timestamp":"2026-01-10T16:53:15.220Z"}
+{"level":"info","message":"[d3800038-5540-490d-84a8-6ced3d64676e] POST /v1/friends/request","service":"api-gateway","timestamp":"2026-01-10T16:54:08.496Z"}
+{"level":"info","message":"[d3800038-5540-490d-84a8-6ced3d64676e] Body: {\"recepient\":\"847bfb81-df16-48ef-a601-d1e970e74df5\"}","service":"api-gateway","timestamp":"2026-01-10T16:54:08.498Z"}
+{"level":"info","message":"Authenticated user b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 for POST /request","service":"api-gateway","timestamp":"2026-01-10T16:54:08.500Z"}
+{"level":"info","message":"[d3800038-5540-490d-84a8-6ced3d64676e] Proxying POST /request to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:54:08.501Z"}
+{"level":"info","message":"[d3800038-5540-490d-84a8-6ced3d64676e] Friends Service responded with 400 for /request","service":"api-gateway","timestamp":"2026-01-10T16:54:08.514Z"}
+{"level":"info","message":"[c8e8b7ec-7185-49f5-ab19-2128ce5f50a1] POST /v1/friends/request","service":"api-gateway","timestamp":"2026-01-10T16:54:15.703Z"}
+{"level":"info","message":"[c8e8b7ec-7185-49f5-ab19-2128ce5f50a1] Body: {\"recipient\":\"847bfb81-df16-48ef-a601-d1e970e74df5\"}","service":"api-gateway","timestamp":"2026-01-10T16:54:15.703Z"}
+{"level":"info","message":"Authenticated user b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 for POST /request","service":"api-gateway","timestamp":"2026-01-10T16:54:15.704Z"}
+{"level":"info","message":"[c8e8b7ec-7185-49f5-ab19-2128ce5f50a1] Proxying POST /request to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:54:15.704Z"}
+{"level":"info","message":"[c8e8b7ec-7185-49f5-ab19-2128ce5f50a1] Friends Service responded with 400 for /request","service":"api-gateway","timestamp":"2026-01-10T16:54:15.710Z"}
+{"level":"info","message":"[73ba8882-e12e-4a99-a215-c503a91e2748] POST /v1/friends/request","service":"api-gateway","timestamp":"2026-01-10T16:54:20.947Z"}
+{"level":"info","message":"[73ba8882-e12e-4a99-a215-c503a91e2748] Body: {\"recipientID\":\"847bfb81-df16-48ef-a601-d1e970e74df5\"}","service":"api-gateway","timestamp":"2026-01-10T16:54:20.948Z"}
+{"level":"info","message":"Authenticated user b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 for POST /request","service":"api-gateway","timestamp":"2026-01-10T16:54:20.950Z"}
+{"level":"info","message":"[73ba8882-e12e-4a99-a215-c503a91e2748] Proxying POST /request to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:54:20.951Z"}
+{"level":"info","message":"[73ba8882-e12e-4a99-a215-c503a91e2748] Friends Service responded with 400 for /request","service":"api-gateway","timestamp":"2026-01-10T16:54:20.955Z"}
+{"level":"info","message":"[d901c86d-53e1-4635-9e1f-72eaa75f204f] POST /v1/friends/request","service":"api-gateway","timestamp":"2026-01-10T16:54:28.727Z"}
+{"level":"info","message":"[d901c86d-53e1-4635-9e1f-72eaa75f204f] Body: {\"recipientId\":\"847bfb81-df16-48ef-a601-d1e970e74df5\"}","service":"api-gateway","timestamp":"2026-01-10T16:54:28.728Z"}
+{"level":"info","message":"Authenticated user b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 for POST /request","service":"api-gateway","timestamp":"2026-01-10T16:54:28.730Z"}
+{"level":"info","message":"[d901c86d-53e1-4635-9e1f-72eaa75f204f] Proxying POST /request to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:54:28.731Z"}
+{"level":"info","message":"[d901c86d-53e1-4635-9e1f-72eaa75f204f] Friends Service responded with 500 for /request","service":"api-gateway","timestamp":"2026-01-10T16:54:28.761Z"}
+{"level":"info","message":"[4d944e91-b21e-4208-9446-c771826834ba] POST /v1/friends/request","service":"api-gateway","timestamp":"2026-01-10T16:55:44.208Z"}
+{"level":"info","message":"[4d944e91-b21e-4208-9446-c771826834ba] Body: {\"recipientId\":\"847bfb81-df16-48ef-a601-d1e970e74df5\"}","service":"api-gateway","timestamp":"2026-01-10T16:55:44.209Z"}
+{"level":"info","message":"Authenticated user b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 for POST /request","service":"api-gateway","timestamp":"2026-01-10T16:55:44.212Z"}
+{"level":"info","message":"[4d944e91-b21e-4208-9446-c771826834ba] Proxying POST /request to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:55:44.213Z"}
+{"level":"info","message":"[4d944e91-b21e-4208-9446-c771826834ba] Friends Service responded with 500 for /request","service":"api-gateway","timestamp":"2026-01-10T16:55:44.387Z"}
+{"level":"info","message":"[ed809a8c-b0fd-4b37-a959-bd8f3f9fa5c3] POST /v1/friends/request","service":"api-gateway","timestamp":"2026-01-10T16:55:46.325Z"}
+{"level":"info","message":"[ed809a8c-b0fd-4b37-a959-bd8f3f9fa5c3] Body: {\"recipientId\":\"847bfb81-df16-48ef-a601-d1e970e74df5\"}","service":"api-gateway","timestamp":"2026-01-10T16:55:46.325Z"}
+{"level":"info","message":"Authenticated user b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 for POST /request","service":"api-gateway","timestamp":"2026-01-10T16:55:46.326Z"}
+{"level":"info","message":"[ed809a8c-b0fd-4b37-a959-bd8f3f9fa5c3] Proxying POST /request to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:55:46.326Z"}
+{"level":"info","message":"[ed809a8c-b0fd-4b37-a959-bd8f3f9fa5c3] Friends Service responded with 500 for /request","service":"api-gateway","timestamp":"2026-01-10T16:55:46.337Z"}
+{"level":"info","message":"[ba67499a-bebc-4ffe-a784-371f8b9f67b9] POST /v1/friends/request","service":"api-gateway","timestamp":"2026-01-10T16:56:32.993Z"}
+{"level":"info","message":"[ba67499a-bebc-4ffe-a784-371f8b9f67b9] Body: {\"recipientId\":\"847bfb81-df16-48ef-a601-d1e970e74df5\"}","service":"api-gateway","timestamp":"2026-01-10T16:56:32.994Z"}
+{"level":"info","message":"Authenticated user b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 for POST /request","service":"api-gateway","timestamp":"2026-01-10T16:56:32.997Z"}
+{"level":"info","message":"[ba67499a-bebc-4ffe-a784-371f8b9f67b9] Proxying POST /request to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:56:32.997Z"}
+{"level":"info","message":"[ba67499a-bebc-4ffe-a784-371f8b9f67b9] Friends Service responded with 500 for /request","service":"api-gateway","timestamp":"2026-01-10T16:56:33.031Z"}
+{"level":"info","message":"[7285120b-d744-49a8-802d-04d1f9e30157] POST /v1/friends/request","service":"api-gateway","timestamp":"2026-01-10T16:58:19.289Z"}
+{"level":"info","message":"[7285120b-d744-49a8-802d-04d1f9e30157] Body: {\"recipientId\":\"847bfb81-df16-48ef-a601-d1e970e74df5\"}","service":"api-gateway","timestamp":"2026-01-10T16:58:19.292Z"}
+{"level":"info","message":"Authenticated user b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 for POST /request","service":"api-gateway","timestamp":"2026-01-10T16:58:19.296Z"}
+{"level":"info","message":"[7285120b-d744-49a8-802d-04d1f9e30157] Proxying POST /request to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:58:19.297Z"}
+{"level":"info","message":"[7285120b-d744-49a8-802d-04d1f9e30157] Friends Service responded with 500 for /request","service":"api-gateway","timestamp":"2026-01-10T16:58:19.443Z"}
+{"level":"info","message":"[ec5db149-b6df-4049-9d7e-69988f25a68f] POST /v1/friends/request","service":"api-gateway","timestamp":"2026-01-10T16:58:20.927Z"}
+{"level":"info","message":"[ec5db149-b6df-4049-9d7e-69988f25a68f] Body: {\"recipientId\":\"847bfb81-df16-48ef-a601-d1e970e74df5\"}","service":"api-gateway","timestamp":"2026-01-10T16:58:20.928Z"}
+{"level":"info","message":"Authenticated user b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 for POST /request","service":"api-gateway","timestamp":"2026-01-10T16:58:20.930Z"}
+{"level":"info","message":"[ec5db149-b6df-4049-9d7e-69988f25a68f] Proxying POST /request to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:58:20.930Z"}
+{"level":"info","message":"[ec5db149-b6df-4049-9d7e-69988f25a68f] Friends Service responded with 500 for /request","service":"api-gateway","timestamp":"2026-01-10T16:58:20.940Z"}
+{"level":"info","message":"[7cc5cd1c-d05c-4b73-ac41-6f0c40c261cd] GET /v1/friends/list","service":"api-gateway","timestamp":"2026-01-10T16:58:24.080Z"}
+{"level":"info","message":"Authenticated user b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 for GET /list","service":"api-gateway","timestamp":"2026-01-10T16:58:24.082Z"}
+{"level":"info","message":"[7cc5cd1c-d05c-4b73-ac41-6f0c40c261cd] Proxying GET /list to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:58:24.083Z"}
+{"level":"info","message":"[7cc5cd1c-d05c-4b73-ac41-6f0c40c261cd] Friends Service responded with 500 for /list","service":"api-gateway","timestamp":"2026-01-10T16:58:24.093Z"}
+{"level":"info","message":"[1f15375c-2e2f-422b-b826-81f70642551d] GET /v1/friends/list","service":"api-gateway","timestamp":"2026-01-10T16:58:25.743Z"}
+{"level":"info","message":"Authenticated user b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 for GET /list","service":"api-gateway","timestamp":"2026-01-10T16:58:25.745Z"}
+{"level":"info","message":"[1f15375c-2e2f-422b-b826-81f70642551d] Proxying GET /list to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:58:25.746Z"}
+{"level":"info","message":"[1f15375c-2e2f-422b-b826-81f70642551d] Friends Service responded with 500 for /list","service":"api-gateway","timestamp":"2026-01-10T16:58:25.753Z"}
+{"level":"info","message":"[66e43a79-c78a-4856-95ba-3cc893f8b585] GET /v1/friends/list","service":"api-gateway","timestamp":"2026-01-10T16:58:39.898Z"}
+{"level":"info","message":"Authenticated user b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 for GET /list","service":"api-gateway","timestamp":"2026-01-10T16:58:39.902Z"}
+{"level":"info","message":"[66e43a79-c78a-4856-95ba-3cc893f8b585] Proxying GET /list to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:58:39.903Z"}
+{"level":"info","message":"[66e43a79-c78a-4856-95ba-3cc893f8b585] Friends Service responded with 500 for /list","service":"api-gateway","timestamp":"2026-01-10T16:58:39.940Z"}
+{"level":"info","message":"[4f5e80a3-05a3-4177-abf7-c9e69b1e45f0] GET /v1/friends/list","service":"api-gateway","timestamp":"2026-01-10T16:58:40.802Z"}
+{"level":"info","message":"Authenticated user b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 for GET /list","service":"api-gateway","timestamp":"2026-01-10T16:58:40.803Z"}
+{"level":"info","message":"[4f5e80a3-05a3-4177-abf7-c9e69b1e45f0] Proxying GET /list to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:58:40.804Z"}
+{"level":"info","message":"[4f5e80a3-05a3-4177-abf7-c9e69b1e45f0] Friends Service responded with 500 for /list","service":"api-gateway","timestamp":"2026-01-10T16:58:40.817Z"}
+{"level":"info","message":"[3f5ff5f0-44ad-4c3e-937a-ee35cc683c4e] GET /v1/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T16:58:43.190Z"}
+{"level":"info","message":"[3f5ff5f0-44ad-4c3e-937a-ee35cc683c4e] Proxying GET /b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 to Profile Service","service":"api-gateway","timestamp":"2026-01-10T16:58:43.191Z"}
+{"level":"info","message":"[3f5ff5f0-44ad-4c3e-937a-ee35cc683c4e] Profile Service responded with 200 for /b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"api-gateway","timestamp":"2026-01-10T16:58:43.200Z"}
+{"level":"info","message":"[3f48d808-f914-4fe5-8c73-cca987a7b250] GET /v1/friends/list","service":"api-gateway","timestamp":"2026-01-10T16:58:48.398Z"}
+{"level":"info","message":"Authenticated user b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 for GET /list","service":"api-gateway","timestamp":"2026-01-10T16:58:48.398Z"}
+{"level":"info","message":"[3f48d808-f914-4fe5-8c73-cca987a7b250] Proxying GET /list to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:58:48.399Z"}
+{"level":"info","message":"[3f48d808-f914-4fe5-8c73-cca987a7b250] Friends Service responded with 500 for /list","service":"api-gateway","timestamp":"2026-01-10T16:58:48.404Z"}
+{"level":"info","message":"[1547a45f-be1a-4756-b383-c98ef0738e41] POST /v1/friends/request","service":"api-gateway","timestamp":"2026-01-10T16:58:59.376Z"}
+{"level":"info","message":"[1547a45f-be1a-4756-b383-c98ef0738e41] Body: {\"recipientId\":\"847bfb81-df16-48ef-a601-d1e970e74df5\"}","service":"api-gateway","timestamp":"2026-01-10T16:58:59.376Z"}
+{"level":"info","message":"Authenticated user b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 for POST /request","service":"api-gateway","timestamp":"2026-01-10T16:58:59.378Z"}
+{"level":"info","message":"[1547a45f-be1a-4756-b383-c98ef0738e41] Proxying POST /request to Friends Service","service":"api-gateway","timestamp":"2026-01-10T16:58:59.378Z"}
+{"level":"info","message":"[1547a45f-be1a-4756-b383-c98ef0738e41] Friends Service responded with 500 for /request","service":"api-gateway","timestamp":"2026-01-10T16:58:59.397Z"}
+{"level":"info","message":"[3b24a1c5-9c22-408f-b69e-4d930e895c02] POST /v1/friends/request","service":"api-gateway","timestamp":"2026-01-10T17:01:04.636Z"}
+{"level":"info","message":"[3b24a1c5-9c22-408f-b69e-4d930e895c02] Body: {\"recipientId\":\"847bfb81-df16-48ef-a601-d1e970e74df5\"}","service":"api-gateway","timestamp":"2026-01-10T17:01:04.637Z"}
+{"level":"info","message":"Authenticated user b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 for POST /request","service":"api-gateway","timestamp":"2026-01-10T17:01:04.642Z"}
+{"level":"info","message":"[3b24a1c5-9c22-408f-b69e-4d930e895c02] Proxying POST /request to Friends Service","service":"api-gateway","timestamp":"2026-01-10T17:01:04.643Z"}
+{"level":"info","message":"[3b24a1c5-9c22-408f-b69e-4d930e895c02] Friends Service responded with 200 for /request","service":"api-gateway","timestamp":"2026-01-10T17:01:04.793Z"}
+{"level":"info","message":"[f6561749-27be-4793-97be-6ff6a9c313df] POST /v1/friends/request","service":"api-gateway","timestamp":"2026-01-10T17:06:34.214Z"}
+{"level":"info","message":"[f6561749-27be-4793-97be-6ff6a9c313df] Body: {\"recipientId\":\"847bfb81-df16-48ef-a601-d1e970e74df5\"}","service":"api-gateway","timestamp":"2026-01-10T17:06:34.215Z"}
+{"level":"info","message":"Authenticated user b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 for POST /request","service":"api-gateway","timestamp":"2026-01-10T17:06:34.218Z"}
+{"level":"info","message":"[f6561749-27be-4793-97be-6ff6a9c313df] Proxying POST /request to Friends Service","service":"api-gateway","timestamp":"2026-01-10T17:06:34.219Z"}
+{"level":"info","message":"[f6561749-27be-4793-97be-6ff6a9c313df] Friends Service responded with 400 for /request","service":"api-gateway","timestamp":"2026-01-10T17:06:34.267Z"}
+{"level":"info","message":"[b6c345ed-2a33-433d-8ea6-eaafdeb5fc0b] POST /v1/friends/accept","service":"api-gateway","timestamp":"2026-01-10T17:07:28.712Z"}
+{"level":"info","message":"[b6c345ed-2a33-433d-8ea6-eaafdeb5fc0b] Body: {\"requestId\":\"f1e13baf-9aaa-4074-95e2-ab1980be643e\"}","service":"api-gateway","timestamp":"2026-01-10T17:07:28.713Z"}
+{"level":"info","message":"Authenticated user b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10 for POST /accept","service":"api-gateway","timestamp":"2026-01-10T17:07:28.715Z"}
+{"level":"info","message":"[b6c345ed-2a33-433d-8ea6-eaafdeb5fc0b] Proxying POST /accept to Friends Service","service":"api-gateway","timestamp":"2026-01-10T17:07:28.716Z"}
+{"level":"info","message":"[b6c345ed-2a33-433d-8ea6-eaafdeb5fc0b] Friends Service responded with 404 for /accept","service":"api-gateway","timestamp":"2026-01-10T17:07:28.742Z"}
