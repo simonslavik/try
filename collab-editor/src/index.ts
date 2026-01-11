@@ -7,6 +7,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware, optionalAuthMiddleware } from './middleware/authMiddleware.js';
+import multer from 'multer';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,6 +20,40 @@ const prisma = new PrismaClient();
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
+
+// Serve uploaded images
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, '../uploads/bookclub-images');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = `${uuidv4()}${path.extname(file.originalname)}`;
+    cb(null, uniqueName);
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    
+    if (extname && mimetype) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed (jpeg, jpg, png, gif, webp)'));
+    }
+  }
+});
 
 // HTTP server
 const server = createServer(app);
@@ -31,8 +67,9 @@ interface Client {
   userId: string;
   username: string;
   ws: WebSocket;
-  bookClubId: string;
+  bookClubId?: string;
   roomId?: string; // Current room they're viewing
+  isDMConnection?: boolean; // Track if this is a DM connection
 }
 
 // Active book clubs with connected clients (memory)
@@ -41,6 +78,9 @@ interface ActiveBookClub {
 }
 
 const activeBookClubs = new Map<string, ActiveBookClub>();
+
+// Active DM connections - Map userId to their WebSocket client
+const activeDMClients = new Map<string, Client>();
 
 // Health check
 app.get('/health', async (req, res) => {
@@ -105,8 +145,34 @@ app.get('/bookclubs/:bookClubId', async (req, res) => {
     
     const activeClub = activeBookClubs.get(req.params.bookClubId);
     
+    // Fetch full user details for all members from user-service
+    let members = bookClub.members; // Keep original member IDs as fallback
+    if (bookClub.members && bookClub.members.length > 0) {
+      try {
+        const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:3001/api';
+        const response = await fetch(`${userServiceUrl}/users/batch`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userIds: bookClub.members })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.users && data.users.length > 0) {
+            members = data.users;
+          }
+        } else {
+          const errorText = await response.text();
+          console.error('Failed to fetch user details from user-service:', response.status, errorText);
+        }
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    }
+    
     res.json({
       ...bookClub,
+      members,
       connectedUsers: activeClub 
         ? Array.from(activeClub.clients.values()).map(c => ({
             id: c.id,
@@ -118,6 +184,40 @@ app.get('/bookclubs/:bookClubId', async (req, res) => {
   } catch (error) {
     console.error('Error fetching book club:', error);
     res.status(500).json({ error: 'Failed to fetch book club' });
+  }
+});
+
+app.put('/bookclubs/:bookClubId', authMiddleware, async (req, res) => {
+  try {
+    const { bookClubId } = req.params;
+    const { name, isPublic } = req.body;
+    const userId = req.user!.userId;
+    
+    const bookClub = await prisma.bookClub.findUnique({
+      where: { id: bookClubId }
+    });
+    
+    if (!bookClub) {
+      return res.status(404).json({ error: 'Book club not found' });
+    }
+    
+    if (bookClub.creatorId !== userId) {
+      return res.status(403).json({ error: 'Only the book club creator can update the book club' });
+    }
+    
+    const updatedBookClub = await prisma.bookClub.update({
+      where: { id: bookClubId },
+      data: {
+        name: name !== undefined ? name.trim() : bookClub.name,
+        isPublic: isPublic !== undefined ? isPublic : bookClub.isPublic
+      }
+    });
+    
+    console.log(`✏️ Book club ${bookClubId} updated by user ${userId}`);
+    res.json({ message: 'Book club updated successfully', bookClub: updatedBookClub });
+  } catch (error) {
+    console.error('Error updating book club:', error);
+    res.status(500).json({ error: 'Failed to update book club' });
   }
 });
 
@@ -136,15 +236,57 @@ app.get('/bookclubs', optionalAuthMiddleware, async (req, res) => {
       orderBy: { updatedAt: 'desc' },
       take: 50
     });
+
+    // Collect all unique user IDs from all bookclubs
+    const allUserIds = new Set<string>();
+    bookClubs.forEach(club => {
+      club.members.forEach(memberId => allUserIds.add(memberId));
+    });
+
+    // Fetch full user details for all members from user-service
+    let userDetailsMap = new Map<string, any>();
+    if (allUserIds.size > 0) {
+      try {
+        const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:3001/api';
+        const response = await fetch(`${userServiceUrl}/users/batch`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userIds: Array.from(allUserIds) })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.users && data.users.length > 0) {
+            data.users.forEach((user: any) => {
+              userDetailsMap.set(user.id, user);
+            });
+          }
+        } else {
+          const errorText = await response.text();
+          console.error('Failed to fetch user details from user-service:', response.status, errorText);
+        }
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    }
     
-    // Add active user count to each bookclub
+    // Add active user count and member details to each bookclub
     const bookClubsWithUserCount = bookClubs.map(club => {
       const activeClub = activeBookClubs.get(club.id);
+      
+      // Map member IDs to full user objects
+      const memberDetails = club.members
+        .map(memberId => userDetailsMap.get(memberId))
+        .filter(user => user !== undefined);
+      
       return {
         ...club,
+        members: memberDetails.length > 0 ? memberDetails : club.members,
         activeUsers: activeClub ? activeClub.clients.size : 0
       };
     });
+
+    
     
     res.json({ bookClubs: bookClubsWithUserCount });
   } catch (error) {
@@ -176,6 +318,101 @@ app.get('/my-bookclubs', authMiddleware, async (req, res) => {
   } catch (error) {
     console.error('Error fetching user bookclubs:', error);
     res.status(500).json({ error: 'Failed to fetch your bookclubs' });
+  }
+});
+
+// Upload bookclub image (requires authentication and ownership)
+app.post('/bookclubs/:bookClubId/image', authMiddleware, upload.single('image'), async (req, res) => {
+  try {
+    const { bookClubId } = req.params;
+    const userId = req.user!.userId;
+    
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+    
+    const bookClub = await prisma.bookClub.findUnique({
+      where: { id: bookClubId }
+    });
+    
+    if (!bookClub) {
+      // Delete uploaded file if bookclub doesn't exist
+      fs.unlinkSync(req.file.path);
+      return res.status(404).json({ error: 'Book club not found' });
+    }
+    
+    if (bookClub.creatorId !== userId) {
+      // Delete uploaded file if user is not the creator
+      fs.unlinkSync(req.file.path);
+      return res.status(403).json({ error: 'Only the book club creator can upload images' });
+    }
+    
+    // Delete old image if exists
+    if (bookClub.imageUrl) {
+      const oldImagePath = path.join(__dirname, '..', bookClub.imageUrl);
+      if (fs.existsSync(oldImagePath)) {
+        fs.unlinkSync(oldImagePath);
+      }
+    }
+    
+    // Update bookclub with new image URL
+    const imageUrl = `/uploads/bookclub-images/${req.file.filename}`;
+    const updatedBookClub = await prisma.bookClub.update({
+      where: { id: bookClubId },
+      data: { imageUrl }
+    });
+    
+    console.log(`📷 Image uploaded for book club ${bookClubId}`);
+    res.json({ message: 'Image uploaded successfully', imageUrl: updatedBookClub.imageUrl });
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    // Clean up uploaded file on error
+    if (req.file) {
+      fs.unlinkSync(req.file.path);
+    }
+    res.status(500).json({ error: 'Failed to upload image' });
+  }
+});
+
+// Delete bookclub image (requires authentication and ownership)
+app.delete('/bookclubs/:bookClubId/image', authMiddleware, async (req, res) => {
+  try {
+    const { bookClubId } = req.params;
+    const userId = req.user!.userId;
+    
+    const bookClub = await prisma.bookClub.findUnique({
+      where: { id: bookClubId }
+    });
+    
+    if (!bookClub) {
+      return res.status(404).json({ error: 'Book club not found' });
+    }
+    
+    if (bookClub.creatorId !== userId) {
+      return res.status(403).json({ error: 'Only the book club creator can delete images' });
+    }
+    
+    if (!bookClub.imageUrl) {
+      return res.status(400).json({ error: 'Book club has no image to delete' });
+    }
+    
+    // Delete image file
+    const imagePath = path.join(__dirname, '..', bookClub.imageUrl);
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
+    }
+    
+    // Update bookclub to remove image URL
+    await prisma.bookClub.update({
+      where: { id: bookClubId },
+      data: { imageUrl: null }
+    });
+    
+    console.log(`🗑️  Image deleted for book club ${bookClubId}`);
+    res.json({ message: 'Image deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting image:', error);
+    res.status(500).json({ error: 'Failed to delete image' });
   }
 });
 
@@ -316,12 +553,20 @@ wss.on('connection', (ws: WebSocket) => {
           handleJoin(ws, message);
           break;
         
+        case 'join-dm':
+          handleJoinDM(ws, message);
+          break;
+        
         case 'switch-room':
           handleSwitchRoom(message);
           break;
         
         case 'chat-message':
           handleChatMessage(message);
+          break;
+        
+        case 'dm-message':
+          handleDMMessage(message);
           break;
         
         default:
@@ -391,6 +636,7 @@ wss.on('connection', (ws: WebSocket) => {
         activeClub.clients.set(clientId, currentClient);
 
         // Add user to members if not already
+        let wasNewMember = false;
         if (!bookClub.members.includes(userId)) {
           await prisma.bookClub.update({
             where: { id: bookClubId },
@@ -399,6 +645,7 @@ wss.on('connection', (ws: WebSocket) => {
               lastActiveAt: new Date()
             }
           });
+          wasNewMember = true;
         } else {
           await prisma.bookClub.update({
             where: { id: bookClubId },
@@ -413,6 +660,28 @@ wss.on('connection', (ws: WebSocket) => {
           take: 100
         });
 
+        // Fetch all member details from user service
+        const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:3001/api';
+        let memberDetails = [];
+        const allMembers = wasNewMember ? [...bookClub.members, userId] : bookClub.members;
+        
+        try {
+          const response = await fetch(`${userServiceUrl}/users/batch`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userIds: allMembers })
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            memberDetails = data.users || [];
+          } else {
+            console.error('Failed to fetch member details:', response.status);
+          }
+        } catch (error) {
+          console.error('Error fetching member details:', error);
+        }
+
         // Send initial data to new user
         ws.send(JSON.stringify({
           type: 'init',
@@ -420,6 +689,7 @@ wss.on('connection', (ws: WebSocket) => {
           bookClub,
           currentRoomId: targetRoomId,
           messages: recentMessages,
+          members: memberDetails,
           users: Array.from(activeClub.clients.values()).map(c => ({
             id: c.id,
             userId: c.userId,
@@ -428,16 +698,29 @@ wss.on('connection', (ws: WebSocket) => {
           }))
         }));
 
-        // Notify others that someone joined
-        broadcastToBookClub(activeClub, {
-          type: 'user-joined',
-          user: {
-            id: clientId,
-            userId: currentClient.userId,
-            username: currentClient.username,
-            roomId: currentClient.roomId
-          }
-        }, clientId);
+        // Notify others that someone joined (including updated members if new)
+        if (wasNewMember) {
+          broadcastToBookClub(activeClub, {
+            type: 'user-joined',
+            user: {
+              id: clientId,
+              userId: currentClient.userId,
+              username: currentClient.username,
+              roomId: currentClient.roomId
+            },
+            members: memberDetails
+          }, clientId);
+        } else {
+          broadcastToBookClub(activeClub, {
+            type: 'user-joined',
+            user: {
+              id: clientId,
+              userId: currentClient.userId,
+              username: currentClient.username,
+              roomId: currentClient.roomId
+            }
+          }, clientId);
+        }
 
         console.log(`👥 ${username} joined book club ${bookClubId} in room ${targetRoomId} (${activeClub.clients.size} users)`);
       })
@@ -535,7 +818,100 @@ wss.on('connection', (ws: WebSocket) => {
     });
   }
 
+  function handleJoinDM(ws: WebSocket, message: any) {
+    const { userId, username } = message;
+    
+    // Create DM client
+    const clientId = uuidv4();
+    currentClient = {
+      id: clientId,
+      userId,
+      username,
+      ws,
+      isDMConnection: true
+    };
+    
+    // Store in active DM clients (one per user)
+    activeDMClients.set(userId, currentClient);
+    
+    ws.send(JSON.stringify({
+      type: 'dm-joined',
+      userId
+    }));
+    
+    console.log(`📨 ${username} (${userId}) joined DM connection`);
+  }
+
+  async function handleDMMessage(message: any) {
+    if (!currentClient || !currentClient.isDMConnection) return;
+
+    const { receiverId, content } = message;
+    
+    try {
+      // Save message to user-service database via API
+      const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:3001/api';
+      const response = await fetch(`${userServiceUrl}/messages`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-User-Id': currentClient.userId // Internal service-to-service header
+        },
+        body: JSON.stringify({ receiverId, content })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || 'Failed to save DM');
+      }
+
+      const data = await response.json();
+      // Handle both response formats: { data: message } or { message }
+      const savedMessage = data.data || data.message;
+
+      if (!savedMessage) {
+        throw new Error('No message in response');
+      }
+
+      // Send confirmation to sender
+      if (currentClient.ws.readyState === WebSocket.OPEN) {
+        currentClient.ws.send(JSON.stringify({
+          type: 'dm-sent',
+          message: savedMessage
+        }));
+      }
+
+      // Send message to receiver if they're online
+      const receiverClient = activeDMClients.get(receiverId);
+      if (receiverClient && receiverClient.ws.readyState === WebSocket.OPEN) {
+        receiverClient.ws.send(JSON.stringify({
+          type: 'dm-received',
+          message: savedMessage
+        }));
+      }
+
+      console.log(`📨 DM from ${currentClient.username} to ${receiverId}: ${content}`);
+    } catch (error) {
+      console.error('Error handling DM:', error);
+      if (currentClient && currentClient.ws.readyState === WebSocket.OPEN) {
+        currentClient.ws.send(JSON.stringify({
+          type: 'error',
+          message: error instanceof Error ? error.message : 'Failed to send direct message'
+        }));
+      }
+    }
+  }
+
   function handleDisconnect(client: Client) {
+    // Handle DM disconnection
+    if (client.isDMConnection) {
+      activeDMClients.delete(client.userId);
+      console.log(`📪 ${client.username} (${client.userId}) left DM connection`);
+      return;
+    }
+
+    // Handle bookclub disconnection
+    if (!client.bookClubId) return;
+    
     const activeClub = activeBookClubs.get(client.bookClubId);
     if (!activeClub) return;
 

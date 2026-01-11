@@ -90,6 +90,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/collab_editor
       NODE_ENV: development
       JWT_SECRET: ${JWT_SECRET}
+      USER_SERVICE_URL: http://user-service:3001/api
     depends_on:
       postgres:
         condition: service_healthy

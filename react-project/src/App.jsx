@@ -4,17 +4,37 @@ import AuthPage from "./pages/auth";
 import Register from "./pages/register";
 import Login from "./pages/login";
 import Home from "./pages/home";
-import CollaborativeEditor from "./pages/editor/enhanced";
+import BookClub from "./pages/bookclub/:id";
 import ProtectedRoute from "./components/ProtectedRoute";
+import NewBookClubPage from "./pages/createbookclub";
+import ChangeProfilePage from "./pages/changeProfile";
+import ProfilePage from "./pages/profilePage/:id";
+import DirectMessagePage from "./pages/directMessages/:userId";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/change-profile" element={
+        <ProtectedRoute>
+          <ChangeProfilePage />
+        </ProtectedRoute>
+      }/>
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/register" element={<Register />}/>
       <Route path="/login" element={<Login />}/>
-      <Route path="/editor" element={<CollaborativeEditor />} />
+      <Route path="/bookclub/:id" element={<BookClub />} />
+      <Route path="/create-bookclub" element={
+        <ProtectedRoute>
+          <NewBookClubPage />
+        </ProtectedRoute>
+      }/>
+      <Route path="/profile/:id" element={<ProfilePage />}/>
+      <Route path="/messages/:userId?" element={
+        <ProtectedRoute>
+          <DirectMessagePage />
+        </ProtectedRoute>
+      }/>
     </Routes>
   );
 }

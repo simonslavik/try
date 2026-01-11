@@ -1,17 +1,19 @@
 import { Request, Response } from 'express';
 import prisma from '../config/database.js';
 
+
 /**
  * Get current user's profile
  * Requires authentication
  */
-export const getMyProfile = async (req: Request, res: Response) => {
+export const getProfileById = async (req: Request, res: Response) => {
     try {
-        const userId = req.user?.userId;
+        const { userId } = req.params;
+        const currentUserId = req.user?.userId; // Get the logged-in user ID if available
 
         if (!userId) {
-            return res.status(401).json({ 
-                message: 'User not authenticated' 
+            return res.status(400).json({ 
+                message: 'User ID is required' 
             });
         }
 
@@ -22,7 +24,8 @@ export const getMyProfile = async (req: Request, res: Response) => {
                 name: true,
                 email: true,
                 createdAt: true,
-                updatedAt: true
+                updatedAt: true,
+                profileImage: true
             }
         });
 
@@ -32,9 +35,47 @@ export const getMyProfile = async (req: Request, res: Response) => {
             });
         }
 
+        // If there's a logged-in user and they're viewing someone else's profile, check friendship status
+        let friendshipStatus = null;
+        if (currentUserId && currentUserId !== userId) {
+            const friendship = await prisma.friendship.findFirst({
+                where: {
+                    OR: [
+                        { userId: currentUserId, friendId: userId },
+                        { userId: userId, friendId: currentUserId }
+                    ]
+                }
+            });
+
+            if (friendship) {
+                // Determine the relationship from current user's perspective
+                if (friendship.status === 'ACCEPTED') {
+                    friendshipStatus = 'friends';
+                } else if (friendship.userId === currentUserId) {
+                    friendshipStatus = 'request_sent'; // Current user sent the request
+                } else {
+                    friendshipStatus = 'request_received'; // Current user received the request
+                }
+            }
+        }
+
+        let numberOfFriends = await prisma.friendship.count({
+            where: {
+                OR: [
+                    { userId: userId },
+                    { friendId: userId }
+                ],
+                status: 'ACCEPTED'
+            }
+        });
+
         return res.status(200).json({
             success: true,
-            data: user
+            data: {
+                ...user,
+                friendshipStatus,
+                numberOfFriends
+            }
         });
     } catch (error: any) {
         console.error('Get profile error:', error);
@@ -74,7 +115,8 @@ export const updateMyProfile = async (req: Request, res: Response) => {
                 id: true,
                 name: true,
                 email: true,
-                updatedAt: true
+                updatedAt: true,
+                profileImage: true
             }
         });
 
@@ -107,7 +149,8 @@ export const getUserById = async (req: Request, res: Response) => {
                 name: true,
                 email: true,
                 createdAt: true,
-                updatedAt: true
+                updatedAt: true,
+                profileImage: true
             }
         });
 
@@ -141,7 +184,8 @@ export const listUsers = async (req: Request, res: Response) => {
                 id: true,
                 name: true,
                 email: true,
-                createdAt: true
+                createdAt: true,
+                profileImage: true
             },
             orderBy: {
                 createdAt: 'desc'
@@ -155,6 +199,50 @@ export const listUsers = async (req: Request, res: Response) => {
         });
     } catch (error: any) {
         console.error('List users error:', error);
+        return res.status(500).json({ 
+            message: 'Failed to fetch users',
+            error: error.message 
+        });
+    }
+};
+
+/**
+ * Get multiple users by IDs (batch endpoint)
+ * No authentication required - used by other services
+ */
+export const getUsersByIds = async (req: Request, res: Response) => {
+    try {
+        const { userIds } = req.body;
+
+        if (!Array.isArray(userIds) || userIds.length === 0) {
+            return res.status(400).json({ 
+                message: 'userIds must be a non-empty array' 
+            });
+        }
+
+        const users = await prisma.user.findMany({
+            where: {
+                id: { in: userIds }
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                profileImage: true
+            }
+        });
+
+        return res.status(200).json({
+            success: true,
+            users: users.map(user => ({
+                id: user.id,
+                username: user.name,
+                email: user.email,
+                profileImage: user.profileImage
+            }))
+        });
+    } catch (error: any) {
+        console.error('Batch get users error:', error);
         return res.status(500).json({ 
             message: 'Failed to fetch users',
             error: error.message 
