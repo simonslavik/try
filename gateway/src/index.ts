@@ -36,13 +36,13 @@ app.use(cors());
 app.use(express.json());
 
 const ratelimitOptions = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // Increased from 100 to 1000 requests per window
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
     logger.warn(`Sensitive endpoint rate limit exceeded for IP: ${req.ip}`);
-    res.status(429).json({ success: false, message: "Too many requests" });
+    res.status(429).json({ success: false, message: "Too many requests, please try again later" });
   },
   store: new RedisStore({
     sendCommand: (...args: string[]) => redisClient.sendCommand(args) as any,

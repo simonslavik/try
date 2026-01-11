@@ -1,12 +1,13 @@
 
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AuthContext from '../../../context';
 import HomePageHeader from '../../../components/HomePageHeader';
+import { FiCornerRightDown, FiMail, FiMessageCircle } from 'react-icons/fi';
 
 const ProfilePage = () => {
   const { id } = useParams();
-  const { auth } = useContext(AuthContext);
+  const { auth, setAuth } = useContext(AuthContext);
   const navigate = useNavigate();
   
   const [profile, setProfile] = useState(null);
@@ -14,6 +15,12 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [friendRequestLoading, setFriendRequestLoading] = useState(false);
+  
+  // Image upload states
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef(null);
   
   const isOwnProfile = auth?.user?.id === id;
 
@@ -64,6 +71,75 @@ const ProfilePage = () => {
     }
   }, [id, auth]);
 
+  const handleImageSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+      // Automatically upload the image
+      uploadImage(file);
+    }
+  };
+
+  const uploadImage = async (file) => {
+    if (!auth?.token) {
+      alert('Please login to change profile picture');
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch('http://localhost:3000/v1/profile/image', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${auth.token}`
+        },
+        body: formData
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Update profile state
+        setProfile(prev => ({
+          ...prev,
+          profileImage: data.imageUrl
+        }));
+        // Update auth context only if user exists and this is own profile
+        if (auth?.user && isOwnProfile) {
+          setAuth({
+            user: {
+              ...auth.user,
+              profileImage: data.imageUrl
+            },
+            token: auth.token,
+            refreshToken: auth.refreshToken
+          });
+        }
+        // Reset selection
+        setSelectedImage(null);
+        setImagePreview(null);
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || 'Failed to upload image');
+      }
+    } catch (err) {
+      console.error('Error uploading image:', err);
+      alert('Failed to upload image');
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div>
@@ -106,16 +182,36 @@ const ProfilePage = () => {
         <div className="bg-white rounded-lg shadow-md p-8 mb-6">
           <div className="flex items-start gap-6">
             {/* Profile Image */}
-            <img 
-              src={profile.profileImage 
-                ? `http://localhost:3001${profile.profileImage}` 
-                : '/images/default.webp'
-              }
-              alt={profile.name}
-              className="w-32 h-32 rounded-full object-cover border-4 border-purple-200"
-              onError={(e) => { e.target.src = '/images/default.webp'; }}
-            />
-            
+            <div className="relative">
+              <img 
+                src={imagePreview || (profile.profileImage 
+                  ? `http://localhost:3001${profile.profileImage}` 
+                  : '/images/default.webp')
+                }
+                alt={profile.name}
+                className={`w-32 h-32 rounded-full object-cover border-4 border-purple-200 ${
+                  isOwnProfile ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''
+                }`}
+                onClick={() => isOwnProfile && fileInputRef.current?.click()}
+                onError={(e) => { e.target.src = '/images/default.webp'; }}
+              />
+              {uploadingImage && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
+                  <div className="text-white text-sm">Uploading...</div>
+                </div>
+              )}
+              {isOwnProfile && (
+                <>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                    className="hidden"
+                  />
+                </>
+              )}
+            </div>
             {/* Profile Info */}
             <div className="flex-1">
               <div className="flex items-center justify-between">
@@ -133,14 +229,22 @@ const ProfilePage = () => {
                   </button>
                 )}
                 {!isOwnProfile && (
-                  <>
+                  <div className="flex items-center gap-3">
                     {profile.friendshipStatus === 'friends' ? (
-                      <button
-                        className="px-4 py-2 bg-gray-500 text-white rounded-lg cursor-not-allowed"
-                        disabled
-                      >
-                        Already Friends
-                      </button>
+                      <>
+                        <button
+                          onClick={() => navigate(`/messages/${id}`)}
+                          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                        >
+                          Message
+                        </button>
+                        <button
+                          className="px-4 py-2 bg-gray-500 text-white rounded-lg cursor-not-allowed"
+                          disabled
+                        >
+                          Friends
+                        </button>
+                      </>
                     ) : profile.friendshipStatus === 'request_sent' ? (
                       <button
                         className="px-4 py-2 bg-yellow-500 text-white rounded-lg cursor-not-allowed"
@@ -193,7 +297,7 @@ const ProfilePage = () => {
                         {friendRequestLoading ? 'Sending...' : 'Add Friend'}
                       </button>
                     )}
-                  </>
+                  </div>
                 )}
               </div>
               

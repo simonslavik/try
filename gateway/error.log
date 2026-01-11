@@ -54,3 +54,9 @@
 {"level":"error","message":"Proxy error for Collab Editor Service: request entity too large","service":"api-gateway","timestamp":"2026-01-08T12:50:42.470Z"}
 {"level":"error","message":"Proxy error for Collab Editor Service: request entity too large","service":"api-gateway","timestamp":"2026-01-08T12:50:49.516Z"}
 {"level":"error","message":"Proxy error for Collab Editor Service: request entity too large","service":"api-gateway","timestamp":"2026-01-08T16:24:46.436Z"}
+{"code":"ENOTFOUND","errno":-3008,"hostname":"redis","level":"error","message":"Could not connect to Redis getaddrinfo ENOTFOUND redis","service":"api-gateway","stack":"Error: getaddrinfo ENOTFOUND redis\n    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)","syscall":"getaddrinfo","timestamp":"2026-01-10T20:48:44.829Z"}
+{"code":"ENOTFOUND","errno":-3008,"hostname":"redis","level":"error","message":"Could not connect to Redis getaddrinfo ENOTFOUND redis","service":"api-gateway","stack":"Error: getaddrinfo ENOTFOUND redis\n    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)","syscall":"getaddrinfo","timestamp":"2026-01-10T22:27:35.121Z"}
+{"level":"error","message":"Proxy error for Collab Editor Service: connect ECONNREFUSED 172.18.0.4:4000","service":"api-gateway","timestamp":"2026-01-10T22:40:32.913Z"}
+{"level":"error","message":"Proxy error for Collab Editor Service: connect ECONNREFUSED 172.18.0.4:4000","service":"api-gateway","timestamp":"2026-01-10T22:40:38.763Z"}
+{"level":"error","message":"Proxy error for Collab Editor Service: connect ECONNREFUSED 172.18.0.4:4000","service":"api-gateway","timestamp":"2026-01-10T22:40:39.885Z"}
+{"level":"error","message":"Proxy error for Collab Editor Service: connect ECONNREFUSED 172.18.0.4:4000","service":"api-gateway","timestamp":"2026-01-10T22:40:46.097Z"}

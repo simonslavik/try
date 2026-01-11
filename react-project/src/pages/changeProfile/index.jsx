@@ -158,8 +158,8 @@ const ChangeProfilePage = () => {
                 refreshToken: auth.refreshToken
             });
 
-            // Redirect to home
-            navigate('/');
+            // Go back to previous page
+            navigate(-1);
         } catch (err) {
             console.error('Error changing profile:', err);
             setError(err.response?.data?.error || err.response?.data?.message || 'Failed to change profile. Please try again.');
@@ -271,7 +271,7 @@ const ChangeProfilePage = () => {
 
                 <div className="mt-4 text-center">
                     <button
-                        onClick={() => navigate('/')}
+                        onClick={() => navigate(-1)}
                         className="text-sm text-purple-600 hover:text-purple-800"
                     >
                         Cancel and go back

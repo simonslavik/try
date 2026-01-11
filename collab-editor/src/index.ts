@@ -67,8 +67,9 @@ interface Client {
   userId: string;
   username: string;
   ws: WebSocket;
-  bookClubId: string;
+  bookClubId?: string;
   roomId?: string; // Current room they're viewing
+  isDMConnection?: boolean; // Track if this is a DM connection
 }
 
 // Active book clubs with connected clients (memory)
@@ -77,6 +78,9 @@ interface ActiveBookClub {
 }
 
 const activeBookClubs = new Map<string, ActiveBookClub>();
+
+// Active DM connections - Map userId to their WebSocket client
+const activeDMClients = new Map<string, Client>();
 
 // Health check
 app.get('/health', async (req, res) => {
@@ -549,12 +553,20 @@ wss.on('connection', (ws: WebSocket) => {
           handleJoin(ws, message);
           break;
         
+        case 'join-dm':
+          handleJoinDM(ws, message);
+          break;
+        
         case 'switch-room':
           handleSwitchRoom(message);
           break;
         
         case 'chat-message':
           handleChatMessage(message);
+          break;
+        
+        case 'dm-message':
+          handleDMMessage(message);
           break;
         
         default:
@@ -806,7 +818,100 @@ wss.on('connection', (ws: WebSocket) => {
     });
   }
 
+  function handleJoinDM(ws: WebSocket, message: any) {
+    const { userId, username } = message;
+    
+    // Create DM client
+    const clientId = uuidv4();
+    currentClient = {
+      id: clientId,
+      userId,
+      username,
+      ws,
+      isDMConnection: true
+    };
+    
+    // Store in active DM clients (one per user)
+    activeDMClients.set(userId, currentClient);
+    
+    ws.send(JSON.stringify({
+      type: 'dm-joined',
+      userId
+    }));
+    
+    console.log(`📨 ${username} (${userId}) joined DM connection`);
+  }
+
+  async function handleDMMessage(message: any) {
+    if (!currentClient || !currentClient.isDMConnection) return;
+
+    const { receiverId, content } = message;
+    
+    try {
+      // Save message to user-service database via API
+      const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:3001/api';
+      const response = await fetch(`${userServiceUrl}/messages`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-User-Id': currentClient.userId // Internal service-to-service header
+        },
+        body: JSON.stringify({ receiverId, content })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || 'Failed to save DM');
+      }
+
+      const data = await response.json();
+      // Handle both response formats: { data: message } or { message }
+      const savedMessage = data.data || data.message;
+
+      if (!savedMessage) {
+        throw new Error('No message in response');
+      }
+
+      // Send confirmation to sender
+      if (currentClient.ws.readyState === WebSocket.OPEN) {
+        currentClient.ws.send(JSON.stringify({
+          type: 'dm-sent',
+          message: savedMessage
+        }));
+      }
+
+      // Send message to receiver if they're online
+      const receiverClient = activeDMClients.get(receiverId);
+      if (receiverClient && receiverClient.ws.readyState === WebSocket.OPEN) {
+        receiverClient.ws.send(JSON.stringify({
+          type: 'dm-received',
+          message: savedMessage
+        }));
+      }
+
+      console.log(`📨 DM from ${currentClient.username} to ${receiverId}: ${content}`);
+    } catch (error) {
+      console.error('Error handling DM:', error);
+      if (currentClient && currentClient.ws.readyState === WebSocket.OPEN) {
+        currentClient.ws.send(JSON.stringify({
+          type: 'error',
+          message: error instanceof Error ? error.message : 'Failed to send direct message'
+        }));
+      }
+    }
+  }
+
   function handleDisconnect(client: Client) {
+    // Handle DM disconnection
+    if (client.isDMConnection) {
+      activeDMClients.delete(client.userId);
+      console.log(`📪 ${client.username} (${client.userId}) left DM connection`);
+      return;
+    }
+
+    // Handle bookclub disconnection
+    if (!client.bookClubId) return;
+    
     const activeClub = activeBookClubs.get(client.bookClubId);
     if (!activeClub) return;
 

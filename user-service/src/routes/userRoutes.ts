@@ -4,6 +4,7 @@ import { getProfileById, updateMyProfile, getUserById, listUsers, getUsersByIds 
 import { authMiddleware, optionalAuthMiddleware } from '../middleware/authMiddleware.js';
 import { addProfileImage, deleteProfileImage, upload } from '../controllers/profileImageController.js';
 import { sendFriendRequest, acceptFriendRequest, rejectFriendRequest, removeFriend, listFriends, listFriendRequests} from '../controllers/friendsController.js';
+import { getDirectMessages, sendDirectMessage, getConversations } from '../controllers/directMessagesController.js';
 const userRoutes = Router();
 
 // Public routes (no authentication required)
@@ -37,5 +38,10 @@ userRoutes.post('/friends/reject', authMiddleware, rejectFriendRequest );
 userRoutes.delete('/friends/remove', authMiddleware, removeFriend);
 userRoutes.get('/friends/list', authMiddleware, listFriends);
 userRoutes.get('/friends/requests', authMiddleware, listFriendRequests);
+
+// Direct Messages
+userRoutes.get('/messages/conversations', authMiddleware, getConversations);
+userRoutes.get('/messages/:otherUserId', authMiddleware, getDirectMessages);
+userRoutes.post('/messages', sendDirectMessage); // Allow both auth and internal service calls
 
 export default userRoutes;

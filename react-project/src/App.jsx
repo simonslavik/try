@@ -9,6 +9,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import NewBookClubPage from "./pages/createbookclub";
 import ChangeProfilePage from "./pages/changeProfile";
 import ProfilePage from "./pages/profilePage/:id";
+import DirectMessagePage from "./pages/directMessages/:userId";
 
 function App() {
   return (
@@ -29,6 +30,11 @@ function App() {
         </ProtectedRoute>
       }/>
       <Route path="/profile/:id" element={<ProfilePage />}/>
+      <Route path="/messages/:userId?" element={
+        <ProtectedRoute>
+          <DirectMessagePage />
+        </ProtectedRoute>
+      }/>
     </Routes>
   );
 }
