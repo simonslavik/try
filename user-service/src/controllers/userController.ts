@@ -41,12 +41,14 @@ export const registerUser = async (req: Request, res: Response) => {
                 name,
                 email,
                 password: hashedPassword,
+                profileImage: null
             },  
             select: {
                 id: true,
                 name: true,
                 email: true,
-                createdAt: true
+                createdAt: true,
+                profileImage: true
             }
         });
 
@@ -121,7 +123,8 @@ export const loginUser = async (req: Request, res: Response) => {
             user: {
                 id: user.id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                profileImage: user.profileImage
             },
             accessToken,
             refreshToken

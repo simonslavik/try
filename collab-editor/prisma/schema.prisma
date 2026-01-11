@@ -17,6 +17,7 @@ datasource db {
 model BookClub {
   id           String   @id @default(uuid())
   name         String   @default("Untitled Book Club")
+  imageUrl     String? // Optional bookclub cover image
   isPublic     Boolean  @default(true)
   members      String[] // List of User IDs from user-service (no FK due to separate DBs)
   creatorId    String // User ID from user-service (no FK due to separate DBs)

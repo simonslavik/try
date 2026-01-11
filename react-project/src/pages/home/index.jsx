@@ -13,6 +13,7 @@ const Home = () => {
     const { auth, logout } = useContext(AuthContext);
     const [bookClubs, setBookClubs] = useState([]);
     const [myBookClubs, setMyBookClubs] = useState([]);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -42,30 +43,10 @@ const Home = () => {
     }, [auth]);
     
     const createNewBookClub = () => {
-        if (!auth?.token) {
-            alert('Please login to create a book club');
-            return;
-        }
-        
-        console.log('Creating bookclub with token:', auth.token);
-        
-        // axios already has Authorization header set by auth context
-        axios.post('http://localhost:3000/v1/editor/bookclubs', {
-            name: 'New Book Club',
-            isPublic: true,
-        })
-        .then(response => {
-            console.log('Created Bookclub:', response.data);
-            // Refresh my book clubs list
-            setMyBookClubs(prev => [...prev, response.data.bookClub]);
-            setBookClubs(prev => [...prev, response.data.bookClub]);
-        })
-        .catch(error => {
-            alert('Failed to create book club. Please try again.');
-            console.error('Error creating book club:', error);
-            console.error('Error response:', error.response?.data);
-        });
+        navigate('/create-bookclub');
     };
+
+
 
     return (
         <div>
@@ -85,23 +66,60 @@ const Home = () => {
                                 {myBookClubs.map(bookClub => (
                                     <div 
                                         key={bookClub.id}
+                                        onClick={() => navigate(`/bookclub/${bookClub.id}`)}
                                         className="p-4 border rounded hover:bg-gray-50 cursor-pointer flex-shrink-0 min-w-[200px]"
                                     >
-                                        <h3 className="font-medium">{bookClub.name}</h3>
-                                        <p className="text-sm text-gray-600">
-                                            {bookClub.activeUsers || 0} users online
+                                        <img 
+                                            src={bookClub.imageUrl ? `http://localhost:4000${bookClub.imageUrl}` : '/images/default.webp'} 
+                                            alt={bookClub.name}
+                                            className="w-full h-32 object-cover mb-2 rounded"
+                                            onError={(e) => { e.target.src = '/images/default.webp'; }}
+                                        />
+                                        <h3 className="font-medium truncate">{bookClub.name}</h3>
+                                        {bookClub.members && bookClub.members.length > 0 && (
+                                            <div className="mt-2">
+                                                <p className="text-sm text-gray-600 mb-1">
+                                                    {bookClub.members.length} {bookClub.members.length === 1 ? 'member' : 'members'}
+                                                </p>
+                                                <div className="flex -space-x-2">
+                                                    {bookClub.members.slice(0, 5).map(member => (
+                                                        <img 
+                                                            key={member.id} 
+                                                            src={member.profileImage 
+                                                                ? `http://localhost:3001${member.profileImage}` 
+                                                                : '/images/default.webp'
+                                                            } 
+                                                            alt={member.username} 
+                                                            className="w-8 h-8 rounded-full border-2 border-white object-cover"
+                                                            title={member.username}
+                                                            onError={(e) => { e.target.src = '/images/default.webp'; }}
+                                                        />
+                                                    ))}
+                                                    {bookClub.members.length > 5 && (
+                                                        <div className="w-8 h-8 rounded-full border-2 border-white bg-gray-300 flex items-center justify-center text-xs font-semibold text-gray-700">
+                                                            +{bookClub.members.length - 5}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                        <p className="text-sm text-gray-600 mt-2">
+                                            <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                                            {bookClub.activeUsers || 0} online
                                         </p>
                                     </div>
                                     
                                 ))}
-                                <button onClick={createNewBookClub}>
-                                    <div className="p-4 border rounded hover:bg-gray-50 cursor-pointer w-20 h-20 flex items-center justify-center">
-                                        <h3 className="font-medium text-2xl">+</h3>
-                                    </div>
-                                </button>
                             </div>
                         )}
                     </div>
+                )}
+                {auth?.user && (
+                <div className='flex justify-center'>
+                    <button className='border rounded p-2 bg-blue-500 text-white hover:bg-blue-600' onClick={createNewBookClub}>
+                        Create New Book Club
+                    </button>
+                </div>
                 )}
                 
                 <div className="flex flex-col  bg-gray-100 p-4 rounded w-full">
@@ -117,20 +135,51 @@ const Home = () => {
                             {bookClubs.map(bookClub => (
                                 <div 
                                     key={bookClub.id}
+                                    onClick={() => navigate(`/bookclub/${bookClub.id}`)}
                                     className="p-4 border rounded hover:bg-gray-50 cursor-pointer flex-shrink-0 min-w-[200px]"
                                 >
-                                    <h3 className="font-medium">{bookClub.name}</h3>
-                                    <p className="text-sm text-gray-600">
-                                        {bookClub.activeUsers || 0} users online
+                                    <img 
+                                        src={bookClub.imageUrl ? `http://localhost:4000${bookClub.imageUrl}` : '/images/default.webp'} 
+                                        alt={bookClub.name}
+                                        className="w-full h-32 object-cover mb-2 rounded"
+                                        onError={(e) => { e.target.src = '/images/default.webp'; }}
+                                    />
+                                    <h3 className="font-medium truncate">{bookClub.name}</h3>
+                                    {bookClub.members && bookClub.members.length > 0 && (
+                                        <div className="mt-2">
+                                            <p className="text-sm text-gray-600 mb-1">
+                                                {bookClub.members.length} {bookClub.members.length === 1 ? 'member' : 'members'}
+                                            </p>
+                                            <div className="flex -space-x-2">
+                                                {bookClub.members.slice(0, 5).map(member => (
+                                                    <img 
+                                                        key={member.id} 
+                                                        src={member.profileImage 
+                                                            ? `http://localhost:3001${member.profileImage}` 
+                                                            : '/images/default.webp'
+                                                        } 
+                                                        alt={member.username} 
+                                                        className="w-8 h-8 rounded-full border-2 border-white object-cover"
+                                                        title={member.username}
+                                                        onError={(e) => { e.target.src = '/images/default.webp'; }}
+                                                    />
+                                                ))}
+                                                {bookClub.members.length > 5 && (
+                                                    <div className="w-8 h-8 rounded-full border-2 border-white bg-gray-300 flex items-center justify-center text-xs font-semibold text-gray-700">
+                                                        +{bookClub.members.length - 5}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                    <p className="text-sm text-gray-600 mt-2">
+                                        <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                                        {bookClub.activeUsers || 0} online
                                     </p>
                                 </div>
                             ))}
-                            <button onClick={createNewBookClub}>
-                                <div className="p-4 border rounded hover:bg-gray-50 cursor-pointer w-20 h-20 flex items-center justify-center">
-                                    <h3 className="font-medium text-2xl">+</h3>
-                                </div>
-                            </button>
                         </div>
+                        
                     )}
                 </div>
             </div>

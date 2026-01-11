@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import AuthContext from '../../context';
 
-const Login = () => {
+const Register = () => {
     const navigate = useNavigate();
     const { setAuth } = useContext(AuthContext);
     const [form, setForm] = useState({ name: '', email: '', password: '' });
@@ -44,7 +44,9 @@ const Login = () => {
             const user = res?.data?.user || res?.data?.data?.user || null;
             if (token) {
                 setAuth({ token, user });
-                navigate('/');
+                // Redirect to the page they came from, or home
+                const returnTo = location.state?.from || '/';
+                navigate(returnTo);
                 return;
             }
             setMessage(res.data?.message || 'Registered');
@@ -111,4 +113,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default Register;

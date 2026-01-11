@@ -1,11 +1,12 @@
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import AuthContext from '../../context';
 
-const Register = () => {
+const Login = () => {
 
     const navigate = useNavigate();
+    const location = useLocation();
     const { setAuth } = useContext(AuthContext);
     const [formData, setFormData] = useState({
         email: '',
@@ -42,12 +43,25 @@ const Register = () => {
         setLoading(true);
         try {
             const res = await axios.post('/v1/auth/login', formData);
-            // Try to extract token and user from common response shapes
-            const token = res?.data?.token || res?.data?.accessToken || res?.data?.data?.token;
-            const user = res?.data?.user || res?.data?.data?.user || null;
-            if (token) {
-                setAuth({ token, user });
-                navigate('/');
+            
+            // Extract token, refreshToken, and user from response
+            const accessToken = res?.data?.accessToken || res?.data?.token;
+            const refreshToken = res?.data?.refreshToken;
+            const user = res?.data?.user;
+            
+            console.log('Login response:', res.data);
+            console.log('User data:', user);
+            
+            if (accessToken && user) {
+                setAuth({ 
+                    token: accessToken,
+                    refreshToken: refreshToken,
+                    user: user
+                });
+                
+                // Redirect to the page they came from, or home
+                const returnTo = location.state?.from || '/';
+                navigate(returnTo);
                 return;
             }
             setMessage(res.data?.message || 'Logged in');
@@ -107,4 +121,4 @@ const Register = () => {
     );
 };
 
-export default Register;
+export default Login;

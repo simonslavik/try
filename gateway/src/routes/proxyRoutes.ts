@@ -61,7 +61,9 @@ const createProxyConfig = (serviceName: string, pathTransform?: (path: string) =
 
 export const setupProxyRoutes = (app: Express): void => {
   const services = [
-    { envVar: 'USER_SERVICE_URL', route: '/v1/profile', name: 'Profile Service', requireAuth: true },
+    { envVar: 'USER_SERVICE_URL', route: '/v1/profile', name: 'Profile Service', requireAuth: false },
+    { envVar: 'USER_SERVICE_URL', route: '/v1/friends', name: 'Friends Service', requireAuth: true },
+    { envVar: 'USER_SERVICE_URL', route: '/v1/messages', name: 'Messages Service', requireAuth: true },
     { envVar: 'USER_SERVICE_URL', route: '/v1/users', name: 'User Service', requireAuth: true },
     { envVar: 'USER_SERVICE_URL', route: '/v1/auth', name: 'Auth Service', requireAuth: false },
     { 
