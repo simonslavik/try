@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Book {
+  id            String  @id @default(uuid())
+  title         String
+  author        String
+  coverUrl      String?
+  description   String?
+  pageCount     Int?
+  isbn          String?
+  googleBooksId String? @unique
+
+  bookClubBooks BookClubBook[]
+  userBooks     UserBook[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BookClubBook {
+  id         String    @id @default(uuid())
+  bookClubId String
+  bookId     String
+  status     String // 'current', 'upcoming', 'completed'
+  startDate  DateTime?
+  endDate    DateTime?
+  addedById  String // User who added the book
+
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  readingProgress ReadingProgress[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([bookClubId, bookId])
+  @@index([bookClubId])
+  @@index([status])
+}
+
+model UserBook {
+  id     String  @id @default(uuid())
+  userId String
+  bookId String
+  status String // 'favorite', 'reading', 'want_to_read', 'completed'
+  rating Int? // 1-5 stars
+  review String?
+
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, bookId])
+  @@index([userId])
+  @@index([status])
+}
+
+model ReadingProgress {
+  id             String   @id @default(uuid())
+  bookClubBookId String
+  userId         String
+  pagesRead      Int      @default(0)
+  percentage     Int      @default(0) // Calculated field for progress bar
+  lastReadDate   DateTime @default(now())
+  notes          String?
+
+  bookClubBook BookClubBook @relation(fields: [bookClubBookId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([bookClubBookId, userId])
+  @@index([userId])
+}
