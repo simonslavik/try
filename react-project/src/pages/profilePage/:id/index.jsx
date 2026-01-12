@@ -11,7 +11,8 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   
   const [profile, setProfile] = useState(null);
-  const [bookClubs, setBookClubs] = useState([]);
+  const [createdBookClubs, setCreatedBookClubs] = useState([]);
+  const [memberBookClubs, setMemberBookClubs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [friendRequestLoading, setFriendRequestLoading] = useState(false);
@@ -44,18 +45,28 @@ const ProfilePage = () => {
           return;
         }
         
-        // Fetch user's bookclubs
-        const bookClubsResponse = await fetch('http://localhost:3000/v1/editor/bookclubs', { headers });
-        const bookClubsData = await bookClubsResponse.json();
+        // Fetch user's created bookclubs
+        const createdBookClubsResponse = await fetch(`http://localhost:3000/v1/editor/users/${id}/bookclubs`, { headers });
+        const createdBookClubsData = await createdBookClubsResponse.json();
         
-        if (bookClubsResponse.ok) {
-          // Filter bookclubs where this user is a member
-          const userBookClubs = (bookClubsData.bookClubs || []).filter(club => 
-            club.members.some(member => 
+        if (createdBookClubsResponse.ok) {
+          setCreatedBookClubs(createdBookClubsData.bookClubs || []);
+        }
+        
+        // Fetch all bookclubs and filter for ones where user is a member
+        const allBookClubsResponse = await fetch('http://localhost:3000/v1/editor/bookclubs', { headers });
+        const allBookClubsData = await allBookClubsResponse.json();
+        
+        if (allBookClubsResponse.ok) {
+          // Filter bookclubs where this user is a member (but not creator to avoid duplicates)
+          const memberClubs = (allBookClubsData.bookClubs || []).filter(club => {
+            const isMember = club.members.some(member => 
               typeof member === 'string' ? member === id : member.id === id
-            )
-          );
-          setBookClubs(userBookClubs);
+            );
+            const isCreator = club.creatorId === id;
+            return isMember && !isCreator; // Only show if member but not creator
+          });
+          setMemberBookClubs(memberClubs);
         }
         
       } catch (err) {
@@ -303,7 +314,7 @@ const ProfilePage = () => {
               
               <div className="mt-6 flex gap-8">
                 <div>
-                  <div className="text-2xl font-bold text-purple-600">{bookClubs.length}</div>
+                  <div className="text-2xl font-bold text-purple-600">{createdBookClubs.length + memberBookClubs.length}</div>
                   <div className="text-sm text-gray-600">Book Clubs</div>
                 </div>
                 <div>
@@ -321,16 +332,16 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* Book Clubs Section */}
+        {/* Created Book Clubs Section */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            {isOwnProfile ? 'My Book Clubs' : `${profile.name}'s Book Clubs`}
+            {isOwnProfile ? 'My Created Book Clubs' : `Book Clubs by ${profile.name}`}
           </h2>
           
-          {bookClubs.length === 0 ? (
+          {createdBookClubs.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-gray-400 text-lg mb-4">
-                {isOwnProfile ? "You haven't joined any book clubs yet" : "No book clubs yet"}
+                {isOwnProfile ? "You haven't created any book clubs yet" : "No book clubs created yet"}
               </div>
               {isOwnProfile && (
                 <button
@@ -343,7 +354,58 @@ const ProfilePage = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {bookClubs.map(club => (
+              {createdBookClubs.map(club => (
+                <div
+                  key={club.id}
+                  onClick={() => navigate(`/bookclub/${club.id}`)}
+                  className="border rounded-lg p-4 hover:shadow-lg cursor-pointer transition-shadow"
+                >
+                  <img 
+                    src={club.imageUrl 
+                      ? `http://localhost:4000${club.imageUrl}` 
+                      : '/images/default.webp'
+                    }
+                    alt={club.name}
+                    className="w-full h-40 object-cover rounded-lg mb-3"
+                    onError={(e) => { e.target.src = '/images/default.webp'; }}
+                  />
+                  <h3 className="font-semibold text-lg truncate mb-2">{club.name}</h3>
+                  
+                  <div className="flex items-center justify-between text-sm text-gray-600">
+                    <span>{club.memberCount || club.members?.length || 0} members</span>
+                    {club.activeUsers > 0 && (
+                      <span className="text-green-600">{club.activeUsers} online</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Member Book Clubs Section */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            {isOwnProfile ? 'Book Clubs I\'m In' : `${profile.name} is a member of`}
+          </h2>
+          
+          {memberBookClubs.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-gray-400 text-lg mb-4">
+                {isOwnProfile ? "You haven't joined any book clubs yet" : "Not a member of any book clubs"}
+              </div>
+              {isOwnProfile && (
+                <button
+                  onClick={() => navigate('/')}
+                  className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  Browse Book Clubs
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {memberBookClubs.map(club => (
                 <div
                   key={club.id}
                   onClick={() => navigate(`/bookclub/${club.id}`)}

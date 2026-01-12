@@ -1,10 +1,8 @@
 import { useEffect, useState, useContext, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import AuthContext from '../../../context';
 import { FiHash, FiUsers, FiPlus, FiSettings, FiHome, FiImage, FiTrash2, FiMail } from 'react-icons/fi';
 import MyBookClubsSidebar from '../../../components/MyBookClubsSidebar';
-import BookClubImage from '../../../components/BookClubImage';
-import HomePageHeader from '../../../components/HomePageHeader';
 import SideBarRooms from '../../../components/SideBarRooms';
 import DMSidebar from '../../../components/DMSidebar';
 import DMChat from '../../../components/DMChat';
@@ -13,9 +11,10 @@ const BookClub = () => {
   const { id: bookClubId } = useParams();
   const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
   
-  // Mode state
-  const [viewMode, setViewMode] = useState('bookclub'); // 'bookclub' or 'dm'
+  // Mode state - check if navigation state specifies DM mode
+  const [viewMode, setViewMode] = useState(location.state?.viewMode || 'bookclub'); // 'bookclub' or 'dm'
   
   // Bookclub states
   const [bookClub, setBookClub] = useState(null);
@@ -35,6 +34,8 @@ const BookClub = () => {
   const [conversations, setConversations] = useState([]);
   const [currentDMUser, setCurrentDMUser] = useState(null);
   const [dmMessages, setDmMessages] = useState([]);
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [friends, setFriends] = useState([]);
   
   const ws = useRef(null);
   const dmWs = useRef(null);
@@ -220,7 +221,7 @@ const BookClub = () => {
 
   // DM WebSocket connection
   useEffect(() => {
-    if (!auth?.user?.id || viewMode !== 'dm') return;
+    if (!auth?.user?.id || !auth?.user?.name) return;
 
     const ws = new WebSocket('ws://localhost:4000');
     dmWs.current = ws;
@@ -238,26 +239,39 @@ const BookClub = () => {
       const data = JSON.parse(event.data);
       
       switch (data.type) {
+        case 'dm-joined':
+          console.log('✅ Joined DM connection');
+          break;
+          
         case 'dm-sent':
+          // Message we sent was confirmed - add it if not already in list
           setDmMessages(prev => {
             if (prev.find(m => m.id === data.message.id)) return prev;
             return [...prev, data.message];
           });
+          setSendingMessage(false);
           break;
           
         case 'dm-received':
+          // New message received from someone else
           const newMsg = data.message;
-          if (newMsg.senderId === currentDMUser?.id || newMsg.receiverId === currentDMUser?.id) {
+          
+          // Update messages if this is the active conversation
+          if (currentDMUser && (newMsg.senderId === currentDMUser.id || newMsg.receiverId === currentDMUser.id)) {
             setDmMessages(prev => {
               if (prev.find(m => m.id === newMsg.id)) return prev;
               return [...prev, newMsg];
             });
           }
+          
+          // Update conversations list
           fetchConversations();
           break;
           
         case 'error':
-          console.error('DM WebSocket error:', data.message);
+          console.error('WebSocket error:', data.message);
+          setSendingMessage(false);
+          alert(data.message || 'Failed to send message');
           break;
       }
     };
@@ -275,7 +289,7 @@ const BookClub = () => {
         ws.close();
       }
     };
-  }, [auth, viewMode, currentDMUser]);
+  }, [auth?.user?.id, auth?.user?.name, currentDMUser]);
 
   // Fetch conversations when switching to DM mode
   const fetchConversations = async () => {
@@ -286,17 +300,42 @@ const BookClub = () => {
         headers: { Authorization: `Bearer ${auth.token}` }
       });
       const data = await response.json();
+      
       if (response.ok) {
+        // Backend returns { success: true, data: [...conversations] }
         setConversations(data.data || []);
+      } else {
+        console.error('Failed to fetch conversations:', data.message);
       }
     } catch (err) {
       console.error('Error fetching conversations:', err);
     }
   };
 
+  // Fetch friends list
+  const fetchFriends = async () => {
+    if (!auth?.token) return;
+    
+    try {
+      const response = await fetch('http://localhost:3000/v1/friends/list', {
+        headers: { Authorization: `Bearer ${auth.token}` }
+      });
+      const data = await response.json();
+      
+      if (response.ok) {
+        setFriends(data.data || []);
+      } else {
+        console.error('Failed to fetch friends:', data.message);
+      }
+    } catch (err) {
+      console.error('Error fetching friends:', err);
+    }
+  };
+
   useEffect(() => {
     if (viewMode === 'dm') {
       fetchConversations();
+      fetchFriends();
     }
   }, [viewMode, auth]);
 
@@ -309,8 +348,12 @@ const BookClub = () => {
         headers: { Authorization: `Bearer ${auth.token}` }
       });
       const data = await response.json();
+      
       if (response.ok) {
-        setDmMessages(data.data || []);
+        setDmMessages(data.data.messages || []);
+        setCurrentDMUser(data.data.otherUser);
+      } else {
+        console.error('Failed to fetch messages:', data.message);
       }
     } catch (err) {
       console.error('Error fetching DM messages:', err);
@@ -318,22 +361,20 @@ const BookClub = () => {
   };
 
   const handleSelectDMConversation = async (userId) => {
-    const conversation = conversations.find(c => c.otherUser.id === userId);
-    if (conversation) {
-      setCurrentDMUser(conversation.otherUser);
-      await fetchDMMessages(userId);
-    }
+    await fetchDMMessages(userId);
   };
 
   const handleSendDM = (content) => {
-    if (!dmWs.current || dmWs.current.readyState !== WebSocket.OPEN || !currentDMUser) {
+    if (!content.trim() || sendingMessage || !dmWs.current || dmWs.current.readyState !== WebSocket.OPEN || !currentDMUser) {
       return;
     }
 
+    setSendingMessage(true);
+    
     dmWs.current.send(JSON.stringify({
       type: 'dm-message',
       receiverId: currentDMUser.id,
-      content: content
+      content: content.trim()
     }));
   };
 
@@ -487,25 +528,25 @@ const BookClub = () => {
     <div className="flex h-screen bg-gray-900">
         <div className='flex justify-center'>
           {/* My Bookclubs Sidebar */}
-          {auth?.user && (
-            <MyBookClubsSidebar 
-              bookClubs={myBookClubs} 
-              currentBookClubId={bookClubId}
-              viewMode={viewMode}
-              onSelectBookClub={(id) => {
-                setViewMode('bookclub');
-                navigate(`/bookclub/${id}`);
-              }}
-              onOpenDM={() => setViewMode('dm')}
-            />
-          )}
+          <MyBookClubsSidebar 
+            bookClubs={myBookClubs} 
+            currentBookClubId={bookClubId}
+            viewMode={viewMode}
+            onSelectBookClub={(id) => {
+              setViewMode('bookclub');
+              navigate(`/bookclub/${id}`);
+            }}
+            onOpenDM={() => setViewMode('dm')}
+          />
           
           {/* Conditional Sidebar - Bookclub Rooms or DM Conversations */}
           {viewMode === 'dm' ? (
             <DMSidebar
               conversations={conversations}
+              friends={friends}
               currentConversation={currentDMUser?.id}
               onSelectConversation={handleSelectDMConversation}
+              onStartConversation={handleSelectDMConversation}
               onBackToBookclub={() => setViewMode('bookclub')}
               auth={auth}
             />

@@ -301,7 +301,7 @@ app.get('/my-bookclubs', authMiddleware, async (req, res) => {
     const userId = req.user!.userId;
     
     const bookClubs = await prisma.bookClub.findMany({
-      where: { members: { has: userId } },
+      where: { creatorId: userId },
       orderBy: { updatedAt: 'desc' }
     });
     
@@ -318,6 +318,36 @@ app.get('/my-bookclubs', authMiddleware, async (req, res) => {
   } catch (error) {
     console.error('Error fetching user bookclubs:', error);
     res.status(500).json({ error: 'Failed to fetch your bookclubs' });
+  }
+});
+
+// Get bookclubs created by a specific user (public endpoint)
+app.get('/users/:userId/bookclubs', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    const bookClubs = await prisma.bookClub.findMany({
+      where: { 
+        creatorId: userId,
+        isPublic: true // Only show public bookclubs
+      },
+      orderBy: { updatedAt: 'desc' }
+    });
+    
+    // Add active user count and member count to each bookclub
+    const bookClubsWithUserCount = bookClubs.map(club => {
+      const activeClub = activeBookClubs.get(club.id);
+      return {
+        ...club,
+        activeUsers: activeClub ? activeClub.clients.size : 0,
+        memberCount: club.members.length
+      };
+    });
+    
+    res.json({ bookClubs: bookClubsWithUserCount });
+  } catch (error) {
+    console.error('Error fetching user bookclubs:', error);
+    res.status(500).json({ error: 'Failed to fetch user bookclubs' });
   }
 });
 

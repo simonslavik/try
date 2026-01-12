@@ -16,6 +16,7 @@ const HomePageHeader = () => {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const [friendRequests, setFriendRequests] = useState([]);
+    const [userBookClubs, setUserBookClubs] = useState([]);
     const newsDropdownRef = useRef(null);
     const profileDropdownRef = useRef(null);
 
@@ -60,7 +61,28 @@ const HomePageHeader = () => {
         setLoading(false);
       }
     };
-    fetchFriendRequests();
+    
+    const fetchUserBookClubs = async () => {
+      try {
+        const headers = auth?.token 
+          ? { Authorization: `Bearer ${auth.token}` }
+          : {};
+        
+        const response = await fetch('http://localhost:3000/v1/editor/bookclubs?mine=true', { headers });
+        const data = await response.json();
+        
+        if (response.ok) {
+          setUserBookClubs(data.bookClubs || []);
+        }
+      } catch (err) {
+        console.error('Error fetching user bookclubs:', err);
+      }
+    };
+    
+    if (auth?.user) {
+      fetchFriendRequests();
+      fetchUserBookClubs();
+    }
   }, [auth]);
 
   // Close dropdowns when clicking outside
@@ -91,7 +113,7 @@ const HomePageHeader = () => {
                 <div ref={newsDropdownRef} className="relative">
                     <button 
                         onClick={() => { setNewsShowDropdown(!newsShowDropdown); if (showDropdown) { setShowDropdown(false); } }} 
-                        className="relative px-2 py-2 text-black rounded hover:bg-gray-100 transition mr-4 cursor-pointer"
+                        className="relative px-2 py-2 text-black rounded hover:bg-gray-100 transition cursor-pointer"
                     >
                     <FiBell size={22} />
                     {friendRequests.length > 0 && (
@@ -200,8 +222,19 @@ const HomePageHeader = () => {
                     )}
                 </button>
                 </div>
-                <button onClick ={() => navigate(`/messages${auth?.user ? `/${auth.user.id}` : ''}`)}>
-                    <FiMail size={22} className="mx-4 cursor-pointer" />
+                <button 
+                    onClick={() => {
+                        if (userBookClubs.length > 0) {
+                            // Navigate to first bookclub in DM mode
+                            navigate(`/bookclub/${userBookClubs[0].id}`, { state: { viewMode: 'dm' } });
+                        } else {
+                            // Fallback to messages page if no bookclubs
+                            navigate(`/messages${auth?.user ? `/${auth.user.id}` : ''}`);
+                        }
+                    }}
+                    className="flex items-center ml-4 border-2 border-gray-200 rounded-full cursor-pointer p-2 hover:bg-gray-100 border-t-indigo-400 "
+                >
+                    <span className="ml-2 font-medium">OpenBookClubs</span>
                 </button>
                 <div className="ml-4 relative" ref={profileDropdownRef}>
                     <button onClick={handleProfileClick}>
@@ -232,9 +265,6 @@ const HomePageHeader = () => {
                         </div>
                     )}
                 </div>
-                <button className="flex items-center ml-4 border-2 border-gray-200 rounded-full cursor-pointer p-2" onClick={() => navigate('/')}>
-                    <span className="ml-2 font-medium">OpenBookClubs</span>
-                </button>
             </div>  
             )}
 
