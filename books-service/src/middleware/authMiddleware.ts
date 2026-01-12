@@ -17,6 +17,7 @@ declare global {
 interface TokenPayload {
     userId: string;
     email: string;
+    role?: string;
     iat: number;
     exp: number;
 }
@@ -54,7 +55,8 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         // Attach user info to request object
         req.user = {
             userId: decoded.userId,
-            email: decoded.email
+            email: decoded.email,
+            role: decoded.role || 'user'
         };
 
         // Continue to next middleware/controller

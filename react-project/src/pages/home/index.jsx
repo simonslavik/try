@@ -238,9 +238,12 @@ const Home = () => {
                                             </div>
                                         </div>
                                     )}
-                                    <button className="text-sm text-black font-semibold mt-2 border border-black rounded px-2 py-1 cursor-pointer bg-amber-100 hover:bg-amber-50" onClick={() => navigate(`/bookclub/${bookClub.id}`)}>
-                                        Join
-                                    </button>
+                                    {auth?.user && (
+                                        <button className="text-sm text-black font-semibold mt-2 border border-black rounded px-2 py-1 cursor-pointer bg-amber-100 hover:bg-amber-50" onClick={() => navigate(`/bookclub/${bookClub.id}`)}>
+                                            Join
+                                        </button>
+                                    )}
+                                    
                                     <p className="text-sm text-gray-600 mt-2">
                                         <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-1"></span>
                                         {bookClub.activeUsers || 0} online

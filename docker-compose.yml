@@ -66,11 +66,13 @@ services:
       REDIS_URL: redis://redis:6379
       USER_SERVICE_URL: http://user-service:3001
       COLLAB_EDITOR_URL: http://collab-editor:4000
+      BOOKS_SERVICE_URL: http://books-service:3002
       NODE_ENV: development
     depends_on:
       - redis
       - user-service
       - collab-editor
+      - books-service
     restart: unless-stopped
     networks:
       - microservices-network
@@ -99,6 +101,28 @@ services:
       - microservices-network
     volumes:
       - ./collab-editor:/app
+      - /app/node_modules
+
+  books-service:
+    build:
+      context: ./books-service
+      dockerfile: Dockerfile
+    container_name: books-service
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: 3002
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      NODE_ENV: development
+      GOOGLE_BOOKS_API_KEY: ${GOOGLE_BOOKS_API_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - microservices-network
+    volumes:
+      - ./books-service:/app
       - /app/node_modules
 
 volumes:

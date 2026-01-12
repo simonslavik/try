@@ -60,3 +60,4 @@
 {"level":"error","message":"Proxy error for Collab Editor Service: connect ECONNREFUSED 172.18.0.4:4000","service":"api-gateway","timestamp":"2026-01-10T22:40:38.763Z"}
 {"level":"error","message":"Proxy error for Collab Editor Service: connect ECONNREFUSED 172.18.0.4:4000","service":"api-gateway","timestamp":"2026-01-10T22:40:39.885Z"}
 {"level":"error","message":"Proxy error for Collab Editor Service: connect ECONNREFUSED 172.18.0.4:4000","service":"api-gateway","timestamp":"2026-01-10T22:40:46.097Z"}
+{"code":"ENOTFOUND","errno":-3008,"hostname":"redis","level":"error","message":"Could not connect to Redis getaddrinfo ENOTFOUND redis","service":"api-gateway","stack":"Error: getaddrinfo ENOTFOUND redis\n    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)","syscall":"getaddrinfo","timestamp":"2026-01-12T18:04:07.422Z"}
