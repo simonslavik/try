@@ -198,7 +198,7 @@ const NewBookClubPage = () => {
 
                 <div className="mt-4 text-center">
                     <button
-                        onClick={() => navigate('/')}
+                        onClick={() => navigate(-1)}
                         className="text-sm text-purple-600 hover:text-purple-800"
                     >
                         Cancel and go back

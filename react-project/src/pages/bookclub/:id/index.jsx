@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import AuthContext from '../../../context';
-import { FiHash, FiUsers, FiPlus, FiSettings, FiHome, FiImage, FiTrash2, FiMail } from 'react-icons/fi';
+import { FiHash, FiUsers, FiPlus, FiSettings, FiHome, FiImage, FiTrash2, FiMail, FiStar } from 'react-icons/fi';
 import MyBookClubsSidebar from '../../../components/MyBookClubsSidebar';
 import SideBarRooms from '../../../components/SideBarRooms';
 import DMSidebar from '../../../components/DMSidebar';
@@ -36,6 +36,8 @@ const BookClub = () => {
   const [dmMessages, setDmMessages] = useState([]);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [friends, setFriends] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   
   const ws = useRef(null);
   const dmWs = useRef(null);
@@ -49,6 +51,18 @@ const BookClub = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (selectedUserId) {
+        setSelectedUserId(null);
+      }
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [selectedUserId]);
 
   // Fetch bookclub details
   useEffect(() => {
@@ -494,6 +508,41 @@ const BookClub = () => {
     }
   };
 
+  const handleSendFriendRequest = async (userId) => {
+    if (!auth?.token) return;
+    
+    try {
+      const response = await fetch('http://localhost:3000/v1/friends/request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth.token}`
+        },
+        body: JSON.stringify({ recipientId: userId })
+      });
+      
+      const data = await response.json();
+      console.log('Friend request response:', data, 'Status:', response.status);
+      
+      if (response.ok) {
+        alert('Friend request sent!');
+        setSelectedUserId(null);
+      } else {
+        console.error('Friend request failed:', data);
+        alert(data.error || data.message || 'Failed to send friend request');
+      }
+    } catch (err) {
+      console.error('Error sending friend request:', err);
+      alert('Failed to send friend request: ' + err.message);
+    }
+  };
+
+  const handleStartDM = async (userId) => {
+    setViewMode('dm');
+    await fetchDMMessages(userId);
+    setSelectedUserId(null);
+  };
+
 
   
 
@@ -570,15 +619,19 @@ const BookClub = () => {
           <div className='absolute bottom-0 flex justify-center pointer-events-none  '> 
             {auth?.user && (
               <div className="p-2 bg-gray-800 rounded-2xl flex items-center gap-2 shadow-lg pointer-events-auto w-78">
-                  <img 
-                    src={auth.user.profileImage 
-                      ? `http://localhost:3001${auth.user.profileImage}` 
-                      : '/images/default.webp'
-                    } 
-                    alt={auth.user.name} 
-                    className="w-10 h-10 rounded-full object-cover"
-                    onError={(e) => { e.target.src = '/images/default.webp'; }}
-                  />
+                  <div className="relative">
+                    <img 
+                      src={auth.user.profileImage 
+                        ? `http://localhost:3001${auth.user.profileImage}` 
+                        : '/images/default.webp'
+                      } 
+                      alt={auth.user.name} 
+                      className="w-10 h-10 rounded-full object-cover hover:bg-gray-50 cursor-pointer"
+                      onError={(e) => { e.target.src = '/images/default.webp'; }}
+                      onClick={() => navigate(`/profile/${auth.user.id}`)}
+                    />
+                    <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-800 bg-green-500"></div>
+                  </div>
                   <span className="text-white font-medium truncate">
                     {auth.user.name}
                   </span>
@@ -687,33 +740,109 @@ const BookClub = () => {
           )}
           {/* Connected Users - only show in bookclub mode */}
           {viewMode === 'bookclub' && (
-          <div className="w-34 bg-gray-800 border-l border-gray-700 p-2">
+          <div className="w-44 bg-gray-800 border-l border-gray-700 p-2">
             <div className="flex items-center gap-2 px-2 py-1 mb-2">
               <FiUsers className="text-gray-400" size={14} />
               <h3 className="text-gray-400 text-xs font-semibold uppercase">
                 Online ({connectedUsers.length})
               </h3>
             </div>
-            <div className="max-h-screen overflow-y-auto">
+            <div className="max-h-screen overflow-y-auto w-full space-y-2">
               {bookClubMembers.map(user => {
-                const isOnline = connectedUsers.filter(connectedUser => connectedUser.id === user.id);
+                const isOnline = connectedUsers.some(connectedUser => connectedUser.userId === user.id);
+                const isCurrentUser = user.id === auth?.user?.id;
+                const isFriend = friends.some(friend => friend.id === user.id);
                 return (
-                  <div onClick={() => navigate(`/profile/${user.id}`)} key={user.id} className="px-2 py-1 text-sm text-gray-300 flex items-center gap-2 hover:bg-gray-700 rounded cursor-pointer">
-                    <div className="relative">
-                      <img 
-                        src={user.profileImage 
-                          ? `http://localhost:3001${user.profileImage}` 
-                          : '/images/default.webp'
-                        } 
-                        alt={user.username} 
-                        className="w-8 h-8 rounded-full object-cover"
-                        onError={(e) => { e.target.src = '/images/default.webp'; }}
-                      />
-                      <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-800 ${
-                        isOnline ? 'bg-green-500' : 'bg-gray-500'
-                      }`}></div>
+                  <div key={user.id} className="relative">
+                    <div 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (isCurrentUser) {
+                          navigate(`/profile/${user.id}`);
+                        } else {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          const menuWidth = 180; // min-w-[180px]
+                          const spaceOnRight = window.innerWidth - rect.right;
+                          
+                          // Position to the left if not enough space on right
+                          const left = spaceOnRight >= menuWidth + 8 
+                            ? rect.right + 8 
+                            : rect.left - menuWidth - 8;
+                          
+                          const newPosition = {
+                            top: rect.top,
+                            left: left
+                          };
+                          console.log('Setting menu position:', newPosition, 'Screen width:', window.innerWidth);
+                          setMenuPosition(newPosition);
+                          setSelectedUserId(selectedUserId === user.id ? null : user.id);
+                        }
+                      }}
+                      className="px-2 py-1 text-sm text-gray-300 flex items-center gap-2 hover:bg-gray-700 rounded cursor-pointer"
+                    >
+                      <div className="relative">
+                        <img 
+                          src={user.profileImage 
+                            ? `http://localhost:3001${user.profileImage}` 
+                            : '/images/default.webp'
+                          } 
+                          alt={user.username} 
+                          className="w-8 h-8 rounded-full object-cover"
+                          onError={(e) => { e.target.src = '/images/default.webp'; }}
+                        />
+                        <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-800 ${
+                          isOnline ? 'bg-green-500' : 'bg-gray-500'
+                        }`}></div>
+                      </div>
+                      <span className="truncate">{user.username}</span>
+                      {isFriend && (
+                        <FiUsers className="text-white ml-auto" size={18} title="Friend" />
+                      )}
                     </div>
-                    <span className="truncate">{user.username}</span>
+                    
+                    {/* User Actions Menu */}
+                    {selectedUserId === user.id && !isCurrentUser && (
+                      <div 
+                        className="fixed bg-gray-700 border-black rounded-lg shadow-xl z-[9999] min-w-[100px]"
+                        style={{
+                          top: `${menuPosition.top + 45}px`
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {console.log('Rendering menu at:', menuPosition, 'for user:', user.id)}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/profile/${user.id}`);
+                            setSelectedUserId(null);
+                          }}
+                          className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-600 rounded-t-lg transition-colors"
+                        >
+                          View Profile
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleStartDM(user.id);
+                          }}
+                          className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-600 transition-colors border-t border-gray-600"
+                        >
+                          Send a DM
+                        </button>
+                        
+                        {!isFriend && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSendFriendRequest(user.id);
+                            }}
+                            className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-600 rounded-b-lg transition-colors border-t border-gray-600"
+                          >
+                            Add to Friends
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })}
