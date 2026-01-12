@@ -1,8 +1,8 @@
 import React from 'react';
-import { FiHome } from 'react-icons/fi';
+import { FiHome, FiMail, FiSend } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 
-const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub }) => {
+const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, viewMode, onSelectBookClub, onOpenDM }) => {
     const navigate = useNavigate();
 
     return (
@@ -15,6 +15,19 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub }) 
           >
             <FiHome size={20} />
           </button>
+          {onOpenDM && (
+            <button 
+              onClick={onOpenDM}
+              className={`w-12 h-12 rounded-full flex items-center justify-center text-white transition-colors flex-shrink-0 ${
+                viewMode === 'dm'
+                  ? 'bg-purple-600 ring-2 ring-purple-400'
+                  : 'bg-gray-700 hover:bg-purple-600'
+              }`}
+              title="Direct Messages"
+            >
+              <FiSend size={20}/>
+            </button>
+          )}
           
           {/* Separator */}
           <div className="w-10 h-px bg-gray-700"></div>
@@ -25,7 +38,7 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub }) 
               key={club.id}
               onClick={() => onSelectBookClub(club.id)}
               className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm transition-all flex-shrink-0 ${
-                club.id === currentBookClubId
+                viewMode === 'bookclub' && club.id === currentBookClubId
                   ? 'bg-purple-600 ring-2 ring-purple-400'
                   : 'bg-gray-700 hover:bg-purple-600 hover:rounded-2xl'
               }`}

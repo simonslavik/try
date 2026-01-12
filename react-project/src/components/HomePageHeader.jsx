@@ -232,7 +232,7 @@ const HomePageHeader = () => {
                         </div>
                     )}
                 </div>
-                <button className="flex items-center ml-4 " onClick={() => navigate('/')}>
+                <button className="flex items-center ml-4 border-2 border-gray-200 rounded-full cursor-pointer p-2" onClick={() => navigate('/')}>
                     <span className="ml-2 font-medium">OpenBookClubs</span>
                 </button>
             </div>  
