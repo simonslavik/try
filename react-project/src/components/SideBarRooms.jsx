@@ -1,7 +1,7 @@
 
 
 import React, { useState, useRef, useEffect } from 'react';
-import { FiHome, FiPlus, FiHash, FiMail } from 'react-icons/fi';
+import { FiHome, FiPlus, FiHash, FiMail, FiBook } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import BookClubImage from './BookClubImage';
 
@@ -21,7 +21,9 @@ const SideBarRooms = ({
     onOpenDM,
     setAddCurrentBookState,
     addCurrentBookState,
-    onCurrentBookClick
+    onCurrentBookClick,
+    onShowBooksHistory,
+    setShowBooksHistory
 }) => {
     const navigate = useNavigate();
     const [editingName, setEditingName] = useState(false);
@@ -264,6 +266,17 @@ const SideBarRooms = ({
                 {currentBook ? 'Change Book' : 'Add Current Book'}
               </button>
             </div>
+            
+            {/* Books History Button */}
+            <div className='border-b border-gray-700 p-4'>
+              <button
+                onClick={() => onShowBooksHistory && onShowBooksHistory()}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded bg-gray-700 text-white hover:bg-gray-600 transition-colors text-sm"
+              >
+                <FiBook size={14} />
+                BookClub Books History
+              </button>
+            </div>
 
             {/* Rooms List */}
             <div className="flex-1 overflow-y-auto">
@@ -284,7 +297,7 @@ const SideBarRooms = ({
                 {rooms.map(room => (
                   <button
                     key={room.id}
-                    onClick={() => switchRoom(room)}
+                    onClick={() => { switchRoom(room); setShowBooksHistory(false); }}
                     className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-colors ${
                       currentRoom?.id === room.id
                         ? 'bg-gray-700 text-white'

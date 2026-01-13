@@ -33,6 +33,9 @@ const BookClub = () => {
   const [addCurrentBookState, setAddCurrentBookState] = useState(false);
   const [currentBookDetailsOpen, setCurrentBookDetailsOpen] = useState(false);
   const [currentBookData, setCurrentBookData] = useState(null);
+  const [showBooksHistory, setShowBooksHistory] = useState(false);
+  const [bookclubBooks, setBookclubBooks] = useState({ current: [], upcoming: [], completed: [] });
+  const [loadingBooks, setLoadingBooks] = useState(false);
 
   
   // DM states
@@ -56,6 +59,43 @@ const BookClub = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Fetch bookclub books history
+  const fetchBookclubBooks = async () => {
+    if (!auth?.token || !bookClubId) return;
+    
+    setLoadingBooks(true);
+    try {
+      const response = await fetch(
+        `http://localhost:3000/v1/bookclub/${bookClubId}/books`,
+        {
+          headers: {
+            'Authorization': `Bearer ${auth.token}`
+          }
+        }
+      );
+      const data = await response.json();
+      
+      if (data.success) {
+        // Organize books by status
+        const organized = {
+          current: data.data.filter(book => book.status === 'current'),
+          upcoming: data.data.filter(book => book.status === 'upcoming'),
+          completed: data.data.filter(book => book.status === 'completed')
+        };
+        setBookclubBooks(organized);
+      }
+    } catch (err) {
+      console.error('Error fetching bookclub books:', err);
+    } finally {
+      setLoadingBooks(false);
+    }
+  };
+
+  const handleShowBooksHistory = () => {
+    setShowBooksHistory(true);
+    fetchBookclubBooks();
+  };
 
   // Close user menu when clicking outside
   useEffect(() => {
@@ -624,6 +664,8 @@ const BookClub = () => {
                 setCurrentBookData(bookData);
                 setCurrentBookDetailsOpen(true);
               }}
+              onShowBooksHistory={handleShowBooksHistory}
+              setShowBooksHistory={setShowBooksHistory}
             />
           )}
           
@@ -664,18 +706,178 @@ const BookClub = () => {
             {/* Room Header */}
             <div className="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <FiHash className="text-gray-400" />
-                <h2 className="text-white font-semibold">{currentRoom?.name}</h2>
+                {showBooksHistory ? (
+                  <>
+                    <FiStar className="text-yellow-400" />
+                    <h2 className="text-white font-semibold">BookClub Books History</h2>
+                  </>
+                ) : (
+                  <>
+                    <FiHash className="text-gray-400" />
+                    <h2 className="text-white font-semibold">{currentRoom?.name}</h2>
+                  </>
+                )}
               </div>
-              {auth?.user && (
-                <button className="text-gray-400 hover:text-white">
-                  <FiSettings />
-                </button>
-              )}
+              <div className="flex items-center gap-2">
+                {showBooksHistory && (
+                  <button 
+                    onClick={() => setShowBooksHistory(false)}
+                    className="text-sm px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+                  >
+                    Back to Chat
+                  </button>
+                )}
+                {auth?.user && !showBooksHistory && (
+                  <button className="text-gray-400 hover:text-white">
+                    <FiSettings />
+                  </button>
+                )}
+              </div>
             </div>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {/* Content Area - Books History or Messages */}
+            {showBooksHistory ? (
+              <div className="flex-1 overflow-y-auto p-6">
+                {loadingBooks ? (
+                  <div className="text-center text-gray-500 mt-8">
+                    <p>Loading books...</p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {/* Current Book */}
+                    {bookclubBooks.current.length > 0 && (
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                          <span className="text-2xl">📖</span> Currently Reading
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {bookclubBooks.current.map(bookClubBook => (
+                            <div
+                              key={bookClubBook.id}
+                              onClick={() => {
+                                setCurrentBookData(bookClubBook);
+                                setCurrentBookDetailsOpen(true);
+                              }}
+                              className="bg-gray-800 rounded-lg p-4 border border-purple-500 cursor-pointer hover:bg-gray-700 transition-colors"
+                            >
+                              <div className="flex gap-3">
+                                <img
+                                  src={bookClubBook.book?.coverUrl || '/images/default.webp'}
+                                  alt={bookClubBook.book?.title}
+                                  className="w-20 h-28 object-cover rounded shadow-md"
+                                  onError={(e) => { e.target.src = '/images/default.webp'; }}
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="text-white font-semibold text-sm line-clamp-2 mb-1">
+                                    {bookClubBook.book?.title}
+                                  </h4>
+                                  <p className="text-gray-400 text-xs mb-2">
+                                    {bookClubBook.book?.author}
+                                  </p>
+                                  {bookClubBook.startDate && bookClubBook.endDate && (
+                                    <p className="text-xs text-purple-400">
+                                      {new Date(bookClubBook.startDate).toLocaleDateString()} - {new Date(bookClubBook.endDate).toLocaleDateString()}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Upcoming Books */}
+                    {bookclubBooks.upcoming.length > 0 && (
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                          <span className="text-2xl">📚</span> Coming Up Next
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {bookclubBooks.upcoming.map(bookClubBook => (
+                            <div
+                              key={bookClubBook.id}
+                              className="bg-gray-800 rounded-lg p-4 border border-blue-500 hover:bg-gray-700 transition-colors"
+                            >
+                              <div className="flex gap-3">
+                                <img
+                                  src={bookClubBook.book?.coverUrl || '/images/default.webp'}
+                                  alt={bookClubBook.book?.title}
+                                  className="w-20 h-28 object-cover rounded shadow-md"
+                                  onError={(e) => { e.target.src = '/images/default.webp'; }}
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="text-white font-semibold text-sm line-clamp-2 mb-1">
+                                    {bookClubBook.book?.title}
+                                  </h4>
+                                  <p className="text-gray-400 text-xs mb-2">
+                                    {bookClubBook.book?.author}
+                                  </p>
+                                  {bookClubBook.startDate && (
+                                    <p className="text-xs text-blue-400">
+                                      Starts: {new Date(bookClubBook.startDate).toLocaleDateString()}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Completed Books */}
+                    {bookclubBooks.completed.length > 0 && (
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                          <span className="text-2xl">✅</span> Completed
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {bookclubBooks.completed.map(bookClubBook => (
+                            <div
+                              key={bookClubBook.id}
+                              className="bg-gray-800 rounded-lg p-4 border border-green-500 hover:bg-gray-700 transition-colors"
+                            >
+                              <div className="flex gap-3">
+                                <img
+                                  src={bookClubBook.book?.coverUrl || '/images/default.webp'}
+                                  alt={bookClubBook.book?.title}
+                                  className="w-20 h-28 object-cover rounded shadow-md"
+                                  onError={(e) => { e.target.src = '/images/default.webp'; }}
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="text-white font-semibold text-sm line-clamp-2 mb-1">
+                                    {bookClubBook.book?.title}
+                                  </h4>
+                                  <p className="text-gray-400 text-xs mb-2">
+                                    {bookClubBook.book?.author}
+                                  </p>
+                                  {bookClubBook.endDate && (
+                                    <p className="text-xs text-green-400">
+                                      Finished: {new Date(bookClubBook.endDate).toLocaleDateString()}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Empty State */}
+                    {bookclubBooks.current.length === 0 && bookclubBooks.upcoming.length === 0 && bookclubBooks.completed.length === 0 && (
+                      <div className="text-center text-gray-500 mt-8">
+                        <FiStar className="mx-auto text-4xl mb-2 opacity-30" />
+                        <p className="text-sm">No books added yet</p>
+                        <p className="text-xs mt-1">Add a current book to get started!</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {messages.length === 0 ? (
                 <div className="text-center text-gray-500 mt-8">
                   <FiHash className="mx-auto text-4xl mb-2 opacity-30" />
@@ -717,10 +919,11 @@ const BookClub = () => {
                 ))
               )}
               <div ref={messagesEndRef} />
-            </div>
+              </div>
+            )}
 
-            {/* Message Input */}
-            {auth?.user ? (
+            {/* Message Input - Only show when not viewing books history */}
+            {!showBooksHistory && auth?.user ? (
               <form onSubmit={handleSendMessage} className="bg-gray-800 border-t border-gray-700 p-4">
                 <div className="flex gap-2">
                   <input
@@ -739,13 +942,13 @@ const BookClub = () => {
                   </button>
                 </div>
               </form>
-            ) : (
+            ) : !showBooksHistory ? (
               <div className="bg-gray-800 border-t border-gray-700 p-4 text-center">
                 <p className="text-gray-400">
                   Please <button onClick={() => navigate('/login', { state: { from: `/bookclub/${bookClubId}` } })} className="text-purple-400 hover:underline">log in</button> to chat
                 </p>
               </div>
-            )}
+            ) : null}
 
           </div>
           )}
