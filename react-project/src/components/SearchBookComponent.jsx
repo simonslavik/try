@@ -1,5 +1,5 @@
 
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../context';
 
 const GATEWAY_URL = 'http://localhost:3000';
@@ -13,29 +13,44 @@ const BookSearch = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const { auth } = useContext(AuthContext);
 
+  // Auto-search with debouncing
+  useEffect(() => {
+    // Clear results if query is empty
+    if (!query.trim()) {
+      setResults([]);
+      setError(null);
+      return;
+    }
+
+    // Debounce: wait 500ms after user stops typing
+    const timeoutId = setTimeout(async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(`${GATEWAY_URL}/v1/books/search?q=${encodeURIComponent(query)}&limit=20`);
+        const data = await response.json();
+        
+        if (data.success) {
+          setResults(data.data || []);
+        } else {
+          setError('Failed to search books');
+        }
+      } catch (err) {
+        setError('Network error. Please try again.');
+        console.error('Search error:', err);
+      } finally {
+        setLoading(false);
+      }
+    }, 500); // 500ms delay
+
+    // Cleanup: cancel previous timeout if user keeps typing
+    return () => clearTimeout(timeoutId);
+  }, [query]);
+
   const searchBooks = async (e) => {
     e?.preventDefault();
-    if (!query.trim()) return;
-
-    setLoading(true);
-    setError(null);
-    setResults([]);
-
-    try {
-      const response = await fetch(`${GATEWAY_URL}/v1/books/search?q=${encodeURIComponent(query)}&limit=20`);
-      const data = await response.json();
-      
-      if (data.success) {
-        setResults(data.data || []);
-      } else {
-        setError('Failed to search books');
-      }
-    } catch (err) {
-      setError('Network error. Please try again.');
-      console.error('Search error:', err);
-    } finally {
-      setLoading(false);
-    }
+    // Form submit will be handled by useEffect
   };
 
   const addToLibrary = async (googleBooksId, status) => {
@@ -73,35 +88,31 @@ const BookSearch = () => {
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      searchBooks(e);
-    }
-  };
+
 
   return (
     <div className="max-w-6xl mx-auto p-6">
       {/* Search Bar */}
       <div className="mb-8">
-        <form onSubmit={searchBooks} className="flex gap-3">
+        <div className="flex gap-3">
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onKeyPress={handleKeyPress}
             placeholder="Search for books by title, author, or ISBN..."
             className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-            disabled={loading}
           />
-          <button
-            type="submit"
-            onClick={searchBooks}
-            disabled={loading || !query.trim()}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors"
-          >
-            {loading ? 'Searching...' : 'Search'}
-          </button>
-        </form>
+          {loading && (
+            <div className="flex items-center px-4">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            </div>
+          )}
+        </div>
+        {query && (
+          <p className="mt-2 text-sm text-gray-500">
+            Searching as you type...
+          </p>
+        )}
       </div>
 
       {/* Messages */}
@@ -117,16 +128,8 @@ const BookSearch = () => {
         </div>
       )}
 
-      {/* Loading State */}
-      {loading && (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Searching books...</p>
-        </div>
-      )}
-
       {/* No Results */}
-      {!loading && results.length === 0 && query && (
+      {!loading && results.length === 0 && query.trim() && (
         <div className="text-center py-12">
           <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />

@@ -6,6 +6,7 @@ import MyBookClubsSidebar from '../../../components/MyBookClubsSidebar';
 import SideBarRooms from '../../../components/SideBarRooms';
 import DMSidebar from '../../../components/DMSidebar';
 import DMChat from '../../../components/DMChat';
+import AddCurrentBookModal from '../../../components/AddCurrentBookModal';
 
 const BookClub = () => {
   const { id: bookClubId } = useParams();
@@ -28,6 +29,7 @@ const BookClub = () => {
   const [error, setError] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [myBookClubs, setMyBookClubs] = useState([]);
+  const [addCurrentBookState, setAddCurrentBookState] = useState(false);
 
   
   // DM states
@@ -613,6 +615,8 @@ const BookClub = () => {
               handleDeleteImage={handleDeleteImage}
               onNameUpdate={(newName) => setBookClub(prev => ({ ...prev, name: newName }))}
               onOpenDM={() => setViewMode('dm')}
+              setAddCurrentBookState={setAddCurrentBookState}
+              addCurrentBookState={addCurrentBookState}
             />
           )}
           
@@ -850,6 +854,18 @@ const BookClub = () => {
           </div>
           )}
         </div>
+
+        {/* Add Current Book Modal */}
+        {addCurrentBookState && (
+          <AddCurrentBookModal
+            bookClubId={bookClubId}
+            onClose={() => setAddCurrentBookState(false)}
+            onBookAdded={(book) => {
+              console.log('Book added:', book);
+              // TODO: Refresh current book display or update state
+            }}
+          />
+        )}
     </div>
   );
 };

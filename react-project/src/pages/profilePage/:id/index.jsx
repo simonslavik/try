@@ -26,6 +26,18 @@ const ProfilePage = () => {
   
   const isOwnProfile = auth?.user?.id === id;
 
+
+  // Books
+  const GATEWAY_URL = 'http://localhost:3000';
+  const [favoriteBooks, setFavoriteBooks] = useState([]);
+  const [booksImReading, setBooksImReading] = useState([]);
+  const [booksToRead, setBooksToRead] = useState([]);
+  const [booksRead, setBooksRead] = useState([]);
+
+
+
+
+
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
@@ -69,6 +81,42 @@ const ProfilePage = () => {
           });
           setMemberBookClubs(memberClubs);
         }
+
+        const favoriteBooksResponse = await fetch(`${GATEWAY_URL}/v1/user-books?status=favorite`, {
+          headers: auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}
+        });
+        const data2 = await favoriteBooksResponse.json();
+        
+        if (data2.success) {
+          setFavoriteBooks(data2.data || []);
+        } 
+
+        const booksImReadingResponse = await fetch(`${GATEWAY_URL}/v1/user-books?status=reading`, {
+          headers: auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}
+        });
+        const data3 = await booksImReadingResponse.json();
+        
+        if (data3.success) {
+          setBooksImReading(data3.data || []);
+        } 
+
+        const booksToReadResponse = await fetch(`${GATEWAY_URL}/v1/user-books?status=want_to_read`, {
+          headers: auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}
+        });
+        const data4 = await booksToReadResponse.json();
+        
+        if (data4.success) {
+          setBooksToRead(data4.data || []);
+        } 
+
+        const booksReadResponse = await fetch(`${GATEWAY_URL}/v1/user-books?status=completed`, {
+          headers: auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}
+        });
+        const data5 = await booksReadResponse.json();
+        
+        if (data5.success) {
+          setBooksRead(data5.data || []);
+        } 
         
       } catch (err) {
         console.error('Error fetching profile:', err);
@@ -454,7 +502,114 @@ const ProfilePage = () => {
             </div>
           )}
         </div>
-        <BookSearch />
+
+        {/* Books Section - Only show for own profile */}
+        {isOwnProfile && (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">My Books</h2>
+            
+            {/* Favorite Books */}
+            {favoriteBooks.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold text-red-600 mb-3">❤️ Favorites</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {favoriteBooks.map(userBook => (
+                    <div key={userBook.id} className="group">
+                      <img
+                        src={userBook.book.coverUrl || '/images/default.webp'}
+                        alt={userBook.book.title}
+                        className="w-full h-48 object-cover rounded-lg shadow-md group-hover:shadow-xl transition-shadow"
+                        onError={(e) => { e.target.src = '/images/default.webp'; }}
+                      />
+                      <h4 className="mt-2 text-sm font-medium line-clamp-2">{userBook.book.title}</h4>
+                      <p className="text-xs text-gray-600">{userBook.book.author}</p>
+                      {userBook.rating && (
+                        <p className="text-xs text-yellow-600">{'⭐'.repeat(userBook.rating)}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Currently Reading */}
+            {booksImReading.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold text-green-600 mb-3">📖 Currently Reading</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {booksImReading.map(userBook => (
+                    <div key={userBook.id} className="group">
+                      <img
+                        src={userBook.book.coverUrl || '/images/default.webp'}
+                        alt={userBook.book.title}
+                        className="w-full h-48 object-cover rounded-lg shadow-md group-hover:shadow-xl transition-shadow"
+                        onError={(e) => { e.target.src = '/images/default.webp'; }}
+                      />
+                      <h4 className="mt-2 text-sm font-medium line-clamp-2">{userBook.book.title}</h4>
+                      <p className="text-xs text-gray-600">{userBook.book.author}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Want to Read */}
+            {booksToRead.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold text-blue-600 mb-3">📚 Want to Read</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {booksToRead.map(userBook => (
+                    <div key={userBook.id} className="group">
+                      <img
+                        src={userBook.book.coverUrl || '/images/default.webp'}
+                        alt={userBook.book.title}
+                        className="w-full h-48 object-cover rounded-lg shadow-md group-hover:shadow-xl transition-shadow"
+                        onError={(e) => { e.target.src = '/images/default.webp'; }}
+                      />
+                      <h4 className="mt-2 text-sm font-medium line-clamp-2">{userBook.book.title}</h4>
+                      <p className="text-xs text-gray-600">{userBook.book.author}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Completed Books */}
+            {booksRead.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold text-purple-600 mb-3">✅ Completed</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {booksRead.map(userBook => (
+                    <div key={userBook.id} className="group">
+                      <img
+                        src={userBook.book.coverUrl || '/images/default.webp'}
+                        alt={userBook.book.title}
+                        className="w-full h-48 object-cover rounded-lg shadow-md group-hover:shadow-xl transition-shadow"
+                        onError={(e) => { e.target.src = '/images/default.webp'; }}
+                      />
+                      <h4 className="mt-2 text-sm font-medium line-clamp-2">{userBook.book.title}</h4>
+                      <p className="text-xs text-gray-600">{userBook.book.author}</p>
+                      {userBook.rating && (
+                        <p className="text-xs text-yellow-600">{'⭐'.repeat(userBook.rating)}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {favoriteBooks.length === 0 && booksImReading.length === 0 && 
+             booksToRead.length === 0 && booksRead.length === 0 && (
+              <div className="text-center py-8 text-gray-400">
+                <p>No books in your library yet. Search for books below to get started!</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Book Search - Only show for own profile */}
+        {isOwnProfile && <BookSearch />}
       </div>
     </div>
   );
