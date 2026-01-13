@@ -270,7 +270,29 @@ app.get('/bookclubs', optionalAuthMiddleware, async (req, res) => {
       }
     }
     
-    // Add active user count and member details to each bookclub
+    // Fetch current books for all bookclubs from books-service
+    const currentBooksMap = new Map<string, any>();
+    try {
+      const booksServiceUrl = process.env.BOOKS_SERVICE_URL || 'http://localhost:3002';
+      const currentBookPromises = bookClubs.map(async (club) => {
+        try {
+          const response = await fetch(`${booksServiceUrl}/v1/bookclub/${club.id}/books?status=current`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.data && data.data.length > 0) {
+              currentBooksMap.set(club.id, data.data[0]);
+            }
+          }
+        } catch (err) {
+          console.error(`Error fetching current book for bookclub ${club.id}:`, err);
+        }
+      });
+      await Promise.all(currentBookPromises);
+    } catch (error) {
+      console.error('Error fetching current books:', error);
+    }
+    
+    // Add active user count, member details, and current book to each bookclub
     const bookClubsWithUserCount = bookClubs.map(club => {
       const activeClub = activeBookClubs.get(club.id);
       
@@ -282,7 +304,8 @@ app.get('/bookclubs', optionalAuthMiddleware, async (req, res) => {
       return {
         ...club,
         members: memberDetails.length > 0 ? memberDetails : club.members,
-        activeUsers: activeClub ? activeClub.clients.size : 0
+        activeUsers: activeClub ? activeClub.clients.size : 0,
+        currentBook: currentBooksMap.get(club.id) || null
       };
     });
 
@@ -305,12 +328,35 @@ app.get('/my-bookclubs', authMiddleware, async (req, res) => {
       orderBy: { updatedAt: 'desc' }
     });
     
-    // Add active user count to each bookclub
+    // Fetch current books for all bookclubs from books-service
+    const currentBooksMap = new Map<string, any>();
+    try {
+      const booksServiceUrl = process.env.BOOKS_SERVICE_URL || 'http://localhost:3002';
+      const currentBookPromises = bookClubs.map(async (club) => {
+        try {
+          const response = await fetch(`${booksServiceUrl}/v1/bookclub/${club.id}/books?status=current`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.data && data.data.length > 0) {
+              currentBooksMap.set(club.id, data.data[0]);
+            }
+          }
+        } catch (err) {
+          console.error(`Error fetching current book for bookclub ${club.id}:`, err);
+        }
+      });
+      await Promise.all(currentBookPromises);
+    } catch (error) {
+      console.error('Error fetching current books:', error);
+    }
+    
+    // Add active user count and current book to each bookclub
     const bookClubsWithUserCount = bookClubs.map(club => {
       const activeClub = activeBookClubs.get(club.id);
       return {
         ...club,
-        activeUsers: activeClub ? activeClub.clients.size : 0
+        activeUsers: activeClub ? activeClub.clients.size : 0,
+        currentBook: currentBooksMap.get(club.id) || null
       };
     });
     
@@ -343,8 +389,31 @@ app.get('/users/:userId/bookclubs', async (req, res) => {
         memberCount: club.members.length
       };
     });
+
+    // Fetch current books for each bookclub from books-service
+    const currentBooksPromises = bookClubsWithUserCount.map(async (club) => {
+      try {
+        const response = await fetch(`${process.env.BOOKS_SERVICE_URL}/v1/bookclub/${club.id}/books?status=current`);
+        if (response.ok) {
+          const data = await response.json();
+          return { bookClubId: club.id, currentBook: data.data?.[0] || null };
+        }
+      } catch (error) {
+        console.error(`Error fetching current book for bookclub ${club.id}:`, error);
+      }
+      return { bookClubId: club.id, currentBook: null };
+    });
+
+    const currentBooksResults = await Promise.all(currentBooksPromises);
+    const currentBooksMap = new Map(currentBooksResults.map(r => [r.bookClubId, r.currentBook]));
+
+    // Add current book to each bookclub
+    const bookClubsWithCurrentBook = bookClubsWithUserCount.map(club => ({
+      ...club,
+      currentBook: currentBooksMap.get(club.id) || null
+    }));
     
-    res.json({ bookClubs: bookClubsWithUserCount });
+    res.json({ bookClubs: bookClubsWithCurrentBook });
   } catch (error) {
     console.error('Error fetching user bookclubs:', error);
     res.status(500).json({ error: 'Failed to fetch user bookclubs' });

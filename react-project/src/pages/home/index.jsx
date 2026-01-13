@@ -16,7 +16,8 @@ const Home = () => {
     const [myMemberBookClubs, setMyMemberBookClubs] = useState([]);
 
     const navigate = useNavigate();
-
+    
+    
     useEffect(() => {
         const headers = auth?.token 
             ? { Authorization: `Bearer ${auth.token}` }
@@ -152,6 +153,26 @@ const Home = () => {
                                         onError={(e) => { e.target.src = '/images/default.webp'; }}
                                     />
                                     <h3 className="font-medium truncate">{bookClub.name}</h3>
+                                    
+                                    {/* Current Book */}
+                                    {bookClub.currentBook && (
+                                        <div className="mt-2 p-2 bg-purple-50 rounded border border-purple-200">
+                                            <p className="text-xs text-purple-600 font-semibold mb-1">📖 Currently Reading</p>
+                                            <div className="flex gap-2">
+                                                <img 
+                                                    src={bookClub.currentBook.book?.coverUrl || '/images/default.webp'}
+                                                    alt={bookClub.currentBook.book?.title}
+                                                    className="w-12 h-16 object-cover rounded"
+                                                    onError={(e) => { e.target.src = '/images/default.webp'; }}
+                                                />
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-xs font-medium text-gray-900 line-clamp-2">{bookClub.currentBook.book?.title}</p>
+                                                    <p className="text-xs text-gray-600 truncate">{bookClub.currentBook.book?.author}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    
                                     {bookClub.members && bookClub.members.length > 0 && (
                                         <div className="mt-2">
                                             <p className="text-sm text-gray-600 mb-1">
@@ -211,6 +232,26 @@ const Home = () => {
                                         onError={(e) => { e.target.src = '/images/default.webp'; }}
                                     />
                                     <h3 className="font-medium truncate">{bookClub.name}</h3>
+                                    
+                                    {/* Current Book */}
+                                    {bookClub.currentBook && (
+                                        <div className="mt-2 p-2 bg-purple-50 rounded border border-purple-200">
+                                            <p className="text-xs text-purple-600 font-semibold mb-1">📖 Currently Reading</p>
+                                            <div className="flex gap-2">
+                                                <img 
+                                                    src={bookClub.currentBook.book?.coverUrl || '/images/default.webp'}
+                                                    alt={bookClub.currentBook.book?.title}
+                                                    className="w-12 h-16 object-cover rounded"
+                                                    onError={(e) => { e.target.src = '/images/default.webp'; }}
+                                                />
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-xs font-medium text-gray-900 line-clamp-2">{bookClub.currentBook.book?.title}</p>
+                                                    <p className="text-xs text-gray-600 truncate">{bookClub.currentBook.book?.author}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    
                                     {bookClub.members && bookClub.members.length > 0 && (
                                         <div className="mt-2">
                                             <p className="text-sm text-gray-600 mb-1">

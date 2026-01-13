@@ -4,7 +4,16 @@ import cors from 'cors';
 import prisma from './config/database';
 import { GoogleBooksService } from '../utils/googlebookapi';
 import { authMiddleware } from './middleware/authMiddleware';
-import { addBookSchema, updateBookSchema } from '../utils/validation';
+import { 
+  addBookSchema, 
+  updateBookSchema,
+  addBookForBookClubSchema,
+  updateBookClubBookSchema,
+  postsBookProgressSchema,
+  bookClubIdParamSchema,
+  bookIdParamSchema,
+  bookClubBookIdParamSchema
+} from '../utils/validation';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -209,6 +218,8 @@ app.get('/v1/bookclub/:bookClubId/books', async (req, res) => {
     const where: any = { bookClubId };
     if (status) where.status = status;
 
+    
+
     const books = await prisma.bookClubBook.findMany({
       where,
       include: { 
@@ -227,12 +238,20 @@ app.get('/v1/bookclub/:bookClubId/books', async (req, res) => {
 // Add book to bookclub
 app.post('/v1/bookclub/:bookClubId/books', authMiddleware, async (req: any, res) => {
   try {
+    // Validate params
+    const paramValidation = bookClubIdParamSchema.validate(req.params);
+    if (paramValidation.error) {
+      return res.status(400).json({ error: paramValidation.error.details[0].message });
+    }
+
+    // Validate body
+    const bodyValidation = addBookForBookClubSchema.validate(req.body);
+    if (bodyValidation.error) {
+      return res.status(400).json({ error: bodyValidation.error.details[0].message });
+    }
+
     const { bookClubId } = req.params;
     const { googleBooksId, status = 'upcoming', startDate, endDate } = req.body;
-
-    if (!googleBooksId) {
-      return res.status(400).json({ error: 'googleBooksId required' });
-    }
 
     // Fetch and create book
     const bookData = await GoogleBooksService.getBookById(googleBooksId);
@@ -264,8 +283,37 @@ app.post('/v1/bookclub/:bookClubId/books', authMiddleware, async (req: any, res)
 // Update bookclub book status
 app.patch('/v1/bookclub/:bookClubId/books/:bookId', authMiddleware, async (req: any, res) => {
   try {
+    // Validate params
+    const paramValidation = bookClubIdParamSchema.validate({ bookClubId: req.params.bookClubId });
+    if (paramValidation.error) {
+      return res.status(400).json({ error: paramValidation.error.details[0].message });
+    }
+    const bookIdValidation = bookIdParamSchema.validate({ bookId: req.params.bookId });
+    if (bookIdValidation.error) {
+      return res.status(400).json({ error: bookIdValidation.error.details[0].message });
+    }
+
+    // Validate body
+    const bodyValidation = updateBookClubBookSchema.validate(req.body);
+    if (bodyValidation.error) {
+      return res.status(400).json({ error: bodyValidation.error.details[0].message });
+    }
+
     const { bookClubId, bookId } = req.params;
     const { status, startDate, endDate } = req.body;
+
+    // Check if book exists in bookclub
+    const existingBookClubBook = await prisma.bookClubBook.findUnique({
+      where: {
+        bookClubId_bookId: { bookClubId, bookId }
+      }
+    });
+
+    if (!existingBookClubBook) {
+      return res.status(404).json({ 
+        error: 'Book not found in this bookclub. Please add it first.' 
+      });
+    }
 
     const bookClubBook = await prisma.bookClubBook.update({
       where: {
@@ -285,12 +333,72 @@ app.patch('/v1/bookclub/:bookClubId/books/:bookId', authMiddleware, async (req: 
   }
 });
 
+
+
+app.delete('/v1/bookclub/:bookClubId/books/:bookId', authMiddleware, async (req: any, res) => {
+  try {
+    // Validate params
+    const paramValidation = bookClubIdParamSchema.validate({ bookClubId: req.params.bookClubId });
+    if (paramValidation.error) {
+      return res.status(400).json({ error: paramValidation.error.details[0].message });
+    }
+    const bookIdValidation = bookIdParamSchema.validate({ bookId: req.params.bookId });
+    if (bookIdValidation.error) {
+      return res.status(400).json({ error: bookIdValidation.error.details[0].message });
+    }
+
+    const { bookClubId, bookId } = req.params;
+
+    // Check if book exists in bookclub
+    const existingBookClubBook = await prisma.bookClubBook.findUnique({
+      where: {
+        bookClubId_bookId: { bookClubId, bookId }
+      }
+    });
+
+    if (!existingBookClubBook) {
+      return res.status(404).json({ 
+        error: 'Book not found in this bookclub' 
+      });
+    }
+
+    await prisma.bookClubBook.delete({
+      where: {
+        bookClubId_bookId: { bookClubId, bookId }
+      }
+    });
+
+    res.json({ success: true, message: 'Book removed from bookclub' });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ============= READING PROGRESS =============
 
 // Get user's reading progress for a bookclub book
 app.get('/v1/bookclub-books/:bookClubBookId/progress', authMiddleware, async (req: any, res) => {
   try {
+    // Validate params
+    const paramValidation = bookClubBookIdParamSchema.validate(req.params);
+    if (paramValidation.error) {
+      return res.status(400).json({ error: paramValidation.error.details[0].message });
+    }
+
     const { bookClubBookId } = req.params;
+
+    // Check if book exists in bookclub
+    const existingBookClubBook = await prisma.bookClubBook.findUnique({
+      where: {
+        id: bookClubBookId
+      }
+    });
+
+    if (!existingBookClubBook) {
+      return res.status(404).json({ 
+        error: 'Book not found in bookclub' 
+      });
+    }
 
     const progress = await prisma.readingProgress.findUnique({
       where: {
@@ -315,6 +423,18 @@ app.get('/v1/bookclub-books/:bookClubBookId/progress', authMiddleware, async (re
 // Update reading progress
 app.post('/v1/bookclub-books/:bookClubBookId/progress', authMiddleware, async (req: any, res) => {
   try {
+    // Validate params
+    const paramValidation = bookClubBookIdParamSchema.validate(req.params);
+    if (paramValidation.error) {
+      return res.status(400).json({ error: paramValidation.error.details[0].message });
+    }
+
+    // Validate body
+    const bodyValidation = postsBookProgressSchema.validate(req.body);
+    if (bodyValidation.error) {
+      return res.status(400).json({ error: bodyValidation.error.details[0].message });
+    }
+
     const { bookClubBookId } = req.params;
     const { pagesRead, notes } = req.body;
 

@@ -420,6 +420,25 @@ const ProfilePage = () => {
                   />
                   <h3 className="font-semibold text-lg truncate mb-2">{club.name}</h3>
                   
+                  {/* Current Book */}
+                  {club.currentBook && (
+                    <div className="mt-2 mb-2 p-2 bg-purple-50 rounded border border-purple-200">
+                      <p className="text-xs text-purple-600 font-semibold mb-1">📖 Currently Reading</p>
+                      <div className="flex gap-2">
+                        <img 
+                          src={club.currentBook.book?.coverUrl || '/images/default.webp'}
+                          alt={club.currentBook.book?.title}
+                          className="w-12 h-16 object-cover rounded"
+                          onError={(e) => { e.target.src = '/images/default.webp'; }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-gray-900 line-clamp-2">{club.currentBook.book?.title}</p>
+                          <p className="text-xs text-gray-600 truncate">{club.currentBook.book?.author}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className="flex items-center justify-between text-sm text-gray-600">
                     <span>{club.memberCount || club.members?.length || 0} members</span>
                     {club.activeUsers > 0 && (
@@ -470,6 +489,25 @@ const ProfilePage = () => {
                     onError={(e) => { e.target.src = '/images/default.webp'; }}
                   />
                   <h3 className="font-semibold text-lg truncate mb-2">{club.name}</h3>
+                  
+                  {/* Current Book */}
+                  {club.currentBook && (
+                    <div className="mt-2 mb-2 p-2 bg-purple-50 rounded border border-purple-200">
+                      <p className="text-xs text-purple-600 font-semibold mb-1">📖 Currently Reading</p>
+                      <div className="flex gap-2">
+                        <img 
+                          src={club.currentBook.book?.coverUrl || '/images/default.webp'}
+                          alt={club.currentBook.book?.title}
+                          className="w-12 h-16 object-cover rounded"
+                          onError={(e) => { e.target.src = '/images/default.webp'; }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-gray-900 line-clamp-2">{club.currentBook.book?.title}</p>
+                          <p className="text-xs text-gray-600 truncate">{club.currentBook.book?.author}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   
                   {club.members && club.members.length > 0 && (
                     <div className="flex items-center gap-2 mb-2">

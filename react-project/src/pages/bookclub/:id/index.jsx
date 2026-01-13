@@ -7,6 +7,7 @@ import SideBarRooms from '../../../components/SideBarRooms';
 import DMSidebar from '../../../components/DMSidebar';
 import DMChat from '../../../components/DMChat';
 import AddCurrentBookModal from '../../../components/AddCurrentBookModal';
+import CurrentBookDetailsModal from '../../../components/CurrentBookDetailsModal';
 
 const BookClub = () => {
   const { id: bookClubId } = useParams();
@@ -30,6 +31,8 @@ const BookClub = () => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [myBookClubs, setMyBookClubs] = useState([]);
   const [addCurrentBookState, setAddCurrentBookState] = useState(false);
+  const [currentBookDetailsOpen, setCurrentBookDetailsOpen] = useState(false);
+  const [currentBookData, setCurrentBookData] = useState(null);
 
   
   // DM states
@@ -617,6 +620,10 @@ const BookClub = () => {
               onOpenDM={() => setViewMode('dm')}
               setAddCurrentBookState={setAddCurrentBookState}
               addCurrentBookState={addCurrentBookState}
+              onCurrentBookClick={(bookData) => {
+                setCurrentBookData(bookData);
+                setCurrentBookDetailsOpen(true);
+              }}
             />
           )}
           
@@ -862,7 +869,26 @@ const BookClub = () => {
             onClose={() => setAddCurrentBookState(false)}
             onBookAdded={(book) => {
               console.log('Book added:', book);
-              // TODO: Refresh current book display or update state
+              setAddCurrentBookState(false);
+              // Trigger refresh in SideBarRooms by updating a timestamp or similar
+            }}
+          />
+        )}
+
+        {/* Current Book Details Modal */}
+        {currentBookDetailsOpen && currentBookData && (
+          <CurrentBookDetailsModal
+            bookClubId={bookClubId}
+            currentBookData={currentBookData}
+            onClose={() => setCurrentBookDetailsOpen(false)}
+            onBookUpdated={(updatedBook) => {
+              setCurrentBookData(updatedBook);
+              // Trigger refresh in SideBarRooms
+            }}
+            onBookRemoved={() => {
+              setCurrentBookData(null);
+              setCurrentBookDetailsOpen(false);
+              // Trigger refresh in SideBarRooms
             }}
           />
         )}

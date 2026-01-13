@@ -4495,3 +4495,283 @@
 {"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T14:53:31.641Z","userAgent":"node"}
 {"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T14:53:31.659Z","userAgent":"node"}
 {"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T14:53:31.672Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T14:54:32.321Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T14:54:33.995Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T14:54:34.847Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T14:54:35.762Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T14:54:36.928Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:02:33.769Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:02:33.775Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:02:34.091Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/messages/conversations","service":"user-service","timestamp":"2026-01-13T15:10:27.286Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/list","service":"user-service","timestamp":"2026-01-13T15:10:27.294Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:29.712Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:29.752Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:29.762Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:31.085Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:31.088Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:31.133Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:32.481Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:32.485Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:32.518Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:33.849Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:33.850Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:33.868Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:34.823Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:34.833Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:34.859Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:35.546Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:35.548Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:35.587Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:36.430Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:36.432Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:36.467Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:37.009Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:37.010Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:37.028Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T15:10:38.017Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:38.026Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:38.027Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T15:10:38.034Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:38.046Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:38.052Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:40.423Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:40.424Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:40.444Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:40.448Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:40.469Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:40.481Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T15:10:41.694Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:41.702Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:41.709Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T15:10:41.714Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:41.722Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:41.726Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:42.404Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:42.405Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:42.417Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:42.418Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:42.431Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:42.442Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T15:10:44.715Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:44.729Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T15:10:44.730Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:44.734Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:44.747Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:44.751Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:45.273Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:45.274Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:45.297Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:45.299Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:45.317Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:45.324Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T15:10:46.930Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:46.937Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:46.945Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T15:10:46.948Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:46.960Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:46.965Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:47.686Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:47.687Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:47.699Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:47.700Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:47.709Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:47.723Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T15:10:48.917Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:48.923Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:48.929Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T15:10:48.938Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:48.950Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:48.951Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T15:10:59.902Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/d743de23-ad78-4f7a-883c-a9055ae7da0a","service":"user-service","timestamp":"2026-01-13T15:10:59.905Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:59.916Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T15:10:59.923Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/d743de23-ad78-4f7a-883c-a9055ae7da0a","service":"user-service","timestamp":"2026-01-13T15:10:59.930Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:59.942Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:59.961Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:10:59.968Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/d743de23-ad78-4f7a-883c-a9055ae7da0a","service":"user-service","timestamp":"2026-01-13T15:11:30.692Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/d743de23-ad78-4f7a-883c-a9055ae7da0a","service":"user-service","timestamp":"2026-01-13T15:11:30.704Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T15:11:32.460Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/d743de23-ad78-4f7a-883c-a9055ae7da0a","service":"user-service","timestamp":"2026-01-13T15:11:32.468Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T15:11:32.495Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/d743de23-ad78-4f7a-883c-a9055ae7da0a","service":"user-service","timestamp":"2026-01-13T15:11:32.499Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:32.523Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:32.534Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:32.538Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:32.546Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/messages/conversations","service":"user-service","timestamp":"2026-01-13T15:11:41.741Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/list","service":"user-service","timestamp":"2026-01-13T15:11:41.764Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:41.768Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:41.772Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/messages/conversations","service":"user-service","timestamp":"2026-01-13T15:11:41.806Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/list","service":"user-service","timestamp":"2026-01-13T15:11:41.809Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:41.845Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:41.851Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:41.860Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:41.871Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:47.269Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:47.273Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:47.301Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:48.267Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:48.268Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:48.288Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:48.880Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:48.881Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:48.899Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:49.581Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:49.588Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:11:49.611Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:13:58.699Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:13:59.811Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:14:00.832Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:14:01.614Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:14:02.365Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:14:02.945Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T15:14:54.520Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/d743de23-ad78-4f7a-883c-a9055ae7da0a","service":"user-service","timestamp":"2026-01-13T15:14:54.533Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:14:54.564Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T15:14:54.565Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/d743de23-ad78-4f7a-883c-a9055ae7da0a","service":"user-service","timestamp":"2026-01-13T15:14:54.567Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:14:54.590Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:14:54.594Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:14:54.630Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/list","service":"user-service","timestamp":"2026-01-13T15:15:18.157Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/messages/conversations","service":"user-service","timestamp":"2026-01-13T15:15:18.169Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:18.186Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:18.192Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/list","service":"user-service","timestamp":"2026-01-13T15:15:18.195Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/messages/conversations","service":"user-service","timestamp":"2026-01-13T15:15:18.197Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:18.204Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:18.217Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:18.232Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:18.235Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:55.414Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:55.426Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:55.464Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:56.767Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:56.770Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:56.817Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:57.516Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:57.517Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:57.533Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:58.873Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:58.877Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:58.907Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:59.601Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:59.603Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:15:59.623Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:16:00.266Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:16:00.268Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:16:00.286Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:16:01.116Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:16:01.117Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:16:01.133Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T15:16:10.168Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:16:10.194Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:16:10.196Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T15:16:10.200Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:16:10.232Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T15:16:10.235Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:12:43.462Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:55:49.104Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:55:49.118Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:55:49.170Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:55:49.173Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:55:49.245Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:56:40.440Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:56:40.445Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:56:40.465Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:56:40.466Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:56:40.515Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T16:58:17.808Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:58:17.837Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:58:17.858Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T16:58:17.875Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:58:17.882Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:58:17.883Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:58:54.728Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:58:54.734Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:58:54.767Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:58:54.768Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:58:55.087Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T16:59:33.336Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:33.375Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:33.379Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T16:59:33.380Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:33.391Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:33.399Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:34.154Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:34.156Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:34.161Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:34.175Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:34.203Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T16:59:35.650Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:35.667Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:35.673Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T16:59:35.681Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:35.705Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:35.709Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:36.320Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:36.321Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:36.340Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:36.341Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:36.363Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:36.371Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T16:59:37.994Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:38.008Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:38.011Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T16:59:38.015Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:38.030Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:38.031Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:38.968Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:38.969Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:38.989Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:38.990Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:39.012Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T16:59:39.020Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T17:18:29.783Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T17:18:29.845Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:18:29.960Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:18:29.968Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:18:30.054Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:18:30.069Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T17:18:34.236Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T17:18:34.253Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:18:34.262Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:18:34.265Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:18:34.314Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:18:34.343Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T17:18:37.340Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/d743de23-ad78-4f7a-883c-a9055ae7da0a","service":"user-service","timestamp":"2026-01-13T17:18:37.343Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:18:37.357Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T17:18:37.365Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/d743de23-ad78-4f7a-883c-a9055ae7da0a","service":"user-service","timestamp":"2026-01-13T17:18:37.382Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:18:37.395Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:18:37.416Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:18:37.429Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T17:19:13.863Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/d743de23-ad78-4f7a-883c-a9055ae7da0a","service":"user-service","timestamp":"2026-01-13T17:19:13.881Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T17:19:13.914Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/d743de23-ad78-4f7a-883c-a9055ae7da0a","service":"user-service","timestamp":"2026-01-13T17:19:13.918Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:19:14.093Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:19:14.133Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:19:14.170Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:19:14.180Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T17:19:15.204Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/d743de23-ad78-4f7a-883c-a9055ae7da0a","service":"user-service","timestamp":"2026-01-13T17:19:15.205Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:19:15.210Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T17:19:15.213Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/d743de23-ad78-4f7a-883c-a9055ae7da0a","service":"user-service","timestamp":"2026-01-13T17:19:15.224Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:19:15.239Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:19:15.289Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:19:15.319Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T17:19:24.865Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T17:19:24.893Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:19:24.896Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:19:24.906Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:19:24.937Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:19:24.939Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:19:35.717Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T17:20:36.832Z","userAgent":"node"}

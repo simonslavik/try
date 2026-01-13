@@ -20,7 +20,8 @@ const SideBarRooms = ({
     onNameUpdate,
     onOpenDM,
     setAddCurrentBookState,
-    addCurrentBookState
+    addCurrentBookState,
+    onCurrentBookClick
 }) => {
     const navigate = useNavigate();
     const [editingName, setEditingName] = useState(false);
@@ -185,7 +186,10 @@ const SideBarRooms = ({
               </div>
               
               {currentBook ? (
-                <div className="bg-gray-700 rounded-lg p-3 mb-3">
+                <div 
+                  onClick={() => onCurrentBookClick && onCurrentBookClick(currentBook)}
+                  className="bg-gray-700 rounded-lg p-3 mb-3 cursor-pointer hover:bg-gray-600 transition-colors"
+                >
                   {/* Book Cover and Info */}
                   <div className="flex gap-3 mb-3">
                     <img
