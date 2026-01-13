@@ -4164,3 +4164,35 @@
 {"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2026-01-12T18:04:29.457Z"}
 {"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2026-01-12T18:04:29.459Z"}
 {"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2026-01-12T18:04:29.459Z"}
+{"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2026-01-13T11:55:42.786Z"}
+{"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2026-01-13T11:55:42.788Z"}
+{"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2026-01-13T11:55:42.789Z"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2026-01-13T12:00:00.951Z","userAgent":"PostmanRuntime/7.51.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2026-01-13T12:00:07.420Z","userAgent":"PostmanRuntime/7.51.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T12:00:13.216Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"user-service","timestamp":"2026-01-13T12:00:13.237Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T12:00:13.360Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/b1e26e32-c0a4-4d0e-8cd5-2cd2468a7e10","service":"user-service","timestamp":"2026-01-13T12:00:13.517Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T12:00:13.616Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T12:00:13.650Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T12:00:16.975Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T12:00:16.998Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2026-01-13T12:00:23.994Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2026-01-13T12:00:39.420Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T12:00:39.733Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T12:00:39.764Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T12:00:39.789Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T12:00:39.814Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T12:00:43.852Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/d743de23-ad78-4f7a-883c-a9055ae7da0a","service":"user-service","timestamp":"2026-01-13T12:00:43.859Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-13T12:00:43.881Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/d743de23-ad78-4f7a-883c-a9055ae7da0a","service":"user-service","timestamp":"2026-01-13T12:00:43.889Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T12:00:43.911Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T12:00:43.921Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2026-01-13T12:01:10.821Z","userAgent":"PostmanRuntime/7.51.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2026-01-13T12:01:28.537Z","userAgent":"PostmanRuntime/7.51.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2026-01-13T12:02:35.711Z","userAgent":"PostmanRuntime/7.51.0"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T12:04:36.913Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.6","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-13T12:06:00.312Z","userAgent":"node"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2026-01-13T12:06:11.174Z","userAgent":"PostmanRuntime/7.51.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2026-01-13T12:12:17.414Z","userAgent":"curl/8.7.1"}

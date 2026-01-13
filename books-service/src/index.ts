@@ -4,6 +4,7 @@ import cors from 'cors';
 import prisma from './config/database';
 import { GoogleBooksService } from '../utils/googlebookapi';
 import { authMiddleware } from './middleware/authMiddleware';
+import { addBookSchema, updateBookSchema } from '../utils/validation';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -67,11 +68,13 @@ app.get('/v1/user-books', authMiddleware, async (req: any, res) => {
 // Add book to user's library
 app.post('/v1/user-books', authMiddleware, async (req: any, res) => {
   try {
-    const { googleBooksId, status, rating, review } = req.body;
-
-    if (!googleBooksId || !status) {
-      return res.status(400).json({ error: 'googleBooksId and status required' });
+    // Validate request body
+    const { error, value } = addBookSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
     }
+
+    const { googleBooksId, status, rating, review } = value;
 
     // Fetch book from Google Books API
     const bookData = await GoogleBooksService.getBookById(googleBooksId);
@@ -111,8 +114,14 @@ app.post('/v1/user-books', authMiddleware, async (req: any, res) => {
 // Update user book status/rating
 app.patch('/v1/user-books/:bookId', authMiddleware, async (req: any, res) => {
   try {
+    // Validate request body
+    const { error, value } = updateBookSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
     const { bookId } = req.params;
-    const { status, rating, review } = req.body;
+    const { status, rating, review } = value;
 
     const userBook = await prisma.userBook.update({
       where: {

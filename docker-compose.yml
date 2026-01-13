@@ -112,7 +112,8 @@ services:
       - "3002:3002"
     environment:
       PORT: 3002
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/books_service
+      JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: development
       GOOGLE_BOOKS_API_KEY: ${GOOGLE_BOOKS_API_KEY}
     depends_on:
