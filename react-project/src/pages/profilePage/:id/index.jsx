@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import AuthContext from '../../../context';
 import HomePageHeader from '../../../components/HomePageHeader';
 import { FiCornerRightDown, FiMail, FiMessageCircle } from 'react-icons/fi';
+import BookSearch from '../../../components/SearchBookComponent';
 
 const ProfilePage = () => {
   const { id } = useParams();
@@ -453,6 +454,7 @@ const ProfilePage = () => {
             </div>
           )}
         </div>
+        <BookSearch />
       </div>
     </div>
   );

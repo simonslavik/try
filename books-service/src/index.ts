@@ -123,6 +123,28 @@ app.patch('/v1/user-books/:bookId', authMiddleware, async (req: any, res) => {
     const { bookId } = req.params;
     const { status, rating, review } = value;
 
+    // Check if book exists in user's library
+    const existingUserBook = await prisma.userBook.findUnique({
+      where: {
+        userId_bookId: {
+          userId: req.user.userId,
+          bookId
+        }
+      }
+    });
+
+    if (!existingUserBook) {
+      return res.status(404).json({ 
+        error: 'Book not found in your library. Please add it first.' 
+      });
+    }
+
+    // Build update data object with only provided fields
+    const updateData: any = {};
+    if (status !== undefined) updateData.status = status;
+    if (rating !== undefined) updateData.rating = rating;
+    if (review !== undefined) updateData.review = review;
+
     const userBook = await prisma.userBook.update({
       where: {
         userId_bookId: {
@@ -130,7 +152,7 @@ app.patch('/v1/user-books/:bookId', authMiddleware, async (req: any, res) => {
           bookId
         }
       },
-      data: { status, rating, review },
+      data: updateData,
       include: { book: true }
     });
 
@@ -144,6 +166,22 @@ app.patch('/v1/user-books/:bookId', authMiddleware, async (req: any, res) => {
 app.delete('/v1/user-books/:bookId', authMiddleware, async (req: any, res) => {
   try {
     const { bookId } = req.params;
+
+    // Check if book exists in user's library
+    const existingUserBook = await prisma.userBook.findUnique({
+      where: {
+        userId_bookId: {
+          userId: req.user.userId,
+          bookId
+        }
+      }
+    });
+
+    if (!existingUserBook) {
+      return res.status(404).json({ 
+        error: 'Book not found in your library' 
+      });
+    }
 
     await prisma.userBook.delete({
       where: {
