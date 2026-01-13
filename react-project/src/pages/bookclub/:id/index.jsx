@@ -97,6 +97,35 @@ const BookClub = () => {
     fetchBookclubBooks();
   };
 
+  const handleStatusChange = async (bookId, newStatus) => {
+    if (!auth?.token) return;
+    
+    try {
+      const response = await fetch(
+        `http://localhost:3000/v1/bookclub/${bookClubId}/books/${bookId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${auth.token}`
+          },
+          body: JSON.stringify({ status: newStatus })
+        }
+      );
+      
+      const data = await response.json();
+      if (data.success) {
+        // Refresh the books list
+        fetchBookclubBooks();
+      } else {
+        alert(data.error || 'Failed to update book status');
+      }
+    } catch (err) {
+      console.error('Error updating book status:', err);
+      alert('Failed to update book status');
+    }
+  };
+
   // Close user menu when clicking outside
   useEffect(() => {
     const handleClickOutside = () => {
@@ -666,6 +695,7 @@ const BookClub = () => {
               }}
               onShowBooksHistory={handleShowBooksHistory}
               setShowBooksHistory={setShowBooksHistory}
+              showBooksHistory={showBooksHistory}
             />
           )}
           
@@ -708,7 +738,6 @@ const BookClub = () => {
               <div className="flex items-center gap-2">
                 {showBooksHistory ? (
                   <>
-                    <FiStar className="text-yellow-400" />
                     <h2 className="text-white font-semibold">BookClub Books History</h2>
                   </>
                 ) : (
@@ -719,14 +748,6 @@ const BookClub = () => {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                {showBooksHistory && (
-                  <button 
-                    onClick={() => setShowBooksHistory(false)}
-                    className="text-sm px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
-                  >
-                    Back to Chat
-                  </button>
-                )}
                 {auth?.user && !showBooksHistory && (
                   <button className="text-gray-400 hover:text-white">
                     <FiSettings />
@@ -754,13 +775,15 @@ const BookClub = () => {
                           {bookclubBooks.current.map(bookClubBook => (
                             <div
                               key={bookClubBook.id}
-                              onClick={() => {
-                                setCurrentBookData(bookClubBook);
-                                setCurrentBookDetailsOpen(true);
-                              }}
-                              className="bg-gray-800 rounded-lg p-4 border border-purple-500 cursor-pointer hover:bg-gray-700 transition-colors"
+                              className="bg-gray-800 rounded-lg p-4 border border-purple-500 hover:bg-gray-700 transition-colors"
                             >
-                              <div className="flex gap-3">
+                              <div 
+                                onClick={() => {
+                                  setCurrentBookData(bookClubBook);
+                                  setCurrentBookDetailsOpen(true);
+                                }}
+                                className="flex gap-3 cursor-pointer mb-3"
+                              >
                                 <img
                                   src={bookClubBook.book?.coverUrl || '/images/default.webp'}
                                   alt={bookClubBook.book?.title}
@@ -781,6 +804,16 @@ const BookClub = () => {
                                   )}
                                 </div>
                               </div>
+                              <select
+                                value={bookClubBook.status}
+                                onChange={(e) => handleStatusChange(bookClubBook.bookId, e.target.value)}
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-full px-3 py-1.5 bg-gray-700 border border-gray-600 rounded text-white text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
+                              >
+                                <option value="current">📖 Currently Reading</option>
+                                <option value="upcoming">📚 Coming Up Next</option>
+                                <option value="completed">✅ Completed</option>
+                              </select>
                             </div>
                           ))}
                         </div>
@@ -799,7 +832,13 @@ const BookClub = () => {
                               key={bookClubBook.id}
                               className="bg-gray-800 rounded-lg p-4 border border-blue-500 hover:bg-gray-700 transition-colors"
                             >
-                              <div className="flex gap-3">
+                              <div 
+                                onClick={() => {
+                                  setCurrentBookData(bookClubBook);
+                                  setCurrentBookDetailsOpen(true);
+                                }}
+                                className="flex gap-3 cursor-pointer mb-3"
+                              >
                                 <img
                                   src={bookClubBook.book?.coverUrl || '/images/default.webp'}
                                   alt={bookClubBook.book?.title}
@@ -820,6 +859,16 @@ const BookClub = () => {
                                   )}
                                 </div>
                               </div>
+                              <select
+                                value={bookClubBook.status}
+                                onChange={(e) => handleStatusChange(bookClubBook.bookId, e.target.value)}
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-full px-3 py-1.5 bg-gray-700 border border-gray-600 rounded text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              >
+                                <option value="current">📖 Currently Reading</option>
+                                <option value="upcoming">📚 Coming Up Next</option>
+                                <option value="completed">✅ Completed</option>
+                              </select>
                             </div>
                           ))}
                         </div>
@@ -838,7 +887,13 @@ const BookClub = () => {
                               key={bookClubBook.id}
                               className="bg-gray-800 rounded-lg p-4 border border-green-500 hover:bg-gray-700 transition-colors"
                             >
-                              <div className="flex gap-3">
+                              <div 
+                                onClick={() => {
+                                  setCurrentBookData(bookClubBook);
+                                  setCurrentBookDetailsOpen(true);
+                                }}
+                                className="flex gap-3 cursor-pointer mb-3"
+                              >
                                 <img
                                   src={bookClubBook.book?.coverUrl || '/images/default.webp'}
                                   alt={bookClubBook.book?.title}
@@ -859,6 +914,16 @@ const BookClub = () => {
                                   )}
                                 </div>
                               </div>
+                              <select
+                                value={bookClubBook.status}
+                                onChange={(e) => handleStatusChange(bookClubBook.bookId, e.target.value)}
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-full px-3 py-1.5 bg-gray-700 border border-gray-600 rounded text-white text-xs focus:outline-none focus:ring-2 focus:ring-green-500"
+                              >
+                                <option value="current">📖 Currently Reading</option>
+                                <option value="upcoming">📚 Coming Up Next</option>
+                                <option value="completed">✅ Completed</option>
+                              </select>
                             </div>
                           ))}
                         </div>

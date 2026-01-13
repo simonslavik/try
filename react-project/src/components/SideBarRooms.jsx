@@ -23,7 +23,8 @@ const SideBarRooms = ({
     addCurrentBookState,
     onCurrentBookClick,
     onShowBooksHistory,
-    setShowBooksHistory
+    setShowBooksHistory,
+    showBooksHistory
 }) => {
     const navigate = useNavigate();
     const [editingName, setEditingName] = useState(false);
@@ -271,7 +272,11 @@ const SideBarRooms = ({
             <div className='border-b border-gray-700 p-4'>
               <button
                 onClick={() => onShowBooksHistory && onShowBooksHistory()}
-                className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded bg-gray-700 text-white hover:bg-gray-600 transition-colors text-sm"
+                className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded transition-colors text-sm ${
+                  showBooksHistory 
+                    ? 'bg-purple-600 text-white' 
+                    : 'bg-gray-700 text-white hover:bg-gray-600'
+                }`}
               >
                 <FiBook size={14} />
                 BookClub Books History
@@ -299,7 +304,7 @@ const SideBarRooms = ({
                     key={room.id}
                     onClick={() => { switchRoom(room); setShowBooksHistory(false); }}
                     className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-colors ${
-                      currentRoom?.id === room.id
+                      currentRoom?.id === room.id && !showBooksHistory
                         ? 'bg-gray-700 text-white'
                         : 'text-gray-400 hover:bg-gray-700 hover:text-white'
                     }`}
