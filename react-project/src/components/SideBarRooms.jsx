@@ -169,17 +169,23 @@ const SideBarRooms = ({
                   className="text-white font-bold text-lg bg-gray-700 px-2 py-1 rounded border border-purple-500 focus:outline-none w-full"
                 />
               ) : (
-                <h2 
-                  className={`text-white font-bold text-lg truncate ${
-                    auth?.user && auth.user.id === bookClub?.creatorId 
-                      ? 'cursor-pointer hover:text-purple-400' 
-                      : ''
-                  }`}
-                  onDoubleClick={handleNameDoubleClick}
-                  title={auth?.user && auth.user.id === bookClub?.creatorId ? 'Double-click to edit' : ''}
-                >
-                  {bookClub?.name}
-                </h2>
+                <div className="flex items-center">
+                  <h2 
+                    className={`text-white font-bold text-lg truncate ${
+                      auth?.user && auth.user.id === bookClub?.creatorId 
+                        ? 'cursor-pointer hover:text-purple-400' 
+                        : ''
+                    }`}
+                    
+                    onClick={() => navigate(`/bookclubpage/${bookClub?.id}`)}
+                  >
+                    {bookClub?.name}
+                  </h2>
+                  {auth?.user && auth.user.id === bookClub?.creatorId ? <button onClick={handleNameDoubleClick} className="ml-2 text-gray-400 hover:text-white">
+                    <FiPlus size={14} />
+                  </button> : null}
+                  
+                </div>
               )}
             </div>
             {/* Books Section */}
@@ -263,7 +269,6 @@ const SideBarRooms = ({
                 onClick={() => setAddCurrentBookState(true)}
                 className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded bg-purple-600 text-white hover:bg-purple-700 transition-colors text-sm"
               >
-                <FiPlus size={14} />
                 {currentBook ? 'Change Book' : 'Add Current Book'}
               </button>
             </div>

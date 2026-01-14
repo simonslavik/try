@@ -3,8 +3,8 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AuthContext from '../../../context';
 import HomePageHeader from '../../../components/HomePageHeader';
-import { FiCornerRightDown, FiMail, FiMessageCircle } from 'react-icons/fi';
-import BookSearch from '../../../components/SearchBookComponent';
+import { FiCornerRightDown, FiMail, FiMessageCircle, FiPlus } from 'react-icons/fi';
+import AddBookToLibraryModal from '../../../components/AddBookToLibraryModal';
 
 const ProfilePage = () => {
   const { id } = useParams();
@@ -33,6 +33,7 @@ const ProfilePage = () => {
   const [booksImReading, setBooksImReading] = useState([]);
   const [booksToRead, setBooksToRead] = useState([]);
   const [booksRead, setBooksRead] = useState([]);
+  const [showAddBookModal, setShowAddBookModal] = useState(false);
 
 
 
@@ -388,7 +389,7 @@ const ProfilePage = () => {
           </h2>
           
           {createdBookClubs.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="text-center py-12" >
               <div className="text-gray-400 text-lg mb-4">
                 {isOwnProfile ? "You haven't created any book clubs yet" : "No book clubs created yet"}
               </div>
@@ -406,7 +407,7 @@ const ProfilePage = () => {
               {createdBookClubs.map(club => (
                 <div
                   key={club.id}
-                  onClick={() => navigate(`/bookclub/${club.id}`)}
+                  onClick={() => navigate(`/bookclubpage/${club.id}`)}
                   className="border rounded-lg p-4 hover:shadow-lg cursor-pointer transition-shadow"
                 >
                   <img 
@@ -543,8 +544,17 @@ const ProfilePage = () => {
 
         {/* Books Section - Only show for own profile */}
         {isOwnProfile && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">My Books</h2>
+          <div className="bg-white rounded-lg shadow-md p-6 mt-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">My Books</h2>
+              <button
+                onClick={() => setShowAddBookModal(true)}
+                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-xl font-semibold shadow-lg transition-all transform hover:scale-105 flex items-center gap-2"
+              >
+                <FiPlus size={20} />
+                Add Books
+              </button>
+            </div>
             
             {/* Favorite Books */}
             {favoriteBooks.length > 0 && (
@@ -640,14 +650,22 @@ const ProfilePage = () => {
             {favoriteBooks.length === 0 && booksImReading.length === 0 && 
              booksToRead.length === 0 && booksRead.length === 0 && (
               <div className="text-center py-8 text-gray-400">
-                <p>No books in your library yet. Search for books below to get started!</p>
+                <p>No books in your library yet. Click "Add Books" to get started!</p>
               </div>
             )}
           </div>
         )}
 
-        {/* Book Search - Only show for own profile */}
-        {isOwnProfile && <BookSearch />}
+        {/* Add Book Modal */}
+        {showAddBookModal && (
+          <AddBookToLibraryModal
+            onClose={() => setShowAddBookModal(false)}
+            onBookAdded={() => {
+              // Refresh the profile page to show new books
+              window.location.reload();
+            }}
+          />
+        )}
       </div>
     </div>
   );

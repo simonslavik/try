@@ -9,27 +9,38 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import NewBookClubPage from "./pages/createbookclub";
 import ChangeProfilePage from "./pages/changeProfile";
 import ProfilePage from "./pages/profilePage/:id";
+import BookClubPage from "./pages/bookclubPage/:id";
 
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/change-profile" element={
-        <ProtectedRoute>
-          <ChangeProfilePage />
-        </ProtectedRoute>
-      }/>
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/register" element={<Register />}/>
       <Route path="/login" element={<Login />}/>
-      <Route path="/bookclub/:id" element={<BookClub />} />
+      <Route path="/bookclub/:id" element={
+        <ProtectedRoute>
+          <BookClub />
+        </ProtectedRoute>
+      } />
+      <Route path="/bookclubpage/:id" element={
+        <ProtectedRoute>
+          <BookClubPage />
+        </ProtectedRoute>
+      } />
       <Route path="/create-bookclub" element={
         <ProtectedRoute>
           <NewBookClubPage />
         </ProtectedRoute>
       }/>
       <Route path="/profile/:id" element={<ProfilePage />}/>
+      <Route path="/change-profile" element={
+        <ProtectedRoute>
+          <ChangeProfilePage />
+        </ProtectedRoute>
+      }/>
+      
     </Routes>
   );
 }

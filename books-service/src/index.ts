@@ -12,7 +12,8 @@ import {
   postsBookProgressSchema,
   bookClubIdParamSchema,
   bookIdParamSchema,
-  bookClubBookIdParamSchema
+  bookClubBookIdParamSchema,
+  bookClubBookReviewSchema
 } from '../utils/validation';
 
 const app = express();
@@ -475,6 +476,121 @@ app.post('/v1/bookclub-books/:bookClubBookId/progress', authMiddleware, async (r
 
     res.json({ success: true, data: progress });
   } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST - Add or update review for a bookclub book
+app.post('/v1/bookclub-books/:bookClubBookId/review', authMiddleware, async (req: any, res) => {
+  try {
+    // Validate params
+    const paramValidation = bookClubBookIdParamSchema.validate(req.params);
+    if (paramValidation.error) {
+      return res.status(400).json({ error: paramValidation.error.details[0].message });
+    }
+
+    // Validate body
+    const bodyValidation = bookClubBookReviewSchema.validate(req.body);
+    if (bodyValidation.error) {
+      return res.status(400).json({ error: bodyValidation.error.details[0].message });
+    }
+
+    const { bookClubBookId } = req.params;
+    const { rating, reviewText } = req.body;
+
+    // Check if book exists in bookclub
+    const bookClubBook = await prisma.bookClubBook.findUnique({
+      where: { id: bookClubBookId }
+    });
+
+    if (!bookClubBook) {
+      return res.status(404).json({ error: 'Book not found in bookclub' });
+    }
+
+    const review = await prisma.bookClubBookReview.upsert({
+      where: {
+        bookClubBookId_userId: {
+          bookClubBookId,
+          userId: req.user.userId
+        }
+      },
+      update: {
+        rating,
+        reviewText: reviewText || null
+      },
+      create: {
+        bookClubBookId,
+        userId: req.user.userId,
+        rating,
+        reviewText: reviewText || null
+      }
+    });
+
+    res.json({ success: true, data: review });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET - Get all reviews for a bookclub book
+app.get('/v1/bookclub-books/:bookClubBookId/reviews', async (req: any, res) => {
+  try {
+    // Validate params
+    const paramValidation = bookClubBookIdParamSchema.validate(req.params);
+    if (paramValidation.error) {
+      return res.status(400).json({ error: paramValidation.error.details[0].message });
+    }
+
+    const { bookClubBookId } = req.params;
+
+    const reviews = await prisma.bookClubBookReview.findMany({
+      where: { bookClubBookId },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    // Calculate average rating
+    const averageRating = reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : 0;
+
+    res.json({ 
+      success: true, 
+      data: {
+        reviews,
+        averageRating: Math.round(averageRating * 10) / 10,
+        totalReviews: reviews.length
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE - Delete user's review
+app.delete('/v1/bookclub-books/:bookClubBookId/review', authMiddleware, async (req: any, res) => {
+  try {
+    // Validate params
+    const paramValidation = bookClubBookIdParamSchema.validate(req.params);
+    if (paramValidation.error) {
+      return res.status(400).json({ error: paramValidation.error.details[0].message });
+    }
+
+    const { bookClubBookId } = req.params;
+
+    await prisma.bookClubBookReview.delete({
+      where: {
+        bookClubBookId_userId: {
+          bookClubBookId,
+          userId: req.user.userId
+        }
+      }
+    });
+
+    res.json({ success: true, message: 'Review deleted successfully' });
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Review not found' });
+    }
     res.status(500).json({ error: error.message });
   }
 });

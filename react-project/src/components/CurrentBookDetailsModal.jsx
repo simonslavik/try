@@ -1,12 +1,12 @@
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context';
-import { FiX, FiCalendar, FiClock, FiEdit2, FiTrash2, FiBook, FiBarChart2 } from 'react-icons/fi';
+import { FiX, FiCalendar, FiClock, FiEdit2, FiTrash2, FiBook, FiBarChart2, FiStar } from 'react-icons/fi';
 
 const GATEWAY_URL = 'http://localhost:3000';
 
 const CurrentBookDetailsModal = ({ bookClubId, currentBookData, onClose, onBookUpdated, onBookRemoved }) => {
   const { auth } = useContext(AuthContext);
-  const [activeTab, setActiveTab] = useState('details'); // 'details', 'schedule', 'progress'
+  const [activeTab, setActiveTab] = useState('details'); // 'details', 'schedule', 'progress', 'reviews'
   
   // Schedule editing state
   const [editingSchedule, setEditingSchedule] = useState(false);
@@ -14,6 +14,23 @@ const CurrentBookDetailsModal = ({ bookClubId, currentBookData, onClose, onBookU
   const [endDate, setEndDate] = useState('');
   const [readingDays, setReadingDays] = useState(30);
   const [submitting, setSubmitting] = useState(false);
+
+  // Progress tracking state
+  const [myProgress, setMyProgress] = useState(null);
+  const [pagesRead, setPagesRead] = useState(0);
+  const [progressNotes, setProgressNotes] = useState('');
+  const [loadingProgress, setLoadingProgress] = useState(false);
+  const [savingProgress, setSavingProgress] = useState(false);
+
+  // Reviews state
+  const [reviews, setReviews] = useState([]);
+  const [myReview, setMyReview] = useState(null);
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [reviewText, setReviewText] = useState('');
+  const [loadingReviews, setLoadingReviews] = useState(false);
+  const [savingReview, setSavingReview] = useState(false);
+  const [averageRating, setAverageRating] = useState(0);
 
   useEffect(() => {
     if (currentBookData?.startDate) {
@@ -40,6 +57,201 @@ const CurrentBookDetailsModal = ({ bookClubId, currentBookData, onClose, onBookU
       setEndDate(end.toISOString().split('T')[0]);
     }
   }, [startDate, readingDays, editingSchedule]);
+
+  // Fetch user's reading progress
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (!currentBookData?.id || !auth?.token) return;
+      
+      setLoadingProgress(true);
+      try {
+        const response = await fetch(
+          `${GATEWAY_URL}/v1/bookclub-books/${currentBookData.id}/progress`,
+          {
+            headers: {
+              'Authorization': `Bearer ${auth.token}`
+            }
+          }
+        );
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+          setMyProgress(data.data);
+          setPagesRead(data.data.pagesRead || 0);
+          setProgressNotes(data.data.notes || '');
+        }
+      } catch (err) {
+        console.error('Error fetching progress:', err);
+      } finally {
+        setLoadingProgress(false);
+      }
+    };
+
+    if (activeTab === 'progress') {
+      fetchProgress();
+    }
+  }, [activeTab, currentBookData, auth]);
+
+  const handleSaveProgress = async () => {
+    if (!currentBookData?.id || !auth?.token) return;
+    
+    setSavingProgress(true);
+    try {
+      const response = await fetch(
+        `${GATEWAY_URL}/v1/bookclub-books/${currentBookData.id}/progress`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${auth.token}`
+          },
+          body: JSON.stringify({
+            pagesRead: parseInt(pagesRead),
+            notes: progressNotes
+          })
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        setMyProgress(data.data);
+        alert('Progress saved successfully!');
+      } else {
+        alert(data.error || 'Failed to save progress');
+      }
+    } catch (err) {
+      console.error('Error saving progress:', err);
+      alert('Failed to save progress');
+    } finally {
+      setSavingProgress(false);
+    }
+  };
+
+  // Fetch reviews
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!currentBookData?.id) return;
+      
+      setLoadingReviews(true);
+      try {
+        const response = await fetch(
+          `${GATEWAY_URL}/v1/bookclub-books/${currentBookData.id}/reviews`
+        );
+        const data = await response.json();
+        
+        if (data.success) {
+          setReviews(data.data.reviews || []);
+          setAverageRating(data.data.averageRating || 0);
+          
+          // Find user's review
+          if (auth?.user) {
+            const userReview = data.data.reviews.find(r => r.userId === auth.user.id);
+            if (userReview) {
+              setMyReview(userReview);
+              setRating(userReview.rating);
+              setReviewText(userReview.reviewText || '');
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching reviews:', err);
+      } finally {
+        setLoadingReviews(false);
+      }
+    };
+
+    if (activeTab === 'reviews') {
+      fetchReviews();
+    }
+  }, [activeTab, currentBookData, auth]);
+
+  const handleSaveReview = async () => {
+    if (!currentBookData?.id || !auth?.token || rating === 0) {
+      alert('Please select a rating');
+      return;
+    }
+    
+    setSavingReview(true);
+    try {
+      const response = await fetch(
+        `${GATEWAY_URL}/v1/bookclub-books/${currentBookData.id}/review`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${auth.token}`
+          },
+          body: JSON.stringify({
+            rating,
+            reviewText
+          })
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        setMyReview(data.data);
+        // Refresh reviews
+        const reviewsResponse = await fetch(
+          `${GATEWAY_URL}/v1/bookclub-books/${currentBookData.id}/reviews`
+        );
+        const reviewsData = await reviewsResponse.json();
+        if (reviewsData.success) {
+          setReviews(reviewsData.data.reviews || []);
+          setAverageRating(reviewsData.data.averageRating || 0);
+        }
+        alert('Review saved successfully!');
+      } else {
+        alert(data.error || 'Failed to save review');
+      }
+    } catch (err) {
+      console.error('Error saving review:', err);
+      alert('Failed to save review');
+    } finally {
+      setSavingReview(false);
+    }
+  };
+
+  const handleDeleteReview = async () => {
+    if (!currentBookData?.id || !auth?.token) return;
+    if (!confirm('Are you sure you want to delete your review?')) return;
+    
+    try {
+      const response = await fetch(
+        `${GATEWAY_URL}/v1/bookclub-books/${currentBookData.id}/review`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${auth.token}`
+          }
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        setMyReview(null);
+        setRating(0);
+        setReviewText('');
+        // Refresh reviews
+        const reviewsResponse = await fetch(
+          `${GATEWAY_URL}/v1/bookclub-books/${currentBookData.id}/reviews`
+        );
+        const reviewsData = await reviewsResponse.json();
+        if (reviewsData.success) {
+          setReviews(reviewsData.data.reviews || []);
+          setAverageRating(reviewsData.data.averageRating || 0);
+        }
+        alert('Review deleted successfully');
+      } else {
+        alert(data.error || 'Failed to delete review');
+      }
+    } catch (err) {
+      console.error('Error deleting review:', err);
+      alert('Failed to delete review');
+    }
+  };
+
+
 
   const calculateDaysRemaining = () => {
     if (!currentBookData?.endDate) return 0;
@@ -182,6 +394,17 @@ const CurrentBookDetailsModal = ({ bookClubId, currentBookData, onClose, onBookU
           >
             <FiBarChart2 className="inline mr-2" size={18} />
             Progress
+          </button>
+          <button
+            onClick={() => setActiveTab('reviews')}
+            className={`flex-1 px-6 py-3 font-medium transition-colors ${
+              activeTab === 'reviews'
+                ? 'bg-white text-purple-600 border-b-2 border-purple-600'
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            <FiStar className="inline mr-2" size={18} />
+            Reviews
           </button>
         </div>
 
@@ -398,61 +621,299 @@ const CurrentBookDetailsModal = ({ bookClubId, currentBookData, onClose, onBookU
             <div className="max-w-2xl mx-auto">
               <h3 className="text-2xl font-bold text-gray-900 mb-6">Reading Progress</h3>
               
-              {/* Overall Progress */}
-              <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 mb-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h4 className="text-lg font-semibold text-gray-900">Time Progress</h4>
-                  <span className="text-3xl font-bold text-purple-600">{calculateProgress()}%</span>
+              {loadingProgress ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">Loading your progress...</p>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
-                  <div
-                    className="bg-gradient-to-r from-purple-500 to-blue-500 h-4 rounded-full transition-all"
-                    style={{ width: `${calculateProgress()}%` }}
-                  />
-                </div>
-                <p className="text-sm text-gray-600">
-                  {calculateDaysRemaining()} days remaining until target completion
-                </p>
-              </div>
+              ) : (
+                <>
+                  {/* My Reading Progress */}
+                  <div className="bg-gradient-to-r from-green-50 to-teal-50 rounded-lg p-6 mb-6">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4">Your Reading Progress</h4>
+                    
+                    {/* Pages Read Input */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Pages Read
+                      </label>
+                      <div className="flex gap-4 items-end">
+                        <div className="flex-1">
+                          <input
+                            type="number"
+                            min="0"
+                            max={book?.pageCount || 1000}
+                            value={pagesRead}
+                            onChange={(e) => setPagesRead(e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="0"
+                          />
+                        </div>
+                        <span className="text-gray-600 text-sm pb-2">
+                          of {book?.pageCount || '???'} pages
+                        </span>
+                      </div>
+                    </div>
 
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white border-2 border-purple-200 rounded-lg p-6 text-center">
-                  <p className="text-4xl font-bold text-purple-600 mb-2">
-                    {new Date(currentBookData.startDate).toLocaleDateString('en-US', { day: 'numeric' })}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Started {new Date(currentBookData.startDate).toLocaleDateString('en-US', { month: 'short' })}
-                  </p>
-                </div>
+                    {/* Progress Bar */}
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>Progress</span>
+                        <span className="font-semibold text-green-600">
+                          {book?.pageCount ? Math.min(100, Math.round((pagesRead / book.pageCount) * 100)) : 0}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-4">
+                        <div
+                          className="bg-gradient-to-r from-green-500 to-teal-500 h-4 rounded-full transition-all"
+                          style={{ 
+                            width: `${book?.pageCount ? Math.min(100, (pagesRead / book.pageCount) * 100) : 0}%` 
+                          }}
+                        />
+                      </div>
+                    </div>
 
-                <div className="bg-white border-2 border-blue-200 rounded-lg p-6 text-center">
-                  <p className="text-4xl font-bold text-blue-600 mb-2">
-                    {new Date(currentBookData.endDate).toLocaleDateString('en-US', { day: 'numeric' })}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Due {new Date(currentBookData.endDate).toLocaleDateString('en-US', { month: 'short' })}
-                  </p>
-                </div>
+                    {/* Notes */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Notes (Optional)
+                      </label>
+                      <textarea
+                        value={progressNotes}
+                        onChange={(e) => setProgressNotes(e.target.value)}
+                        rows={3}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="Add notes about your reading session..."
+                      />
+                    </div>
 
-                {book?.pageCount && (
-                  <>
+                    {/* Last Updated */}
+                    {myProgress?.lastReadDate && (
+                      <p className="text-sm text-gray-600 mb-4">
+                        Last updated: {new Date(myProgress.lastReadDate).toLocaleString()}
+                      </p>
+                    )}
+
+                    {/* Save Button */}
+                    <button
+                      onClick={handleSaveProgress}
+                      disabled={savingProgress}
+                      className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors"
+                    >
+                      {savingProgress ? 'Saving...' : 'Save Progress'}
+                    </button>
+                  </div>
+
+                  {/* Time Progress */}
+                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 mb-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h4 className="text-lg font-semibold text-gray-900">Time Progress</h4>
+                      <span className="text-3xl font-bold text-purple-600">{calculateProgress()}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
+                      <div
+                        className="bg-gradient-to-r from-purple-500 to-blue-500 h-4 rounded-full transition-all"
+                        style={{ width: `${calculateProgress()}%` }}
+                      />
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      {calculateDaysRemaining()} days remaining until target completion
+                    </p>
+                  </div>
+
+                  {/* Stats Grid */}
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="bg-white border-2 border-purple-200 rounded-lg p-6 text-center">
                       <p className="text-4xl font-bold text-purple-600 mb-2">
-                        {book.pageCount}
+                        {new Date(currentBookData.startDate).toLocaleDateString('en-US', { day: 'numeric' })}
                       </p>
-                      <p className="text-sm text-gray-600">Total pages</p>
+                      <p className="text-sm text-gray-600">
+                        Started {new Date(currentBookData.startDate).toLocaleDateString('en-US', { month: 'short' })}
+                      </p>
                     </div>
 
                     <div className="bg-white border-2 border-blue-200 rounded-lg p-6 text-center">
                       <p className="text-4xl font-bold text-blue-600 mb-2">
-                        {calculatePagesPerDay()}
+                        {new Date(currentBookData.endDate).toLocaleDateString('en-US', { day: 'numeric' })}
                       </p>
-                      <p className="text-sm text-gray-600">Pages per day</p>
+                      <p className="text-sm text-gray-600">
+                        Due {new Date(currentBookData.endDate).toLocaleDateString('en-US', { month: 'short' })}
+                      </p>
                     </div>
-                  </>
-                )}
-              </div>
+
+                    {book?.pageCount && (
+                      <>
+                        <div className="bg-white border-2 border-purple-200 rounded-lg p-6 text-center">
+                          <p className="text-4xl font-bold text-purple-600 mb-2">
+                            {book.pageCount}
+                          </p>
+                          <p className="text-sm text-gray-600">Total pages</p>
+                        </div>
+
+                        <div className="bg-white border-2 border-blue-200 rounded-lg p-6 text-center">
+                          <p className="text-4xl font-bold text-blue-600 mb-2">
+                            {calculatePagesPerDay()}
+                          </p>
+                          <p className="text-sm text-gray-600">Pages per day</p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* REVIEWS TAB */}
+          {activeTab === 'reviews' && (
+            <div className="max-w-3xl mx-auto">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">Book Reviews</h3>
+              
+              {loadingReviews ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">Loading reviews...</p>
+                </div>
+              ) : (
+                <>
+                  {/* Average Rating */}
+                  <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-6 mb-6 text-center">
+                    <p className="text-sm text-gray-600 mb-2">Average Rating</p>
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <span className="text-5xl font-bold text-yellow-600">{averageRating.toFixed(1)}</span>
+                      <FiStar className="text-yellow-500 fill-yellow-500" size={32} />
+                    </div>
+                    <p className="text-sm text-gray-600">Based on {reviews.length} review{reviews.length !== 1 ? 's' : ''}</p>
+                  </div>
+
+                  {/* My Review Form */}
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 mb-6">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                      {myReview ? 'Your Review' : 'Write a Review'}
+                    </h4>
+                    
+                    {/* Star Rating */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Rating
+                      </label>
+                      <div className="flex gap-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onMouseEnter={() => setHoverRating(star)}
+                            onMouseLeave={() => setHoverRating(0)}
+                            onClick={() => setRating(star)}
+                            className="transition-transform hover:scale-110"
+                          >
+                            <FiStar
+                              size={32}
+                              className={
+                                star <= (hoverRating || rating)
+                                  ? 'text-yellow-500 fill-yellow-500'
+                                  : 'text-gray-300'
+                              }
+                            />
+                          </button>
+                        ))}
+                        {rating > 0 && (
+                          <span className="ml-2 text-gray-600 self-center">
+                            {rating} star{rating !== 1 ? 's' : ''}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Review Text */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Review (Optional)
+                      </label>
+                      <textarea
+                        value={reviewText}
+                        onChange={(e) => setReviewText(e.target.value)}
+                        rows={4}
+                        maxLength={2000}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Share your thoughts about this book..."
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        {reviewText.length}/2000 characters
+                      </p>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-3">
+                      <button
+                        onClick={handleSaveReview}
+                        disabled={savingReview || rating === 0}
+                        className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors"
+                      >
+                        {savingReview ? 'Saving...' : myReview ? 'Update Review' : 'Submit Review'}
+                      </button>
+                      {myReview && (
+                        <button
+                          onClick={handleDeleteReview}
+                          className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+                        >
+                          <FiTrash2 className="inline" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* All Reviews */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                      All Reviews ({reviews.length})
+                    </h4>
+                    
+                    {reviews.length === 0 ? (
+                      <div className="text-center py-8 bg-gray-50 rounded-lg">
+                        <FiStar className="mx-auto text-4xl text-gray-300 mb-2" />
+                        <p className="text-gray-600">No reviews yet. Be the first to review!</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {reviews.map((review) => (
+                          <div
+                            key={review.id}
+                            className={`bg-white border rounded-lg p-4 ${
+                              review.userId === auth?.user?.id ? 'border-blue-300 bg-blue-50' : 'border-gray-200'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between mb-2">
+                              <div>
+                                <p className="font-semibold text-gray-900">
+                                  {review.userId === auth?.user?.id ? 'You' : `User ${review.userId.slice(0, 8)}`}
+                                </p>
+                                <div className="flex gap-1 mt-1">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <FiStar
+                                      key={star}
+                                      size={16}
+                                      className={
+                                        star <= review.rating
+                                          ? 'text-yellow-500 fill-yellow-500'
+                                          : 'text-gray-300'
+                                      }
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                              <p className="text-xs text-gray-500">
+                                {new Date(review.createdAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                            {review.reviewText && (
+                              <p className="text-gray-700 whitespace-pre-line">{review.reviewText}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>

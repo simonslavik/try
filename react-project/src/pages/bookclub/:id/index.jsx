@@ -8,6 +8,7 @@ import DMSidebar from '../../../components/DMSidebar';
 import DMChat from '../../../components/DMChat';
 import AddCurrentBookModal from '../../../components/AddCurrentBookModal';
 import CurrentBookDetailsModal from '../../../components/CurrentBookDetailsModal';
+import AddBookToBookclubModal from '../../../components/AddBookToBookclubModal';
 
 const BookClub = () => {
   const { id: bookClubId } = useParams();
@@ -36,6 +37,7 @@ const BookClub = () => {
   const [showBooksHistory, setShowBooksHistory] = useState(false);
   const [bookclubBooks, setBookclubBooks] = useState({ current: [], upcoming: [], completed: [] });
   const [loadingBooks, setLoadingBooks] = useState(false);
+  const [showAddBookModal, setShowAddBookModal] = useState(false);
 
   
   // DM states
@@ -59,6 +61,12 @@ const BookClub = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Reset books history view when bookClubId changes
+  useEffect(() => {
+    setShowBooksHistory(false);
+    setBookclubBooks({ current: [], upcoming: [], completed: [] });
+  }, [bookClubId]);
 
   // Fetch bookclub books history
   const fetchBookclubBooks = async () => {
@@ -765,6 +773,12 @@ const BookClub = () => {
                   </div>
                 ) : (
                   <div className="space-y-6">
+                    <div className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg transition-all transform hover:scale-105 flex items-center gap-2 cursor-pointer"
+                        onClick={() => setShowAddBookModal(true)}
+                      >
+                        <FiPlus size={20} />
+                        Add New Book to Bookclub
+                    </div>
                     {/* Current Book */}
                     {bookclubBooks.current.length > 0 && (
                       <div>
@@ -1157,6 +1171,21 @@ const BookClub = () => {
               setCurrentBookData(null);
               setCurrentBookDetailsOpen(false);
               // Trigger refresh in SideBarRooms
+            }}
+          />
+        )}
+
+
+        {/* Add Book to Bookclub Modal */}
+        {showAddBookModal && (
+          <AddBookToBookclubModal
+            bookClubId={bookClubId}
+            onClose={() => setShowAddBookModal(false)}
+            onBookAdded={(book) => {
+              console.log('Book added:', book);
+              setShowAddBookModal(false);
+              // Refresh the books list
+              fetchBookclubBooks();
             }}
           />
         )}

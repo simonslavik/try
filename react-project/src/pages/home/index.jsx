@@ -222,8 +222,9 @@ const Home = () => {
                         <div className="flex gap-4 overflow-x-auto">
                             {bookClubs.map(bookClub => (
                                 <div 
+                                    onClick={() => navigate(`/bookclubpage/${bookClub.id}`)}
                                     key={bookClub.id}
-                                    className="p-4 border rounded hover:bg-gray-50 flex-shrink-0 min-w-[200px]"
+                                    className="p-4 border rounded hover:bg-gray-50 flex-shrink-0 min-w-[200px] cursor-pointer"
                                 >
                                     <img 
                                         src={bookClub.imageUrl ? `http://localhost:4000${bookClub.imageUrl}` : '/images/default.webp'} 
@@ -278,11 +279,6 @@ const Home = () => {
                                                 )}
                                             </div>
                                         </div>
-                                    )}
-                                    {auth?.user && (
-                                        <button className="text-sm text-black font-semibold mt-2 border border-black rounded px-2 py-1 cursor-pointer bg-amber-100 hover:bg-amber-50" onClick={() => navigate(`/bookclub/${bookClub.id}`)}>
-                                            Join
-                                        </button>
                                     )}
                                     
                                     <p className="text-sm text-gray-600 mt-2">

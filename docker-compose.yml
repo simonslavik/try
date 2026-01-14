@@ -1,6 +1,7 @@
 services:
   redis:
     image: redis:latest
+    platform: linux/amd64
     container_name: redis-cache
     ports:
       - "6379:6379"
@@ -13,6 +14,7 @@ services:
 
   postgres:
     image: postgres:15
+    platform: linux/amd64
     container_name: postgres-db
     ports:
       - "5432:5432"

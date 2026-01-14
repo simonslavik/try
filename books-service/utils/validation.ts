@@ -98,3 +98,14 @@ export const googleBooksIdParamSchema = joi.object({
         'any.required': 'googleBooksId is required'
     })
 }); 
+
+export const bookClubBookReviewSchema = joi.object({
+    rating: joi.number().min(1).max(5).required().messages({
+        'any.required': 'Rating is required',
+        'number.min': 'Rating must be at least 1',
+        'number.max': 'Rating cannot exceed 5'
+    }),
+    reviewText: joi.string().max(2000).optional().allow('').messages({
+        'string.max': 'Review cannot exceed 2000 characters'
+    })
+});
