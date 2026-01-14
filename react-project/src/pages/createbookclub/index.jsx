@@ -4,6 +4,25 @@ import axios from 'axios';
 import AuthContext from '../../context';
 import { FiImage, FiX, FiHome } from 'react-icons/fi';
 
+const categories = [
+    'General',
+    'Fiction',
+    'Non-Fiction',
+    'Mystery',
+    'Romance',
+    'Science Fiction',
+    'Fantasy',
+    'Thriller',
+    'Biography',
+    'Self-Help',
+    'History',
+    'Poetry',
+    'Young Adult',
+    'Classic Literature',
+    'Horror',
+    'Philosophy'
+];
+
 const NewBookClubPage = () => {
     const { auth } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -11,6 +30,7 @@ const NewBookClubPage = () => {
 
     const [form, setForm] = useState({
         name: '',
+        category: 'General',
         isPublic: true
     });
     const [selectedImage, setSelectedImage] = useState(null);
@@ -66,6 +86,7 @@ const NewBookClubPage = () => {
             // Create bookclub
             const response = await axios.post('http://localhost:3000/v1/editor/bookclubs', {
                 name: form.name.trim(),
+                category: form.category,
                 isPublic: form.isPublic,
             });
 
@@ -128,7 +149,26 @@ const NewBookClubPage = () => {
                             required
                         />
                     </div>
+Category Selection */}
+                    <div>
+                        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+                            Category *
+                        </label>
+                        <select
+                            id="category"
+                            name="category"
+                            value={form.category}
+                            onChange={handleChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
+                            required
+                        >
+                            {categories.map(cat => (
+                                <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                        </select>
+                    </div>
 
+                    {/* 
                     {/* Public/Private Toggle */}
                     <div className="flex items-center">
                         <input

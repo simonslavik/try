@@ -10,6 +10,7 @@ import NewBookClubPage from "./pages/createbookclub";
 import ChangeProfilePage from "./pages/changeProfile";
 import ProfilePage from "./pages/profilePage/:id";
 import BookClubPage from "./pages/bookclubPage/:id";
+import DiscoverBookClubs from "./pages/discover";
 
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
           <ChangeProfilePage />
         </ProtectedRoute>
       }/>
+      <Route path="/discover" element={<DiscoverBookClubs />}/>
       
     </Routes>
   );

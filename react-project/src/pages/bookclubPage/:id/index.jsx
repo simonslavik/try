@@ -434,16 +434,6 @@ const BookClubPage = () => {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Join/Leave Button */}
-                            {auth?.user && (
-                                <button
-                                    onClick={() => navigate(`/bookclub/${bookClubId}`)}
-                                    className="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 shadow-lg"
-                                >
-                                    Start Chatting
-                                </button>
-                            )}
                         </div>
                     </div>
                 </div>

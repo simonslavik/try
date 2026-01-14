@@ -3,14 +3,14 @@ import { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import HomePageHeader from '../../components/HomePageHeader';
-import axios from 'axios';
+
 
 
     
 
 
 const Home = () => {
-    const { auth, logout } = useContext(AuthContext);
+    const { auth} = useContext(AuthContext);
     const [bookClubs, setBookClubs] = useState([]);
     const [myCreatedBookClubs, setMyCreatedBookClubs] = useState([]);
     const [myMemberBookClubs, setMyMemberBookClubs] = useState([]);
@@ -67,8 +67,8 @@ const Home = () => {
             <HomePageHeader />
             <div className="flex flex-col p-8 w-full min-h-screen gap-4">
                 {auth?.user && (
-                    <div className="flex flex-col  bg-gray-100 p-4 rounded w-full">
-                        <h1 className='font-semibold text-xl mb-4 '>My Created Book Clubs</h1>
+                    <div className="flex flex-col justify-center items-center p-4 rounded w-full">
+                        <h1 className='text-xl mb-4 font-mono font-light '>BookClubs Created By You</h1>
                         {myCreatedBookClubs.length === 0 ? (
                             <button onClick={createNewBookClub}>
                                 <div className="p-4 border rounded hover:bg-gray-50 cursor-pointer w-17 h-17 flex items-center justify-center">
@@ -81,18 +81,18 @@ const Home = () => {
                                     <div 
                                         key={bookClub.id}
                                         onClick={() => navigate(`/bookclub/${bookClub.id}`)}
-                                        className="p-4 border rounded hover:bg-gray-50 cursor-pointer flex-shrink-0 min-w-[200px]"
+                                        className="p-4 shadow border rounded cursor-pointer flex-shrink-0 w-[280px] h-[420px] flex flex-col"
                                     >
                                         <img 
                                             src={bookClub.imageUrl ? `http://localhost:4000${bookClub.imageUrl}` : '/images/default.webp'} 
                                             alt={bookClub.name}
-                                            className="w-full h-32 object-cover mb-2 rounded"
+                                            className="w-full h-40 object-cover mb-3 rounded"
                                             onError={(e) => { e.target.src = '/images/default.webp'; }}
                                         />
-                                        <h3 className="font-medium truncate">{bookClub.name}</h3>
+                                        <h3 className="font-sans truncate">{bookClub.name}</h3>
                                         {bookClub.members && bookClub.members.length > 0 && (
                                             <div className="mt-2">
-                                                <p className="text-sm text-gray-600 mb-1">
+                                                <p className="text-sm font-sans text-gray-600 mb-1">
                                                     {bookClub.members.length} {bookClub.members.length === 1 ? 'member' : 'members'}
                                                 </p>
                                                 <div className="flex -space-x-2">
@@ -117,7 +117,7 @@ const Home = () => {
                                                 </div>
                                             </div>
                                         )}
-                                        <p className="text-sm text-gray-600 mt-2">
+                                        <p className="text-sm font-sans text-gray-600 mt-2">
                                             <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-1"></span>
                                             {bookClub.activeUsers || 0} online
                                         </p>
@@ -130,26 +130,26 @@ const Home = () => {
                 )}
                 {auth?.user && (
                 <div className='flex justify-center'>
-                    <button className='border rounded p-2 bg-blue-500 text-white hover:bg-blue-600' onClick={createNewBookClub}>
+                    <button className='font-medium border-0.5 rounded p-2  bg-gray-200 text-gray-800 cursor-pointer hover:bg-gray-100'  onClick={createNewBookClub}>
                         Create New Book Club
                     </button>
                 </div>
                 )}
                 
                 {auth?.user && myMemberBookClubs.length > 0 && (
-                    <div className="flex flex-col bg-gray-100 p-4 rounded w-full">
+                    <div className="flex flex-col p-4 rounded w-full">
                         <h1 className='font-semibold text-xl mb-4'>Book Clubs I'm In</h1>
                         <div className="flex gap-4 overflow-x-auto">
                             {myMemberBookClubs.map(bookClub => (
                                 <div 
                                     key={bookClub.id}
                                     onClick={() => navigate(`/bookclub/${bookClub.id}`)}
-                                    className="p-4 border rounded hover:bg-gray-50 cursor-pointer flex-shrink-0 min-w-[200px]"
+                                    className="p-4 border rounded hover:bg-gray-50 cursor-pointer flex-shrink-0 w-[280px] h-[420px] flex flex-col"
                                 >
                                     <img 
                                         src={bookClub.imageUrl ? `http://localhost:4000${bookClub.imageUrl}` : '/images/default.webp'} 
                                         alt={bookClub.name}
-                                        className="w-full h-32 object-cover mb-2 rounded"
+                                        className="w-full h-40 object-cover mb-3 rounded"
                                         onError={(e) => { e.target.src = '/images/default.webp'; }}
                                     />
                                     <h3 className="font-medium truncate">{bookClub.name}</h3>
@@ -210,7 +210,7 @@ const Home = () => {
                     </div>
                 )}
                 
-                <div className="flex flex-col  bg-gray-100 p-4 rounded w-full">
+                <div className="flex flex-col p-4 rounded w-full">
                     <h1 className='font-semibold text-xl mb-4 '>All Book Clubs</h1>
                     {bookClubs.length === 0 ? (
                         <button onClick={createNewBookClub}>
@@ -224,12 +224,12 @@ const Home = () => {
                                 <div 
                                     onClick={() => navigate(`/bookclubpage/${bookClub.id}`)}
                                     key={bookClub.id}
-                                    className="p-4 border rounded hover:bg-gray-50 flex-shrink-0 min-w-[200px] cursor-pointer"
+                                    className="p-4 border rounded hover:bg-gray-50 flex-shrink-0 w-[280px] h-[420px] cursor-pointer flex flex-col"
                                 >
                                     <img 
                                         src={bookClub.imageUrl ? `http://localhost:4000${bookClub.imageUrl}` : '/images/default.webp'} 
                                         alt={bookClub.name}
-                                        className="w-full h-32 object-cover mb-2 rounded"
+                                        className="w-full h-40 object-cover mb-3 rounded"
                                         onError={(e) => { e.target.src = '/images/default.webp'; }}
                                     />
                                     <h3 className="font-medium truncate">{bookClub.name}</h3>
@@ -290,6 +290,14 @@ const Home = () => {
                         </div>
                         
                     )}
+                </div>
+                <div className='flex justify-center'>
+                    <button 
+                        onClick={() => navigate('/discover')}
+                        className='font-medium border-0.5 rounded p-2  bg-gray-200 text-gray-800 cursor-pointer hover:bg-gray-100'
+                    >
+                        Discover More Book Clubs
+                    </button>
                 </div>
             </div>
         </div>
