@@ -97,7 +97,7 @@ app.get('/health', async (req, res) => {
 // Create new bookclub (requires authentication)
 app.post('/bookclubs', authMiddleware, async (req, res) => {
   try {
-    const { name, isPublic } = req.body;
+    const { name, category, isPublic } = req.body;
     const userId = req.user!.userId;
     
     if (!name || name.trim() === '') {
@@ -107,6 +107,7 @@ app.post('/bookclubs', authMiddleware, async (req, res) => {
     const bookClub = await prisma.bookClub.create({
       data: {
         name: name.trim(),
+        category: category || 'General',
         isPublic: isPublic !== false,
         members: [userId],
         creatorId: userId,
