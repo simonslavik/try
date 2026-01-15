@@ -6,6 +6,7 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [bookClubBooks, setBookClubBooks] = useState([]);
 
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -16,6 +17,7 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
 
   useEffect(() => {
     fetchEvents();
+    fetchBookClubBooks();
   }, [bookClubId]);
 
   const fetchEvents = async () => {
@@ -28,6 +30,21 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
       }
     } catch (error) {
       console.error('Error fetching events:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchBookClubBooks = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/v1/bookclub/${bookClubId}/books`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        return setBookClubBooks(data.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching book club books:', error);
     } finally {
       setLoading(false);
     }
@@ -67,6 +84,49 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
         eventDate.getFullYear() === date.getFullYear()
       );
     });
+  };
+
+  const getBooksForDate = (date) => {
+    if (!date) return [];
+    
+    return bookClubBooks.filter(book => {
+      if (!book.startDate && !book.endDate) return false;
+      
+      const dateTime = date.getTime();
+      const startTime = book.startDate ? new Date(book.startDate).getTime() : null;
+      const endTime = book.endDate ? new Date(book.endDate).getTime() : null;
+      
+      // Show book on start date
+      if (startTime && new Date(book.startDate).toDateString() === date.toDateString()) {
+        return true;
+      }
+      
+      // Show book on end date
+      if (endTime && new Date(book.endDate).toDateString() === date.toDateString()) {
+        return true;
+      }
+      
+      return false;
+    });
+  };
+
+  const getBookStatusColor = (status) => {
+    const colors = {
+      current: 'bg-emerald-600',
+      upcoming: 'bg-amber-600',
+      completed: 'bg-slate-600'
+    };
+    return colors[status] || 'bg-gray-600';
+  };
+
+  const getBookStatusLabel = (book, date) => {
+    if (book.startDate && new Date(book.startDate).toDateString() === date.toDateString()) {
+      return '📖 Start';
+    }
+    if (book.endDate && new Date(book.endDate).toDateString() === date.toDateString()) {
+      return '✓ Due';
+    }
+    return book.status;
   };
 
   const handlePrevMonth = () => {
@@ -173,6 +233,7 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
       <div className="grid grid-cols-7 gap-1">
         {days.map((date, index) => {
           const dayEvents = getEventsForDate(date);
+          const dayBooks = getBooksForDate(date);
           const today = isToday(date);
           
           return (
@@ -192,6 +253,7 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
                     {date.getDate()}
                   </div>
                   <div className="space-y-1">
+                    {/* Events */}
                     {dayEvents.map(event => (
                       <div
                         key={event.id}
@@ -200,6 +262,19 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
                         title={event.title}
                       >
                         <div className="font-semibold truncate">{event.title}</div>
+                      </div>
+                    ))}
+                    
+                    {/* Books */}
+                    {dayBooks.map(book => (
+                      <div
+                        key={book.id}
+                        className={`text-xs p-1 rounded ${getBookStatusColor(book.status)} text-white cursor-pointer hover:opacity-80 transition-opacity border border-white border-opacity-30`}
+                        title={`${book.book.title} - ${getBookStatusLabel(book, date)}`}
+                      >
+                        <div className="font-semibold truncate">
+                          {getBookStatusLabel(book, date)}: {book.book.title}
+                        </div>
                       </div>
                     ))}
                   </div>
