@@ -1,7 +1,7 @@
 
 
 import React, { useState, useRef, useEffect } from 'react';
-import { FiHome, FiPlus, FiHash, FiMail, FiBook } from 'react-icons/fi';
+import { FiHome, FiPlus, FiHash, FiMail, FiBook, FiCalendar } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import BookClubImage from './BookClubImage';
 
@@ -24,7 +24,9 @@ const SideBarRooms = ({
     onCurrentBookClick,
     onShowBooksHistory,
     setShowBooksHistory,
-    showBooksHistory
+    showBooksHistory,
+    onShowCalendar,
+    showCalendar
 }) => {
     const navigate = useNavigate();
     const [editingName, setEditingName] = useState(false);
@@ -288,6 +290,21 @@ const SideBarRooms = ({
               </button>
             </div>
 
+            {/* Calendar Button */}
+            <div className='border-b border-gray-700 p-4'>
+              <button
+                onClick={() => onShowCalendar && onShowCalendar()}
+                className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded transition-colors text-sm ${
+                  showCalendar 
+                    ? 'bg-purple-600 text-white' 
+                    : 'bg-gray-700 text-white hover:bg-gray-600'
+                }`}
+              >
+                <FiCalendar size={14} />
+                BookClub Calendar
+              </button>
+            </div>
+
             {/* Rooms List */}
             <div className="flex-1 overflow-y-auto">
               <div className="p-2">
@@ -309,7 +326,7 @@ const SideBarRooms = ({
                     key={room.id}
                     onClick={() => { switchRoom(room); setShowBooksHistory(false); }}
                     className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-colors ${
-                      currentRoom?.id === room.id && !showBooksHistory
+                      currentRoom?.id === room.id && !showBooksHistory && !showCalendar
                         ? 'bg-gray-700 text-white'
                         : 'text-gray-400 hover:bg-gray-700 hover:text-white'
                     }`}

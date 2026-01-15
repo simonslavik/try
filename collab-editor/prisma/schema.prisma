@@ -27,7 +27,8 @@ model BookClub {
   lastActiveAt DateTime @default(now())
 
   // Relations
-  rooms Room[]
+  rooms  Room[]
+  events BookClubEvent[]
 
   @@index([creatorId])
   @@index([lastActiveAt])
@@ -64,4 +65,21 @@ model Message {
 
   @@index([roomId, createdAt])
   @@map("messages")
+}
+
+// BookClubEvent model - stores calendar events for book clubs
+model BookClubEvent {
+  id          String   @id @default(uuid())
+  bookClubId  String
+  bookClub    BookClub @relation(fields: [bookClubId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  eventDate   DateTime
+  eventType   String   @default("meeting") // meeting, book_deadline, discussion, other
+  createdBy   String // User ID from user-service
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([bookClubId, eventDate])
+  @@map("bookclub_events")
 }

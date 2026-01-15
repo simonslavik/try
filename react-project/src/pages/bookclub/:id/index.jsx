@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import AuthContext from '../../../context';
-import { FiHash, FiUsers, FiPlus, FiSettings, FiHome, FiImage, FiTrash2, FiMail, FiStar } from 'react-icons/fi';
+import { FiHash, FiUsers, FiPlus, FiSettings, FiHome, FiImage, FiTrash2, FiMail, FiStar, FiCalendar } from 'react-icons/fi';
 import MyBookClubsSidebar from '../../../components/MyBookClubsSidebar';
 import SideBarRooms from '../../../components/SideBarRooms';
 import DMSidebar from '../../../components/DMSidebar';
@@ -9,6 +9,8 @@ import DMChat from '../../../components/DMChat';
 import AddCurrentBookModal from '../../../components/AddCurrentBookModal';
 import CurrentBookDetailsModal from '../../../components/CurrentBookDetailsModal';
 import AddBookToBookclubModal from '../../../components/AddBookToBookclubModal';
+import CalendarView from '../../../components/CalendarView';
+import AddEventModal from '../../../components/AddEventModal';
 
 const BookClub = () => {
   const { id: bookClubId } = useParams();
@@ -38,6 +40,11 @@ const BookClub = () => {
   const [bookclubBooks, setBookclubBooks] = useState({ current: [], upcoming: [], completed: [] });
   const [loadingBooks, setLoadingBooks] = useState(false);
   const [showAddBookModal, setShowAddBookModal] = useState(false);
+  
+  // Calendar states
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [showAddEventModal, setShowAddEventModal] = useState(false);
+  const [eventToEdit, setEventToEdit] = useState(null);
 
   
   // DM states
@@ -62,9 +69,10 @@ const BookClub = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Reset books history view when bookClubId changes
+  // Reset books history and calendar view when bookClubId changes
   useEffect(() => {
     setShowBooksHistory(false);
+    setShowCalendar(false);
     setBookclubBooks({ current: [], upcoming: [], completed: [] });
   }, [bookClubId]);
 
@@ -102,6 +110,7 @@ const BookClub = () => {
 
   const handleShowBooksHistory = () => {
     setShowBooksHistory(true);
+    setShowCalendar(false);
     fetchBookclubBooks();
   };
 
@@ -520,6 +529,8 @@ const BookClub = () => {
     if (room.id !== currentRoom?.id) {
       setMessages([]);
       setCurrentRoom(room);
+      setShowBooksHistory(false);
+      setShowCalendar(false);
       
       // Send switch-room message to server
       if (ws.current && ws.current.readyState === WebSocket.OPEN) {
@@ -625,6 +636,49 @@ const BookClub = () => {
     setSelectedUserId(null);
   };
 
+  // Calendar event handlers
+  const handleAddEvent = () => {
+    setEventToEdit(null);
+    setShowAddEventModal(true);
+  };
+
+  const handleEditEvent = (event) => {
+    setEventToEdit(event);
+    setShowAddEventModal(true);
+  };
+
+  const handleDeleteEvent = async (eventId) => {
+    if (!auth?.token) return;
+    
+    try {
+      const response = await fetch(`http://localhost:3000/v1/editor/events/${eventId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${auth.token}`
+        }
+      });
+      
+      if (response.ok) {
+        // Event deleted successfully - calendar will refetch
+        return true;
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Failed to delete event');
+        return false;
+      }
+    } catch (err) {
+      console.error('Error deleting event:', err);
+      alert('Failed to delete event');
+      return false;
+    }
+  };
+
+  const handleEventSaved = () => {
+    // Calendar component will refetch events
+    setShowAddEventModal(false);
+    setEventToEdit(null);
+  };
+
 
   
 
@@ -704,6 +758,12 @@ const BookClub = () => {
               onShowBooksHistory={handleShowBooksHistory}
               setShowBooksHistory={setShowBooksHistory}
               showBooksHistory={showBooksHistory}
+              onShowCalendar={() => {
+                setShowCalendar(true);
+                setShowBooksHistory(false);
+                setCurrentRoom(null);
+              }}
+              showCalendar={showCalendar}
             />
           )}
           
@@ -748,6 +808,11 @@ const BookClub = () => {
                   <>
                     <h2 className="text-white font-semibold">BookClub Books History</h2>
                   </>
+                ) : showCalendar ? (
+                  <>
+                    <FiCalendar className="text-gray-400" />
+                    <h2 className="text-white font-semibold">BookClub Calendar</h2>
+                  </>
                 ) : (
                   <>
                     <FiHash className="text-gray-400" />
@@ -756,7 +821,7 @@ const BookClub = () => {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                {auth?.user && !showBooksHistory && (
+                {auth?.user && !showBooksHistory && !showCalendar && (
                   <button className="text-gray-400 hover:text-white">
                     <FiSettings />
                   </button>
@@ -764,8 +829,18 @@ const BookClub = () => {
               </div>
             </div>
 
-            {/* Content Area - Books History or Messages */}
-            {showBooksHistory ? (
+            {/* Content Area - Calendar, Books History, or Messages */}
+            {showCalendar ? (
+              <div className="flex-1 overflow-hidden">
+                <CalendarView
+                  bookClubId={bookClubId}
+                  auth={auth}
+                  onAddEvent={handleAddEvent}
+                  onEditEvent={handleEditEvent}
+                  onDeleteEvent={handleDeleteEvent}
+                />
+              </div>
+            ) : showBooksHistory ? (
               <div className="flex-1 overflow-y-auto p-6">
                 {loadingBooks ? (
                   <div className="text-center text-gray-500 mt-8">
@@ -1187,6 +1262,21 @@ const BookClub = () => {
               // Refresh the books list
               fetchBookclubBooks();
             }}
+          />
+        )}
+
+        {/* Add/Edit Event Modal */}
+        {showAddEventModal && (
+          <AddEventModal
+            isOpen={showAddEventModal}
+            onClose={() => {
+              setShowAddEventModal(false);
+              setEventToEdit(null);
+            }}
+            bookClubId={bookClubId}
+            auth={auth}
+            eventToEdit={eventToEdit}
+            onEventSaved={handleEventSaved}
           />
         )}
     </div>
