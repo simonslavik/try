@@ -109,3 +109,4 @@
 {"level":"error","message":"Proxy error for BookClub Book Service: socket hang up","service":"api-gateway","timestamp":"2026-01-14T13:26:22.197Z"}
 {"level":"error","message":"Proxy error for BookClub Book Service: socket hang up","service":"api-gateway","timestamp":"2026-01-14T13:27:51.898Z"}
 {"level":"error","message":"Proxy error for BookClub Book Service: socket hang up","service":"api-gateway","timestamp":"2026-01-14T13:28:51.533Z"}
+{"level":"error","message":"Proxy error for Collab Editor Service: connect ECONNREFUSED 172.18.0.5:4000","service":"api-gateway","timestamp":"2026-01-15T09:50:12.802Z"}
