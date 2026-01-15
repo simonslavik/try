@@ -1,7 +1,7 @@
 
 
 import React, { useState, useRef, useEffect } from 'react';
-import { FiHome, FiPlus, FiHash, FiMail, FiBook, FiCalendar } from 'react-icons/fi';
+import { FiHome, FiPlus, FiHash, FiMail, FiBook, FiCalendar, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import BookClubImage from './BookClubImage';
 
@@ -33,6 +33,7 @@ const SideBarRooms = ({
     const [newName, setNewName] = useState(bookClub?.name || '');
     const [currentBook, setCurrentBook] = useState(null);
     const nameInputRef = useRef(null);
+    const [displayBooksSection, setDisplayBooksSection] = useState(true);
 
     useEffect(() => {
         setNewName(bookClub?.name || '');
@@ -147,9 +148,9 @@ const SideBarRooms = ({
     };
 
     return (
-          <div className="w-64 bg-gray-800 border-r border-gray-700 flex flex-col">
+          <div className="w-64 bg-gray-800 border-r border-gray-700 flex flex-col h-full  overflow-y-auto">
             {/* Bookclub Header with Image */}
-            <div className="p-4 border-b border-gray-700">
+            <div className="p-4 border-b border-gray-700 flex-shrink-0">
               {/* Bookclub Image */}
               <BookClubImage 
                 bookClub={bookClub} 
@@ -190,8 +191,26 @@ const SideBarRooms = ({
                 </div>
               )}
             </div>
+
+            {/* Toggle Books Section Button */}
+            <button 
+              onClick={() => setDisplayBooksSection(!displayBooksSection)} 
+              className="p-3 border-b border-gray-700 text-white bg-gray-750 hover:bg-gray-700 w-full flex items-center justify-between transition-colors group"
+            >
+              <div className="flex items-center gap-2">
+                <FiBook size={16} className="text-purple-400" />
+                <span className="font-semibold text-sm">Current Book</span>
+              </div>
+              {displayBooksSection ? (
+                <FiChevronUp size={16} className="text-gray-400 group-hover:text-white transition-colors" />
+              ) : (
+                <FiChevronDown size={16} className="text-gray-400 group-hover:text-white transition-colors" />
+              )}
+            </button>
+
             {/* Books Section */}
-            <div className="border-b border-gray-700 p-4">
+            {displayBooksSection && (
+            <div className="border-b border-gray-700 p-4 flex-shrink-0">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-gray-400 text-xs font-semibold uppercase">Current Book</h3>
               </div>
@@ -274,9 +293,10 @@ const SideBarRooms = ({
                 {currentBook ? 'Change Book' : 'Add Current Book'}
               </button>
             </div>
+            )}
             
             {/* Books History Button */}
-            <div className='border-b border-gray-700 p-4'>
+            <div className='border-b border-gray-700 p-4 flex-shrink-0'>
               <button
                 onClick={() => onShowBooksHistory && onShowBooksHistory()}
                 className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded transition-colors text-sm ${
@@ -291,7 +311,7 @@ const SideBarRooms = ({
             </div>
 
             {/* Calendar Button */}
-            <div className='border-b border-gray-700 p-4'>
+            <div className='border-b border-gray-700 p-4 flex-shrink-0'>
               <button
                 onClick={() => onShowCalendar && onShowCalendar()}
                 className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded transition-colors text-sm ${
@@ -306,7 +326,7 @@ const SideBarRooms = ({
             </div>
 
             {/* Rooms List */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1">
               <div className="p-2">
                 <div className="flex items-center justify-between px-2 py-1 mb-2">
                   <h3 className="text-gray-400 text-xs font-semibold uppercase">Rooms</h3>

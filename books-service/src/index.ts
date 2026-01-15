@@ -173,18 +173,13 @@ app.patch('/v1/user-books/:bookId', authMiddleware, async (req: any, res) => {
 });
 
 // Remove book from user's library
-app.delete('/v1/user-books/:bookId', authMiddleware, async (req: any, res) => {
+app.delete('/v1/user-books/:userBookId', authMiddleware, async (req: any, res) => {
   try {
-    const { bookId } = req.params;
+    const { userBookId } = req.params;
 
     // Check if book exists in user's library
     const existingUserBook = await prisma.userBook.findUnique({
-      where: {
-        userId_bookId: {
-          userId: req.user.userId,
-          bookId
-        }
-      }
+      where: { id: userBookId }
     });
 
     if (!existingUserBook) {
@@ -193,13 +188,15 @@ app.delete('/v1/user-books/:bookId', authMiddleware, async (req: any, res) => {
       });
     }
 
+    // Verify the book belongs to the requesting user
+    if (existingUserBook.userId !== req.user.userId) {
+      return res.status(403).json({ 
+        error: 'You can only delete books from your own library' 
+      });
+    }
+
     await prisma.userBook.delete({
-      where: {
-        userId_bookId: {
-          userId: req.user.userId,
-          bookId
-        }
-      }
+      where: { id: userBookId }
     });
 
     res.json({ success: true, message: 'Book removed from library' });

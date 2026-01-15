@@ -3,6 +3,8 @@ import { useContext, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { FiBell, FiMail, FiMenu, FiX, FiUser, FiSettings, FiLogOut, FiPlusCircle } from 'react-icons/fi';
+import LoginModule from './loginModule';
+import RegisterModule from './registerModule';
 
 
     
@@ -18,6 +20,8 @@ const HomePageHeader = () => {
     const [friendRequests, setFriendRequests] = useState([]);
     const [userBookClubs, setUserBookClubs] = useState([]);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
+    const [openLogin, setOpenLogin] = useState(false);
+    const [openRegister, setOpenRegister] = useState(false);
     const newsDropdownRef = useRef(null);
     const profileDropdownRef = useRef(null);
     const mobileMenuRef = useRef(null);
@@ -475,21 +479,35 @@ const HomePageHeader = () => {
             )}
 
             {!auth?.user && (
-            <div className='ml-auto'>
+            <div className='ml-auto flex gap-2 flex-1 justify-end'>
                 <button 
-                    onClick={() => navigate('/login')}
+                    onClick={() => setOpenLogin(true)}
                     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition mr-1"
                 >
                     Login
                 </button>
                 <button 
-                    onClick={() => navigate('/register')}
+                    onClick={() => setOpenRegister(true)}
                     className="px-4 py-2 bg-blue-950 text-white rounded hover:bg-blue-700 transition"
                 >
                     Register
                 </button>
             </div>
             
+            )}
+
+            {/* Login and Register Modals */}
+            {openLogin && (
+                <LoginModule 
+                    onClose={() => setOpenLogin(false)} 
+                    onSwitchToRegister={() => { setOpenLogin(false); setOpenRegister(true); }}
+                />
+            )}
+            {openRegister && (
+                <RegisterModule 
+                    onClose={() => setOpenRegister(false)} 
+                    onSwitchToLogin={() => { setOpenRegister(false); setOpenLogin(true); }}
+                />
             )}
         </div>
     );

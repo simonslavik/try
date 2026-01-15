@@ -6,6 +6,7 @@ import HomePageHeader from '../../components/HomePageHeader';
 
 
 
+
     
 
 
@@ -14,6 +15,7 @@ const Home = () => {
     const [bookClubs, setBookClubs] = useState([]);
     const [myCreatedBookClubs, setMyCreatedBookClubs] = useState([]);
     const [myMemberBookClubs, setMyMemberBookClubs] = useState([]);
+
 
     const navigate = useNavigate();
     
@@ -300,6 +302,8 @@ const Home = () => {
                     </button>
                 </div>
             </div>
+
+
         </div>
     );
 };
