@@ -3,7 +3,10 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AuthContext from '../../../context';
 import HomePageHeader from '../../../components/HomePageHeader';
-import { FiCornerRightDown, FiMail, FiMessageCircle } from 'react-icons/fi';
+import { FiInfo, FiMail, FiMessageCircle, FiPlus } from 'react-icons/fi';
+import AddBookToLibraryModal from '../../../components/AddBookToLibraryModal';
+import BookDetailsModal from '../../../components/BookDetails';
+
 
 const ProfilePage = () => {
   const { id } = useParams();
@@ -11,7 +14,8 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   
   const [profile, setProfile] = useState(null);
-  const [bookClubs, setBookClubs] = useState([]);
+  const [createdBookClubs, setCreatedBookClubs] = useState([]);
+  const [memberBookClubs, setMemberBookClubs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [friendRequestLoading, setFriendRequestLoading] = useState(false);
@@ -23,6 +27,26 @@ const ProfilePage = () => {
   const fileInputRef = useRef(null);
   
   const isOwnProfile = auth?.user?.id === id;
+
+
+  // Books
+  const GATEWAY_URL = 'http://localhost:3000';
+  const [favoriteBooks, setFavoriteBooks] = useState([]);
+  const [booksImReading, setBooksImReading] = useState([]);
+  const [booksToRead, setBooksToRead] = useState([]);
+  const [booksRead, setBooksRead] = useState([]);
+  const [showAddBookModal, setShowAddBookModal] = useState(false);
+  const [showBookDetails, setShowBookDetails] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
+
+
+  const onCloseBookDetails = () => {
+    setShowBookDetails(false);
+    setSelectedBook(null);
+  };
+
+
+
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -44,19 +68,65 @@ const ProfilePage = () => {
           return;
         }
         
-        // Fetch user's bookclubs
-        const bookClubsResponse = await fetch('http://localhost:3000/v1/editor/bookclubs', { headers });
-        const bookClubsData = await bookClubsResponse.json();
+        // Fetch user's created bookclubs
+        const createdBookClubsResponse = await fetch(`http://localhost:3000/v1/editor/users/${id}/bookclubs`, { headers });
+        const createdBookClubsData = await createdBookClubsResponse.json();
         
-        if (bookClubsResponse.ok) {
-          // Filter bookclubs where this user is a member
-          const userBookClubs = (bookClubsData.bookClubs || []).filter(club => 
-            club.members.some(member => 
-              typeof member === 'string' ? member === id : member.id === id
-            )
-          );
-          setBookClubs(userBookClubs);
+        if (createdBookClubsResponse.ok) {
+          setCreatedBookClubs(createdBookClubsData.bookClubs || []);
         }
+        
+        // Fetch all bookclubs and filter for ones where user is a member
+        const allBookClubsResponse = await fetch('http://localhost:3000/v1/editor/bookclubs', { headers });
+        const allBookClubsData = await allBookClubsResponse.json();
+        
+        if (allBookClubsResponse.ok) {
+          // Filter bookclubs where this user is a member (but not creator to avoid duplicates)
+          const memberClubs = (allBookClubsData.bookClubs || []).filter(club => {
+            const isMember = club.members.some(member => 
+              typeof member === 'string' ? member === id : member.id === id
+            );
+            const isCreator = club.creatorId === id;
+            return isMember && !isCreator; // Only show if member but not creator
+          });
+          setMemberBookClubs(memberClubs);
+        }
+
+        const favoriteBooksResponse = await fetch(`${GATEWAY_URL}/v1/user-books?status=favorite`, {
+          headers: auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}
+        });
+        const data2 = await favoriteBooksResponse.json();
+        
+        if (data2.success) {
+          setFavoriteBooks(data2.data || []);
+        } 
+
+        const booksImReadingResponse = await fetch(`${GATEWAY_URL}/v1/user-books?status=reading`, {
+          headers: auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}
+        });
+        const data3 = await booksImReadingResponse.json();
+        
+        if (data3.success) {
+          setBooksImReading(data3.data || []);
+        } 
+
+        const booksToReadResponse = await fetch(`${GATEWAY_URL}/v1/user-books?status=want_to_read`, {
+          headers: auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}
+        });
+        const data4 = await booksToReadResponse.json();
+        
+        if (data4.success) {
+          setBooksToRead(data4.data || []);
+        } 
+
+        const booksReadResponse = await fetch(`${GATEWAY_URL}/v1/user-books?status=completed`, {
+          headers: auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}
+        });
+        const data5 = await booksReadResponse.json();
+        
+        if (data5.success) {
+          setBooksRead(data5.data || []);
+        } 
         
       } catch (err) {
         console.error('Error fetching profile:', err);
@@ -139,6 +209,29 @@ const ProfilePage = () => {
       }
     }
   };
+
+  const DeleteUserBook = async (userBookId) => {
+    try {
+      const response = await fetch(`http://localhost:3000/v1/user-books/${userBookId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${auth.token}`
+        }
+      });
+
+      if (response.ok) {
+        // Remove the book from local state
+        setFavoriteBooks(prev => prev.filter(ub => ub.id !== userBookId));
+        setBooksImReading(prev => prev.filter(ub => ub.id !== userBookId));
+        setBooksRead(prev => prev.filter(ub => ub.id !== userBookId));
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || 'Failed to delete book');
+      }
+    } catch (err) {
+      console.error('Error deleting user book:', err);
+    }
+  }
 
   if (loading) {
     return (
@@ -303,7 +396,7 @@ const ProfilePage = () => {
               
               <div className="mt-6 flex gap-8">
                 <div>
-                  <div className="text-2xl font-bold text-purple-600">{bookClubs.length}</div>
+                  <div className="text-2xl font-bold text-purple-600">{createdBookClubs.length + memberBookClubs.length}</div>
                   <div className="text-sm text-gray-600">Book Clubs</div>
                 </div>
                 <div>
@@ -321,16 +414,16 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* Book Clubs Section */}
+        {/* Created Book Clubs Section */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            {isOwnProfile ? 'My Book Clubs' : `${profile.name}'s Book Clubs`}
+            {isOwnProfile ? 'My Created Book Clubs' : `Book Clubs by ${profile.name}`}
           </h2>
           
-          {bookClubs.length === 0 ? (
-            <div className="text-center py-12">
+          {createdBookClubs.length === 0 ? (
+            <div className="text-center py-12" >
               <div className="text-gray-400 text-lg mb-4">
-                {isOwnProfile ? "You haven't joined any book clubs yet" : "No book clubs yet"}
+                {isOwnProfile ? "You haven't created any book clubs yet" : "No book clubs created yet"}
               </div>
               {isOwnProfile && (
                 <button
@@ -343,7 +436,77 @@ const ProfilePage = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {bookClubs.map(club => (
+              {createdBookClubs.map(club => (
+                <div
+                  key={club.id}
+                  onClick={() => navigate(`/bookclubpage/${club.id}`)}
+                  className="border rounded-lg p-4 hover:shadow-lg cursor-pointer transition-shadow"
+                >
+                  <img 
+                    src={club.imageUrl 
+                      ? `http://localhost:4000${club.imageUrl}` 
+                      : '/images/default.webp'
+                    }
+                    alt={club.name}
+                    className="w-full h-40 object-cover rounded-lg mb-3"
+                    onError={(e) => { e.target.src = '/images/default.webp'; }}
+                  />
+                  <h3 className="font-semibold text-lg truncate mb-2">{club.name}</h3>
+                  
+                  {/* Current Book */}
+                  {club.currentBook && (
+                    <div className="mt-2 mb-2 p-2 bg-purple-50 rounded border border-purple-200">
+                      <p className="text-xs text-purple-600 font-semibold mb-1">📖 Currently Reading</p>
+                      <div className="flex gap-2">
+                        <img 
+                          src={club.currentBook.book?.coverUrl || '/images/default.webp'}
+                          alt={club.currentBook.book?.title}
+                          className="w-12 h-16 object-cover rounded"
+                          onError={(e) => { e.target.src = '/images/default.webp'; }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-gray-900 line-clamp-2">{club.currentBook.book?.title}</p>
+                          <p className="text-xs text-gray-600 truncate">{club.currentBook.book?.author}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center justify-between text-sm text-gray-600">
+                    <span>{club.memberCount || club.members?.length || 0} members</span>
+                    {club.activeUsers > 0 && (
+                      <span className="text-green-600">{club.activeUsers} online</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Member Book Clubs Section */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            {isOwnProfile ? 'Book Clubs I\'m In' : `${profile.name} is a member of`}
+          </h2>
+          
+          {memberBookClubs.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-gray-400 text-lg mb-4">
+                {isOwnProfile ? "You haven't joined any book clubs yet" : "Not a member of any book clubs"}
+              </div>
+              {isOwnProfile && (
+                <button
+                  onClick={() => navigate('/discover')}
+                  className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  Browse Book Clubs
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {memberBookClubs.map(club => (
                 <div
                   key={club.id}
                   onClick={() => navigate(`/bookclub/${club.id}`)}
@@ -359,6 +522,25 @@ const ProfilePage = () => {
                     onError={(e) => { e.target.src = '/images/default.webp'; }}
                   />
                   <h3 className="font-semibold text-lg truncate mb-2">{club.name}</h3>
+                  
+                  {/* Current Book */}
+                  {club.currentBook && (
+                    <div className="mt-2 mb-2 p-2 bg-purple-50 rounded border border-purple-200">
+                      <p className="text-xs text-purple-600 font-semibold mb-1">📖 Currently Reading</p>
+                      <div className="flex gap-2">
+                        <img 
+                          src={club.currentBook.book?.coverUrl || '/images/default.webp'}
+                          alt={club.currentBook.book?.title}
+                          className="w-12 h-16 object-cover rounded"
+                          onError={(e) => { e.target.src = '/images/default.webp'; }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-gray-900 line-clamp-2">{club.currentBook.book?.title}</p>
+                          <p className="text-xs text-gray-600 truncate">{club.currentBook.book?.author}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   
                   {club.members && club.members.length > 0 && (
                     <div className="flex items-center gap-2 mb-2">
@@ -391,6 +573,246 @@ const ProfilePage = () => {
             </div>
           )}
         </div>
+
+        {/* Books Section */}
+        {(favoriteBooks.length > 0 || booksImReading.length > 0 || booksToRead.length > 0 || booksRead.length > 0 || isOwnProfile) && (
+          <div className="bg-white rounded-lg shadow-md p-6 mt-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                {isOwnProfile ? 'My Library' : `${profile.name}'s Library`}
+              </h2>
+              {isOwnProfile && (
+                <button
+                  onClick={() => setShowAddBookModal(true)}
+                  className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-xl font-semibold shadow-lg transition-all transform hover:scale-105 flex items-center gap-2"
+                >
+                  <FiPlus size={20} />
+                  Add Books
+                </button>
+              )}
+            </div>
+            
+            {/* Favorite Books */}
+            {favoriteBooks.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold text-red-600 mb-3">Favorites</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {favoriteBooks.map(userBook => (
+                    <div key={userBook.id} className="group relative">
+                      <img
+                        src={userBook.book.coverUrl || '/images/default.webp'}
+                        alt={userBook.book.title}
+                        className="w-full h-48 object-cover rounded-lg shadow-md group-hover:shadow-xl transition-shadow"
+                        onError={(e) => { e.target.src = '/images/default.webp'; }}
+                      />
+                      {/* Action Overlay */}
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all rounded-lg flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100">
+                        {isOwnProfile && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (confirm('Remove this book from your library?')) {
+                                DeleteUserBook(userBook.id);
+                              }
+                            }}
+                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors shadow-lg"
+                          >
+                            Remove
+                          </button>
+                        )}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedBook(userBook.book);
+                            setShowBookDetails(true);
+                          }}
+                          className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-lg"
+                        >
+                          <FiInfo size={24} />
+                        </button>
+                      </div>
+                      <h4 className="mt-2 text-sm font-medium line-clamp-2">{userBook.book.title}</h4>
+                      <p className="text-xs text-gray-600">{userBook.book.author}</p>
+                      {userBook.rating && (
+                        <p className="text-xs text-yellow-600">{'⭐'.repeat(userBook.rating)}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Currently Reading */}
+            {booksImReading.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold text-green-600 mb-3">Currently Reading</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {booksImReading.map(userBook => (
+                    <div key={userBook.id} className="group relative">
+                      <img
+                        src={userBook.book.coverUrl || '/images/default.webp'}
+                        alt={userBook.book.title}
+                        className="w-full h-48 object-cover rounded-lg shadow-md group-hover:shadow-xl transition-shadow"
+                        onError={(e) => { e.target.src = '/images/default.webp'; }}
+                      />
+                      {/* Action Overlay */}
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all rounded-lg flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100">
+                        {isOwnProfile && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (confirm('Remove this book from your library?')) {
+                                DeleteUserBook(userBook.id);
+                              }
+                            }}
+                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors shadow-lg"
+                          >
+                            Remove
+                          </button>
+                        )}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedBook(userBook.book);
+                            setShowBookDetails(true);
+                          }}
+                          className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-lg"
+                        >
+                          <FiInfo size={24} />
+                        </button>
+                      </div>
+                      <h4 className="mt-2 text-sm font-medium line-clamp-2">{userBook.book.title}</h4>
+                      <p className="text-xs text-gray-600">{userBook.book.author}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Want to Read */}
+            {booksToRead.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold text-blue-600 mb-3">Want to Read</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {booksToRead.map(userBook => (
+                    <div key={userBook.id} className="group relative">
+                      <img
+                        src={userBook.book.coverUrl || '/images/default.webp'}
+                        alt={userBook.book.title}
+                        className="w-full h-48 object-cover rounded-lg shadow-md group-hover:shadow-xl transition-shadow"
+                        onError={(e) => { e.target.src = '/images/default.webp'; }}
+                      />
+                      {/* Action Overlay */}
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all rounded-lg flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100">
+                        {isOwnProfile && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (confirm('Remove this book from your library?')) {
+                                DeleteUserBook(userBook.id);
+                              }
+                            }}
+                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors shadow-lg"
+                          >
+                            Remove
+                          </button>
+                        )}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedBook(userBook.book);
+                            setShowBookDetails(true);
+                          }}
+                          className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-lg"
+                        >
+                          <FiInfo size={24} />
+                        </button>
+                      </div>
+                      <h4 className="mt-2 text-sm font-medium line-clamp-2">{userBook.book.title}</h4>
+                      <p className="text-xs text-gray-600">{userBook.book.author}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Completed Books */}
+            {booksRead.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold text-purple-600 mb-3">✅ Completed</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {booksRead.map(userBook => (
+                    <div key={userBook.id} className="group relative">
+                      <img
+                        src={userBook.book.coverUrl || '/images/default.webp'}
+                        alt={userBook.book.title}
+                        className="w-full h-48 object-cover rounded-lg shadow-md group-hover:shadow-xl transition-shadow"
+                        onError={(e) => { e.target.src = '/images/default.webp'; }}
+                      />
+                      {/* Action Overlay */}
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all rounded-lg flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100">
+                        {isOwnProfile && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (confirm('Remove this book from your library?')) {
+                                DeleteUserBook(userBook.id);
+                              }
+                            }}
+                            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors shadow-lg"
+                          >
+                            Remove
+                          </button>
+                        )}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedBook(userBook.book);
+                            setShowBookDetails(true);
+                          }}
+                          className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-lg"
+                        >
+                          <FiInfo size={24} />
+                        </button>
+                      </div>
+                      <h4 className="mt-2 text-sm font-medium line-clamp-2">{userBook.book.title}</h4>
+                      <p className="text-xs text-gray-600">{userBook.book.author}</p>
+                      {userBook.rating && (
+                        <p className="text-xs text-yellow-600">{'⭐'.repeat(userBook.rating)}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {favoriteBooks.length === 0 && booksImReading.length === 0 && 
+             booksToRead.length === 0 && booksRead.length === 0 && (
+              <div className="text-center py-8 text-gray-400">
+                <p>{isOwnProfile ? 'No books in your library yet. Click "Add Books" to get started!' : 'No books in library yet.'}</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Add Book Modal */}
+        {showAddBookModal && (
+          <AddBookToLibraryModal
+            onClose={() => setShowAddBookModal(false)}
+            onBookAdded={() => {
+              // Refresh the profile page to show new books
+              window.location.reload();
+            }}
+          />
+        )}
+
+        {showBookDetails && (
+          <BookDetailsModal 
+            onClose={onCloseBookDetails}
+            book={selectedBook} 
+          />
+        )}
       </div>
     </div>
   );

@@ -1,1 +1,28 @@
-@import "tailwindcss"
+/* Multiple fonts for different purposes */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=JetBrains+Mono:wght@400;600&display=swap');
+
+/* If you have Recife font files, uncomment and place them in /public/fonts/ */
+/* 
+@font-face {
+  font-family: 'Recife';
+  src: url('/fonts/Recife-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Recife';
+  src: url('/fonts/Recife-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}
+*/
+
+@import "tailwindcss";
+
+@layer base {
+  body {
+    /* Using Outfit - Modern geometric sans-serif */
+    /* To switch back to serif: 'Cormorant Garamond', serif */
+    font-family: 'Outfit', sans-serif;
+  }
+}

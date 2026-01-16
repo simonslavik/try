@@ -5,11 +5,14 @@ import { authMiddleware, optionalAuthMiddleware } from '../middleware/authMiddle
 import { addProfileImage, deleteProfileImage, upload } from '../controllers/profileImageController.js';
 import { sendFriendRequest, acceptFriendRequest, rejectFriendRequest, removeFriend, listFriends, listFriendRequests} from '../controllers/friendsController.js';
 import { getDirectMessages, sendDirectMessage, getConversations } from '../controllers/directMessagesController.js';
+import { googleAuth } from '../controllers/googleAuthController.js';
+
 const userRoutes = Router();
 
 // Public routes (no authentication required)
 userRoutes.post('/auth/register', registerUser);
 userRoutes.post('/auth/login', loginUser);
+userRoutes.post('/auth/google', googleAuth); // Google OAuth endpoint
 userRoutes.post('/auth/refresh', refreshAccessToken);
 
 // Batch endpoint for fetching multiple users (used by other services)

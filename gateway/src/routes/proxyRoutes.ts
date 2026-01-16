@@ -73,6 +73,11 @@ export const setupProxyRoutes = (app: Express): void => {
       requireAuth: false,
       pathTransform: (path: string) => path.replace(/^\/v1\/editor/, '') // /v1/editor/health -> /health
     },
+    { envVar: 'BOOKS_SERVICE_URL', route: '/v1/books', name: 'Books Service', requireAuth: false, pathTransform: (path: string) => path },
+    { envVar: 'BOOKS_SERVICE_URL', route: '/v1/bookclubs', name: 'Bookclubs Service', requireAuth: true, pathTransform: (path: string) => path },
+    { envVar: 'BOOKS_SERVICE_URL', route: '/v1/user-books', name: 'User Books Service', requireAuth: true, pathTransform: (path: string) => path },
+    { envVar: 'BOOKS_SERVICE_URL', route: '/v1/bookclub', name: 'BookClub Book Service', requireAuth: false, pathTransform: (path: string) => path },
+    { envVar: 'BOOKS_SERVICE_URL', route: '/v1/bookclub-books', name: 'BookClub Book Progress Service', requireAuth: true, pathTransform: (path: string) => path }
   ];
   
   services.forEach(({ envVar, route, name, requireAuth, pathTransform }: any) => {

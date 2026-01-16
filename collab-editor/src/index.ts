@@ -97,7 +97,7 @@ app.get('/health', async (req, res) => {
 // Create new bookclub (requires authentication)
 app.post('/bookclubs', authMiddleware, async (req, res) => {
   try {
-    const { name, isPublic } = req.body;
+    const { name, category, isPublic } = req.body;
     const userId = req.user!.userId;
     
     if (!name || name.trim() === '') {
@@ -107,6 +107,7 @@ app.post('/bookclubs', authMiddleware, async (req, res) => {
     const bookClub = await prisma.bookClub.create({
       data: {
         name: name.trim(),
+        category: category || 'General',
         isPublic: isPublic !== false,
         members: [userId],
         creatorId: userId,
@@ -270,7 +271,29 @@ app.get('/bookclubs', optionalAuthMiddleware, async (req, res) => {
       }
     }
     
-    // Add active user count and member details to each bookclub
+    // Fetch current books for all bookclubs from books-service
+    const currentBooksMap = new Map<string, any>();
+    try {
+      const booksServiceUrl = process.env.BOOKS_SERVICE_URL || 'http://localhost:3002';
+      const currentBookPromises = bookClubs.map(async (club) => {
+        try {
+          const response = await fetch(`${booksServiceUrl}/v1/bookclub/${club.id}/books?status=current`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.data && data.data.length > 0) {
+              currentBooksMap.set(club.id, data.data[0]);
+            }
+          }
+        } catch (err) {
+          console.error(`Error fetching current book for bookclub ${club.id}:`, err);
+        }
+      });
+      await Promise.all(currentBookPromises);
+    } catch (error) {
+      console.error('Error fetching current books:', error);
+    }
+    
+    // Add active user count, member details, and current book to each bookclub
     const bookClubsWithUserCount = bookClubs.map(club => {
       const activeClub = activeBookClubs.get(club.id);
       
@@ -282,7 +305,8 @@ app.get('/bookclubs', optionalAuthMiddleware, async (req, res) => {
       return {
         ...club,
         members: memberDetails.length > 0 ? memberDetails : club.members,
-        activeUsers: activeClub ? activeClub.clients.size : 0
+        activeUsers: activeClub ? activeClub.clients.size : 0,
+        currentBook: currentBooksMap.get(club.id) || null
       };
     });
 
@@ -301,16 +325,39 @@ app.get('/my-bookclubs', authMiddleware, async (req, res) => {
     const userId = req.user!.userId;
     
     const bookClubs = await prisma.bookClub.findMany({
-      where: { members: { has: userId } },
+      where: { creatorId: userId },
       orderBy: { updatedAt: 'desc' }
     });
     
-    // Add active user count to each bookclub
+    // Fetch current books for all bookclubs from books-service
+    const currentBooksMap = new Map<string, any>();
+    try {
+      const booksServiceUrl = process.env.BOOKS_SERVICE_URL || 'http://localhost:3002';
+      const currentBookPromises = bookClubs.map(async (club) => {
+        try {
+          const response = await fetch(`${booksServiceUrl}/v1/bookclub/${club.id}/books?status=current`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.data && data.data.length > 0) {
+              currentBooksMap.set(club.id, data.data[0]);
+            }
+          }
+        } catch (err) {
+          console.error(`Error fetching current book for bookclub ${club.id}:`, err);
+        }
+      });
+      await Promise.all(currentBookPromises);
+    } catch (error) {
+      console.error('Error fetching current books:', error);
+    }
+    
+    // Add active user count and current book to each bookclub
     const bookClubsWithUserCount = bookClubs.map(club => {
       const activeClub = activeBookClubs.get(club.id);
       return {
         ...club,
-        activeUsers: activeClub ? activeClub.clients.size : 0
+        activeUsers: activeClub ? activeClub.clients.size : 0,
+        currentBook: currentBooksMap.get(club.id) || null
       };
     });
     
@@ -318,6 +365,59 @@ app.get('/my-bookclubs', authMiddleware, async (req, res) => {
   } catch (error) {
     console.error('Error fetching user bookclubs:', error);
     res.status(500).json({ error: 'Failed to fetch your bookclubs' });
+  }
+});
+
+// Get bookclubs created by a specific user (public endpoint)
+app.get('/users/:userId/bookclubs', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    const bookClubs = await prisma.bookClub.findMany({
+      where: { 
+        creatorId: userId,
+        isPublic: true // Only show public bookclubs
+      },
+      orderBy: { updatedAt: 'desc' }
+    });
+    
+    // Add active user count and member count to each bookclub
+    const bookClubsWithUserCount = bookClubs.map(club => {
+      const activeClub = activeBookClubs.get(club.id);
+      return {
+        ...club,
+        activeUsers: activeClub ? activeClub.clients.size : 0,
+        memberCount: club.members.length
+      };
+    });
+
+    // Fetch current books for each bookclub from books-service
+    const currentBooksPromises = bookClubsWithUserCount.map(async (club) => {
+      try {
+        const response = await fetch(`${process.env.BOOKS_SERVICE_URL}/v1/bookclub/${club.id}/books?status=current`);
+        if (response.ok) {
+          const data = await response.json();
+          return { bookClubId: club.id, currentBook: data.data?.[0] || null };
+        }
+      } catch (error) {
+        console.error(`Error fetching current book for bookclub ${club.id}:`, error);
+      }
+      return { bookClubId: club.id, currentBook: null };
+    });
+
+    const currentBooksResults = await Promise.all(currentBooksPromises);
+    const currentBooksMap = new Map(currentBooksResults.map(r => [r.bookClubId, r.currentBook]));
+
+    // Add current book to each bookclub
+    const bookClubsWithCurrentBook = bookClubsWithUserCount.map(club => ({
+      ...club,
+      currentBook: currentBooksMap.get(club.id) || null
+    }));
+    
+    res.json({ bookClubs: bookClubsWithCurrentBook });
+  } catch (error) {
+    console.error('Error fetching user bookclubs:', error);
+    res.status(500).json({ error: 'Failed to fetch user bookclubs' });
   }
 });
 
@@ -413,6 +513,145 @@ app.delete('/bookclubs/:bookClubId/image', authMiddleware, async (req, res) => {
   } catch (error) {
     console.error('Error deleting image:', error);
     res.status(500).json({ error: 'Failed to delete image' });
+  }
+});
+
+// ===== CALENDAR EVENTS ENDPOINTS =====
+
+// Get all events for a bookclub
+app.get('/bookclubs/:bookClubId/events', async (req, res) => {
+  try {
+    const { bookClubId } = req.params;
+    
+    // Check if bookclub exists
+    const bookClub = await prisma.bookClub.findUnique({
+      where: { id: bookClubId }
+    });
+    
+    if (!bookClub) {
+      return res.status(404).json({ error: 'Book club not found' });
+    }
+    
+    // Get all events for this bookclub
+    const events = await prisma.bookClubEvent.findMany({
+      where: { bookClubId },
+      orderBy: { eventDate: 'asc' }
+    });
+    
+    res.json({ events });
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    res.status(500).json({ error: 'Failed to fetch events' });
+  }
+});
+
+// Create a new event for a bookclub (requires authentication and membership)
+app.post('/bookclubs/:bookClubId/events', authMiddleware, async (req, res) => {
+  try {
+    const { bookClubId } = req.params;
+    const { title, description, eventDate, eventType } = req.body;
+    const userId = req.user!.userId;
+    
+    if (!title || !eventDate) {
+      return res.status(400).json({ error: 'Title and event date are required' });
+    }
+    
+    // Check if user is a member of the bookclub
+    const bookClub = await prisma.bookClub.findUnique({
+      where: { id: bookClubId }
+    });
+    
+    if (!bookClub) {
+      return res.status(404).json({ error: 'Book club not found' });
+    }
+    
+    if (!bookClub.members.includes(userId)) {
+      return res.status(403).json({ error: 'You must be a member to create events' });
+    }
+    
+    const event = await prisma.bookClubEvent.create({
+      data: {
+        title: title.trim(),
+        description: description?.trim() || null,
+        eventDate: new Date(eventDate),
+        eventType: eventType || 'meeting',
+        bookClubId,
+        createdBy: userId
+      }
+    });
+    
+    console.log(`📅 Event created in book club ${bookClubId}: ${event.title}`);
+    res.json({ event, message: 'Event created successfully' });
+  } catch (error) {
+    console.error('Error creating event:', error);
+    res.status(500).json({ error: 'Failed to create event' });
+  }
+});
+
+// Update an event (requires authentication and ownership)
+app.patch('/events/:eventId', authMiddleware, async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const { title, description, eventDate, eventType } = req.body;
+    const userId = req.user!.userId;
+    
+    const event = await prisma.bookClubEvent.findUnique({
+      where: { id: eventId }
+    });
+    
+    if (!event) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+    
+    if (event.createdBy !== userId) {
+      return res.status(403).json({ error: 'Only the event creator can update it' });
+    }
+    
+    const updatedEvent = await prisma.bookClubEvent.update({
+      where: { id: eventId },
+      data: {
+        ...(title && { title: title.trim() }),
+        ...(description !== undefined && { description: description?.trim() || null }),
+        ...(eventDate && { eventDate: new Date(eventDate) }),
+        ...(eventType && { eventType })
+      }
+    });
+    
+    console.log(`📝 Event updated: ${updatedEvent.title}`);
+    res.json({ event: updatedEvent, message: 'Event updated successfully' });
+  } catch (error) {
+    console.error('Error updating event:', error);
+    res.status(500).json({ error: 'Failed to update event' });
+  }
+});
+
+// Delete an event (requires authentication and ownership)
+app.delete('/events/:eventId', authMiddleware, async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const userId = req.user!.userId;
+    
+    const event = await prisma.bookClubEvent.findUnique({
+      where: { id: eventId }
+    });
+    
+    if (!event) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+    
+    if (event.createdBy !== userId) {
+      return res.status(403).json({ error: 'Only the event creator can delete it' });
+    }
+    
+    await prisma.bookClubEvent.delete({
+      where: { id: eventId }
+    });
+    
+    console.log(`🗑️  Event deleted: ${event.title}`);
+    res.json({ message: 'Event deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting event:', error);
+    res.status(500).json({ error: 'Failed to delete event' });
   }
 });
 
