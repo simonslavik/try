@@ -7485,3 +7485,84 @@
 {"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-15T13:19:37.039Z","userAgent":"node"}
 {"ip":"::ffff:172.18.0.5","level":"info","message":"POST /api/users/batch","service":"user-service","timestamp":"2026-01-15T14:09:51.699Z","userAgent":"node"}
 {"ip":"::ffff:172.18.0.7","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2026-01-15T14:38:09.160Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"level":"warn","message":"⚠️  Environment Configuration Warnings:","service":"user-service","timestamp":"2026-01-16T14:05:39.477Z"}
+{"level":"warn","message":"   - JWT_SECRET is using default value - change this in production!","service":"user-service","timestamp":"2026-01-16T14:05:39.479Z"}
+{"level":"warn","message":"   - JWT_REFRESH_SECRET is using default value - change this in production!","service":"user-service","timestamp":"2026-01-16T14:05:39.479Z"}
+{"level":"warn","message":"","service":"user-service","timestamp":"2026-01-16T14:05:39.479Z"}
+{"level":"info","message":"✅ All required environment variables are set","service":"user-service","timestamp":"2026-01-16T14:05:39.479Z"}
+{"level":"info","message":"📋 Configuration Summary:","service":"user-service","timestamp":"2026-01-16T14:05:39.479Z"}
+{"level":"info","message":"   - Database: postgres:5432/microservices","service":"user-service","timestamp":"2026-01-16T14:05:39.479Z"}
+{"level":"info","message":"   - Port: 3001","service":"user-service","timestamp":"2026-01-16T14:05:39.480Z"}
+{"level":"info","message":"   - JWT Expiration: 15m","service":"user-service","timestamp":"2026-01-16T14:05:39.480Z"}
+{"level":"info","message":"   - Google OAuth: Enabled ✓","service":"user-service","timestamp":"2026-01-16T14:05:39.480Z"}
+{"level":"info","message":"","service":"user-service","timestamp":"2026-01-16T14:05:39.480Z"}
+{"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2026-01-16T14:05:39.483Z"}
+{"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2026-01-16T14:05:39.483Z"}
+{"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2026-01-16T14:05:39.483Z"}
+{"level":"warn","message":"⚠️  Environment Configuration Warnings:","service":"user-service","timestamp":"2026-01-16T14:06:19.728Z"}
+{"level":"warn","message":"   - JWT_SECRET is using default value - change this in production!","service":"user-service","timestamp":"2026-01-16T14:06:19.732Z"}
+{"level":"warn","message":"   - JWT_REFRESH_SECRET is using default value - change this in production!","service":"user-service","timestamp":"2026-01-16T14:06:19.734Z"}
+{"level":"warn","message":"","service":"user-service","timestamp":"2026-01-16T14:06:19.734Z"}
+{"level":"info","message":"✅ All required environment variables are set","service":"user-service","timestamp":"2026-01-16T14:06:19.735Z"}
+{"level":"info","message":"📋 Configuration Summary:","service":"user-service","timestamp":"2026-01-16T14:06:19.735Z"}
+{"level":"info","message":"   - Database: postgres:5432/microservices","service":"user-service","timestamp":"2026-01-16T14:06:19.736Z"}
+{"level":"info","message":"   - Port: 3001","service":"user-service","timestamp":"2026-01-16T14:06:19.736Z"}
+{"level":"info","message":"   - JWT Expiration: 15m","service":"user-service","timestamp":"2026-01-16T14:06:19.736Z"}
+{"level":"info","message":"   - Google OAuth: Enabled ✓","service":"user-service","timestamp":"2026-01-16T14:06:19.736Z"}
+{"level":"info","message":"","service":"user-service","timestamp":"2026-01-16T14:06:19.736Z"}
+{"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2026-01-16T14:06:19.747Z"}
+{"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2026-01-16T14:06:19.748Z"}
+{"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2026-01-16T14:06:19.748Z"}
+{"level":"warn","message":"⚠️  Environment Configuration Warnings:","service":"user-service","timestamp":"2026-01-16T14:11:08.704Z"}
+{"level":"warn","message":"   - JWT_SECRET is using default value - change this in production!","service":"user-service","timestamp":"2026-01-16T14:11:08.705Z"}
+{"level":"warn","message":"   - JWT_REFRESH_SECRET is using default value - change this in production!","service":"user-service","timestamp":"2026-01-16T14:11:08.705Z"}
+{"level":"warn","message":"","service":"user-service","timestamp":"2026-01-16T14:11:08.705Z"}
+{"level":"info","message":"✅ All required environment variables are set","service":"user-service","timestamp":"2026-01-16T14:11:08.705Z"}
+{"level":"info","message":"📋 Configuration Summary:","service":"user-service","timestamp":"2026-01-16T14:11:08.706Z"}
+{"level":"info","message":"   - Database: postgres:5432/microservices","service":"user-service","timestamp":"2026-01-16T14:11:08.706Z"}
+{"level":"info","message":"   - Port: 3001","service":"user-service","timestamp":"2026-01-16T14:11:08.706Z"}
+{"level":"info","message":"   - JWT Expiration: 15m","service":"user-service","timestamp":"2026-01-16T14:11:08.706Z"}
+{"level":"info","message":"   - Google OAuth: Enabled ✓","service":"user-service","timestamp":"2026-01-16T14:11:08.706Z"}
+{"level":"info","message":"","service":"user-service","timestamp":"2026-01-16T14:11:08.706Z"}
+{"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2026-01-16T14:11:08.710Z"}
+{"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2026-01-16T14:11:08.710Z"}
+{"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2026-01-16T14:11:08.710Z"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"POST /api/auth/google","service":"user-service","timestamp":"2026-01-16T14:11:31.544Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"POST /api/auth/google","service":"user-service","timestamp":"2026-01-16T14:11:40.798Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"POST /api/auth/login","service":"user-service","timestamp":"2026-01-16T14:11:45.240Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2026-01-16T14:12:03.360Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2026-01-16T14:12:09.213Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"level":"warn","message":"⚠️  Environment Configuration Warnings:","service":"user-service","timestamp":"2026-01-16T14:16:30.509Z"}
+{"level":"warn","message":"   - JWT_SECRET is using default value - change this in production!","service":"user-service","timestamp":"2026-01-16T14:16:30.511Z"}
+{"level":"warn","message":"   - JWT_REFRESH_SECRET is using default value - change this in production!","service":"user-service","timestamp":"2026-01-16T14:16:30.511Z"}
+{"level":"warn","message":"","service":"user-service","timestamp":"2026-01-16T14:16:30.511Z"}
+{"level":"info","message":"✅ All required environment variables are set","service":"user-service","timestamp":"2026-01-16T14:16:30.511Z"}
+{"level":"info","message":"📋 Configuration Summary:","service":"user-service","timestamp":"2026-01-16T14:16:30.511Z"}
+{"level":"info","message":"   - Database: postgres:5432/microservices","service":"user-service","timestamp":"2026-01-16T14:16:30.511Z"}
+{"level":"info","message":"   - Port: 3001","service":"user-service","timestamp":"2026-01-16T14:16:30.511Z"}
+{"level":"info","message":"   - JWT Expiration: 15m","service":"user-service","timestamp":"2026-01-16T14:16:30.512Z"}
+{"level":"info","message":"   - Google OAuth: Enabled ✓","service":"user-service","timestamp":"2026-01-16T14:16:30.512Z"}
+{"level":"info","message":"","service":"user-service","timestamp":"2026-01-16T14:16:30.512Z"}
+{"level":"info","message":"🚀 User Service running on port 3001","service":"user-service","timestamp":"2026-01-16T14:16:30.516Z"}
+{"level":"info","message":"📍 Health check: http://localhost:3001/health","service":"user-service","timestamp":"2026-01-16T14:16:30.516Z"}
+{"level":"info","message":"🔐 Auth endpoints: http://localhost:3001/api/auth/*","service":"user-service","timestamp":"2026-01-16T14:16:30.516Z"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"POST /api/auth/google","service":"user-service","timestamp":"2026-01-16T14:22:18.278Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-16T14:22:18.712Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-16T14:22:18.738Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-16T14:22:18.778Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-16T14:22:22.554Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/8cfbb2db-b42b-45a1-8c5a-b5c24d9a61c7","service":"user-service","timestamp":"2026-01-16T14:22:22.559Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-16T14:22:22.577Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/8cfbb2db-b42b-45a1-8c5a-b5c24d9a61c7","service":"user-service","timestamp":"2026-01-16T14:22:22.595Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"POST /api/auth/google","service":"user-service","timestamp":"2026-01-16T14:22:35.487Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-16T14:22:35.567Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-16T14:22:35.641Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-16T14:22:35.680Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"POST /api/auth/register","service":"user-service","timestamp":"2026-01-16T14:22:59.150Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-16T14:22:59.462Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-16T14:22:59.561Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-16T14:22:59.614Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-16T14:23:01.675Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/251da4bd-8623-428e-9946-bc2b523677ec","service":"user-service","timestamp":"2026-01-16T14:23:01.688Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/friends/requests","service":"user-service","timestamp":"2026-01-16T14:23:01.704Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}
+{"ip":"::ffff:172.18.0.7","level":"info","message":"GET /api/profile/251da4bd-8623-428e-9946-bc2b523677ec","service":"user-service","timestamp":"2026-01-16T14:23:01.726Z","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:147.0) Gecko/20100101 Firefox/147.0"}

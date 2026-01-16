@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import AuthContext from '../context';
 import { FiX } from 'react-icons/fi';
+import { GoogleLogin } from '@react-oauth/google';
 
 const RegisterModule = ({ onClose, onSwitchToLogin }) => {
     const navigate = useNavigate();
@@ -59,6 +60,43 @@ const RegisterModule = ({ onClose, onSwitchToLogin }) => {
         } finally {
             setLoading(false);
         }
+    };
+
+    // Handle Google OAuth registration (same endpoint as login)
+    const handleGoogleSuccess = async (credentialResponse) => {
+        setLoading(true);
+        setErrors([]);
+        setMessage('');
+        
+        try {
+            const res = await axios.post('/v1/auth/google', {
+                credential: credentialResponse.credential
+            });
+
+            const accessToken = res?.data?.accessToken;
+            const refreshToken = res?.data?.refreshToken;
+            const user = res?.data?.user;
+
+            if (accessToken && user) {
+                setAuth({ 
+                    token: accessToken,
+                    refreshToken: refreshToken,
+                    user: user
+                });
+                
+                onClose && onClose();
+                window.location.reload();
+            }
+        } catch (err) {
+            const respMsg = err?.response?.data?.message;
+            setErrors([respMsg || 'Google registration failed']);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleGoogleError = () => {
+        setErrors(['Google authentication failed. Please try again.']);
     };
 
     return (
@@ -163,6 +201,31 @@ const RegisterModule = ({ onClose, onSwitchToLogin }) => {
                         ) : 'Create Account'}
                     </button>
                 </form>
+
+                {/* Google OAuth Button */}
+                <div className="mt-6">
+                    <div className="relative mb-4">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-2 bg-white text-gray-500">Or sign up with</span>
+                        </div>
+                    </div>
+                    
+                    <div className="flex justify-center">
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={handleGoogleError}
+                            useOneTap
+                            theme="outline"
+                            size="large"
+                            text="signup_with"
+                            shape="rectangular"
+                            width="100%"
+                        />
+                    </div>
+                </div>
 
                 {/* Divider */}
                 <div className="relative my-6">
