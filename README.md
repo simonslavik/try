@@ -21,28 +21,40 @@ cd try
 2. **Copy environment variables**
 
 ```bash
-cp .env.example .env
+# Backend (user-service)
+cp user-service/.env.example user-service/.env
+
+# Frontend (react-project)
+cp react-project/.env.example react-project/.env
 ```
 
-3. **Generate a strong JWT secret**
+3. **Configure Google OAuth (Required)**
+
+Follow the [Google OAuth Setup Guide](GOOGLE_OAUTH_SETUP.md) to:
+
+- Create Google OAuth credentials
+- Add your Client ID and Secret to the `.env` files
+
+4. **Validate your configuration**
 
 ```bash
-openssl rand -base64 32
+./check-env.sh
 ```
 
-4. **Edit `.env` and add your generated JWT secret**
-
-```env
-JWT_SECRET=<paste-your-generated-secret-here>
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres  # Change in production!
-POSTGRES_DB=microservices
-```
+This will verify all environment variables are set correctly before starting.
 
 5. **Start all services**
 
+Option A - Automated (validates environment first):
+
 ```bash
-docker-compose up -d
+./start.sh
+```
+
+Option B - Manual:
+
+```bash
+docker-compose up --build
 ```
 
 6. **Verify services are running**
