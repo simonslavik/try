@@ -4,12 +4,20 @@ import helmet from 'helmet';
 import userRoutes from './routes/userRoutes.js';
 import errorHandler from './middleware/errorHandler.js';
 import logger from './utils/logger.js';
+import validateEnv from './utils/envValidator.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Validate environment variables before starting the server
+try {
+    validateEnv();
+} catch (error) {
+    process.exit(1);
+}
 
 const app = express();
 const PORT = process.env.PORT || 3001;
