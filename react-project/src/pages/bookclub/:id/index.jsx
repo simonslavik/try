@@ -11,6 +11,7 @@ import CurrentBookDetailsModal from '../../../components/CurrentBookDetailsModal
 import AddBookToBookclubModal from '../../../components/AddBookToBookclubModal';
 import CalendarView from '../../../components/CalendarView';
 import AddEventModal from '../../../components/AddEventModal';
+import BookSuggestionsView from '../../../components/BookSuggestionsView';
 
 const BookClub = () => {
   const { id: bookClubId } = useParams();
@@ -48,6 +49,9 @@ const BookClub = () => {
   const [selectedEventDate, setSelectedEventDate] = useState(null);
   const [calendarRefresh, setCalendarRefresh] = useState(null);
 
+  // Suggestions states
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
   
   // DM states
   const [conversations, setConversations] = useState([]);
@@ -75,6 +79,7 @@ const BookClub = () => {
   useEffect(() => {
     setShowBooksHistory(false);
     setShowCalendar(false);
+    setShowSuggestions(false);
     setBookclubBooks({ current: [], upcoming: [], completed: [] });
   }, [bookClubId]);
 
@@ -113,6 +118,7 @@ const BookClub = () => {
   const handleShowBooksHistory = () => {
     setShowBooksHistory(true);
     setShowCalendar(false);
+    setShowSuggestions(false);
     fetchBookclubBooks();
   };
 
@@ -535,6 +541,7 @@ const BookClub = () => {
       setCurrentRoom(room);
       setShowBooksHistory(false);
       setShowCalendar(false);
+      setShowSuggestions(false);
       
       // Send switch-room message to server
       if (ws.current && ws.current.readyState === WebSocket.OPEN) {
@@ -775,12 +782,21 @@ const BookClub = () => {
               onShowCalendar={() => {
                 setShowCalendar(true);
                 setShowBooksHistory(false);
+                setShowSuggestions(false);
                 setCurrentRoom(null);
               }}
               showCalendar={showCalendar}
+              onShowSuggestions={() => {
+                setShowSuggestions(true);
+                setShowBooksHistory(false);
+                setShowCalendar(false);
+                setCurrentRoom(null);
+              }}
+              showSuggestions={showSuggestions}
             />
           )}
         </div>
+        
         <div className="flex flex-1">
         {/* Main Chat Area - Conditional rendering based on mode */}
         {viewMode === 'dm' ? (
@@ -804,6 +820,10 @@ const BookClub = () => {
                     <FiCalendar className="text-gray-400" />
                     <h2 className="text-white font-semibold">BookClub Calendar</h2>
                   </>
+                ) : showSuggestions ? (
+                  <>
+                    <h2 className="text-white font-semibold">Book Suggestions & Voting</h2>
+                  </>
                 ) : (
                   <>
                     <FiHash className="text-gray-400" />
@@ -812,7 +832,7 @@ const BookClub = () => {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                {auth?.user && !showBooksHistory && !showCalendar && (
+                {auth?.user && !showBooksHistory && !showCalendar && !showSuggestions && (
                   <button className="text-gray-400 hover:text-white">
                     <FiSettings />
                   </button>
@@ -820,7 +840,7 @@ const BookClub = () => {
               </div>
             </div>
 
-            {/* Content Area - Calendar, Books History, or Messages */}
+            {/* Content Area - Calendar, Books History, Suggestions, or Messages */}
             {showCalendar ? (
               <div className="flex-1 overflow-hidden">
                 <CalendarView
@@ -830,6 +850,13 @@ const BookClub = () => {
                   onEditEvent={handleEditEvent}
                   onDeleteEvent={handleDeleteEvent}
                   onEventSaved={handleCalendarRefreshCallback}
+                />
+              </div>
+            ) : showSuggestions ? (
+              <div className="flex-1 overflow-hidden">
+                <BookSuggestionsView
+                  bookClubId={bookClubId}
+                  auth={auth}
                 />
               </div>
             ) : showBooksHistory ? (
@@ -1068,8 +1095,8 @@ const BookClub = () => {
               </div>
             )}
 
-            {/* Message Input - Only show when not viewing books history */}
-            {!showBooksHistory && auth?.user ? (
+            {/* Message Input - Only show when not viewing special views */}
+            {!showBooksHistory && !showCalendar && !showSuggestions && auth?.user ? (
               <form onSubmit={handleSendMessage} className="bg-gray-800 border-t border-gray-700 p-4">
                 <div className="flex gap-2">
                   <input
@@ -1088,7 +1115,7 @@ const BookClub = () => {
                   </button>
                 </div>
               </form>
-            ) : !showBooksHistory ? (
+            ) : !showBooksHistory && !showCalendar && !showSuggestions ? (
               <div className="bg-gray-800 border-t border-gray-700 p-4 text-center">
                 <p className="text-gray-400">
                   Please <button onClick={() => navigate('/login', { state: { from: `/bookclub/${bookClubId}` } })} className="text-purple-400 hover:underline">log in</button> to chat
