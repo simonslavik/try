@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { FiChevronLeft, FiChevronRight, FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
 
-const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent }) => {
+const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent, onEventSaved }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [bookClubBooks, setBookClubBooks] = useState([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -18,7 +19,16 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
   useEffect(() => {
     fetchEvents();
     fetchBookClubBooks();
-  }, [bookClubId]);
+  }, [bookClubId, refreshTrigger]);
+
+  // Expose refresh function to parent via callback
+  useEffect(() => {
+    if (onEventSaved) {
+      // Pass refresh function to parent
+      const refresh = () => setRefreshTrigger(prev => prev + 1);
+      onEventSaved(refresh);
+    }
+  }, [onEventSaved]);
 
   const fetchEvents = async () => {
     try {
@@ -245,7 +255,13 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
                     ? 'bg-purple-900 bg-opacity-30 border-purple-500'
                     : 'bg-gray-700 border-gray-600 hover:bg-gray-650'
                   : 'bg-transparent border-transparent'
-              }`}
+              } ${date && auth?.user ? 'cursor-pointer' : ''}`}
+              onClick={(e) => {
+                // Only trigger on the cell itself, not on events/books
+                if (date && auth?.user && e.target === e.currentTarget) {
+                  onAddEvent && onAddEvent(date);
+                }
+              }}
             >
               {date && (
                 <>

@@ -45,6 +45,8 @@ const BookClub = () => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [showAddEventModal, setShowAddEventModal] = useState(false);
   const [eventToEdit, setEventToEdit] = useState(null);
+  const [selectedEventDate, setSelectedEventDate] = useState(null);
+  const [calendarRefresh, setCalendarRefresh] = useState(null);
 
   
   // DM states
@@ -142,6 +144,8 @@ const BookClub = () => {
       alert('Failed to update book status');
     }
   };
+
+
 
   // Close user menu when clicking outside
   useEffect(() => {
@@ -637,8 +641,9 @@ const BookClub = () => {
   };
 
   // Calendar event handlers
-  const handleAddEvent = () => {
+  const handleAddEvent = (date = null) => {
     setEventToEdit(null);
+    setSelectedEventDate(date);
     setShowAddEventModal(true);
   };
 
@@ -674,9 +679,17 @@ const BookClub = () => {
   };
 
   const handleEventSaved = () => {
-    // Calendar component will refetch events
+    // Trigger calendar refresh
+    if (calendarRefresh) {
+      calendarRefresh();
+    }
     setShowAddEventModal(false);
     setEventToEdit(null);
+    setSelectedEventDate(null);
+  };
+
+  const handleCalendarRefreshCallback = (refreshFn) => {
+    setCalendarRefresh(() => refreshFn);
   };
 
 
@@ -722,6 +735,7 @@ const BookClub = () => {
               navigate(`/bookclub/${id}`);
             }}
             onOpenDM={() => setViewMode('dm')}
+            auth={auth}
           />
           
           {/* Conditional Sidebar - Bookclub Rooms or DM Conversations */}
@@ -766,29 +780,6 @@ const BookClub = () => {
               showCalendar={showCalendar}
             />
           )}
-          
-          <div className='absolute bottom-0 flex justify-center pointer-events-none  '> 
-            {auth?.user && (
-              <div className="p-2 bg-gray-800 rounded-2xl flex items-center gap-2 shadow-lg pointer-events-auto w-78">
-                  <div className="relative">
-                    <img 
-                      src={auth.user.profileImage 
-                        ? `http://localhost:3001${auth.user.profileImage}` 
-                        : '/images/default.webp'
-                      } 
-                      alt={auth.user.name} 
-                      className="w-10 h-10 rounded-full object-cover hover:bg-gray-50 cursor-pointer"
-                      onError={(e) => { e.target.src = '/images/default.webp'; }}
-                      onClick={() => navigate(`/profile/${auth.user.id}`)}
-                    />
-                    <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-800 bg-green-500"></div>
-                  </div>
-                  <span className="text-white font-medium truncate">
-                    {auth.user.name}
-                  </span>
-              </div>
-            )}
-          </div>
         </div>
         <div className="flex flex-1">
         {/* Main Chat Area - Conditional rendering based on mode */}
@@ -838,6 +829,7 @@ const BookClub = () => {
                   onAddEvent={handleAddEvent}
                   onEditEvent={handleEditEvent}
                   onDeleteEvent={handleDeleteEvent}
+                  onEventSaved={handleCalendarRefreshCallback}
                 />
               </div>
             ) : showBooksHistory ? (
@@ -1272,10 +1264,12 @@ const BookClub = () => {
             onClose={() => {
               setShowAddEventModal(false);
               setEventToEdit(null);
+              setSelectedEventDate(null);
             }}
             bookClubId={bookClubId}
             auth={auth}
             eventToEdit={eventToEdit}
+            selectedDate={selectedEventDate}
             onEventSaved={handleEventSaved}
           />
         )}

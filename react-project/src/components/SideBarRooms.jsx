@@ -306,7 +306,7 @@ const SideBarRooms = ({
                 }`}
               >
                 <FiBook size={14} />
-                BookClub Books History
+                BookClub Books
               </button>
             </div>
 

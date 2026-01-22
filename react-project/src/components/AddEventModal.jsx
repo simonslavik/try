@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiX, FiCalendar } from 'react-icons/fi';
 
-const AddEventModal = ({ isOpen, onClose, bookClubId, auth, eventToEdit, onEventSaved }) => {
+const AddEventModal = ({ isOpen, onClose, bookClubId, auth, eventToEdit, onEventSaved, selectedDate }) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -24,16 +24,17 @@ const AddEventModal = ({ isOpen, onClose, bookClubId, auth, eventToEdit, onEvent
         eventType: eventToEdit.eventType || 'meeting'
       });
     } else {
-      // Reset form for new event
+      // Reset form for new event, use selectedDate if provided
+      const defaultDate = selectedDate ? new Date(selectedDate).toISOString().split('T')[0] : '';
       setFormData({
         title: '',
         description: '',
-        eventDate: '',
+        eventDate: defaultDate,
         eventType: 'meeting'
       });
     }
     setError('');
-  }, [eventToEdit, isOpen]);
+  }, [eventToEdit, isOpen, selectedDate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
