@@ -112,3 +112,10 @@
 {"level":"error","message":"Proxy error for Collab Editor Service: connect ECONNREFUSED 172.18.0.5:4000","service":"api-gateway","timestamp":"2026-01-15T09:50:12.802Z"}
 {"level":"error","message":"Proxy error for Collab Editor Service: socket hang up","service":"api-gateway","timestamp":"2026-01-15T14:26:50.946Z"}
 {"level":"error","message":"Proxy error for Auth Service: getaddrinfo ENOTFOUND user-service","service":"api-gateway","timestamp":"2026-01-16T14:08:55.358Z"}
+{"level":"error","message":"Proxy error for BookClub Book Service: connect ECONNREFUSED 172.18.0.5:3002","service":"api-gateway","timestamp":"2026-01-22T13:15:12.636Z"}
+{"level":"error","message":"Proxy error for BookClub Book Service: connect ECONNREFUSED 172.18.0.5:3002","service":"api-gateway","timestamp":"2026-01-22T13:15:12.639Z"}
+{"level":"error","message":"Proxy error for BookClub Book Service: connect ECONNREFUSED 172.18.0.5:3002","service":"api-gateway","timestamp":"2026-01-22T13:15:12.643Z"}
+{"level":"error","message":"Proxy error for BookClub Book Service: connect ECONNREFUSED 172.18.0.5:3002","service":"api-gateway","timestamp":"2026-01-22T13:15:12.646Z"}
+{"level":"error","message":"Proxy error for Books Service: connect ECONNREFUSED 172.18.0.5:3002","service":"api-gateway","timestamp":"2026-01-22T13:18:52.509Z"}
+{"level":"error","message":"Proxy error for Books Service: connect ECONNREFUSED 172.18.0.5:3002","service":"api-gateway","timestamp":"2026-01-22T13:19:07.817Z"}
+{"level":"error","message":"Proxy error for Books Service: connect ECONNREFUSED 172.18.0.5:3002","service":"api-gateway","timestamp":"2026-01-22T13:19:55.292Z"}

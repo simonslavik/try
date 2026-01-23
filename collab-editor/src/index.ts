@@ -516,6 +516,119 @@ app.delete('/bookclubs/:bookClubId/image', authMiddleware, async (req, res) => {
   }
 });
 
+// ===== CHAT FILE UPLOAD ENDPOINTS =====
+
+// Configure multer for chat files
+const chatFileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, '../uploads/chat-files');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = `${uuidv4()}${path.extname(file.originalname)}`;
+    cb(null, uniqueName);
+  }
+});
+
+const chatFileUpload = multer({
+  storage: chatFileStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp|pdf|doc|docx|txt|zip|mp4|mp3/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    
+    if (extname && mimetype) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type'));
+    }
+  }
+});
+
+// Upload chat file
+app.post('/upload/chat-file', authMiddleware, chatFileUpload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const fileUrl = `/uploads/chat-files/${req.file.filename}`;
+    
+    // Save file metadata to database
+    const chatFile = await prisma.chatFile.create({
+      data: {
+        filename: req.file.filename,
+        originalName: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+        url: fileUrl,
+        uploadedBy: req.user!.userId
+      }
+    });
+
+    console.log(`📎 File uploaded: ${req.file.originalname} by user ${req.user!.userId}`);
+    res.json({ 
+      success: true, 
+      data: {
+        id: chatFile.id,
+        url: fileUrl,
+        filename: chatFile.originalName,
+        mimetype: chatFile.mimetype,
+        size: chatFile.size
+      }
+    });
+  } catch (error) {
+    console.error('Error uploading chat file:', error);
+    // Clean up uploaded file on error
+    if (req.file) {
+      fs.unlinkSync(req.file.path);
+    }
+    res.status(500).json({ error: 'Failed to upload file' });
+  }
+});
+
+// Delete chat file
+app.delete('/chat-files/:fileId', authMiddleware, async (req, res) => {
+  try {
+    const { fileId } = req.params;
+    const userId = req.user!.userId;
+    
+    const file = await prisma.chatFile.findUnique({
+      where: { id: fileId }
+    });
+    
+    if (!file) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+    
+    // Check if user owns the file
+    if (file.uploadedBy !== userId) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+    
+    // Delete from filesystem
+    const filePath = path.join(__dirname, '..', file.url);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+    
+    // Delete from database
+    await prisma.chatFile.delete({
+      where: { id: fileId }
+    });
+    
+    console.log(`🗑️  Chat file deleted: ${file.originalName}`);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting chat file:', error);
+    res.status(500).json({ error: 'Failed to delete file' });
+  }
+});
+
 // ===== CALENDAR EVENTS ENDPOINTS =====
 
 // Get all events for a bookclub
@@ -719,7 +832,10 @@ app.get('/bookclubs/:bookClubId/rooms/:roomId/messages', async (req, res) => {
     const messages = await prisma.message.findMany({
       where: { roomId },
       orderBy: { createdAt: 'asc' },
-      take: 100
+      take: 100,
+      include: {
+        attachments: true
+      }
     });
     
     res.json({ messages });
@@ -896,7 +1012,10 @@ wss.on('connection', (ws: WebSocket) => {
         const recentMessages = await prisma.message.findMany({
           where: { roomId: targetRoomId },
           orderBy: { createdAt: 'asc' },
-          take: 100
+          take: 100,
+          include: {
+            attachments: true
+          }
         });
 
         // Fetch all member details from user service
@@ -993,7 +1112,10 @@ wss.on('connection', (ws: WebSocket) => {
         const messages = await prisma.message.findMany({
           where: { roomId },
           orderBy: { createdAt: 'asc' },
-          take: 100
+          take: 100,
+          include: {
+            attachments: true
+          }
         });
 
         // Send room data to user
@@ -1028,7 +1150,13 @@ wss.on('connection', (ws: WebSocket) => {
         roomId: currentClient.roomId,
         userId: currentClient.userId,
         username: currentClient.username,
-        content: message.message
+        content: message.message || null,
+        attachments: message.attachments && message.attachments.length > 0 ? {
+          connect: message.attachments.map((att: any) => ({ id: att.id }))
+        } : undefined
+      },
+      include: {
+        attachments: true
       }
     })
     .then((savedMessage) => {
@@ -1044,7 +1172,10 @@ wss.on('connection', (ws: WebSocket) => {
         }
       });
 
-      console.log(`💬 ${currentClient.username} in room ${currentClient.roomId}: ${message.message}`);
+      const attachmentInfo = savedMessage.attachments?.length > 0 
+        ? ` with ${savedMessage.attachments.length} attachment(s)` 
+        : '';
+      console.log(`💬 ${currentClient.username} in room ${currentClient.roomId}: ${message.message || '[files only]'}${attachmentInfo}`);
     })
     .catch((error) => {
       console.error('Error saving message:', error);

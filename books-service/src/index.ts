@@ -592,6 +592,240 @@ app.delete('/v1/bookclub-books/:bookClubBookId/review', authMiddleware, async (r
   }
 });
 
+// ============= BOOK SUGGESTIONS =============
+
+// GET - Get all suggestions for a bookclub
+app.get('/v1/bookclub/:bookClubId/suggestions', authMiddleware, async (req: any, res) => {
+  try {
+    const { bookClubId } = req.params;
+    
+    const suggestions = await prisma.bookSuggestion.findMany({
+      where: { 
+        bookClubId,
+        status: 'pending'
+      },
+      include: {
+        book: true,
+        votes: true
+      },
+      orderBy: [
+        { upvotes: 'desc' },
+        { createdAt: 'desc' }
+      ]
+    });
+
+    // Add user's vote status to each suggestion
+    const suggestionsWithUserVote = await Promise.all(
+      suggestions.map(async (s) => {
+        // Fetch user info for suggestedById
+        const userVote = s.votes.find(v => v.userId === req.user.userId);
+        
+        return {
+          ...s,
+          userVote: userVote?.voteType || null,
+          suggestedBy: {
+            id: s.suggestedById,
+            name: 'User' // You may want to fetch actual user name from user service
+          }
+        };
+      })
+    );
+
+    res.json({ success: true, data: suggestionsWithUserVote });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST - Suggest a book
+app.post('/v1/bookclub/:bookClubId/suggestions', authMiddleware, async (req: any, res) => {
+  try {
+    const { bookClubId } = req.params;
+    const { googleBooksId, reason } = req.body;
+
+    if (!googleBooksId) {
+      return res.status(400).json({ error: 'googleBooksId is required' });
+    }
+
+    // Fetch book data from Google Books API
+    const bookData = await GoogleBooksService.getBookById(googleBooksId);
+    
+    // Create or find book in database
+    const book = await prisma.book.upsert({
+      where: { googleBooksId },
+      update: {},
+      create: bookData
+    });
+
+    // Check if already suggested
+    const existing = await prisma.bookSuggestion.findFirst({
+      where: {
+        bookClubId,
+        bookId: book.id,
+        status: 'pending'
+      }
+    });
+
+    if (existing) {
+      return res.status(400).json({ error: 'This book has already been suggested' });
+    }
+
+    // Create suggestion
+    const suggestion = await prisma.bookSuggestion.create({
+      data: {
+        bookClubId,
+        bookId: book.id,
+        suggestedById: req.user.userId,
+        reason,
+        status: 'pending',
+        upvotes: 0,
+        downvotes: 0
+      },
+      include: {
+        book: true
+      }
+    });
+
+    res.json({ 
+      success: true, 
+      data: {
+        ...suggestion,
+        suggestedBy: {
+          id: req.user.userId,
+          name: req.user.name || 'User'
+        }
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST - Vote on a suggestion
+app.post('/v1/bookclub/:bookClubId/suggestions/:suggestionId/vote', authMiddleware, async (req: any, res) => {
+  try {
+    const { suggestionId } = req.params;
+    const { voteType } = req.body; // 'upvote' or 'downvote'
+
+    if (!voteType || !['upvote', 'downvote'].includes(voteType)) {
+      return res.status(400).json({ error: 'voteType must be either "upvote" or "downvote"' });
+    }
+
+    // Upsert vote
+    const vote = await prisma.bookSuggestionVote.upsert({
+      where: {
+        suggestionId_userId: {
+          suggestionId,
+          userId: req.user.userId
+        }
+      },
+      update: { voteType },
+      create: {
+        suggestionId,
+        userId: req.user.userId,
+        voteType
+      }
+    });
+
+    // Recalculate vote counts
+    const voteCounts = await prisma.bookSuggestionVote.groupBy({
+      by: ['voteType'],
+      where: { suggestionId },
+      _count: true
+    });
+
+    const upvotes = voteCounts.find(v => v.voteType === 'upvote')?._count || 0;
+    const downvotes = voteCounts.find(v => v.voteType === 'downvote')?._count || 0;
+
+    await prisma.bookSuggestion.update({
+      where: { id: suggestionId },
+      data: { upvotes, downvotes }
+    });
+
+    res.json({ success: true, data: vote });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST - Accept suggestion and make it current book
+app.post('/v1/bookclub/:bookClubId/suggestions/:suggestionId/accept', authMiddleware, async (req: any, res) => {
+  try {
+    const { bookClubId, suggestionId } = req.params;
+    const { startDate, endDate } = req.body;
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({ error: 'startDate and endDate are required' });
+    }
+
+    const suggestion = await prisma.bookSuggestion.findUnique({
+      where: { id: suggestionId },
+      include: { book: true }
+    });
+
+    if (!suggestion) {
+      return res.status(404).json({ error: 'Suggestion not found' });
+    }
+
+    // Mark current book as completed
+    await prisma.bookClubBook.updateMany({
+      where: { bookClubId, status: 'current' },
+      data: { status: 'completed' }
+    });
+
+    // Create new current book
+    const bookClubBook = await prisma.bookClubBook.create({
+      data: {
+        bookClubId,
+        bookId: suggestion.bookId,
+        status: 'current',
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        addedById: req.user.userId
+      },
+      include: { book: true }
+    });
+
+    // Update suggestion status
+    await prisma.bookSuggestion.update({
+      where: { id: suggestionId },
+      data: { status: 'accepted' }
+    });
+
+    res.json({ success: true, data: bookClubBook });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE - Remove a suggestion (only by creator or admin)
+app.delete('/v1/bookclub/:bookClubId/suggestions/:suggestionId', authMiddleware, async (req: any, res) => {
+  try {
+    const { suggestionId } = req.params;
+
+    const suggestion = await prisma.bookSuggestion.findUnique({
+      where: { id: suggestionId }
+    });
+
+    if (!suggestion) {
+      return res.status(404).json({ error: 'Suggestion not found' });
+    }
+
+    // Only allow creator to delete their suggestion
+    if (suggestion.suggestedById !== req.user.userId) {
+      return res.status(403).json({ error: 'You can only delete your own suggestions' });
+    }
+
+    await prisma.bookSuggestion.delete({
+      where: { id: suggestionId }
+    });
+
+    res.json({ success: true, message: 'Suggestion deleted successfully' });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`📚 Books service running on http://localhost:${PORT}`);
 });

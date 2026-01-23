@@ -12,6 +12,8 @@ import AddBookToBookclubModal from '../../../components/AddBookToBookclubModal';
 import CalendarView from '../../../components/CalendarView';
 import AddEventModal from '../../../components/AddEventModal';
 import BookSuggestionsView from '../../../components/BookSuggestionsView';
+import FileUpload from '../../../components/FileUpload';
+import MessageAttachment from '../../../components/MessageAttachment';
 
 const BookClub = () => {
   const { id: bookClubId } = useParams();
@@ -52,6 +54,9 @@ const BookClub = () => {
   // Suggestions states
   const [showSuggestions, setShowSuggestions] = useState(false);
 
+  // File upload states
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [uploadingFiles, setUploadingFiles] = useState(false);
   
   // DM states
   const [conversations, setConversations] = useState([]);
@@ -66,6 +71,7 @@ const BookClub = () => {
   const dmWs = useRef(null);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
+  const fileUploadRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -253,7 +259,8 @@ const BookClub = () => {
               username: msg.username,
               text: msg.content,
               timestamp: msg.createdAt,
-              userId: msg.userId
+              userId: msg.userId,
+              attachments: msg.attachments || []
             })));
             setConnectedUsers(data.users || []);
             // Update members if provided
@@ -268,7 +275,8 @@ const BookClub = () => {
               username: data.message.username,
               text: data.message.content,
               timestamp: data.message.createdAt,
-              userId: data.message.userId
+              userId: data.message.userId,
+              attachments: data.message.attachments || []
             }]);
             break;
           
@@ -493,19 +501,56 @@ const BookClub = () => {
     }));
   };
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
     
-    if (!newMessage.trim() || !ws.current || ws.current.readyState !== WebSocket.OPEN) {
+    console.log('=== SEND MESSAGE DEBUG ===');
+    console.log('Message text:', newMessage);
+    console.log('Selected files count:', selectedFiles.length);
+    console.log('Selected files:', selectedFiles);
+    console.log('FileUploadRef exists:', !!fileUploadRef.current);
+    
+    if ((!newMessage.trim() && selectedFiles.length === 0) || !ws.current || ws.current.readyState !== WebSocket.OPEN) {
+      console.log('Validation failed - returning early');
       return;
     }
 
-    ws.current.send(JSON.stringify({
-      type: 'chat-message',
-      message: newMessage.trim()
-    }));
+    setUploadingFiles(true);
+    
+    try {
+      let attachments = [];
+      
+      // Upload files if any are selected
+      if (selectedFiles.length > 0 && fileUploadRef.current) {
+        console.log('Starting file upload...');
+        attachments = await fileUploadRef.current.uploadFiles();
+        console.log('Uploaded attachments:', attachments);
+      } else {
+        console.log('No files to upload or ref missing');
+      }
 
-    setNewMessage('');
+      // Send message via WebSocket
+      console.log('Sending WebSocket message with attachments:', attachments);
+      const messageData = {
+        type: 'chat-message',
+        message: newMessage.trim() || null,
+        attachments: attachments
+      };
+      console.log('Full message data:', messageData);
+      ws.current.send(JSON.stringify(messageData));
+
+      setNewMessage('');
+      setSelectedFiles([]); // Clear selected files after sending
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Failed to send message');
+    } finally {
+      setUploadingFiles(false);
+    }
+  };
+
+  const handleFilesSelected = (files) => {
+    setSelectedFiles(files);
   };
 
   const handleCreateRoom = async () => {
@@ -1065,28 +1110,70 @@ const BookClub = () => {
                         <span className="text-xs text-gray-500 italic">{msg.text}</span>
                       </div>
                     ) : (
-                      msg.userId === auth?.user?.id ? (
-                        <div className="flex gap-3 justify-end">
-                          <div className=" text-right bg-blue-400 rounded-2xl px-4 py-2 max-w-xs break-words self-end">
-                            <p className="text-gray-300 break-words">{msg.text}</p>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex gap-3">
-                          <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
-                            {msg.username?.[0]?.toUpperCase()}
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-baseline gap-2">
-                              <span className="font-semibold text-white">{msg.username}</span>
-                              <span className="text-xs text-gray-500">
-                                {new Date(msg.timestamp).toLocaleTimeString()}
-                              </span>
+                      <>
+                        {/* Debug: Log message data */}
+                        {console.log('Message:', msg.id, 'Text:', msg.text, 'Attachments:', msg.attachments)}
+                        {msg.userId === auth?.user?.id ? (
+                          <div className="flex gap-3 justify-end">
+                            <div className="text-right max-w-md self-end">
+                              {msg.text && (
+                                <div className="bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl px-4 py-3 shadow-lg mb-2">
+                                  <p className="text-white break-words font-medium">{msg.text}</p>
+                                </div>
+                              )}
+                              {msg.attachments && msg.attachments.length > 0 ? (
+                                <div className="flex flex-col gap-2">
+                                  {msg.attachments.map((attachment) => (
+                                    <MessageAttachment
+                                      key={attachment.id}
+                                      attachment={attachment}
+                                      canDelete={true}
+                                      onDelete={async () => {
+                                        try {
+                                          await fetch(`http://localhost:4000/chat-files/${attachment.id}`, {
+                                            method: 'DELETE',
+                                            headers: { 'Authorization': `Bearer ${auth.token}` }
+                                          });
+                                        } catch (err) {
+                                          console.error('Error deleting file:', err);
+                                        }
+                                      }}
+                                      auth={auth}
+                                    />
+                                  ))}
+                                </div>
+                              ) : null}
                             </div>
-                            <p className="text-gray-300 break-words">{msg.text}</p>
                           </div>
-                        </div>
-                      )
+                        ) : (
+                          <div className="flex gap-3">
+                            <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
+                              {msg.username?.[0]?.toUpperCase()}
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-baseline gap-2 mb-1">
+                                <span className="font-bold text-white">{msg.username}</span>
+                                <span className="text-xs text-gray-500">
+                                  {new Date(msg.timestamp).toLocaleTimeString()}
+                                </span>
+                              </div>
+                              {msg.text && <p className="text-gray-200 break-words leading-relaxed mb-2">{msg.text}</p>}
+                              {msg.attachments && msg.attachments.length > 0 ? (
+                                <div className="flex flex-col gap-2">
+                                  {msg.attachments.map((attachment) => (
+                                    <MessageAttachment
+                                      key={attachment.id}
+                                      attachment={attachment}
+                                      canDelete={false}
+                                      auth={auth}
+                                    />
+                                  ))}
+                                </div>
+                              ) : null}
+                            </div>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 ))
@@ -1097,8 +1184,16 @@ const BookClub = () => {
 
             {/* Message Input - Only show when not viewing special views */}
             {!showBooksHistory && !showCalendar && !showSuggestions && auth?.user ? (
-              <form onSubmit={handleSendMessage} className="bg-gray-800 border-t border-gray-700 p-4">
-                <div className="flex gap-2">
+              <form onSubmit={handleSendMessage} className="bg-gray-800 border-t border-gray-700 relative">
+                {/* File Upload Preview */}
+                <FileUpload 
+                  ref={fileUploadRef}
+                  onFilesSelected={handleFilesSelected} 
+                  auth={auth}
+                  disabled={!currentRoom}
+                />
+                
+                <div className="flex gap-2 p-4">
                   <input
                     type="text"
                     value={newMessage}
@@ -1108,10 +1203,10 @@ const BookClub = () => {
                   />
                   <button
                     type="submit"
-                    disabled={!newMessage.trim()}
+                    disabled={(!newMessage.trim() && selectedFiles.length === 0) || uploadingFiles}
                     className="px-6 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium"
                   >
-                    Send
+                    {uploadingFiles ? 'Sending...' : 'Send'}
                   </button>
                 </div>
               </form>
