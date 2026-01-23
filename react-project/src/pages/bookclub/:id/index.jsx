@@ -1,21 +1,23 @@
 import { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import AuthContext from '../../../context';
-import { FiHash, FiUsers, FiPlus, FiSettings, FiHome, FiImage, FiTrash2, FiMail, FiStar, FiCalendar } from 'react-icons/fi';
 import MyBookClubsSidebar from '../../../components/BookClub/MyBookClubsSidebar';
 import SideBarRooms from '../../../components/BookClub/SideBar/SideBarRooms';
 import DMSidebar from '../../../components/BookClub/SideBar/DMSidebar';
 import DMChat from '../../../components/BookClub/MainChatArea/DMChat';
-import AddCurrentBookModal from '../../../components/AddCurrentBookModal';
-import CurrentBookDetailsModal from '../../../components/CurrentBookDetailsModal';
-import AddBookToBookclubModal from '../../../components/AddBookToBookclubModal';
+import AddCurrentBookModal from '../../../components/BookClub/Modals/AddCurrentBookModal';
+import CurrentBookDetailsModal from '../../../components/BookClub/Modals/CurrentBookDetailsModal';
+import AddBookToBookclubModal from '../../../components/BookClub/Modals/AddBookToBookclubModal';
 import CalendarView from '../../../components/BookClub/MainChatArea/CalendarView';
-import AddEventModal from '../../../components/AddEventModal';
+import AddEventModal from '../../../components/BookClub/Modals/AddEventModal';
 import BookSuggestionsView from '../../../components/BookClub/MainChatArea/BookSuggestionsView';
 import BookClubBookView from '../../../components/BookClub/MainChatArea/BookClubBookView';
-import FileUpload from '../../../components/FileUpload';
 import BookClubChat from '../../../components/BookClub/MainChatArea/BookClubChat';
-import ConnectedUsersArea from '../../../components/BookClub/ConnectedUsersArea/ConnectedUsersArea';
+import ConnectedUsersSidebar from '../../../components/BookClub/ConnectedUsersSidebar';
+import MessageInput from '../../../components/BookClub/MessageInput';
+import BookclubHeader from '../../../components/BookClub/MainChatArea/BookclubHeader';
+import { useBookclubWebSocket } from '../../../hooks/useBookclubWebSocket';
+
 
 const BookClub = () => {
   const { id: bookClubId } = useParams();
@@ -30,31 +32,32 @@ const BookClub = () => {
   const [bookClub, setBookClub] = useState(null);
   const [rooms, setRooms] = useState([]);
   const [currentRoom, setCurrentRoom] = useState(null);
-  const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [connectedUsers, setConnectedUsers] = useState([]);
-  const [bookClubMembers, setBookClubMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [myBookClubs, setMyBookClubs] = useState([]);
+  
+  // Modal states
   const [addCurrentBookState, setAddCurrentBookState] = useState(false);
   const [currentBookDetailsOpen, setCurrentBookDetailsOpen] = useState(false);
   const [currentBookData, setCurrentBookData] = useState(null);
-  const [showBooksHistory, setShowBooksHistory] = useState(false);
-  const [bookclubBooks, setBookclubBooks] = useState({ current: [], upcoming: [], completed: [] });
-  const [loadingBooks, setLoadingBooks] = useState(false);
   const [showAddBookModal, setShowAddBookModal] = useState(false);
   
-  // Calendar states
+  // View states
+  const [showBooksHistory, setShowBooksHistory] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  
+  // Books states
+  const [bookclubBooks, setBookclubBooks] = useState({ current: [], upcoming: [], completed: [] });
+  const [loadingBooks, setLoadingBooks] = useState(false);
+  
+  // Calendar states
   const [showAddEventModal, setShowAddEventModal] = useState(false);
   const [eventToEdit, setEventToEdit] = useState(null);
   const [selectedEventDate, setSelectedEventDate] = useState(null);
   const [calendarRefresh, setCalendarRefresh] = useState(null);
-
-  // Suggestions states
-  const [showSuggestions, setShowSuggestions] = useState(false);
 
   // File upload states
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -66,22 +69,21 @@ const BookClub = () => {
   const [dmMessages, setDmMessages] = useState([]);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [friends, setFriends] = useState([]);
-  const [selectedUserId, setSelectedUserId] = useState(null);
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   
-  const ws = useRef(null);
   const dmWs = useRef(null);
-  const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const fileUploadRef = useRef(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  // Use custom WebSocket hook for bookclub chat
+  const { 
+    ws, 
+    messages, 
+    setMessages, 
+    connectedUsers, 
+    setConnectedUsers,
+    bookClubMembers,
+    setBookClubMembers
+  } = useBookclubWebSocket(bookClub, currentRoom, auth, bookClubId);
 
   // Reset books history and calendar view when bookClubId changes
   useEffect(() => {
@@ -159,20 +161,6 @@ const BookClub = () => {
     }
   };
 
-
-
-  // Close user menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = () => {
-      if (selectedUserId) {
-        setSelectedUserId(null);
-      }
-    };
-    
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, [selectedUserId]);
-
   // Fetch bookclub details
   useEffect(() => {
     const fetchBookClub = async () => {
@@ -187,8 +175,6 @@ const BookClub = () => {
         if (response.ok) {
           setBookClub(data);
           setRooms(data.rooms || []);
-          setConnectedUsers(data.connectedUsers || []);
-          setBookClubMembers(data.members || []);
           
           // Select first room by default
           if (data.rooms && data.rooms.length > 0) {
@@ -226,123 +212,6 @@ const BookClub = () => {
             .catch(error => console.error('Error fetching my book clubs:', error));
     }
   }, [auth]);
-
-  // WebSocket connection
-  useEffect(() => {
-    if (!bookClub || !auth?.token || !currentRoom) return;
-
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//localhost:4000`;
-    
-    ws.current = new WebSocket(wsUrl);
-
-    ws.current.onopen = () => {
-      console.log('WebSocket connected to room:', currentRoom.name);
-      
-      // Send join message with display name
-      const username = auth.user.name || 'Anonymous';
-      ws.current.send(JSON.stringify({
-        type: 'join',
-        bookClubId: bookClubId,
-        userId: auth.user.id,
-        username: username,
-        roomId: currentRoom.id
-      }));
-    };
-
-    ws.current.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        
-        switch (data.type) {
-          case 'init':
-            setMessages(data.messages.map(msg => ({
-              id: msg.id,
-              username: msg.username,
-              text: msg.content,
-              timestamp: msg.createdAt,
-              userId: msg.userId,
-              attachments: msg.attachments || []
-            })));
-            setConnectedUsers(data.users || []);
-            // Update members if provided
-            if (data.members) {
-              setBookClubMembers(data.members);
-            }
-            break;
-          
-          case 'chat-message':
-            setMessages(prev => [...prev, {
-              id: data.message.id,
-              username: data.message.username,
-              text: data.message.content,
-              timestamp: data.message.createdAt,
-              userId: data.message.userId,
-              attachments: data.message.attachments || []
-            }]);
-            break;
-          
-          case 'user-joined':
-            setConnectedUsers(prev => {
-              if (!prev.find(u => u.id === data.user.id)) {
-                return [...prev, data.user];
-              }
-              return prev;
-            });
-            // Update members list if a new member joined
-            if (data.members) {
-              setBookClubMembers(data.members);
-            }
-            setMessages(prev => [...prev, {
-              type: 'system',
-              text: `${data.user.username} joined the room`,
-              timestamp: new Date().toISOString()
-            }]);
-            break;
-          
-          case 'user-left':
-            setConnectedUsers(prev => prev.filter(u => u.id !== data.userId));
-            setMessages(prev => [...prev, {
-              type: 'system',
-              text: `${data.username} left the room`,
-              timestamp: new Date().toISOString()
-            }]);
-            break;
-          
-          case 'room-switched':
-            setMessages(data.messages.map(msg => ({
-              id: msg.id,
-              username: msg.username,
-              text: msg.content,
-              timestamp: msg.createdAt,
-              userId: msg.userId
-            })));
-            break;
-          
-          case 'error':
-            console.error('WebSocket error:', data.message);
-            alert(data.message);
-            break;
-        }
-      } catch (err) {
-        console.error('Error processing WebSocket message:', err);
-      }
-    };
-
-    ws.current.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    ws.current.onclose = () => {
-      console.log('WebSocket disconnected');
-    };
-
-    return () => {
-      if (ws.current) {
-        ws.current.close();
-      }
-    };
-  }, [bookClub, currentRoom, auth, bookClubId]);
 
   // DM WebSocket connection
   useEffect(() => {
@@ -856,36 +725,13 @@ const BookClub = () => {
         ) : (
           <div className="flex flex-col flex-1">
             {/* Room Header */}
-            <div className="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                {showBooksHistory ? (
-                  <>
-                    <h2 className="text-white font-semibold">BookClub Books History</h2>
-                  </>
-                ) : showCalendar ? (
-                  <>
-                    <FiCalendar className="text-gray-400" />
-                    <h2 className="text-white font-semibold">BookClub Calendar</h2>
-                  </>
-                ) : showSuggestions ? (
-                  <>
-                    <h2 className="text-white font-semibold">Book Suggestions & Voting</h2>
-                  </>
-                ) : (
-                  <>
-                    <FiHash className="text-gray-400" />
-                    <h2 className="text-white font-semibold">{currentRoom?.name}</h2>
-                  </>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                {auth?.user && !showBooksHistory && !showCalendar && !showSuggestions && (
-                  <button className="text-gray-400 hover:text-white">
-                    <FiSettings />
-                  </button>
-                )}
-              </div>
-            </div>
+            <BookclubHeader 
+              showBooksHistory={showBooksHistory}
+              showCalendar={showCalendar}
+              showSuggestions={showSuggestions}
+              currentRoom={currentRoom}
+              auth={auth}
+            />
 
             {/* Content Area - Calendar, Books History, Suggestions, or Messages */}
             {showCalendar ? (
@@ -922,32 +768,17 @@ const BookClub = () => {
 
             {/* Message Input - Only show when not viewing special views */}
             {!showBooksHistory && !showCalendar && !showSuggestions && auth?.user ? (
-              <form onSubmit={handleSendMessage} className="bg-gray-800 border-t border-gray-700 relative">
-                {/* File Upload Preview */}
-                <FileUpload 
-                  ref={fileUploadRef}
-                  onFilesSelected={handleFilesSelected} 
-                  auth={auth}
-                  disabled={!currentRoom}
-                />
-                
-                <div className="flex gap-2 p-4">
-                  <input
-                    type="text"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder={`Message #${currentRoom?.name}`}
-                    className="flex-1 px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                  <button
-                    type="submit"
-                    disabled={(!newMessage.trim() && selectedFiles.length === 0) || uploadingFiles}
-                    className="px-6 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium"
-                  >
-                    {uploadingFiles ? 'Sending...' : 'Send'}
-                  </button>
-                </div>
-              </form>
+              <MessageInput
+                newMessage={newMessage}
+                setNewMessage={setNewMessage}
+                selectedFiles={selectedFiles}
+                uploadingFiles={uploadingFiles}
+                currentRoom={currentRoom}
+                fileUploadRef={fileUploadRef}
+                onFilesSelected={handleFilesSelected}
+                onSubmit={handleSendMessage}
+                auth={auth}
+              />
             ) : !showBooksHistory && !showCalendar && !showSuggestions ? (
               <div className="bg-gray-800 border-t border-gray-700 p-4 text-center">
                 <p className="text-gray-400">
@@ -960,13 +791,14 @@ const BookClub = () => {
           )}
           {/* Connected Users - only show in bookclub mode */}
           {viewMode === 'bookclub' && (
-          <ConnectedUsersArea connectedUsers={connectedUsers}
-        bookClubMembers={bookClubMembers}
-        auth={auth}
-        friends={friends}
-        navigate={navigate}
-        selectedUserId={selectedUserId}
-        setSelectedUserId={setSelectedUserId}/>
+            <ConnectedUsersSidebar
+              bookClubMembers={bookClubMembers}
+              connectedUsers={connectedUsers}
+              friends={friends}
+              auth={auth}
+              onSendFriendRequest={handleSendFriendRequest}
+              onStartDM={handleStartDM}
+            />
           )}
         </div>
 

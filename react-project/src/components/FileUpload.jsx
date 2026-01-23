@@ -99,7 +99,7 @@ const FileUpload = forwardRef(({ onFilesSelected, auth, disabled = false }, ref)
     <>
       {/* File Preview Panel - Shows above message input when files are selected */}
       {selectedFiles.length > 0 && (
-        <div className="px-4 py-3 bg-gradient-to-b from-gray-750 to-gray-800 border-t border-purple-500/30 animate-fadeIn">
+        <div className="absolute bottom-full left-0 right-0 mb-2 px-4 py-3 bg-gradient-to-b from-gray-750 to-gray-800 border border-purple-500/30 rounded-t-lg shadow-xl animate-fadeIn">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <div className="bg-purple-600/20 p-1.5 rounded-lg">
