@@ -1,10 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FiSend } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
+import FileUpload from '../../FileUpload';
+import MessageAttachment from '../../MessageAttachment';
 
 const DMChat = ({ otherUser, messages, onSendMessage, auth }) => {
   const [newMessage, setNewMessage] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [uploadingFiles, setUploadingFiles] = useState(false);
   const messagesEndRef = useRef(null);
+  const fileUploadRef = useRef(null);
   const navigate = useNavigate();
 
   const scrollToBottom = () => {
@@ -15,12 +20,28 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth }) => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() && selectedFiles.length === 0) return;
     
-    onSendMessage(newMessage.trim());
-    setNewMessage('');
+    setUploadingFiles(true);
+    
+    try {
+      let uploadedAttachments = [];
+      
+      if (selectedFiles.length > 0) {
+        uploadedAttachments = await fileUploadRef.current?.uploadFiles();
+      }
+      
+      onSendMessage(newMessage.trim(), uploadedAttachments);
+      setNewMessage('');
+      setSelectedFiles([]);
+    } catch (error) {
+      console.error('Error sending DM:', error);
+      alert('Failed to send message');
+    } finally {
+      setUploadingFiles(false);
+    }
   };
 
   if (!otherUser) {
@@ -70,16 +91,31 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth }) => {
               key={msg.id || idx} 
               className={`flex ${msg.senderId === auth?.user?.id ? 'justify-end' : 'justify-start'}`}
             >
-                <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl break-words ${
-                    msg.senderId === auth?.user?.id
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-gray-700 text-gray-200'
-                }`}>
-                    <p>{msg.content}</p>
-                    <p className="text-xs opacity-70 mt-1">
-                    {new Date(msg.createdAt).toLocaleTimeString()}
-                    </p>
-                </div>
+              <div className="flex flex-col gap-2 max-w-xs lg:max-w-md">
+                {msg.content && (
+                  <div className={`px-4 py-2 rounded-2xl break-words ${
+                      msg.senderId === auth?.user?.id
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-gray-700 text-gray-200'
+                  }`}>
+                      <p>{msg.content}</p>
+                      <p className="text-xs opacity-70 mt-1">
+                      {new Date(msg.createdAt).toLocaleTimeString()}
+                      </p>
+                  </div>
+                )}
+                {msg.attachments && msg.attachments.length > 0 && (
+                  <div className="flex flex-col gap-2">
+                    {msg.attachments.map((attachment, attIdx) => (
+                      <MessageAttachment 
+                        key={attIdx} 
+                        attachment={attachment}
+                        isSender={msg.senderId === auth?.user?.id}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           ))
         )}
@@ -88,7 +124,13 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth }) => {
 
       {/* Message Input */}
       <form onSubmit={handleSubmit} className="bg-gray-800 border-t border-gray-700 p-4">
-        <div className="flex gap-2">
+        <div className="relative flex gap-2">
+          <FileUpload 
+            ref={fileUploadRef}
+            onFilesSelected={setSelectedFiles}
+            auth={auth}
+            disabled={uploadingFiles}
+          />
           <input
             type="text"
             value={newMessage}
@@ -98,10 +140,10 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth }) => {
           />
           <button
             type="submit"
-            disabled={!newMessage.trim()}
+            disabled={(!newMessage.trim() && selectedFiles.length === 0) || uploadingFiles}
             className="px-6 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium flex items-center gap-2"
           >
-            <FiSend /> Send
+            <FiSend /> {uploadingFiles ? 'Uploading...' : 'Send'}
           </button>
         </div>
       </form>

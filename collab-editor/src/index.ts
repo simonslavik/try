@@ -1215,7 +1215,7 @@ wss.on('connection', (ws: WebSocket) => {
   async function handleDMMessage(message: any) {
     if (!currentClient || !currentClient.isDMConnection) return;
 
-    const { receiverId, content } = message;
+    const { receiverId, content, attachments = [] } = message;
     
     try {
       // Save message to user-service database via API
@@ -1226,7 +1226,7 @@ wss.on('connection', (ws: WebSocket) => {
           'Content-Type': 'application/json',
           'X-User-Id': currentClient.userId // Internal service-to-service header
         },
-        body: JSON.stringify({ receiverId, content })
+        body: JSON.stringify({ receiverId, content, attachments })
       });
 
       if (!response.ok) {

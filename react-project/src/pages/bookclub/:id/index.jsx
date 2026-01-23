@@ -358,8 +358,12 @@ const BookClub = () => {
     await fetchDMMessages(userId);
   };
 
-  const handleSendDM = (content) => {
-    if (!content.trim() || sendingMessage || !dmWs.current || dmWs.current.readyState !== WebSocket.OPEN || !currentDMUser) {
+  const handleSendDM = (content, attachments = []) => {
+    if ((!content || !content.trim()) && attachments.length === 0) {
+      return;
+    }
+    
+    if (sendingMessage || !dmWs.current || dmWs.current.readyState !== WebSocket.OPEN || !currentDMUser) {
       return;
     }
 
@@ -368,7 +372,8 @@ const BookClub = () => {
     dmWs.current.send(JSON.stringify({
       type: 'dm-message',
       receiverId: currentDMUser.id,
-      content: content.trim()
+      content: content?.trim() || '',
+      attachments: attachments
     }));
   };
 

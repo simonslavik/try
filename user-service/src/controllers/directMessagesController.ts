@@ -89,7 +89,7 @@ export const sendDirectMessage = async (req: Request, res: Response) => {
     try {
         // Support both authenticated requests and internal service calls
         const currentUserId = req.user?.userId || req.headers['x-user-id'] as string;
-        const { receiverId, content } = req.body;
+        const { receiverId, content, attachments = [] } = req.body;
 
         if (!currentUserId) {
             return res.status(401).json({ 
@@ -97,9 +97,16 @@ export const sendDirectMessage = async (req: Request, res: Response) => {
             });
         }
 
-        if (!receiverId || !content || !content.trim()) {
+        if (!receiverId) {
             return res.status(400).json({ 
-                message: 'Receiver ID and message content are required' 
+                message: 'Receiver ID is required' 
+            });
+        }
+
+        // Validate that either content or attachments exist
+        if ((!content || !content.trim()) && (!attachments || attachments.length === 0)) {
+            return res.status(400).json({ 
+                message: 'Message content or attachments are required' 
             });
         }
 
@@ -107,7 +114,8 @@ export const sendDirectMessage = async (req: Request, res: Response) => {
             data: {
                 senderId: currentUserId,
                 receiverId: receiverId,
-                content: content.trim(),
+                content: content?.trim() || '',
+                attachments: attachments,
                 isRead: false
             },
             include: {
