@@ -807,6 +807,9 @@ const BookClub = () => {
           )}
         </div>
 
+
+        {/* MODALS  */}
+
         {/* Add Current Book Modal */}
         {addCurrentBookState && (
           <AddCurrentBookModal

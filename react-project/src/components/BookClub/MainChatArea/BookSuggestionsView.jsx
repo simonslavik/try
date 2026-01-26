@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FiPlus, FiThumbsUp, FiThumbsDown, FiStar, FiTrash2 } from 'react-icons/fi';
-import SuggestBookModal from '../../SuggestBookModal';
+import SuggestBookModal from '../Modals/SuggestBookModal';
 
 const BookSuggestionsView = ({ bookClubId, auth }) => {
   const [bookSuggestions, setBookSuggestions] = useState([]);

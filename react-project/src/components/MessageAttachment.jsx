@@ -6,11 +6,27 @@ const MessageAttachment = ({ attachment, canDelete, onDelete, auth }) => {
 
   const isImage = attachment.mimetype.startsWith('image/');
 
-  const handleDownload = () => {
-    const link = document.createElement('a');
-    link.href = `http://localhost:4000${attachment.url}`;
-    link.download = attachment.filename;
-    link.click();
+  const handleDownload = async () => {
+    try {
+      // Fetch the file as a blob to force download instead of opening in browser
+      const response = await fetch(`http://localhost:4000${attachment.url}`);
+      const blob = await response.blob();
+      
+      // Create a blob URL and trigger download
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = attachment.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up the blob URL
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error('Download failed:', error);
+      alert('Failed to download file');
+    }
   };
 
   const formatFileSize = (bytes) => {

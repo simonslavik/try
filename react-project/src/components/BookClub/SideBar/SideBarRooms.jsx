@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FiHome, FiPlus, FiHash, FiMail, FiBook, FiCalendar, FiChevronUp, FiChevronDown } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
-import BookClubImage from '../../BookClubImage';
+import BookClubImage from './BookClubImage';
 
 
 
