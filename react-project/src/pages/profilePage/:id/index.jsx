@@ -16,6 +16,7 @@ const ProfilePage = () => {
   const [profile, setProfile] = useState(null);
   const [createdBookClubs, setCreatedBookClubs] = useState([]);
   const [memberBookClubs, setMemberBookClubs] = useState([]);
+  const [currentUserBookClubs, setCurrentUserBookClubs] = useState([]); // Current user's bookclubs for messaging
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [friendRequestLoading, setFriendRequestLoading] = useState(false);
@@ -127,6 +128,29 @@ const ProfilePage = () => {
         if (data5.success) {
           setBooksRead(data5.data || []);
         } 
+        
+        // Fetch current user's bookclubs for messaging functionality
+        if (auth?.user?.id && !isOwnProfile) {
+          const currentUserCreatedResponse = await fetch(`http://localhost:3000/v1/editor/users/${auth.user.id}/bookclubs`, { headers });
+          const currentUserCreatedData = await currentUserCreatedResponse.json();
+          
+          const currentUserAllClubs = [];
+          if (currentUserCreatedResponse.ok) {
+            currentUserAllClubs.push(...(currentUserCreatedData.bookClubs || []));
+          }
+          
+          // Fetch bookclubs where current user is a member
+          const currentUserMemberClubs = (allBookClubsData.bookClubs || []).filter(club => {
+            const isMember = club.members.some(member => 
+              typeof member === 'string' ? member === auth.user.id : member.id === auth.user.id
+            );
+            const isCreator = club.creatorId === auth.user.id;
+            return isMember && !isCreator;
+          });
+          currentUserAllClubs.push(...currentUserMemberClubs);
+          
+          setCurrentUserBookClubs(currentUserAllClubs);
+        }
         
       } catch (err) {
         console.error('Error fetching profile:', err);
@@ -323,21 +347,33 @@ const ProfilePage = () => {
                 )}
                 {!isOwnProfile && (
                   <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => {
+                        // Use any bookclub the current user is in
+                        if (currentUserBookClubs.length > 0) {
+                          const firstClub = currentUserBookClubs[0];
+                          // Store DM intent in sessionStorage
+                          sessionStorage.setItem('openDM', JSON.stringify({
+                            userId: id,
+                            username: profile.name
+                          }));
+                          navigate(`/bookclub/${firstClub.id}`);
+                        } else {
+                          alert('You need to join a bookclub first to send messages');
+                        }
+                      }}
+                      className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    >
+                      Message
+                    </button>
+                    
                     {profile.friendshipStatus === 'friends' ? (
-                      <>
-                        <button
-                          onClick={() => navigate(`/messages/${id}`)}
-                          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                        >
-                          Message
-                        </button>
-                        <button
-                          className="px-4 py-2 bg-gray-500 text-white rounded-lg cursor-not-allowed"
-                          disabled
-                        >
-                          Friends
-                        </button>
-                      </>
+                      <button
+                        className="px-4 py-2 bg-gray-500 text-white rounded-lg cursor-not-allowed"
+                        disabled
+                      >
+                        Friends
+                      </button>
                     ) : profile.friendshipStatus === 'request_sent' ? (
                       <button
                         className="px-4 py-2 bg-yellow-500 text-white rounded-lg cursor-not-allowed"

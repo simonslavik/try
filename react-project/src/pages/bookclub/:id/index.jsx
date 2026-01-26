@@ -16,6 +16,7 @@ import BookClubChat from '../../../components/BookClub/MainChatArea/BookClubChat
 import ConnectedUsersSidebar from '../../../components/BookClub/ConnectedUsersSidebar';
 import MessageInput from '../../../components/BookClub/MessageInput';
 import BookclubHeader from '../../../components/BookClub/MainChatArea/BookclubHeader';
+import InviteModal from '../../../components/Modals/InviteModal';
 import { useBookclubWebSocket } from '../../../hooks/useBookclubWebSocket';
 
 
@@ -58,6 +59,9 @@ const BookClub = () => {
   const [eventToEdit, setEventToEdit] = useState(null);
   const [selectedEventDate, setSelectedEventDate] = useState(null);
   const [calendarRefresh, setCalendarRefresh] = useState(null);
+  
+  // Invite modal state
+  const [showInviteModal, setShowInviteModal] = useState(false);
 
   // File upload states
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -333,6 +337,23 @@ const BookClub = () => {
     }
   }, [viewMode, auth]);
 
+  // Check for DM intent from sessionStorage
+  useEffect(() => {
+    const dmIntent = sessionStorage.getItem('openDM');
+    if (dmIntent && auth?.user) {
+      try {
+        const { userId } = JSON.parse(dmIntent);
+        // Clear the intent
+        sessionStorage.removeItem('openDM');
+        // Open DM with the user
+        handleStartDM(userId);
+      } catch (err) {
+        console.error('Error parsing DM intent:', err);
+        sessionStorage.removeItem('openDM');
+      }
+    }
+  }, [bookClubId, auth]);
+
   // Fetch messages for selected DM conversation
   const fetchDMMessages = async (userId) => {
     if (!auth?.token) return;
@@ -581,6 +602,8 @@ const BookClub = () => {
       
       if (response.ok) {
         alert('Friend request sent!');
+        // Refetch friends to update UI
+        await fetchFriends();
         setSelectedUserId(null);
       } else {
         console.error('Friend request failed:', data);
@@ -784,6 +807,10 @@ const BookClub = () => {
               showSuggestions={showSuggestions}
               currentRoom={currentRoom}
               auth={auth}
+              onInviteClick={() => {
+                console.log('Invite button clicked!');
+                setShowInviteModal(true);
+              }}
             />
 
             {/* Content Area - Calendar, Books History, Suggestions, or Messages */}
@@ -918,6 +945,16 @@ const BookClub = () => {
             eventToEdit={eventToEdit}
             selectedDate={selectedEventDate}
             onEventSaved={handleEventSaved}
+          />
+        )}
+
+        {/* Invite Modal */}
+        {console.log('showInviteModal:', showInviteModal)}
+        {showInviteModal && (
+          <InviteModal
+            bookClubId={bookClubId}
+            bookClubName={bookClub?.name}
+            onClose={() => setShowInviteModal(false)}
           />
         )}
     </div>

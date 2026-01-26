@@ -9,6 +9,7 @@ import { PrismaClient } from '@prisma/client';
 import { authMiddleware, optionalAuthMiddleware } from './middleware/authMiddleware.js';
 import multer from 'multer';
 import fs from 'fs';
+import { generateInviteCode } from './utils/inviteCodeGenerator.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -767,6 +768,262 @@ app.delete('/events/:eventId', authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'Failed to delete event' });
   }
 });
+
+// ================== INVITE ROUTES ==================
+
+// Create a new invite link for a bookclub
+app.post('/bookclubs/:bookClubId/invites', authMiddleware, async (req, res) => {
+  try {
+    const { bookClubId } = req.params;
+    const { expiresIn, maxUses } = req.body; // expiresIn in hours (24, 168, etc.), maxUses (1, 5, 10, null for unlimited)
+    const userId = req.user!.userId;
+
+    // Check if bookclub exists and user is creator or member
+    const bookClub = await prisma.bookClub.findUnique({
+      where: { id: bookClubId }
+    });
+
+    if (!bookClub) {
+      return res.status(404).json({ error: 'Book club not found' });
+    }
+
+    // Only creator or members can create invites
+    if (bookClub.creatorId !== userId && !bookClub.members.includes(userId)) {
+      return res.status(403).json({ error: 'Only book club members can create invites' });
+    }
+
+    // Generate unique invite code
+    let code = generateInviteCode();
+    let existing = await prisma.bookClubInvite.findUnique({ where: { code } });
+    
+    // Ensure uniqueness (very unlikely to collide, but just in case)
+    while (existing) {
+      code = generateInviteCode();
+      existing = await prisma.bookClubInvite.findUnique({ where: { code } });
+    }
+
+    // Calculate expiration date
+    let expiresAt: Date | null = null;
+    if (expiresIn && expiresIn > 0) {
+      expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + expiresIn);
+    }
+
+    const invite = await prisma.bookClubInvite.create({
+      data: {
+        bookClubId,
+        code,
+        createdBy: userId,
+        expiresAt,
+        maxUses: maxUses || null
+      }
+    });
+
+    console.log(`📨 Invite created: ${code} for bookclub ${bookClub.name}`);
+    res.json({ success: true, invite });
+  } catch (error) {
+    console.error('Error creating invite:', error);
+    res.status(500).json({ error: 'Failed to create invite' });
+  }
+});
+
+// Get all invites for a bookclub
+app.get('/bookclubs/:bookClubId/invites', authMiddleware, async (req, res) => {
+  try {
+    const { bookClubId } = req.params;
+    const userId = req.user!.userId;
+
+    // Check if bookclub exists and user is creator or member
+    const bookClub = await prisma.bookClub.findUnique({
+      where: { id: bookClubId }
+    });
+
+    if (!bookClub) {
+      return res.status(404).json({ error: 'Book club not found' });
+    }
+
+    if (bookClub.creatorId !== userId && !bookClub.members.includes(userId)) {
+      return res.status(403).json({ error: 'Only book club members can view invites' });
+    }
+
+    const invites = await prisma.bookClubInvite.findMany({
+      where: { bookClubId },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    res.json({ success: true, invites });
+  } catch (error) {
+    console.error('Error fetching invites:', error);
+    res.status(500).json({ error: 'Failed to fetch invites' });
+  }
+});
+
+// Delete an invite
+app.delete('/bookclubs/:bookClubId/invites/:inviteId', authMiddleware, async (req, res) => {
+  try {
+    const { bookClubId, inviteId } = req.params;
+    const userId = req.user!.userId;
+
+    // Check if bookclub exists and user is creator or member
+    const bookClub = await prisma.bookClub.findUnique({
+      where: { id: bookClubId }
+    });
+
+    if (!bookClub) {
+      return res.status(404).json({ error: 'Book club not found' });
+    }
+
+    // Only creator can delete invites (or the person who created the invite)
+    const invite = await prisma.bookClubInvite.findUnique({
+      where: { id: inviteId }
+    });
+
+    if (!invite) {
+      return res.status(404).json({ error: 'Invite not found' });
+    }
+
+    if (bookClub.creatorId !== userId && invite.createdBy !== userId) {
+      return res.status(403).json({ error: 'Only the creator or invite owner can delete invites' });
+    }
+
+    await prisma.bookClubInvite.delete({
+      where: { id: inviteId }
+    });
+
+    console.log(`🗑️  Invite deleted: ${invite.code}`);
+    res.json({ success: true, message: 'Invite deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting invite:', error);
+    res.status(500).json({ error: 'Failed to delete invite' });
+  }
+});
+
+// Join a bookclub via invite code (public endpoint)
+app.post('/invites/:code/join', authMiddleware, async (req, res) => {
+  try {
+    const { code } = req.params;
+    const userId = req.user!.userId;
+
+    // Find invite
+    const invite = await prisma.bookClubInvite.findUnique({
+      where: { code },
+      include: { bookClub: true }
+    });
+
+    if (!invite) {
+      return res.status(404).json({ error: 'Invalid invite code' });
+    }
+
+    // Check if expired
+    if (invite.expiresAt && invite.expiresAt < new Date()) {
+      return res.status(400).json({ error: 'This invite has expired' });
+    }
+
+    // Check if max uses reached
+    if (invite.maxUses && invite.currentUses >= invite.maxUses) {
+      return res.status(400).json({ error: 'This invite has reached its maximum uses' });
+    }
+
+    // Check if user is already a member
+    const bookClub = await prisma.bookClub.findUnique({
+      where: { id: invite.bookClubId }
+    });
+
+    if (!bookClub) {
+      return res.status(404).json({ error: 'Book club not found' });
+    }
+
+    if (bookClub.members.includes(userId) || bookClub.creatorId === userId) {
+      return res.status(400).json({ error: 'You are already a member of this book club' });
+    }
+
+    // Add user to bookclub
+    await prisma.bookClub.update({
+      where: { id: invite.bookClubId },
+      data: {
+        members: {
+          push: userId
+        }
+      }
+    });
+
+    // Increment invite uses
+    await prisma.bookClubInvite.update({
+      where: { id: invite.id },
+      data: {
+        currentUses: { increment: 1 }
+      }
+    });
+
+    console.log(`✅ User ${userId} joined bookclub ${bookClub.name} via invite ${code}`);
+    res.json({ 
+      success: true, 
+      message: 'Successfully joined book club',
+      bookClub: {
+        id: bookClub.id,
+        name: bookClub.name,
+        imageUrl: bookClub.imageUrl
+      }
+    });
+  } catch (error) {
+    console.error('Error joining via invite:', error);
+    res.status(500).json({ error: 'Failed to join book club' });
+  }
+});
+
+// Get invite info without joining (for preview)
+app.get('/invites/:code', async (req, res) => {
+  try {
+    const { code } = req.params;
+
+    const invite = await prisma.bookClubInvite.findUnique({
+      where: { code }
+    });
+
+    if (!invite) {
+      return res.status(404).json({ error: 'Invalid invite code' });
+    }
+
+    // Check if expired
+    if (invite.expiresAt && invite.expiresAt < new Date()) {
+      return res.status(400).json({ error: 'This invite has expired' });
+    }
+
+    // Check if max uses reached
+    if (invite.maxUses && invite.currentUses >= invite.maxUses) {
+      return res.status(400).json({ error: 'This invite has reached its maximum uses' });
+    }
+
+    const bookClub = await prisma.bookClub.findUnique({
+      where: { id: invite.bookClubId }
+    });
+
+    if (!bookClub) {
+      return res.status(404).json({ error: 'Book club not found' });
+    }
+
+    res.json({
+      success: true,
+      bookClub: {
+        id: bookClub.id,
+        name: bookClub.name,
+        imageUrl: bookClub.imageUrl,
+        category: bookClub.category,
+        memberCount: bookClub.members.length + 1 // +1 for creator
+      },
+      invite: {
+        expiresAt: invite.expiresAt,
+        maxUses: invite.maxUses,
+        currentUses: invite.currentUses
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching invite info:', error);
+    res.status(500).json({ error: 'Failed to fetch invite info' });
+  }
+});
+
+// ================== ROOM ROUTES ==================
 
 // Create a new room in a bookclub (requires authentication)
 app.post('/bookclubs/:bookClubId/rooms', authMiddleware, async (req, res) => {

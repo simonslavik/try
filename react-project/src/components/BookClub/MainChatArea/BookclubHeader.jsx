@@ -1,12 +1,13 @@
 import React from 'react';
-import { FiHash, FiSettings, FiCalendar } from 'react-icons/fi';
+import { FiHash, FiSettings, FiCalendar, FiUserPlus } from 'react-icons/fi';
 
 const BookclubHeader = ({ 
   showBooksHistory, 
   showCalendar, 
   showSuggestions, 
   currentRoom,
-  auth 
+  auth,
+  onInviteClick
 }) => {
   return (
     <div className="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between">
@@ -28,6 +29,16 @@ const BookclubHeader = ({
         )}
       </div>
       <div className="flex items-center gap-2">
+        {auth?.user && (
+          <button 
+            onClick={onInviteClick}
+            className="flex items-center gap-2 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors text-sm font-medium"
+            title="Invite people"
+          >
+            <FiUserPlus size={18} />
+            Invite
+          </button>
+        )}
         {auth?.user && !showBooksHistory && !showCalendar && !showSuggestions && (
           <button className="text-gray-400 hover:text-white">
             <FiSettings />
