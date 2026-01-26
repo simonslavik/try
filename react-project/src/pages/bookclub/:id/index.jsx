@@ -348,9 +348,39 @@ const BookClub = () => {
         setCurrentDMUser(data.data.otherUser);
       } else {
         console.error('Failed to fetch messages:', data.message);
+        // If fetch fails, try to find user in conversations or bookClubMembers
+        const userFromConv = conversations.find(c => c.friend?.id === userId)?.friend;
+        const userFromMembers = bookClubMembers.find(m => m.id === userId);
+        if (userFromConv) {
+          setCurrentDMUser(userFromConv);
+          setDmMessages([]);
+        } else if (userFromMembers) {
+          setCurrentDMUser({
+            id: userFromMembers.id,
+            name: userFromMembers.username,
+            email: userFromMembers.email || '',
+            profileImage: userFromMembers.profileImage
+          });
+          setDmMessages([]);
+        }
       }
     } catch (err) {
       console.error('Error fetching DM messages:', err);
+      // Fallback: try to set user from conversations or members
+      const userFromConv = conversations.find(c => c.friend?.id === userId)?.friend;
+      const userFromMembers = bookClubMembers.find(m => m.id === userId);
+      if (userFromConv) {
+        setCurrentDMUser(userFromConv);
+        setDmMessages([]);
+      } else if (userFromMembers) {
+        setCurrentDMUser({
+          id: userFromMembers.id,
+          name: userFromMembers.username,
+          email: userFromMembers.email || '',
+          profileImage: userFromMembers.profileImage
+        });
+        setDmMessages([]);
+      }
     }
   };
 
@@ -565,6 +595,24 @@ const BookClub = () => {
   const handleStartDM = async (userId) => {
     setViewMode('dm');
     await fetchDMMessages(userId);
+    
+    // If user is not in conversations yet, add them temporarily
+    if (!conversations.some(conv => conv.friend?.id === userId)) {
+      const userInfo = bookClubMembers.find(member => member.id === userId);
+      if (userInfo) {
+        setConversations(prev => [{
+          friend: {
+            id: userInfo.id,
+            name: userInfo.username,
+            email: userInfo.email || '',
+            profileImage: userInfo.profileImage
+          },
+          lastMessage: null,
+          unreadCount: 0
+        }, ...prev]);
+      }
+    }
+    
     setSelectedUserId(null);
   };
 

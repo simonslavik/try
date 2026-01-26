@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation } from "react-router-dom";
-import AuthContext from '../context';
+import AuthContext from '../../context';
 import { FiX } from 'react-icons/fi';
 import { GoogleLogin } from '@react-oauth/google';
 

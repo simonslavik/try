@@ -4,8 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import AuthContext from '../../../context';
 import HomePageHeader from '../../../components/HomePageHeader';
 import { FiInfo, FiMail, FiMessageCircle, FiPlus } from 'react-icons/fi';
-import AddBookToLibraryModal from '../../../components/AddBookToLibraryModal';
-import BookDetailsModal from '../../../components/BookDetails';
+import AddBookToLibraryModal from '../../../components/Modals/AddBookToLibraryModal';
+import BookDetailsModal from '../../../components/Modals/BookDetails';
 
 
 const ProfilePage = () => {

@@ -11,9 +11,13 @@ const ConnectedUsersArea = (
         friends,
         navigate,
         selectedUserId,
-        setSelectedUserId
+        setSelectedUserId,
+        handleStartDM,
+        handleSendFriendRequest
     }
 ) => {
+    const [menuPosition, setMenuPosition] = React.useState({ top: 0, left: 0 });
+    
     return (
         <div className="w-44 bg-gray-800 border-l border-gray-700 p-2">
             <div className="flex items-center gap-2 px-2 py-1 mb-2">
@@ -99,6 +103,7 @@ const ConnectedUsersArea = (
                           onClick={(e) => {
                             e.stopPropagation();
                             handleStartDM(user.id);
+                            setSelectedUserId(null);
                           }}
                           className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-600 transition-colors border-t border-gray-600"
                         >

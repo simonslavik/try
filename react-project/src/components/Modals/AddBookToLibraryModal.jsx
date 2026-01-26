@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
 import { FiSearch, FiX, FiBook } from 'react-icons/fi';
-import { AuthContext } from '../context';
+import { AuthContext } from '../../context';
 
 const GATEWAY_URL = 'http://localhost:3000';
 

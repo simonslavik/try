@@ -75,14 +75,14 @@ const DMSidebar = ({ conversations, friends = [], currentConversation, onSelectC
               ))
             )
           ) : (
-            // Conversations List
+            // Conversations List - Shows all users you've messaged (friends or not)
             conversations.length === 0 ? (
               <div className="text-center text-gray-500 py-8 text-sm">
                 No conversations yet
               </div>
             ) : (
               conversations
-                .filter(conv => conv.friend) // Filter out conversations without friend
+                .filter(conv => conv.friend) // 'friend' is the property name but includes all users
                 .map(conv => (
                 <button
                   key={conv.friend.id}

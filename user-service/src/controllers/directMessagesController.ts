@@ -155,47 +155,44 @@ export const getConversations = async (req: Request, res: Response) => {
             });
         }
 
-        // Get all friends
-        const friendships = await prisma.friendship.findMany({
+        // Get all unique users who have exchanged messages with current user
+        const messages = await prisma.directMessage.findMany({
             where: {
                 OR: [
-                    { userId: currentUserId, status: 'ACCEPTED' },
-                    { friendId: currentUserId, status: 'ACCEPTED' }
+                    { senderId: currentUserId },
+                    { receiverId: currentUserId }
                 ]
             },
-            include: {
-                user: {
-                    select: {
-                        id: true,
-                        name: true,
-                        profileImage: true
-                    }
-                },
-                friend: {
-                    select: {
-                        id: true,
-                        name: true,
-                        profileImage: true
-                    }
-                }
+            select: {
+                senderId: true,
+                receiverId: true
             }
         });
 
-        // Get last message with each friend
+        // Extract unique user IDs
+        const userIds = new Set<string>();
+        messages.forEach(msg => {
+            if (msg.senderId !== currentUserId) userIds.add(msg.senderId);
+            if (msg.receiverId !== currentUserId) userIds.add(msg.receiverId);
+        });
+
+        // Get user details and conversation info for each user
         const conversations = await Promise.all(
-            friendships.map(async (friendship) => {
-                const friendId = friendship.userId === currentUserId 
-                    ? friendship.friendId 
-                    : friendship.userId;
-                const friend = friendship.userId === currentUserId 
-                    ? friendship.friend 
-                    : friendship.user;
+            Array.from(userIds).map(async (otherUserId) => {
+                const otherUser = await prisma.user.findUnique({
+                    where: { id: otherUserId },
+                    select: {
+                        id: true,
+                        name: true,
+                        profileImage: true
+                    }
+                });
 
                 const lastMessage = await prisma.directMessage.findFirst({
                     where: {
                         OR: [
-                            { senderId: currentUserId, receiverId: friendId },
-                            { senderId: friendId, receiverId: currentUserId }
+                            { senderId: currentUserId, receiverId: otherUserId },
+                            { senderId: otherUserId, receiverId: currentUserId }
                         ]
                     },
                     orderBy: {
@@ -205,14 +202,14 @@ export const getConversations = async (req: Request, res: Response) => {
 
                 const unreadCount = await prisma.directMessage.count({
                     where: {
-                        senderId: friendId,
+                        senderId: otherUserId,
                         receiverId: currentUserId,
                         isRead: false
                     }
                 });
 
                 return {
-                    friend,
+                    friend: otherUser,
                     lastMessage,
                     unreadCount
                 };
