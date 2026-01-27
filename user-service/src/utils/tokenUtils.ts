@@ -86,7 +86,7 @@ export const verifyRefreshToken = async (token: string): Promise<User | null> =>
             name: refreshToken.user.name
         };
     } catch (error) {
-        console.error('Error verifying refresh token:', error);
+        logError(error, 'Error verifying refresh token');
         return null;
     }
 };
@@ -102,7 +102,7 @@ export const revokeRefreshToken = async (token: string): Promise<boolean> => {
         });
         return true;
     } catch (error) {
-        console.error('Error revoking refresh token:', error);
+        logError(error, 'Error revoking refresh token', { token });
         return false;
     }
 };
@@ -118,7 +118,7 @@ export const revokeAllUserTokens = async (userId: string): Promise<boolean> => {
         });
         return true;
     } catch (error) {
-        console.error('Error revoking all user tokens:', error);
+        logError(error, 'Error revoking all user tokens', { userId });
         return false;
     }
 };
@@ -138,7 +138,7 @@ export const cleanupExpiredTokens = async (): Promise<number> => {
         });
         return result.count;
     } catch (error) {
-        console.error('Error cleaning up expired tokens:', error);
+        logError(error, 'Error cleaning up expired tokens');
         return 0;
     }
 };

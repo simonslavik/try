@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import { registerSchema, loginSchema } from '../utils/validation.js';
 import prisma from '../config/database.js';
 import { generateTokens, verifyRefreshToken, revokeRefreshToken, revokeAllUserTokens } from '../utils/tokenUtils.js';
+import logger, { logError } from '../utils/logger.js';
 
 export const registerUser = async (req: Request, res: Response) => {
     try {
@@ -13,6 +14,12 @@ export const registerUser = async (req: Request, res: Response) => {
 
         if (error) {
             const errors = error.details.map(detail => detail.message);
+            logger.warn({
+                type: 'VALIDATION_ERROR',
+                action: 'REGISTER',
+                errors,
+                email: req.body.email
+            });
             return res.status(400).json({ 
                 message: 'Validation failed',
                 errors 
@@ -27,6 +34,11 @@ export const registerUser = async (req: Request, res: Response) => {
         });
 
         if (existingUser) {
+            logger.warn({
+                type: 'REGISTRATION_FAILED',
+                reason: 'EMAIL_EXISTS',
+                email
+            });
             return res.status(409).json({ 
                 message: 'User with this email already exists' 
             });
@@ -59,6 +71,13 @@ export const registerUser = async (req: Request, res: Response) => {
             name: newUser.name
         });
 
+        logger.info({
+            type: 'USER_REGISTERED',
+            userId: newUser.id,
+            email: newUser.email,
+            name: newUser.name
+        });
+
         res.status(201).json({ 
             message: 'User registered successfully',
             user: newUser,
@@ -66,7 +85,10 @@ export const registerUser = async (req: Request, res: Response) => {
             refreshToken
         });
     } catch (error: any) {
-        console.error('Registration error:', error);
+        logError(error, 'Registration error', {
+            type: 'REGISTRATION_ERROR',
+            email: req.body.email
+        });
         res.status(500).json({ 
             message: 'Error registering user',
             error: error.message 
@@ -83,6 +105,12 @@ export const loginUser = async (req: Request, res: Response) => {
 
         if (error) {
             const errors = error.details.map(detail => detail.message);
+            logger.warn({
+                type: 'VALIDATION_ERROR',
+                action: 'LOGIN',
+                errors,
+                email: req.body.email
+            });
             return res.status(400).json({ 
                 message: 'Validation failed',
                 errors 
@@ -97,6 +125,11 @@ export const loginUser = async (req: Request, res: Response) => {
         });
 
         if (!user) {
+            logger.warn({
+                type: 'LOGIN_FAILED',
+                reason: 'USER_NOT_FOUND',
+                email
+            });
             return res.status(401).json({ 
                 message: 'Invalid email or password' 
             });
@@ -106,6 +139,12 @@ export const loginUser = async (req: Request, res: Response) => {
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
+            logger.warn({
+                type: 'LOGIN_FAILED',
+                reason: 'INVALID_PASSWORD',
+                userId: user.id,
+                email
+            });
             return res.status(401).json({ 
                 message: 'Invalid email or password' 
             });
@@ -116,6 +155,12 @@ export const loginUser = async (req: Request, res: Response) => {
             id: user.id,
             email: user.email,
             name: user.name
+        });
+
+        logger.info({
+            type: 'USER_LOGIN',
+            userId: user.id,
+            email: user.email
         });
 
         res.status(200).json({ 
@@ -130,7 +175,10 @@ export const loginUser = async (req: Request, res: Response) => {
             refreshToken
         });
     } catch (error: any) {
-        console.error('Login error:', error);
+        logError(error, 'Login error', {
+            type: 'LOGIN_ERROR',
+            email: req.body.email
+        });
         res.status(500).json({ 
             message: 'Error logging in',
             error: error.message 
@@ -148,6 +196,11 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
         const { refreshToken } = req.body;
 
         if (!refreshToken) {
+            logger.warn({ 
+                type: 'VALIDATION_ERROR',
+                action: 'REFRESH_TOKEN',
+                error: 'Refresh token is required'
+            });
             return res.status(400).json({ 
                 message: 'Refresh token is required' 
             });
@@ -157,6 +210,10 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
         const user = await verifyRefreshToken(refreshToken);
 
         if (!user) {
+            logger.warn({
+                type: 'REFRESH_TOKEN_INVALID',
+                action: 'REFRESH_TOKEN'
+            });
             return res.status(401).json({ 
                 message: 'Invalid or expired refresh token' 
             });
@@ -168,13 +225,19 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
         // Generate new tokens
         const tokens = await generateTokens(user);
 
+        logger.info({
+            type: 'TOKEN_REFRESHED',
+            userId: user.id,
+            email: user.email
+        });
+
         res.status(200).json({ 
             message: 'Token refreshed successfully',
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken
         });
     } catch (error: any) {
-        console.error('Token refresh error:', error);
+        logError(error, 'Token refresh error');
         res.status(500).json({ 
             message: 'Error refreshing token',
             error: error.message 
@@ -192,6 +255,11 @@ export const logoutUser = async (req: Request, res: Response) => {
         const { refreshToken } = req.body;
 
         if (!refreshToken) {
+            logger.warn({ 
+                type: 'VALIDATION_ERROR',
+                action: 'LOGOUT',
+                error: 'Refresh token is required'
+            });
             return res.status(400).json({ 
                 message: 'Refresh token is required' 
             });
@@ -201,6 +269,11 @@ export const logoutUser = async (req: Request, res: Response) => {
         const revoked = await revokeRefreshToken(refreshToken);
 
         if (!revoked) {
+            logger.warn({
+                type: 'LOGOUT_FAILED',
+                action: 'LOGOUT',
+                error: 'Refresh token not found'
+            });
             return res.status(404).json({ 
                 message: 'Refresh token not found' 
             });
@@ -209,8 +282,13 @@ export const logoutUser = async (req: Request, res: Response) => {
         res.status(200).json({ 
             message: 'Logged out successfully' 
         });
+
+        logger.info({
+            type: 'USER_LOGOUT',
+            action: 'LOGOUT'
+        });
     } catch (error: any) {
-        console.error('Logout error:', error);
+        logError(error, 'Logout error');
         res.status(500).json({ 
             message: 'Error logging out',
             error: error.message 
@@ -229,6 +307,11 @@ export const logoutAllDevices = async (req: Request, res: Response) => {
         const userId = (req as any).user?.userId;
 
         if (!userId) {
+            logger.warn({
+                type: 'VALIDATION_ERROR',
+                action: 'LOGOUT_ALL_DEVICES',
+                error: 'Authentication required'
+            });
             return res.status(401).json({ 
                 message: 'Authentication required' 
             });
@@ -237,11 +320,16 @@ export const logoutAllDevices = async (req: Request, res: Response) => {
         // Revoke all refresh tokens for this user
         await revokeAllUserTokens(userId);
 
+        logger.info({
+            type: 'USER_LOGOUT_ALL_DEVICES',
+            userId
+        });
+
         res.status(200).json({ 
             message: 'Logged out from all devices successfully' 
         });
     } catch (error: any) {
-        console.error('Logout all error:', error);
+        logError(error, 'Logout all error');
         res.status(500).json({ 
             message: 'Error logging out from all devices',
             error: error.message 

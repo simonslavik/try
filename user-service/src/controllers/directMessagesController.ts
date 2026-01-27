@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../config/database.js';
+import { logger, logError } from '../utils/logger.js';
 
 /**
  * Get direct message conversation between two users
@@ -66,6 +67,13 @@ export const getDirectMessages = async (req: Request, res: Response) => {
             }
         });
 
+        logger.info({
+            type: 'DM_MESSAGES_FETCHED',
+            userId: currentUserId,
+            otherUserId,
+            messageCount: messages.length
+        });
+
         return res.status(200).json({
             success: true,
             data: {
@@ -74,7 +82,7 @@ export const getDirectMessages = async (req: Request, res: Response) => {
             }
         });
     } catch (error: any) {
-        console.error('Get direct messages error:', error);
+        logError(error, 'Get direct messages error', { userId: req.user?.userId });
         return res.status(500).json({ 
             message: 'Failed to fetch messages',
             error: error.message 
@@ -98,6 +106,12 @@ export const sendDirectMessage = async (req: Request, res: Response) => {
         }
 
         if (!receiverId) {
+            logger.warn({
+                type: 'VALIDATION_ERROR',
+                action: 'SEND_DM',
+                senderId: currentUserId,
+                error: 'Receiver ID is required'
+            });
             return res.status(400).json({ 
                 message: 'Receiver ID is required' 
             });
@@ -105,6 +119,13 @@ export const sendDirectMessage = async (req: Request, res: Response) => {
 
         // Validate that either content or attachments exist
         if ((!content || !content.trim()) && (!attachments || attachments.length === 0)) {
+            logger.warn({
+                type: 'VALIDATION_ERROR',
+                action: 'SEND_DM',
+                senderId: currentUserId,
+                receiverId,
+                error: 'Message content or attachments are required'
+            });
             return res.status(400).json({ 
                 message: 'Message content or attachments are required' 
             });
@@ -129,12 +150,23 @@ export const sendDirectMessage = async (req: Request, res: Response) => {
             }
         });
 
+        logger.info({
+            type: 'DM_SENT',
+            senderId: currentUserId,
+            receiverId,
+            messageId: message.id,
+            hasAttachments: attachments.length > 0
+        });
+
         return res.status(200).json({
             success: true,
             data: message
         });
     } catch (error: any) {
-        console.error('Send direct message error:', error);
+        logError(error, 'Send direct message error', { 
+            senderId: req.user?.userId || req.headers['x-user-id'],
+            receiverId: req.body.receiverId
+        });
         return res.status(500).json({ 
             message: 'Failed to send message',
             error: error.message 
@@ -229,7 +261,7 @@ export const getConversations = async (req: Request, res: Response) => {
             data: conversations
         });
     } catch (error: any) {
-        console.error('Get conversations error:', error);
+        logError(error, 'Get conversations error', { userId: req.user?.userId });
         return res.status(500).json({ 
             message: 'Failed to fetch conversations',
             error: error.message 

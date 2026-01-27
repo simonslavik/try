@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import userRoutes from './routes/userRoutes.js';
 import errorHandler from './middleware/errorHandler.js';
+import { requestLogger } from './middleware/requestLogger.js';
 import logger from './utils/logger.js';
 import validateEnv from './utils/envValidator.js';
 import path from 'path';
@@ -27,6 +28,8 @@ app.use(helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
     contentSecurityPolicy: false // Disable CSP for now to allow image loading
 })); // Security headers
+
+
 app.use(cors()); // Enable CORS
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
@@ -35,13 +38,7 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Request logging middleware
-app.use((req, res, next) => {
-    logger.info(`${req.method} ${req.path}`, {
-        ip: req.ip,
-        userAgent: req.get('user-agent')
-    });
-    next();
-});
+app.use(requestLogger);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -71,6 +68,16 @@ app.listen(PORT, () => {
     logger.info(`🚀 User Service running on port ${PORT}`);
     logger.info(`📍 Health check: http://localhost:${PORT}/health`);
     logger.info(`🔐 Auth endpoints: http://localhost:${PORT}/api/auth/*`);
+});
+
+// Catch unhandled errors
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled Rejection at:', { promise, reason });
+});
+
+process.on('uncaughtException', (error) => {
+  logger.error('Uncaught Exception:', error);
+  process.exit(1);
 });
 
 export default app;

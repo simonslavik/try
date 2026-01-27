@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../config/database.js';
+import { logger, logError } from '../utils/logger.js';
 
 export const sendFriendRequest = async (req: Request, res: Response) => {
     try {
@@ -13,12 +14,24 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
         }
 
         if (!recipientId) {
+            logger.warn({
+                type: 'VALIDATION_ERROR',
+                action: 'SEND_FRIEND_REQUEST',
+                senderId,
+                error: 'Recipient ID is required'
+            });
             return res.status(400).json({ 
                 message: 'Recipient ID is required' 
             });
         }
 
         if (senderId === recipientId) {
+            logger.warn({
+                type: 'VALIDATION_ERROR',
+                action: 'SEND_FRIEND_REQUEST',
+                senderId,
+                error: 'Cannot send friend request to yourself'
+            });
             return res.status(400).json({ 
                 message: 'Cannot send friend request to yourself' 
             });
@@ -44,6 +57,13 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
         });
 
         if (existingFriendship) {
+            logger.warn({
+                type: 'FRIEND_REQUEST_DUPLICATE',
+                action: 'SEND_FRIEND_REQUEST',
+                senderId,
+                recipientId,
+                status: existingFriendship.status
+            });
             return res.status(400).json({ 
                 message: existingFriendship.status === 'PENDING' 
                     ? 'Friend request already sent' 
@@ -70,13 +90,20 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
             }
         });
 
+        logger.info({
+            type: 'FRIEND_REQUEST_SENT',
+            senderId,
+            recipientId,
+            friendshipId: friendship.id
+        });
+
         return res.status(200).json({
             success: true,
             message: 'Friend request sent successfully',
             data: friendship
         });
     } catch (error: any) {
-        console.error('Send friend request error:', error);
+        logError(error, 'Send friend request error', { senderId: req.user?.userId, recipientId: req.body.recipientId });
         return res.status(500).json({ 
             message: 'Failed to send friend request',
             error: error.message 
@@ -144,13 +171,20 @@ export const acceptFriendRequest = async (req: Request, res: Response) => {
             }
         });
 
+        logger.info({
+            type: 'FRIEND_REQUEST_ACCEPTED',
+            userId,
+            senderId: updatedFriendship.userId,
+            friendshipId: requestId
+        });
+
         return res.status(200).json({
             success: true,
             message: 'Friend request accepted successfully',
             data: updatedFriendship
         });
     } catch (error: any) {
-        console.error('Accept friend request error:', error);
+        logError(error, 'Accept friend request error', { userId: req.user?.userId, requestId: req.body.requestId });
         return res.status(500).json({ 
             message: 'Failed to accept friend request',
             error: error.message 
@@ -202,7 +236,7 @@ export const rejectFriendRequest = async (req: Request, res: Response) => {
             message: 'Friend request rejected successfully'
         });
     } catch (error: any) {
-        console.error('Reject friend request error:', error);
+        logError(error, 'Reject friend request error', { userId: req.user?.userId, requestId: req.body.requestId });
         return res.status(500).json({ 
             message: 'Failed to reject friend request',
             error: error.message 
@@ -248,7 +282,7 @@ export const removeFriend = async (req: Request, res: Response) => {
             message: 'Friend removed successfully'
         });
     } catch (error: any) {
-        console.error('Remove friend error:', error);
+        logError(error, 'Remove friend error', { userId: req.user?.userId, friendId: req.body.friendId });
         return res.status(500).json({ 
             message: 'Failed to remove friend',
             error: error.message 
@@ -304,7 +338,7 @@ export const listFriends = async (req: Request, res: Response) => {
             data: friends
         });
     } catch (error: any) {
-        console.error('List friends error:', error);
+        logError(error, 'List friends error', { userId: req.user?.userId });
         return res.status(500).json({ 
             message: 'Failed to list friends',
             error: error.message 
@@ -349,7 +383,7 @@ export const listFriendRequests = async (req: Request, res: Response) => {
         });
 
     } catch (error: any) {
-        console.error('List friend requests error:', error);
+        logError(error, 'List friend requests error', { userId: req.user?.userId });
         return res.status(500).json({ 
             message: 'Failed to list friend requests',
             error: error.message 

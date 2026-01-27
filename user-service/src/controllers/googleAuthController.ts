@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import prisma from '../config/database.js';
 import { generateTokens } from '../utils/tokenUtils.js';
+import { logger, logError } from '../utils/logger.js';
 
 const googleClient = new OAuth2Client(
     process.env.GOOGLE_CLIENT_ID,
@@ -30,6 +31,11 @@ export const googleAuth = async (req: Request, res: Response) => {
         const payload = ticket.getPayload();
         
         if (!payload) {
+            logger.warn({
+                type: 'GOOGLE_AUTH_FAILED',
+                action: 'GOOGLE_LOGIN',
+                error: 'Invalid Google token'
+            });
             return res.status(401).json({ 
                 message: 'Invalid Google token' 
             });
@@ -38,6 +44,11 @@ export const googleAuth = async (req: Request, res: Response) => {
         const { sub: googleId, email, name, picture } = payload;
 
         if (!email || !name) {
+            logger.warn({
+                type: 'GOOGLE_AUTH_FAILED',
+                action: 'GOOGLE_LOGIN',
+                error: 'Email and name are required from Google'
+            });
             return res.status(400).json({ 
                 message: 'Email and name are required from Google' 
             });
@@ -81,6 +92,12 @@ export const googleAuth = async (req: Request, res: Response) => {
                     createdAt: true
                 }
             });
+            
+            logger.info({
+                type: 'GOOGLE_ACCOUNT_LINKED',
+                userId: user.id,
+                email: user.email
+            });
         }
 
         // If user doesn't exist, create new user
@@ -104,6 +121,19 @@ export const googleAuth = async (req: Request, res: Response) => {
                     createdAt: true
                 }
             });
+            
+            logger.info({
+                type: 'USER_REGISTERED_GOOGLE',
+                userId: user.id,
+                email: user.email,
+                name: user.name
+            });
+        } else {
+            logger.info({
+                type: 'USER_LOGIN_GOOGLE',
+                userId: user.id,
+                email: user.email
+            });
         }
 
         // Generate access and refresh tokens
@@ -121,7 +151,7 @@ export const googleAuth = async (req: Request, res: Response) => {
         });
 
     } catch (error: any) {
-        console.error('Google auth error:', error);
+        logError(error, 'Google auth error');
         res.status(500).json({ 
             message: 'Error authenticating with Google',
             error: error.message 
