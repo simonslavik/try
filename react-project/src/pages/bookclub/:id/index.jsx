@@ -8,6 +8,30 @@ import DMChat from '../../../components/BookClub/MainChatArea/DMChat';
 import AddCurrentBookModal from '../../../components/BookClub/Modals/AddCurrentBookModal';
 import CurrentBookDetailsModal from '../../../components/BookClub/Modals/CurrentBookDetailsModal';
 import AddBookToBookclubModal from '../../../components/BookClub/Modals/AddBookToBookclubModal';
+
+// Function to convert URLs in text to clickable links
+const linkifyText = (text) => {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = text.split(urlRegex);
+  
+  return parts.map((part, index) => {
+    if (part.match(urlRegex)) {
+      return (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-blue-300"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
+};
 import CalendarView from '../../../components/BookClub/MainChatArea/CalendarView';
 import AddEventModal from '../../../components/BookClub/Modals/AddEventModal';
 import BookSuggestionsView from '../../../components/BookClub/MainChatArea/BookSuggestionsView';

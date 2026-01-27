@@ -4,6 +4,30 @@ import { useNavigate } from 'react-router-dom';
 import FileUpload from '../../FileUpload';
 import MessageAttachment from '../../MessageAttachment';
 
+// Function to convert URLs in text to clickable links
+const linkifyText = (text) => {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = text.split(urlRegex);
+  
+  return parts.map((part, index) => {
+    if (part.match(urlRegex)) {
+      return (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-blue-300"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
+};
+
 const DMChat = ({ otherUser, messages, onSendMessage, auth }) => {
   const [newMessage, setNewMessage] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -98,7 +122,7 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth }) => {
                       ? 'bg-purple-600 text-white'
                       : 'bg-gray-700 text-gray-200'
                   }`}>
-                      <p>{msg.content}</p>
+                      <p>{linkifyText(msg.content)}</p>
                       <p className="text-xs opacity-70 mt-1">
                       {new Date(msg.createdAt).toLocaleTimeString()}
                       </p>

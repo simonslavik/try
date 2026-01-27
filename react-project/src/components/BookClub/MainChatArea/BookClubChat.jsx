@@ -3,6 +3,29 @@ import React, { useRef, useEffect } from 'react';
 import { FiHash } from 'react-icons/fi';
 import MessageAttachment from '../../MessageAttachment';
 
+// Function to convert URLs in text to clickable links
+const linkifyText = (text) => {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = text.split(urlRegex);
+  
+  return parts.map((part, index) => {
+    if (part.match(urlRegex)) {
+      return (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-blue-300"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
+};
 
 const BookClubChat = ({ messages, currentRoom, auth }) => {
     const messagesEndRef = useRef(null);
@@ -39,7 +62,7 @@ const BookClubChat = ({ messages, currentRoom, auth }) => {
                             <div className="text-right max-w-md self-end">
                               {msg.text && (
                                 <div className="bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl px-4 py-3 shadow-lg mb-2">
-                                  <p className="text-white break-words font-medium">{msg.text}</p>
+                                  <p className="text-white break-words font-medium">{linkifyText(msg.text)}</p>
                                 </div>
                               )}
                               {msg.attachments && msg.attachments.length > 0 ? (
@@ -78,7 +101,7 @@ const BookClubChat = ({ messages, currentRoom, auth }) => {
                                   {new Date(msg.timestamp).toLocaleTimeString()}
                                 </span>
                               </div>
-                              {msg.text && <p className="text-gray-200 break-words leading-relaxed mb-2">{msg.text}</p>}
+                              {msg.text && <p className="text-gray-200 break-words leading-relaxed mb-2">{linkifyText(msg.text)}</p>}
                               {msg.attachments && msg.attachments.length > 0 ? (
                                 <div className="flex flex-col gap-2">
                                   {msg.attachments.map((attachment) => (

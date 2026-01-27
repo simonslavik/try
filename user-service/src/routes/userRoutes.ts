@@ -45,6 +45,6 @@ userRoutes.get('/friends/requests', authMiddleware, listFriendRequests);
 // Direct Messages
 userRoutes.get('/messages/conversations', authMiddleware, getConversations);
 userRoutes.get('/messages/:otherUserId', authMiddleware, getDirectMessages);
-userRoutes.post('/messages', sendDirectMessage); // Allow both auth and internal service calls
+userRoutes.post('/messages', authMiddleware, sendDirectMessage); // Require authentication for direct HTTP calls
 
 export default userRoutes;

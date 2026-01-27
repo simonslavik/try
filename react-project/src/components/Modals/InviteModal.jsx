@@ -4,11 +4,9 @@ import AuthContext from '../../context';
 
 const InviteModal = ({ bookClubId, bookClubName, onClose }) => {
   const { auth } = useContext(AuthContext);
-  const [activeTab, setActiveTab] = useState('link'); // 'link' or 'friends'
-  const [invites, setInvites] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [copied, setCopied] = useState(null);
-  const [creatingInvite, setCreatingInvite] = useState(false);
+  const [invite, setInvite] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
   
   // Friend search
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,25 +17,22 @@ const InviteModal = ({ bookClubId, bookClubName, onClose }) => {
   const GATEWAY_URL = 'http://localhost:3000';
 
   useEffect(() => {
-    if (activeTab === 'link') {
-      fetchInvites();
-    } else {
-      fetchFriends();
-    }
-  }, [activeTab]);
+    fetchInvite();
+    fetchFriends();
+  }, []);
 
-  const fetchInvites = async () => {
+  const fetchInvite = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${GATEWAY_URL}/v1/editor/bookclubs/${bookClubId}/invites`, {
+      const response = await fetch(`${GATEWAY_URL}/v1/editor/bookclubs/${bookClubId}/invite`, {
         headers: { Authorization: `Bearer ${auth.token}` }
       });
       const data = await response.json();
       if (data.success) {
-        setInvites(data.invites);
+        setInvite(data.invite);
       }
     } catch (error) {
-      console.error('Error fetching invites:', error);
+      console.error('Error fetching invite:', error);
     } finally {
       setLoading(false);
     }
@@ -45,99 +40,56 @@ const InviteModal = ({ bookClubId, bookClubName, onClose }) => {
 
   const fetchFriends = async () => {
     try {
-      setLoading(true);
-      const response = await fetch(`${GATEWAY_URL}/v1/friends`, {
+      const response = await fetch(`${GATEWAY_URL}/v1/friends/list`, {
         headers: { Authorization: `Bearer ${auth.token}` }
       });
       const data = await response.json();
-      if (data.success) {
-        setFriends(data.friends);
-        setSearchResults(data.friends);
+      if (response.ok) {
+        setFriends(data.data || []);
+        setSearchResults(data.data || []);
+      } else {
+        setFriends([]);
+        setSearchResults([]);
       }
     } catch (error) {
       console.error('Error fetching friends:', error);
-    } finally {
-      setLoading(false);
+      setFriends([]);
+      setSearchResults([]);
     }
   };
 
-  const createInvite = async () => {
-    try {
-      setCreatingInvite(true);
-      const response = await fetch(`${GATEWAY_URL}/v1/editor/bookclubs/${bookClubId}/invites`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${auth.token}`
-        },
-        body: JSON.stringify({
-          expiresIn: null, // Never expires like Discord
-          maxUses: null // Unlimited uses
-        })
-      });
-      const data = await response.json();
-      if (data.success) {
-        fetchInvites();
-      }
-    } catch (error) {
-      console.error('Error creating invite:', error);
-    } finally {
-      setCreatingInvite(false);
-    }
-  };
-
-  const deleteInvite = async (inviteId) => {
-    try {
-      const response = await fetch(`${GATEWAY_URL}/v1/editor/bookclubs/${bookClubId}/invites/${inviteId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${auth.token}` }
-      });
-      if (response.ok) {
-        fetchInvites();
-      }
-    } catch (error) {
-      console.error('Error deleting invite:', error);
-    }
-  };
-
-  const copyInviteLink = (code) => {
-    const link = `${window.location.origin}/invite/${code}`;
+  const copyInviteLink = () => {
+    const link = `${window.location.origin}/invite/${invite.code}`;
     navigator.clipboard.writeText(link);
-    setCopied(code);
-    setTimeout(() => setCopied(null), 2000);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const sendDMInvite = async (userId, username) => {
     try {
       setSendingInvites(prev => new Set(prev).add(userId));
       
-      // Create an invite link first
-      const inviteResponse = await fetch(`${GATEWAY_URL}/v1/editor/bookclubs/${bookClubId}/invites`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${auth.token}`
-        },
-        body: JSON.stringify({
-          expiresIn: 24, // 24 hours for DM invites
-          maxUses: 1 // Single use for direct invites
-        })
-      });
+      if (!auth?.token) {
+        alert('You must be logged in to send invites');
+        return;
+      }
       
-      const inviteData = await inviteResponse.json();
-      if (!inviteData.success) {
-        throw new Error('Failed to create invite');
+      if (!invite) {
+        alert('Invite link not available');
+        return;
       }
 
-      const inviteLink = `${window.location.origin}/invite/${inviteData.invite.code}`;
+      const inviteLink = `${window.location.origin}/invite/${invite.code}`;
       const message = `You've been invited to join "${bookClubName}"! Click here to join: ${inviteLink}`;
+
+      console.log('Sending DM to:', userId, 'Token exists:', !!auth.token);
 
       // Send DM with invite
       const dmResponse = await fetch(`${GATEWAY_URL}/v1/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${auth.token}`
+          'Authorization': `Bearer ${auth.token}`
         },
         body: JSON.stringify({
           receiverId: userId,
@@ -145,14 +97,18 @@ const InviteModal = ({ bookClubId, bookClubName, onClose }) => {
         })
       });
 
+      const responseData = await dmResponse.json();
+      console.log('DM Response:', responseData, 'Status:', dmResponse.status);
+
       if (dmResponse.ok) {
         alert(`Invite sent to ${username}!`);
       } else {
-        alert('Failed to send invite');
+        console.error('Failed to send invite:', responseData);
+        alert(`Failed to send invite: ${responseData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error sending DM invite:', error);
-      alert('Failed to send invite');
+      alert('Failed to send invite: ' + error.message);
     } finally {
       setSendingInvites(prev => {
         const newSet = new Set(prev);
@@ -189,157 +145,105 @@ const InviteModal = ({ bookClubId, bookClubName, onClose }) => {
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex border-b border-gray-200">
-          <button
-            onClick={() => setActiveTab('link')}
-            className={`flex-1 py-3 px-4 font-semibold transition-colors flex items-center justify-center gap-2 ${
-              activeTab === 'link'
-                ? 'text-purple-600 border-b-2 border-purple-600'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <FiLink size={20} />
-            Invite Link
-          </button>
-          <button
-            onClick={() => setActiveTab('friends')}
-            className={`flex-1 py-3 px-4 font-semibold transition-colors flex items-center justify-center gap-2 ${
-              activeTab === 'friends'
-                ? 'text-purple-600 border-b-2 border-purple-600'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <FiUsers size={20} />
-            Invite Friends
-          </button>
-        </div>
-
         {/* Content */}
-        <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(80vh - 200px)' }}>
-          {activeTab === 'link' ? (
+        <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(80vh - 100px)' }}>
+          {loading ? (
+            <div className="text-center py-8 text-gray-500">Loading...</div>
+          ) : (
             <>
-              {/* Create Invite Section */}
-              <div className="mb-6">
-                <button
-                  onClick={createInvite}
-                  disabled={creatingInvite}
-                  className="w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:bg-gray-400 font-semibold flex items-center justify-center gap-2"
-                >
-                  {creatingInvite ? 'Creating...' : '+ Generate a New Invite Link'}
-                </button>
-                <p className="text-sm text-gray-500 text-center mt-2">
-                  Invite links never expire and can be used unlimited times
-                </p>
-              </div>
+              {/* Invite Link Section */}
+              {invite && (
+                <div className="mb-6 p-5 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border-2 border-purple-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <FiLink className="text-purple-600" size={20} />
+                    <h3 className="font-semibold text-gray-900">Permanent Invite Link</h3>
+                  </div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="flex-1 bg-white px-4 py-3 rounded-lg border border-gray-300 font-mono text-sm text-purple-600">
+                      {window.location.origin}/invite/{invite.code}
+                    </div>
+                    <button
+                      onClick={copyInviteLink}
+                      className="px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                    >
+                      {copied ? (
+                        <>
+                          <FiCheck size={18} />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <FiCopy size={18} />
+                          Copy
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Uses: {invite.currentUses} • Never expires • Share with anyone!
+                  </p>
+                </div>
+              )}
 
-              {/* Active Invites */}
+              {/* Friends Section */}
               <div>
-                <h3 className="font-semibold text-gray-900 mb-3">Active Invites</h3>
-                {loading ? (
-                  <p className="text-center text-gray-500 py-8">Loading invites...</p>
-                ) : invites.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">
-                    No active invites. Create one to get started!
+                <div className="flex items-center gap-2 mb-4">
+                  <FiUsers className="text-gray-600" size={20} />
+                  <h3 className="font-semibold text-gray-900">Send to Friends</h3>
+                </div>
+
+                {/* Friend Search */}
+                <div className="mb-4">
+                  <div className="relative">
+                    <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => handleSearch(e.target.value)}
+                      placeholder="Search friends..."
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                {/* Friends List */}
+                {searchResults.length === 0 ? (
+                  <p className="text-center text-gray-500 py-8">
+                    {searchQuery ? 'No friends found' : 'No friends yet. Add some friends to invite them!'}
                   </p>
                 ) : (
-                  <div className="space-y-3">
-                    {invites.map(invite => (
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {searchResults.map(friend => (
                       <div
-                        key={invite.id}
-                        className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                        key={friend.id}
+                        className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="font-mono text-sm text-purple-600 mb-1">
-                              {window.location.origin}/invite/{invite.code}
-                            </div>
-                            <div className="text-xs text-gray-600">
-                              Uses: {invite.currentUses} • Never expires
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2 ml-4">
-                            <button
-                              onClick={() => copyInviteLink(invite.code)}
-                              className="p-2 text-purple-600 hover:bg-purple-100 rounded-lg transition-colors"
-                              title="Copy link"
-                            >
-                              {copied === invite.code ? (
-                                <FiCheck size={20} />
-                              ) : (
-                                <FiCopy size={20} />
-                              )}
-                            </button>
-                            <button
-                              onClick={() => deleteInvite(invite.id)}
-                              className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
-                              title="Delete invite"
-                            >
-                              <FiTrash2 size={20} />
-                            </button>
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={friend.profileImage 
+                              ? `http://localhost:3001${friend.profileImage}` 
+                              : '/images/default.webp'}
+                            alt={friend.name}
+                            className="w-10 h-10 rounded-full object-cover"
+                            onError={(e) => { e.target.src = '/images/default.webp'; }}
+                          />
+                          <div>
+                            <div className="font-medium text-gray-900">{friend.name}</div>
+                            <div className="text-sm text-gray-600">{friend.email}</div>
                           </div>
                         </div>
+                        <button
+                          onClick={() => sendDMInvite(friend.id, friend.name)}
+                          disabled={sendingInvites.has(friend.id)}
+                          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:bg-gray-400"
+                        >
+                          {sendingInvites.has(friend.id) ? 'Sending...' : 'Send Invite'}
+                        </button>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
-            </>
-          ) : (
-            <>
-              {/* Friend Search */}
-              <div className="mb-4">
-                <div className="relative">
-                  <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => handleSearch(e.target.value)}
-                    placeholder="Search friends..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              {/* Friends List */}
-              {loading ? (
-                <p className="text-center text-gray-500 py-8">Loading friends...</p>
-              ) : searchResults.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">
-                  {searchQuery ? 'No friends found' : 'No friends yet. Add some friends to invite them!'}
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {searchResults.map(friend => (
-                    <div
-                      key={friend.id}
-                      className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={friend.profileImage 
-                            ? `http://localhost:3001${friend.profileImage}` 
-                            : '/images/default.webp'}
-                          alt={friend.name}
-                          className="w-10 h-10 rounded-full object-cover"
-                          onError={(e) => { e.target.src = '/images/default.webp'; }}
-                        />
-                        <div>
-                          <div className="font-medium text-gray-900">{friend.name}</div>
-                          <div className="text-sm text-gray-600">{friend.email}</div>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => sendDMInvite(friend.id, friend.name)}
-                        disabled={sendingInvites.has(friend.id)}
-                        className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:bg-gray-400"
-                      >
-                        {sendingInvites.has(friend.id) ? 'Sending...' : 'Send Invite'}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
             </>
           )}
         </div>
