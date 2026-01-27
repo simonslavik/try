@@ -22,7 +22,23 @@ export const getDirectMessages = async (req: Request, res: Response) => {
             });
         }
 
-        // Get messages between the two users
+        // Parse pagination params (already validated by middleware)
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 50; // Higher default for messages
+        const skip = (page - 1) * limit;
+
+        // Get total count for pagination metadata
+        const totalCount = await prisma.directMessage.count({
+            where: {
+                OR: [
+                    { senderId: currentUserId, receiverId: otherUserId },
+                    { senderId: otherUserId, receiverId: currentUserId }
+                ]
+            }
+        });
+
+        // Get messages between the two users with pagination
+        // Note: We fetch in descending order and reverse to show newest at bottom
         const messages = await prisma.directMessage.findMany({
             where: {
                 OR: [
@@ -30,8 +46,10 @@ export const getDirectMessages = async (req: Request, res: Response) => {
                     { senderId: otherUserId, receiverId: currentUserId }
                 ]
             },
+            skip,
+            take: limit,
             orderBy: {
-                createdAt: 'asc'
+                createdAt: 'desc' // Get newest first, then reverse
             },
             include: {
                 sender: {
@@ -43,6 +61,9 @@ export const getDirectMessages = async (req: Request, res: Response) => {
                 }
             }
         });
+
+        // Reverse to show oldest first (chronological order)
+        const messagesChronological = messages.reverse();
 
         // Mark messages as read
         await prisma.directMessage.updateMany({
@@ -71,14 +92,25 @@ export const getDirectMessages = async (req: Request, res: Response) => {
             type: 'DM_MESSAGES_FETCHED',
             userId: currentUserId,
             otherUserId,
-            messageCount: messages.length
+            messageCount: messagesChronological.length,
+            page,
+            totalCount
         });
+
+        const totalPages = Math.ceil(totalCount / limit);
 
         return res.status(200).json({
             success: true,
             data: {
-                messages,
+                messages: messagesChronological,
                 otherUser
+            },
+            pagination: {
+                page,
+                limit,
+                totalCount,
+                totalPages,
+                hasMore: page < totalPages
             }
         });
     } catch (error: any) {
@@ -97,37 +129,12 @@ export const sendDirectMessage = async (req: Request, res: Response) => {
     try {
         // Support both authenticated requests and internal service calls
         const currentUserId = req.user?.userId || req.headers['x-user-id'] as string;
+        // Request body is already validated by middleware
         const { receiverId, content, attachments = [] } = req.body;
 
         if (!currentUserId) {
             return res.status(401).json({ 
                 message: 'User not authenticated' 
-            });
-        }
-
-        if (!receiverId) {
-            logger.warn({
-                type: 'VALIDATION_ERROR',
-                action: 'SEND_DM',
-                senderId: currentUserId,
-                error: 'Receiver ID is required'
-            });
-            return res.status(400).json({ 
-                message: 'Receiver ID is required' 
-            });
-        }
-
-        // Validate that either content or attachments exist
-        if ((!content || !content.trim()) && (!attachments || attachments.length === 0)) {
-            logger.warn({
-                type: 'VALIDATION_ERROR',
-                action: 'SEND_DM',
-                senderId: currentUserId,
-                receiverId,
-                error: 'Message content or attachments are required'
-            });
-            return res.status(400).json({ 
-                message: 'Message content or attachments are required' 
             });
         }
 

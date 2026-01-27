@@ -14,13 +14,8 @@ const googleClient = new OAuth2Client(
  */
 export const googleAuth = async (req: Request, res: Response) => {
     try {
+        // Request body is already validated by middleware
         const { credential } = req.body;
-
-        if (!credential) {
-            return res.status(400).json({ 
-                message: 'Google credential is required' 
-            });
-        }
 
         // Verify the Google token
         const ticket = await googleClient.verifyIdToken({

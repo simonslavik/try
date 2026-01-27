@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import userRoutes from './routes/userRoutes.js';
 import errorHandler from './middleware/errorHandler.js';
 import { requestLogger } from './middleware/requestLogger.js';
+import { sanitizeInput } from './middleware/sanitizeInput.js';
 import logger from './utils/logger.js';
 import validateEnv from './utils/envValidator.js';
 import path from 'path';
@@ -29,8 +30,13 @@ app.use(helmet({
     contentSecurityPolicy: false // Disable CSP for now to allow image loading
 })); // Security headers
 
-
-app.use(cors()); // Enable CORS
+// CORS - restrict to specific frontend origin
+app.use(cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
@@ -39,6 +45,9 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Request logging middleware
 app.use(requestLogger);
+
+// XSS Sanitization middleware (defense-in-depth)
+app.use(sanitizeInput);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

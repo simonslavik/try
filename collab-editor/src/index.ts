@@ -10,6 +10,7 @@ import { authMiddleware, optionalAuthMiddleware } from './middleware/authMiddlew
 import multer from 'multer';
 import fs from 'fs';
 import { generateInviteCode } from './utils/inviteCodeGenerator.js';
+import { verifyWebSocketToken } from './utils/websocketAuth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1142,7 +1143,34 @@ wss.on('connection', (ws: WebSocket) => {
   });
 
   function handleJoin(ws: WebSocket, message: any) {
-    const { bookClubId, userId, username, roomId } = message;
+    const { bookClubId, userId, username, roomId, token } = message;
+    
+    // Verify JWT token
+    const verification = verifyWebSocketToken(token);
+    if (!verification.valid) {
+      console.error('❌ WebSocket auth failed:', verification.error);
+      ws.send(JSON.stringify({
+        type: 'auth-error',
+        message: verification.error,
+        shouldReconnect: verification.error?.includes('expired')
+      }));
+      ws.close();
+      return;
+    }
+
+    // Verify userId matches token
+    if (verification.userId !== userId) {
+      console.error('❌ User ID mismatch');
+      ws.send(JSON.stringify({
+        type: 'auth-error',
+        message: 'User ID does not match token',
+        shouldReconnect: false
+      }));
+      ws.close();
+      return;
+    }
+
+    console.log('✅ WebSocket authenticated:', verification.userId);
     
     // Check if bookclub exists in database
     prisma.bookClub.findUnique({ 
@@ -1388,7 +1416,34 @@ wss.on('connection', (ws: WebSocket) => {
   }
 
   function handleJoinDM(ws: WebSocket, message: any) {
-    const { userId, username } = message;
+    const { userId, username, token } = message;
+    
+    // Verify JWT token
+    const verification = verifyWebSocketToken(token);
+    if (!verification.valid) {
+      console.error('❌ DM WebSocket auth failed:', verification.error);
+      ws.send(JSON.stringify({
+        type: 'auth-error',
+        message: verification.error,
+        shouldReconnect: verification.error?.includes('expired')
+      }));
+      ws.close();
+      return;
+    }
+
+    // Verify userId matches token
+    if (verification.userId !== userId) {
+      console.error('❌ DM User ID mismatch');
+      ws.send(JSON.stringify({
+        type: 'auth-error',
+        message: 'User ID does not match token',
+        shouldReconnect: false
+      }));
+      ws.close();
+      return;
+    }
+
+    console.log('✅ DM WebSocket authenticated:', verification.userId);
     
     // Create DM client
     const clientId = uuidv4();

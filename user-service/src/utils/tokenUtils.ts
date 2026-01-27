@@ -31,7 +31,7 @@ export const generateTokens = async (user: User): Promise<Tokens> => {
             email: user.email
         } as TokenPayload,
         process.env.JWT_SECRET!,
-        { expiresIn: '24h' } // 24 hours for development
+        { expiresIn: process.env.JWT_EXPIRATION || '15m' } // 15 minutes, refresh token handles long sessions
     );
 
     // Generate random refresh token (not JWT - just random string)

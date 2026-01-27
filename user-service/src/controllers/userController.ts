@@ -1,32 +1,14 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import { registerSchema, loginSchema } from '../utils/validation.js';
 import prisma from '../config/database.js';
 import { generateTokens, verifyRefreshToken, revokeRefreshToken, revokeAllUserTokens } from '../utils/tokenUtils.js';
 import logger, { logError } from '../utils/logger.js';
+import { sendVerificationEmail } from './authController.js';
 
 export const registerUser = async (req: Request, res: Response) => {
     try {
-        // Validate request body with Joi
-        const { error, value } = registerSchema.validate(req.body, {
-            abortEarly: false  // Return all errors
-        });
-
-        if (error) {
-            const errors = error.details.map(detail => detail.message);
-            logger.warn({
-                type: 'VALIDATION_ERROR',
-                action: 'REGISTER',
-                errors,
-                email: req.body.email
-            });
-            return res.status(400).json({ 
-                message: 'Validation failed',
-                errors 
-            });
-        }
-
-        const { name, email, password } = value;
+        // Request body is already validated by middleware
+        const { name, email, password } = req.body;
 
         // Check if user already exists
         const existingUser = await prisma.user.findUnique({
@@ -71,16 +53,25 @@ export const registerUser = async (req: Request, res: Response) => {
             name: newUser.name
         });
 
+        // Send verification email (don't block response)
+        sendVerificationEmail(newUser.id, newUser.email).catch(err => {
+            logError(err, 'Failed to send verification email', { userId: newUser.id });
+        });
+
         logger.info({
             type: 'USER_REGISTERED',
             userId: newUser.id,
             email: newUser.email,
-            name: newUser.name
+            name: newUser.name,
+            emailVerified: false
         });
 
         res.status(201).json({ 
-            message: 'User registered successfully',
-            user: newUser,
+            message: 'User registered successfully. Please check your email to verify your account.',
+            user: {
+                ...newUser,
+                emailVerified: false
+            },
             accessToken,
             refreshToken
         });
@@ -98,26 +89,8 @@ export const registerUser = async (req: Request, res: Response) => {
 
 export const loginUser = async (req: Request, res: Response) => {
     try {
-        // Validate request body with Joi
-        const { error, value } = loginSchema.validate(req.body, {
-            abortEarly: false
-        });
-
-        if (error) {
-            const errors = error.details.map(detail => detail.message);
-            logger.warn({
-                type: 'VALIDATION_ERROR',
-                action: 'LOGIN',
-                errors,
-                email: req.body.email
-            });
-            return res.status(400).json({ 
-                message: 'Validation failed',
-                errors 
-            });
-        }
-
-        const { email, password } = value;
+        // Request body is already validated by middleware
+        const { email, password } = req.body;
 
         // Find user by email
         const user = await prisma.user.findUnique({
@@ -193,18 +166,8 @@ export const loginUser = async (req: Request, res: Response) => {
  */
 export const refreshAccessToken = async (req: Request, res: Response) => {
     try {
+        // Request body is already validated by middleware
         const { refreshToken } = req.body;
-
-        if (!refreshToken) {
-            logger.warn({ 
-                type: 'VALIDATION_ERROR',
-                action: 'REFRESH_TOKEN',
-                error: 'Refresh token is required'
-            });
-            return res.status(400).json({ 
-                message: 'Refresh token is required' 
-            });
-        }
 
         // Verify refresh token and get user
         const user = await verifyRefreshToken(refreshToken);
@@ -252,18 +215,8 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
  */
 export const logoutUser = async (req: Request, res: Response) => {
     try {
+        // Request body is already validated by middleware
         const { refreshToken } = req.body;
-
-        if (!refreshToken) {
-            logger.warn({ 
-                type: 'VALIDATION_ERROR',
-                action: 'LOGOUT',
-                error: 'Refresh token is required'
-            });
-            return res.status(400).json({ 
-                message: 'Refresh token is required' 
-            });
-        }
 
         // Revoke the refresh token
         const revoked = await revokeRefreshToken(refreshToken);
