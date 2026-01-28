@@ -148,8 +148,7 @@ export const googleAuth = async (req: Request, res: Response) => {
     } catch (error: any) {
         logError(error, 'Google auth error');
         res.status(500).json({ 
-            message: 'Error authenticating with Google',
-            error: error.message 
+            message: 'Error authenticating with Google'
         });
     }
 };

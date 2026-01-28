@@ -116,8 +116,7 @@ export const getDirectMessages = async (req: Request, res: Response) => {
     } catch (error: any) {
         logError(error, 'Get direct messages error', { userId: req.user?.userId });
         return res.status(500).json({ 
-            message: 'Failed to fetch messages',
-            error: error.message 
+            message: 'Failed to fetch messages'
         });
     }
 };
@@ -175,8 +174,7 @@ export const sendDirectMessage = async (req: Request, res: Response) => {
             receiverId: req.body.receiverId
         });
         return res.status(500).json({ 
-            message: 'Failed to send message',
-            error: error.message 
+            message: 'Failed to send message'
         });
     }
 };
@@ -270,8 +268,7 @@ export const getConversations = async (req: Request, res: Response) => {
     } catch (error: any) {
         logError(error, 'Get conversations error', { userId: req.user?.userId });
         return res.status(500).json({ 
-            message: 'Failed to fetch conversations',
-            error: error.message 
+            message: 'Failed to fetch conversations'
         });
     }
 };

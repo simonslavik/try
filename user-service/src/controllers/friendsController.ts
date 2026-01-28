@@ -94,8 +94,7 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
     } catch (error: any) {
         logError(error, 'Send friend request error', { senderId: req.user?.userId, recipientId: req.body.recipientId });
         return res.status(500).json({ 
-            message: 'Failed to send friend request',
-            error: error.message 
+            message: 'Failed to send friend request'
         });
     }
 };
@@ -170,8 +169,7 @@ export const acceptFriendRequest = async (req: Request, res: Response) => {
     } catch (error: any) {
         logError(error, 'Accept friend request error', { userId: req.user?.userId, requestId: req.body.requestId });
         return res.status(500).json({ 
-            message: 'Failed to accept friend request',
-            error: error.message 
+            message: 'Failed to accept friend request'
         });
     }  
 };
@@ -217,8 +215,7 @@ export const rejectFriendRequest = async (req: Request, res: Response) => {
     } catch (error: any) {
         logError(error, 'Reject friend request error', { userId: req.user?.userId, requestId: req.body.requestId });
         return res.status(500).json({ 
-            message: 'Failed to reject friend request',
-            error: error.message 
+            message: 'Failed to reject friend request'
         });
     }  
 };
@@ -258,8 +255,7 @@ export const removeFriend = async (req: Request, res: Response) => {
     } catch (error: any) {
         logError(error, 'Remove friend error', { userId: req.user?.userId, friendId: req.body.friendId });
         return res.status(500).json({ 
-            message: 'Failed to remove friend',
-            error: error.message 
+            message: 'Failed to remove friend'
         });
     }
 };
@@ -343,8 +339,7 @@ export const listFriends = async (req: Request, res: Response) => {
     } catch (error: any) {
         logError(error, 'List friends error', { userId: req.user?.userId });
         return res.status(500).json({ 
-            message: 'Failed to list friends',
-            error: error.message 
+            message: 'Failed to list friends'
         });
     }
 };
@@ -412,8 +407,7 @@ export const listFriendRequests = async (req: Request, res: Response) => {
     } catch (error: any) {
         logError(error, 'List friend requests error', { userId: req.user?.userId });
         return res.status(500).json({ 
-            message: 'Failed to list friend requests',
-            error: error.message 
+            message: 'Failed to list friend requests'
         });
     }
 };

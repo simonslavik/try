@@ -8,7 +8,6 @@ declare global {
             user?: {
                 userId: string;
                 email: string;
-                role: string;
             };
         }
     }
@@ -17,7 +16,6 @@ declare global {
 interface TokenPayload {
     userId: string;
     email: string;
-    role: string;
     iat: number;
     exp: number;
 }
@@ -116,8 +114,7 @@ export const optionalAuthMiddleware = async (req: Request, res: Response, next: 
             
             req.user = {
                 userId: decoded.userId,
-                email: decoded.email,
-                role: decoded.role
+                email: decoded.email
             };
         } catch {
             // Invalid token - continue without user

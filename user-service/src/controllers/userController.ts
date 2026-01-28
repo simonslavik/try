@@ -29,29 +29,35 @@ export const registerUser = async (req: Request, res: Response) => {
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 12);
 
-        // Create new user
-        const newUser = await prisma.user.create({
-            data: {
-                name,
-                email,
-                password: hashedPassword,
-                profileImage: null
-            },  
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                createdAt: true,
-                profileImage: true
-            }
+        // Create user and generate tokens in a transaction
+        const result = await prisma.$transaction(async (tx) => {
+            const newUser = await tx.user.create({
+                data: {
+                    name,
+                    email,
+                    password: hashedPassword,
+                    profileImage: null
+                },  
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    createdAt: true,
+                    profileImage: true
+                }
+            });
+
+            // Generate tokens
+            const tokens = await generateTokens({
+                id: newUser.id,
+                email: newUser.email,
+                name: newUser.name
+            });
+
+            return { user: newUser, ...tokens };
         });
 
-        // Generate access token and refresh token
-        const { accessToken, refreshToken } = await generateTokens({
-            id: newUser.id,
-            email: newUser.email,
-            name: newUser.name
-        });
+        const { user: newUser, accessToken, refreshToken } = result;
 
         // Send verification email (don't block response)
         sendVerificationEmail(newUser.id, newUser.email).catch(err => {
@@ -81,8 +87,7 @@ export const registerUser = async (req: Request, res: Response) => {
             email: req.body.email
         });
         res.status(500).json({ 
-            message: 'Error registering user',
-            error: error.message 
+            message: 'Error registering user'
         });
     }
 };
@@ -153,8 +158,7 @@ export const loginUser = async (req: Request, res: Response) => {
             email: req.body.email
         });
         res.status(500).json({ 
-            message: 'Error logging in',
-            error: error.message 
+            message: 'Error logging in'
         });
     }
 };
@@ -202,8 +206,7 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
     } catch (error: any) {
         logError(error, 'Token refresh error');
         res.status(500).json({ 
-            message: 'Error refreshing token',
-            error: error.message 
+            message: 'Error refreshing token'
         });
     }
 };
@@ -243,8 +246,7 @@ export const logoutUser = async (req: Request, res: Response) => {
     } catch (error: any) {
         logError(error, 'Logout error');
         res.status(500).json({ 
-            message: 'Error logging out',
-            error: error.message 
+            message: 'Error logging out'
         });
     }
 };
@@ -284,8 +286,7 @@ export const logoutAllDevices = async (req: Request, res: Response) => {
     } catch (error: any) {
         logError(error, 'Logout all error');
         res.status(500).json({ 
-            message: 'Error logging out from all devices',
-            error: error.message 
+            message: 'Error logging out from all devices'
         });
     }
 };

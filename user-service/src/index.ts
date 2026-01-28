@@ -5,6 +5,7 @@ import userRoutes from './routes/userRoutes.js';
 import errorHandler from './middleware/errorHandler.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import { sanitizeInput } from './middleware/sanitizeInput.js';
+import { requestIdMiddleware } from './middleware/requestId.js';
 import logger from './utils/logger.js';
 import validateEnv from './utils/envValidator.js';
 import path from 'path';
@@ -42,6 +43,9 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
 // Serve uploaded images
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Request ID middleware (for distributed tracing)
+app.use(requestIdMiddleware);
 
 // Request logging middleware
 app.use(requestLogger);
