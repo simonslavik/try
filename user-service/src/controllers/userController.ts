@@ -4,10 +4,25 @@ import prisma from '../config/database.js';
 import { generateTokens, verifyRefreshToken, revokeRefreshToken, revokeAllUserTokens } from '../utils/tokenUtils.js';
 import logger, { logError } from '../utils/logger.js';
 import { sendVerificationEmail } from './authController.js';
+import { 
+    sendCreated, 
+    sendSuccess, 
+    sendConflict, 
+    sendUnauthorized, 
+    sendNotFound,
+    sendServerError 
+} from '../utils/responseHelpers.js';
+import { 
+    BCRYPT_SALT_ROUNDS, 
+    USER_PUBLIC_FIELDS,
+    USER_BASIC_FIELDS,
+    LogType,
+    ErrorMessage,
+    SuccessMessage 
+} from '../constants/index.js';
 
 export const registerUser = async (req: Request, res: Response) => {
     try {
-        // Request body is already validated by middleware
         const { name, email, password } = req.body;
 
         // Check if user already exists
@@ -17,17 +32,15 @@ export const registerUser = async (req: Request, res: Response) => {
 
         if (existingUser) {
             logger.warn({
-                type: 'REGISTRATION_FAILED',
+                type: LogType.REGISTRATION_FAILED,
                 reason: 'EMAIL_EXISTS',
                 email
             });
-            return res.status(409).json({ 
-                message: 'User with this email already exists' 
-            });
+            return sendConflict(res, ErrorMessage.EMAIL_EXISTS);
         }
 
         // Hash the password
-        const hashedPassword = await bcrypt.hash(password, 12);
+        const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
 
         // Create user and generate tokens in a transaction
         const result = await prisma.$transaction(async (tx) => {
@@ -38,13 +51,7 @@ export const registerUser = async (req: Request, res: Response) => {
                     password: hashedPassword,
                     profileImage: null
                 },  
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    createdAt: true,
-                    profileImage: true
-                }
+                select: USER_PUBLIC_FIELDS
             });
 
             // Generate tokens
@@ -65,36 +72,29 @@ export const registerUser = async (req: Request, res: Response) => {
         });
 
         logger.info({
-            type: 'USER_REGISTERED',
+            type: LogType.USER_REGISTERED,
             userId: newUser.id,
             email: newUser.email,
             name: newUser.name,
             emailVerified: false
         });
 
-        res.status(201).json({ 
-            message: 'User registered successfully. Please check your email to verify your account.',
-            user: {
-                ...newUser,
-                emailVerified: false
-            },
+        return sendCreated(res, {
+            user: { ...newUser, emailVerified: false },
             accessToken,
             refreshToken
-        });
+        }, SuccessMessage.USER_REGISTERED);
     } catch (error: any) {
         logError(error, 'Registration error', {
             type: 'REGISTRATION_ERROR',
             email: req.body.email
         });
-        res.status(500).json({ 
-            message: 'Error registering user'
-        });
+        return sendServerError(res, 'Error registering user');
     }
 };
 
 export const loginUser = async (req: Request, res: Response) => {
     try {
-        // Request body is already validated by middleware
         const { email, password } = req.body;
 
         // Find user by email
@@ -104,13 +104,11 @@ export const loginUser = async (req: Request, res: Response) => {
 
         if (!user) {
             logger.warn({
-                type: 'LOGIN_FAILED',
+                type: LogType.LOGIN_FAILED,
                 reason: 'USER_NOT_FOUND',
                 email
             });
-            return res.status(401).json({ 
-                message: 'Invalid email or password' 
-            });
+            return sendUnauthorized(res, ErrorMessage.INVALID_CREDENTIALS);
         }
 
         // Compare password
@@ -118,14 +116,12 @@ export const loginUser = async (req: Request, res: Response) => {
 
         if (!isPasswordValid) {
             logger.warn({
-                type: 'LOGIN_FAILED',
+                type: LogType.LOGIN_FAILED,
                 reason: 'INVALID_PASSWORD',
                 userId: user.id,
                 email
             });
-            return res.status(401).json({ 
-                message: 'Invalid email or password' 
-            });
+            return sendUnauthorized(res, ErrorMessage.INVALID_CREDENTIALS);
         }
 
         // Generate access token and refresh token
@@ -136,13 +132,12 @@ export const loginUser = async (req: Request, res: Response) => {
         });
 
         logger.info({
-            type: 'USER_LOGIN',
+            type: LogType.USER_LOGIN,
             userId: user.id,
             email: user.email
         });
 
-        res.status(200).json({ 
-            message: 'Login successful',
+        return sendSuccess(res, {
             user: {
                 id: user.id,
                 name: user.name,
@@ -151,26 +146,21 @@ export const loginUser = async (req: Request, res: Response) => {
             },
             accessToken,
             refreshToken
-        });
+        }, SuccessMessage.LOGIN_SUCCESS);
     } catch (error: any) {
         logError(error, 'Login error', {
             type: 'LOGIN_ERROR',
             email: req.body.email
         });
-        res.status(500).json({ 
-            message: 'Error logging in'
-        });
+        return sendServerError(res, 'Error logging in');
     }
 };
 
 /**
  * Refresh access token using refresh token
- * POST /auth/refresh
- * Body: { refreshToken: string }
  */
 export const refreshAccessToken = async (req: Request, res: Response) => {
     try {
-        // Request body is already validated by middleware
         const { refreshToken } = req.body;
 
         // Verify refresh token and get user
@@ -178,12 +168,10 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
 
         if (!user) {
             logger.warn({
-                type: 'REFRESH_TOKEN_INVALID',
+                type: LogType.REFRESH_TOKEN_INVALID,
                 action: 'REFRESH_TOKEN'
             });
-            return res.status(401).json({ 
-                message: 'Invalid or expired refresh token' 
-            });
+            return sendUnauthorized(res, 'Invalid or expired refresh token');
         }
 
         // Delete old refresh token (token rotation)
@@ -193,32 +181,23 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
         const tokens = await generateTokens(user);
 
         logger.info({
-            type: 'TOKEN_REFRESHED',
+            type: LogType.TOKEN_REFRESHED,
             userId: user.id,
             email: user.email
         });
 
-        res.status(200).json({ 
-            message: 'Token refreshed successfully',
-            accessToken: tokens.accessToken,
-            refreshToken: tokens.refreshToken
-        });
+        return sendSuccess(res, tokens, SuccessMessage.TOKEN_REFRESHED);
     } catch (error: any) {
         logError(error, 'Token refresh error');
-        res.status(500).json({ 
-            message: 'Error refreshing token'
-        });
+        return sendServerError(res, 'Error refreshing token');
     }
 };
 
 /**
  * Logout user (revoke refresh token)
- * POST /auth/logout
- * Body: { refreshToken: string }
  */
 export const logoutUser = async (req: Request, res: Response) => {
     try {
-        // Request body is already validated by middleware
         const { refreshToken } = req.body;
 
         // Revoke the refresh token
@@ -226,67 +205,52 @@ export const logoutUser = async (req: Request, res: Response) => {
 
         if (!revoked) {
             logger.warn({
-                type: 'LOGOUT_FAILED',
+                type: LogType.VALIDATION_ERROR,
                 action: 'LOGOUT',
                 error: 'Refresh token not found'
             });
-            return res.status(404).json({ 
-                message: 'Refresh token not found' 
-            });
+            return sendNotFound(res, 'Refresh token');
         }
 
-        res.status(200).json({ 
-            message: 'Logged out successfully' 
-        });
-
         logger.info({
-            type: 'USER_LOGOUT',
+            type: LogType.USER_LOGOUT,
             action: 'LOGOUT'
         });
+
+        return sendSuccess(res, null, SuccessMessage.LOGOUT_SUCCESS);
     } catch (error: any) {
         logError(error, 'Logout error');
-        res.status(500).json({ 
-            message: 'Error logging out'
-        });
+        return sendServerError(res, 'Error logging out');
     }
 };
 
 /**
  * Logout from all devices (revoke all refresh tokens)
- * POST /auth/logout-all
- * Requires authentication (get userId from JWT token in Authorization header)
  */
 export const logoutAllDevices = async (req: Request, res: Response) => {
     try {
-        // Get userId from authenticated request (you'll need auth middleware for this)
-        const userId = (req as any).user?.userId;
+        const userId = req.user?.userId;
 
         if (!userId) {
             logger.warn({
-                type: 'VALIDATION_ERROR',
+                type: LogType.VALIDATION_ERROR,
                 action: 'LOGOUT_ALL_DEVICES',
                 error: 'Authentication required'
             });
-            return res.status(401).json({ 
-                message: 'Authentication required' 
-            });
+            return sendUnauthorized(res);
         }
 
         // Revoke all refresh tokens for this user
         await revokeAllUserTokens(userId);
 
         logger.info({
-            type: 'USER_LOGOUT_ALL_DEVICES',
+            type: LogType.USER_LOGOUT_ALL_DEVICES,
             userId
         });
 
-        res.status(200).json({ 
-            message: 'Logged out from all devices successfully' 
-        });
+        return sendSuccess(res, null, SuccessMessage.LOGOUT_ALL_SUCCESS);
     } catch (error: any) {
         logError(error, 'Logout all error');
-        res.status(500).json({ 
-            message: 'Error logging out from all devices'
-        });
+        return sendServerError(res, 'Error logging out from all devices');
     }
 };

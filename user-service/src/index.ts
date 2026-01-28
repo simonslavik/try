@@ -1,59 +1,83 @@
+// Core
 import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import userRoutes from './routes/userRoutes.js';
-import errorHandler from './middleware/errorHandler.js';
-import { requestLogger } from './middleware/requestLogger.js';
-import { sanitizeInput } from './middleware/sanitizeInput.js';
-import { requestIdMiddleware } from './middleware/requestId.js';
-import logger from './utils/logger.js';
-import validateEnv from './utils/envValidator.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
+// Third-party middleware
+import cors from 'cors';
+import helmet from 'helmet';
+
+// Routes
+import userRoutes from './routes/userRoutes.js';
+
+// Middleware
+import errorHandler from './middleware/errorHandler.js';
+import { requestLogger } from './middleware/requestLogger.js';
+import { sanitizeInput } from './middleware/sanitizeInput.js';
+import { requestIdMiddleware } from './middleware/requestId.js';
+
+// Utils
+import logger from './utils/logger.js';
+import validateEnv from './utils/envValidator.js';
+
+// Constants
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const PORT = process.env.PORT || 3001;
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-// Validate environment variables before starting the server
+// Validate environment variables before starting
 try {
     validateEnv();
 } catch (error) {
+    logger.error('Environment validation failed:', error);
     process.exit(1);
 }
 
 const app = express();
-const PORT = process.env.PORT || 3001;
 
-// Middleware
+// ============================================================================
+// Security Middleware
+// ============================================================================
+
 app.use(helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" },
-    contentSecurityPolicy: false // Disable CSP for now to allow image loading
-})); // Security headers
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    contentSecurityPolicy: false
+}));
 
-// CORS - restrict to specific frontend origin
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: FRONTEND_URL,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json()); // Parse JSON bodies
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+// ============================================================================
+// Body Parsing Middleware
+// ============================================================================
 
-// Serve uploaded images
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ============================================================================
+// Static Files
+// ============================================================================
+
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// Request ID middleware (for distributed tracing)
-app.use(requestIdMiddleware);
+// ============================================================================
+// Request Processing Pipeline
+// ============================================================================
 
-// Request logging middleware
-app.use(requestLogger);
+app.use(requestIdMiddleware);  // Add unique ID for tracing
+app.use(requestLogger);         // Log all requests
+app.use(sanitizeInput);         // XSS protection
 
-// XSS Sanitization middleware (defense-in-depth)
-app.use(sanitizeInput);
+// ============================================================================
+// Routes
+// ============================================================================
 
-// Health check endpoint
+// Health check
 app.get('/health', (req, res) => {
     res.status(200).json({ 
         status: 'healthy',
@@ -62,8 +86,12 @@ app.get('/health', (req, res) => {
     });
 });
 
-// API Routes
+// API routes
 app.use('/api', userRoutes);
+
+// ============================================================================
+// Error Handling (must be last)
+// ============================================================================
 
 // 404 handler
 app.use((req, res) => {
@@ -73,24 +101,31 @@ app.use((req, res) => {
     });
 });
 
-// Error handling middleware (must be last)
+// Global error handler
 app.use(errorHandler);
 
-// Start server
+// ============================================================================
+// Server Startup
+// ============================================================================
+
 app.listen(PORT, () => {
     logger.info(`🚀 User Service running on port ${PORT}`);
     logger.info(`📍 Health check: http://localhost:${PORT}/health`);
-    logger.info(`🔐 Auth endpoints: http://localhost:${PORT}/api/auth/*`);
+    logger.info(`🔐 API: http://localhost:${PORT}/api`);
+    logger.info(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
-// Catch unhandled errors
+// ============================================================================
+// Process Error Handlers
+// ============================================================================
+
 process.on('unhandledRejection', (reason, promise) => {
-  logger.error('Unhandled Rejection at:', { promise, reason });
+    logger.error('Unhandled Promise Rejection:', { reason, promise });
 });
 
 process.on('uncaughtException', (error) => {
-  logger.error('Uncaught Exception:', error);
-  process.exit(1);
+    logger.error('Uncaught Exception:', error);
+    process.exit(1);
 });
 
 export default app;
