@@ -26,14 +26,31 @@ const Home = () => {
     
     
     useEffect(() => {
+        console.log('Home page auth state:', {
+            hasAuth: !!auth,
+            hasToken: !!auth?.token,
+            hasUser: !!auth?.user,
+            userId: auth?.user?.id,
+            tokenPreview: auth?.token ? `${auth.token.substring(0, 20)}...` : 'no token'
+        });
+        
         const headers = auth?.token 
             ? { Authorization: `Bearer ${auth.token}` }
             : {};
 
         // Fetch my created bookclubs (only if authenticated)
         if (auth?.user) {
-            fetch('http://localhost:3000/v1/editor/my-bookclubs', { headers })
-                .then(response => response.json())
+            fetch('http://localhost:3000/v1/editor/bookclubs/my-bookclubs', { headers })
+                .then(response => {
+                    if (!response.ok) {
+                        console.error('My bookclubs request failed:', response.status, response.statusText);
+                        return response.text().then(text => {
+                            console.error('Error response:', text);
+                            throw new Error(`${response.status}: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     console.log('My Created Bookclubs response:', data);
                     setMyCreatedBookClubs(data.bookClubs || []);
@@ -148,12 +165,24 @@ const Home = () => {
     };
 
     const fetchFriends = async () => {
-        if (!auth?.token) return;
+        if (!auth?.token) {
+            console.log('fetchFriends: No auth token available');
+            return;
+        }
         
+        console.log('fetchFriends: Making request with token');
         try {
             const response = await fetch('http://localhost:3000/v1/friends/list', {
                 headers: { Authorization: `Bearer ${auth.token}` }
             });
+            
+            if (!response.ok) {
+                console.error('fetchFriends failed:', response.status);
+                const text = await response.text();
+                console.error('Error response:', text);
+                return;
+            }
+            
             const data = await response.json();
             
             if (response.ok) {
@@ -165,12 +194,24 @@ const Home = () => {
     };
 
     const fetchFriendRequests = async () => {
-        if (!auth?.token) return;
+        if (!auth?.token) {
+            console.log('fetchFriendRequests: No auth token available');
+            return;
+        }
         
+        console.log('fetchFriendRequests: Making request with token');
         try {
             const response = await fetch('http://localhost:3000/v1/friends/requests', {
                 headers: { Authorization: `Bearer ${auth.token}` }
             });
+            
+            if (!response.ok) {
+                console.error('fetchFriendRequests failed:', response.status);
+                const text = await response.text();
+                console.error('Error response:', text);
+                return;
+            }
+            
             const data = await response.json();
             
             if (response.ok) {

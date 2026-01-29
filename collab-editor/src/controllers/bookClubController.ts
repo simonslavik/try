@@ -125,11 +125,19 @@ export const getBookClub = async (req: Request, res: Response) => {
       ...bookClub,
       members,
       connectedUsers: activeClub 
-        ? Array.from(activeClub.clients.values()).map((c: any) => ({
-            id: c.id,
-            username: c.username,
-            userId: c.userId
-          }))
+        ? Array.from(activeClub.clients.values())
+            .filter((c: any) => !c.isDMConnection) // Exclude DM connections
+            .reduce((acc: any[], c: any) => {
+              // Only add if this userId hasn't been added yet
+              if (!acc.find(user => user.userId === c.userId)) {
+                acc.push({
+                  id: c.id,
+                  username: c.username,
+                  userId: c.userId
+                });
+              }
+              return acc;
+            }, [])
         : []
     });
   } catch (error) {
@@ -249,6 +257,18 @@ export const getAllBookClubs = async (req: Request, res: Response) => {
     const bookClubsWithUserCount = bookClubs.map(club => {
       const activeClub = activeBookClubs?.get(club.id);
       
+      // Count unique users (not connections) - filter out DM connections and count unique userIds
+      let uniqueActiveUsers = 0;
+      if (activeClub) {
+        const uniqueUserIds = new Set<string>();
+        activeClub.clients.forEach(client => {
+          if (!client.isDMConnection && client.userId) {
+            uniqueUserIds.add(client.userId);
+          }
+        });
+        uniqueActiveUsers = uniqueUserIds.size;
+      }
+      
       // Map member IDs to full user objects
       const memberDetails = club.members
         .map(memberId => userDetailsMap.get(memberId))
@@ -257,7 +277,7 @@ export const getAllBookClubs = async (req: Request, res: Response) => {
       return {
         ...club,
         members: memberDetails.length > 0 ? memberDetails : club.members,
-        activeUsers: activeClub ? activeClub.clients.size : 0,
+        activeUsers: uniqueActiveUsers,
         currentBook: currentBooksMap.get(club.id) || null
       };
     });
@@ -282,9 +302,22 @@ export const getMyBookClubs = async (req: AuthRequest, res: Response) => {
     // Add active user count and member count to each bookclub
     const bookClubsWithUserCount = bookClubs.map(club => {
       const activeClub = activeBookClubs?.get(club.id);
+      
+      // Count unique users (not connections) - filter out DM connections and count unique userIds
+      let uniqueActiveUsers = 0;
+      if (activeClub) {
+        const uniqueUserIds = new Set<string>();
+        activeClub.clients.forEach(client => {
+          if (!client.isDMConnection && client.userId) {
+            uniqueUserIds.add(client.userId);
+          }
+        });
+        uniqueActiveUsers = uniqueUserIds.size;
+      }
+      
       return {
         ...club,
-        activeUsers: activeClub ? activeClub.clients.size : 0,
+        activeUsers: uniqueActiveUsers,
         memberCount: club.members.length
       };
     });

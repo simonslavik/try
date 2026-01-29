@@ -21,7 +21,7 @@ export const getReadingProgress = async (req: AuthRequest, res: Response): Promi
     const { bookClubBookId } = req.params;
 
     const existingBookClubBook = await prisma.bookClubBook.findUnique({
-      where: { id: bookClubBookId }
+      where: { id: bookClubBookId as string }
     });
 
     if (!existingBookClubBook) {
@@ -34,7 +34,7 @@ export const getReadingProgress = async (req: AuthRequest, res: Response): Promi
     const progress = await prisma.readingProgress.findUnique({
       where: {
         bookClubBookId_userId: {
-          bookClubBookId,
+          bookClubBookId: bookClubBookId as string,
           userId: req.user!.userId
         }
       },
@@ -72,7 +72,7 @@ export const updateReadingProgress = async (req: AuthRequest, res: Response): Pr
     const { pagesRead, notes } = req.body;
 
     const bookClubBook = await prisma.bookClubBook.findUnique({
-      where: { id: bookClubBookId },
+      where: { id: bookClubBookId as string },
       include: { book: true }
     });
 
@@ -87,7 +87,7 @@ export const updateReadingProgress = async (req: AuthRequest, res: Response): Pr
     const progress = await prisma.readingProgress.upsert({
       where: {
         bookClubBookId_userId: {
-          bookClubBookId,
+          bookClubBookId: bookClubBookId as string,
           userId: req.user!.userId
         }
       },
@@ -98,7 +98,7 @@ export const updateReadingProgress = async (req: AuthRequest, res: Response): Pr
         lastReadDate: new Date()
       },
       create: {
-        bookClubBookId,
+        bookClubBookId: bookClubBookId as string,
         userId: req.user!.userId,
         pagesRead,
         percentage,
@@ -133,7 +133,7 @@ export const addOrUpdateReview = async (req: AuthRequest, res: Response): Promis
     const { rating, reviewText } = req.body;
 
     const bookClubBook = await prisma.bookClubBook.findUnique({
-      where: { id: bookClubBookId }
+      where: { id: bookClubBookId as string }
     });
 
     if (!bookClubBook) {
@@ -144,7 +144,7 @@ export const addOrUpdateReview = async (req: AuthRequest, res: Response): Promis
     const review = await prisma.bookClubBookReview.upsert({
       where: {
         bookClubBookId_userId: {
-          bookClubBookId,
+          bookClubBookId: bookClubBookId as string,
           userId: req.user!.userId
         }
       },
@@ -153,7 +153,7 @@ export const addOrUpdateReview = async (req: AuthRequest, res: Response): Promis
         reviewText: reviewText || null
       },
       create: {
-        bookClubBookId,
+        bookClubBookId: bookClubBookId as string,
         userId: req.user!.userId,
         rating,
         reviewText: reviewText || null
@@ -180,7 +180,7 @@ export const getReviews = async (req: AuthRequest, res: Response): Promise<void>
     const { bookClubBookId } = req.params;
 
     const reviews = await prisma.bookClubBookReview.findMany({
-      where: { bookClubBookId },
+      where: { bookClubBookId: bookClubBookId as string },
       orderBy: { createdAt: 'desc' }
     });
 
@@ -217,7 +217,7 @@ export const deleteReview = async (req: AuthRequest, res: Response): Promise<voi
     await prisma.bookClubBookReview.delete({
       where: {
         bookClubBookId_userId: {
-          bookClubBookId,
+          bookClubBookId: bookClubBookId as string,
           userId: req.user!.userId
         }
       }

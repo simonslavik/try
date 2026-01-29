@@ -12,7 +12,7 @@ export const getSuggestions = async (req: AuthRequest, res: Response): Promise<v
 
     const suggestions = await prisma.bookSuggestion.findMany({
       where: {
-        bookClubId,
+        bookClubId: bookClubId as string,
         status: 'pending'
       },
       include: {
@@ -67,7 +67,7 @@ export const createSuggestion = async (req: AuthRequest, res: Response): Promise
 
     const existing = await prisma.bookSuggestion.findFirst({
       where: {
-        bookClubId,
+        bookClubId: bookClubId as string,
         bookId: book.id,
         status: 'pending'
       }
@@ -80,7 +80,7 @@ export const createSuggestion = async (req: AuthRequest, res: Response): Promise
 
     const suggestion = await prisma.bookSuggestion.create({
       data: {
-        bookClubId,
+        bookClubId: bookClubId as string,
         bookId: book.id,
         suggestedById: req.user!.userId,
         reason,
@@ -124,13 +124,13 @@ export const voteSuggestion = async (req: AuthRequest, res: Response): Promise<v
     const vote = await prisma.bookSuggestionVote.upsert({
       where: {
         suggestionId_userId: {
-          suggestionId,
+          suggestionId: suggestionId as string,
           userId: req.user!.userId
         }
       },
       update: { voteType },
       create: {
-        suggestionId,
+        suggestionId: suggestionId as string,
         userId: req.user!.userId,
         voteType
       }
@@ -138,7 +138,7 @@ export const voteSuggestion = async (req: AuthRequest, res: Response): Promise<v
 
     const voteCounts = await prisma.bookSuggestionVote.groupBy({
       by: ['voteType'],
-      where: { suggestionId },
+      where: { suggestionId: suggestionId as string },
       _count: true
     });
 
@@ -146,7 +146,7 @@ export const voteSuggestion = async (req: AuthRequest, res: Response): Promise<v
     const downvotes = voteCounts.find((v: any) => v.voteType === 'downvote')?._count || 0;
 
     await prisma.bookSuggestion.update({
-      where: { id: suggestionId },
+      where: { id: suggestionId as string },
       data: { upvotes, downvotes }
     });
 
@@ -170,7 +170,7 @@ export const acceptSuggestion = async (req: AuthRequest, res: Response): Promise
     }
 
     const suggestion = await prisma.bookSuggestion.findUnique({
-      where: { id: suggestionId },
+      where: { id: suggestionId as string },
       include: { book: true }
     });
 
@@ -180,13 +180,13 @@ export const acceptSuggestion = async (req: AuthRequest, res: Response): Promise
     }
 
     await prisma.bookClubBook.updateMany({
-      where: { bookClubId, status: 'current' },
+      where: { bookClubId: bookClubId as string, status: 'current' },
       data: { status: 'completed' }
     });
 
     const bookClubBook = await prisma.bookClubBook.create({
       data: {
-        bookClubId,
+        bookClubId: bookClubId as string,
         bookId: suggestion.bookId,
         status: 'current',
         startDate: new Date(startDate),
@@ -197,7 +197,7 @@ export const acceptSuggestion = async (req: AuthRequest, res: Response): Promise
     });
 
     await prisma.bookSuggestion.update({
-      where: { id: suggestionId },
+      where: { id: suggestionId as string },
       data: { status: 'accepted' }
     });
 
@@ -215,7 +215,7 @@ export const deleteSuggestion = async (req: AuthRequest, res: Response): Promise
     const { suggestionId } = req.params;
 
     const suggestion = await prisma.bookSuggestion.findUnique({
-      where: { id: suggestionId }
+      where: { id: suggestionId as string }
     });
 
     if (!suggestion) {
@@ -229,7 +229,7 @@ export const deleteSuggestion = async (req: AuthRequest, res: Response): Promise
     }
 
     await prisma.bookSuggestion.delete({
-      where: { id: suggestionId }
+      where: { id: suggestionId as string }
     });
 
     res.json({ success: true, message: 'Suggestion deleted successfully' });

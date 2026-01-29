@@ -2,6 +2,21 @@ import React from 'react';
 import { FiHome, FiMail, FiSend } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 
+// Helper function to get user initials
+const getUserInitials = (name) => {
+  if (!name) return 'GU';
+  
+  const parts = name.trim().split(/\s+/); // Split by whitespace
+  
+  if (parts.length >= 2) {
+    // Multiple words: take first letter of first and last word
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  } else {
+    // Single word: take first two letters
+    return name.substring(0, 2).toUpperCase();
+  }
+};
+
 const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, viewMode, onSelectBookClub, onOpenDM, auth }) => {
     const navigate = useNavigate();
 
@@ -70,26 +85,18 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, viewMode, onSelectBo
             +
           </button>
           <button className='cursor-pointer absolute bottom-4' onClick={() => navigate(`/profile/${auth.user.id}`)}>
-            {auth.user.profileImage ? (
-              <div className="relative">
-                <img
-                  src={auth.user.profileImage 
-                          ? `http://localhost:3001${auth.user.profileImage}` 
-                          : '/images/default.webp'
-                        } 
-                  alt={auth.user.name}
-                  className="w-10 h-10 rounded-full object-cover hover:bg-gray-50 cursor-pointer"
-                />
-                <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-900 bg-green-500"></div>
-              </div>
-            ) : (
-              <div className="relative">
-                <span className='w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-white font-bold text-sm'>
-                  {auth.user ? auth.user.name.substring(0, 2).toUpperCase() : 'GU'}
-                </span>
-                <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-900 bg-green-500"></div>
-              </div>
-            )}
+            <div className="relative">
+              <img
+                src={auth.user.profileImage 
+                  ? `http://localhost:3001${auth.user.profileImage}` 
+                  : '/images/default.webp'
+                } 
+                alt={auth.user.name}
+                className="w-10 h-10 rounded-full object-cover hover:bg-gray-50 cursor-pointer"
+                onError={(e) => { e.target.src = '/images/default.webp'; }}
+              />
+              <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-900 bg-green-500"></div>
+            </div>
           </button>
           
         </div>

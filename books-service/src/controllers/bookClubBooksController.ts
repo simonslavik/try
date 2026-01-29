@@ -64,7 +64,7 @@ export const addBookClubBook = async (req: AuthRequest, res: Response): Promise<
 
     const bookClubBook = await prisma.bookClubBook.create({
       data: {
-        bookClubId,
+        bookClubId: bookClubId as string,
         bookId: book.id,
         status,
         startDate: startDate ? new Date(startDate) : null,
@@ -107,7 +107,7 @@ export const updateBookClubBook = async (req: AuthRequest, res: Response): Promi
     const { status, startDate, endDate } = req.body;
 
     const existingBookClubBook = await prisma.bookClubBook.findUnique({
-      where: { bookClubId_bookId: { bookClubId, bookId } }
+      where: { bookClubId_bookId: { bookClubId: bookClubId as string, bookId: bookId as string } }
     });
 
     if (!existingBookClubBook) {
@@ -118,7 +118,7 @@ export const updateBookClubBook = async (req: AuthRequest, res: Response): Promi
     }
 
     const bookClubBook = await prisma.bookClubBook.update({
-      where: { bookClubId_bookId: { bookClubId, bookId } },
+      where: { bookClubId_bookId: { bookClubId: bookClubId as string, bookId: bookId as string } },
       data: {
         status,
         startDate: startDate ? new Date(startDate) : undefined,
@@ -153,7 +153,7 @@ export const deleteBookClubBook = async (req: AuthRequest, res: Response): Promi
     const { bookClubId, bookId } = req.params;
 
     const existingBookClubBook = await prisma.bookClubBook.findUnique({
-      where: { bookClubId_bookId: { bookClubId, bookId } }
+      where: { bookClubId_bookId: { bookClubId: bookClubId as string, bookId: bookId as string } }
     });
 
     if (!existingBookClubBook) {
@@ -164,7 +164,7 @@ export const deleteBookClubBook = async (req: AuthRequest, res: Response): Promi
     }
 
     await prisma.bookClubBook.delete({
-      where: { bookClubId_bookId: { bookClubId, bookId } }
+      where: { bookClubId_bookId: { bookClubId: bookClubId as string, bookId: bookId as string } }
     });
 
     res.json({ success: true, message: 'Book removed from bookclub' });

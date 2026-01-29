@@ -460,9 +460,24 @@ const BookClub = () => {
     console.log('Selected files count:', selectedFiles.length);
     console.log('Selected files:', selectedFiles);
     console.log('FileUploadRef exists:', !!fileUploadRef.current);
+    console.log('ws ref exists:', !!ws);
+    console.log('ws.current exists:', !!ws.current);
+    console.log('ws.current readyState:', ws.current?.readyState);
+    console.log('WebSocket.OPEN value:', WebSocket.OPEN);
     
-    if ((!newMessage.trim() && selectedFiles.length === 0) || !ws.current || ws.current.readyState !== WebSocket.OPEN) {
+    const hasMessage = newMessage.trim().length > 0;
+    const hasFiles = selectedFiles.length > 0;
+    const hasContent = hasMessage || hasFiles;
+    const wsReady = ws.current && ws.current.readyState === WebSocket.OPEN;
+    
+    console.log('Has message:', hasMessage);
+    console.log('Has files:', hasFiles);
+    console.log('Has content:', hasContent);
+    console.log('WS ready:', wsReady);
+    
+    if (!hasContent || !wsReady) {
       console.log('Validation failed - returning early');
+      console.log('Reason: hasContent=', hasContent, 'wsReady=', wsReady);
       return;
     }
 

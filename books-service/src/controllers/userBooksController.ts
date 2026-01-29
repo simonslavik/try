@@ -93,7 +93,7 @@ export const updateUserBook = async (req: AuthRequest, res: Response): Promise<v
       where: {
         userId_bookId: {
           userId: req.user!.userId,
-          bookId
+          bookId: bookId as string
         }
       }
     });
@@ -115,7 +115,7 @@ export const updateUserBook = async (req: AuthRequest, res: Response): Promise<v
       where: {
         userId_bookId: {
           userId: req.user!.userId,
-          bookId
+          bookId: bookId as string
         }
       },
       data: updateData,
@@ -137,7 +137,7 @@ export const deleteUserBook = async (req: AuthRequest, res: Response): Promise<v
 
     // Check if book exists in user's library
     const existingUserBook = await prisma.userBook.findUnique({
-      where: { id: userBookId }
+      where: { id: userBookId as string }
     });
 
     if (!existingUserBook) {
@@ -156,7 +156,7 @@ export const deleteUserBook = async (req: AuthRequest, res: Response): Promise<v
     }
 
     await prisma.userBook.delete({
-      where: { id: userBookId }
+      where: { id: userBookId as string }
     });
 
     res.json({ success: true, message: 'Book removed from library' });
