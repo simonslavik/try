@@ -131,6 +131,45 @@ export const updateUserBook = async (req: AuthRequest, res: Response): Promise<v
 /**
  * Remove book from user's library
  */
+export const removeUserBook = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { bookId } = req.params;
+
+    // Check if book exists in user's library
+    const existingUserBook = await prisma.userBook.findUnique({
+      where: {
+        userId_bookId: {
+          userId: req.user!.userId,
+          bookId: bookId as string
+        }
+      }
+    });
+
+    if (!existingUserBook) {
+      res.status(404).json({
+        error: 'Book not found in your library'
+      });
+      return;
+    }
+
+    await prisma.userBook.delete({
+      where: {
+        userId_bookId: {
+          userId: req.user!.userId,
+          bookId: bookId as string
+        }
+      }
+    });
+
+    res.json({ success: true, message: 'Book removed from library' });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * Remove book from user's library (by userBookId)
+ */
 export const deleteUserBook = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { userBookId } = req.params;
