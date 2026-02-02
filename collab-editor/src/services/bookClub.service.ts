@@ -1,5 +1,5 @@
 import { BookClubRepository } from '../repositories/bookClub.repository.js';
-import { InviteRepository } from '../repositories/invite.repository.ts';
+import { InviteRepository } from '../repositories/invite.repository.js';
 import { generateInviteCode } from '../utils/inviteCodeGenerator.js';
 import path from 'path';
 import fs from 'fs';

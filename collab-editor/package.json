@@ -9,12 +9,12 @@
     "dev:nodemon": "nodemon",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "jest --detectOpenHandles",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:unit": "jest tests/unit",
-    "test:integration": "jest tests/integration",
-    "test:ci": "jest --ci --coverage --maxWorkers=2"
+    "test": "NODE_ENV=test DATABASE_URL='postgresql://test:test@localhost:5432/collab_test' jest --detectOpenHandles",
+    "test:watch": "NODE_ENV=test DATABASE_URL='postgresql://test:test@localhost:5432/collab_test' jest --watch",
+    "test:coverage": "NODE_ENV=test DATABASE_URL='postgresql://test:test@localhost:5432/collab_test' jest --coverage",
+    "test:unit": "NODE_ENV=test DATABASE_URL='postgresql://test:test@localhost:5432/collab_test' jest tests/unit",
+    "test:integration": "NODE_ENV=test DATABASE_URL='postgresql://test:test@localhost:5432/collab_test' jest tests/integration",
+    "test:ci": "NODE_ENV=test DATABASE_URL='postgresql://test:test@localhost:5432/collab_test' jest --ci --coverage --maxWorkers=2"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
