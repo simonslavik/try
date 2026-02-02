@@ -1,8 +1,10 @@
 import 'dotenv/config';
 import express, { Express } from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import logger from './utils/logger';
 import errorHandler from './middleware/errorHandler';
+import { metricsMiddleware, metricsEndpoint } from './middleware/metrics';
 import bookSearchRoutes from './routes/bookSearchRoutes';
 import userBooksRoutes from './routes/userBooksRoutes';
 import bookClubBooksRoutes from './routes/bookClubBooksRoutes';
@@ -12,9 +14,13 @@ import bookSuggestionsRoutes from './routes/bookSuggestionsRoutes';
 const app: Express = express();
 const PORT = process.env.PORT || 3002;
 
-// Middleware
+// Security Middleware
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
+
+// Metrics middleware
+app.use(metricsMiddleware);
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -30,6 +36,9 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
+
+// Metrics endpoint for Prometheus
+app.get('/metrics', metricsEndpoint);
 
 // API Routes
 app.use('/v1/books', bookSearchRoutes);
