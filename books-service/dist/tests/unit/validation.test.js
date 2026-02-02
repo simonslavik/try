@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const validation_1 = require("../../utils/validation");
+const validation_1 = require("../../src/utils/validation");
 describe('Validation Schemas', () => {
     describe('addBookSchema', () => {
         it('should validate correct book data', () => {

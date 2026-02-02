@@ -5,7 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteSuggestion = exports.acceptSuggestion = exports.voteSuggestion = exports.createSuggestion = exports.getSuggestions = void 0;
 const database_1 = __importDefault(require("../config/database"));
-const googlebookapi_1 = require("../../utils/googlebookapi");
+const bookSuggestions_service_1 = require("../services/bookSuggestions.service");
+const books_repository_1 = require("../repositories/books.repository");
 /**
  * Get all suggestions for a bookclub
  */
@@ -55,37 +56,22 @@ const createSuggestion = async (req, res) => {
             res.status(400).json({ error: 'googleBooksId is required' });
             return;
         }
-        const bookData = await googlebookapi_1.GoogleBooksService.getBookById(googleBooksId);
-        const book = await database_1.default.book.upsert({
-            where: { googleBooksId },
-            update: {},
-            create: bookData
-        });
-        const existing = await database_1.default.bookSuggestion.findFirst({
-            where: {
-                bookClubId: bookClubId,
-                bookId: book.id,
-                status: 'pending'
+        // Check if book already suggested
+        const book = await books_repository_1.BooksRepository.findByGoogleBooksId(googleBooksId);
+        if (book) {
+            const existing = await database_1.default.bookSuggestion.findFirst({
+                where: {
+                    bookClubId: bookClubId,
+                    bookId: book.id,
+                    status: 'pending'
+                }
+            });
+            if (existing) {
+                res.status(400).json({ error: 'This book has already been suggested' });
+                return;
             }
-        });
-        if (existing) {
-            res.status(400).json({ error: 'This book has already been suggested' });
-            return;
         }
-        const suggestion = await database_1.default.bookSuggestion.create({
-            data: {
-                bookClubId: bookClubId,
-                bookId: book.id,
-                suggestedById: req.user.userId,
-                reason,
-                status: 'pending',
-                upvotes: 0,
-                downvotes: 0
-            },
-            include: {
-                book: true
-            }
-        });
+        const suggestion = await bookSuggestions_service_1.BookSuggestionsService.suggestBook(bookClubId, req.user.userId, googleBooksId, reason);
         res.json({
             success: true,
             data: {
@@ -207,9 +193,7 @@ const deleteSuggestion = async (req, res) => {
             res.status(403).json({ error: 'You can only delete your own suggestions' });
             return;
         }
-        await database_1.default.bookSuggestion.delete({
-            where: { id: suggestionId }
-        });
+        await bookSuggestions_service_1.BookSuggestionsService.deleteSuggestion(suggestionId, req.user.userId);
         res.json({ success: true, message: 'Suggestion deleted successfully' });
     }
     catch (error) {

@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteReview = exports.getReviews = exports.addOrUpdateReview = exports.updateReadingProgress = exports.getReadingProgress = void 0;
 const database_1 = __importDefault(require("../config/database"));
-const validation_1 = require("../../utils/validation");
+const validation_1 = require("../utils/validation");
 /**
  * Get user's reading progress for a bookclub book
  */

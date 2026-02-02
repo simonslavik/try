@@ -1,7 +1,8 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import prisma from '../config/database';
-import { GoogleBooksService } from '../../utils/googlebookapi';
+import { BookSuggestionsService } from '../services/bookSuggestions.service';
+import { BooksRepository } from '../repositories/books.repository';
 
 /**
  * Get all suggestions for a bookclub
@@ -57,41 +58,30 @@ export const createSuggestion = async (req: AuthRequest, res: Response): Promise
       return;
     }
 
-    const bookData = await GoogleBooksService.getBookById(googleBooksId);
+    // Check if book already suggested
+    const book = await BooksRepository.findByGoogleBooksId(googleBooksId);
 
-    const book = await prisma.book.upsert({
-      where: { googleBooksId },
-      update: {},
-      create: bookData
-    });
+    if (book) {
+      const existing = await prisma.bookSuggestion.findFirst({
+        where: {
+          bookClubId: bookClubId as string,
+          bookId: book.id,
+          status: 'pending'
+        }
+      });
 
-    const existing = await prisma.bookSuggestion.findFirst({
-      where: {
-        bookClubId: bookClubId as string,
-        bookId: book.id,
-        status: 'pending'
+      if (existing) {
+        res.status(400).json({ error: 'This book has already been suggested' });
+        return;
       }
-    });
-
-    if (existing) {
-      res.status(400).json({ error: 'This book has already been suggested' });
-      return;
     }
 
-    const suggestion = await prisma.bookSuggestion.create({
-      data: {
-        bookClubId: bookClubId as string,
-        bookId: book.id,
-        suggestedById: req.user!.userId,
-        reason,
-        status: 'pending',
-        upvotes: 0,
-        downvotes: 0
-      },
-      include: {
-        book: true
-      }
-    });
+    const suggestion = await BookSuggestionsService.suggestBook(
+      bookClubId as string,
+      req.user!.userId,
+      googleBooksId,
+      reason
+    );
 
     res.json({
       success: true,
@@ -228,10 +218,7 @@ export const deleteSuggestion = async (req: AuthRequest, res: Response): Promise
       return;
     }
 
-    await prisma.bookSuggestion.delete({
-      where: { id: suggestionId as string }
-    });
-
+    await BookSuggestionsService.deleteSuggestion(suggestionId as string, req.user!.userId);
     res.json({ success: true, message: 'Suggestion deleted successfully' });
   } catch (error: any) {
     res.status(500).json({ error: error.message });

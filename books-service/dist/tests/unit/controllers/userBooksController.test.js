@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const userBooksController_1 = require("../../../src/controllers/userBooksController");
 const database_1 = __importDefault(require("../../../src/config/database"));
-const googlebookapi_1 = require("../../../utils/googlebookapi");
+const googleBooks_service_1 = require("../../../src/services/googleBooks.service");
 // Mock dependencies
 jest.mock('../../../src/config/database', () => ({
     __esModule: true,
@@ -22,7 +22,7 @@ jest.mock('../../../src/config/database', () => ({
         }
     }
 }));
-jest.mock('../../../utils/googlebookapi');
+jest.mock('../../../src/services/googleBooks.service');
 describe('UserBooksController', () => {
     let mockReq;
     let mockRes;
@@ -130,11 +130,11 @@ describe('UserBooksController', () => {
                 review: 'Great book',
                 book: mockBook
             };
-            googlebookapi_1.GoogleBooksService.getBookById.mockResolvedValue(mockGoogleBook);
+            googleBooks_service_1.GoogleBooksService.getBookById.mockResolvedValue(mockGoogleBook);
             database_1.default.book.upsert.mockResolvedValue(mockBook);
             database_1.default.userBook.upsert.mockResolvedValue(mockUserBook);
             await (0, userBooksController_1.addUserBook)(mockReq, mockRes);
-            expect(googlebookapi_1.GoogleBooksService.getBookById).toHaveBeenCalledWith('abc123');
+            expect(googleBooks_service_1.GoogleBooksService.getBookById).toHaveBeenCalledWith('abc123');
             expect(database_1.default.book.upsert).toHaveBeenCalled();
             expect(database_1.default.userBook.upsert).toHaveBeenCalled();
             expect(jsonMock).toHaveBeenCalledWith({
@@ -156,7 +156,7 @@ describe('UserBooksController', () => {
                 googleBooksId: 'abc123',
                 status: 'reading'
             };
-            googlebookapi_1.GoogleBooksService.getBookById.mockRejectedValue(new Error('Book not found'));
+            googleBooks_service_1.GoogleBooksService.getBookById.mockRejectedValue(new Error('Book not found'));
             await (0, userBooksController_1.addUserBook)(mockReq, mockRes);
             expect(statusMock).toHaveBeenCalledWith(500);
             expect(jsonMock).toHaveBeenCalledWith({

@@ -3,10 +3,10 @@ import express, { Express } from 'express';
 import userBooksRoutes from '../../src/routes/userBooksRoutes';
 import prisma from '../../src/config/database';
 import jwt from 'jsonwebtoken';
-import { GoogleBooksService } from '../../utils/googlebookapi';
+import { GoogleBooksService } from '../../src/services/googleBooks.service';
 
 // Mock Google Books API
-jest.mock('../../utils/googlebookapi');
+jest.mock('../../src/services/googleBooks.service');
 
 const app: Express = express();
 app.use(express.json());

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { GoogleBooksService } from '../../utils/googlebookapi';
+import { BookSearchService } from '../services/bookSearch.service';
 
 /**
  * Search books via Google Books API
@@ -13,7 +13,7 @@ export const searchBooks = async (req: Request, res: Response): Promise<void> =>
       return;
     }
 
-    const books = await GoogleBooksService.searchBooks(q as string, Number(limit));
+    const books = await BookSearchService.searchBooks(q as string, Number(limit));
     res.json({ success: true, data: books });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -26,7 +26,7 @@ export const searchBooks = async (req: Request, res: Response): Promise<void> =>
 export const getBookDetails = async (req: Request, res: Response): Promise<void> => {
   try {
     const { googleBooksId } = req.params;
-    const book = await GoogleBooksService.getBookById(googleBooksId as string);
+    const book = await BookSearchService.getBookDetails(googleBooksId as string);
     res.json({ success: true, data: book });
   } catch (error: any) {
     res.status(500).json({ error: error.message });

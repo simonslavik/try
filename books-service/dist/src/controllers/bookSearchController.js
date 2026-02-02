@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBookDetails = exports.searchBooks = void 0;
-const googlebookapi_1 = require("../../utils/googlebookapi");
+const bookSearch_service_1 = require("../services/bookSearch.service");
 /**
  * Search books via Google Books API
  */
@@ -12,7 +12,7 @@ const searchBooks = async (req, res) => {
             res.status(400).json({ error: 'Query parameter required' });
             return;
         }
-        const books = await googlebookapi_1.GoogleBooksService.searchBooks(q, Number(limit));
+        const books = await bookSearch_service_1.BookSearchService.searchBooks(q, Number(limit));
         res.json({ success: true, data: books });
     }
     catch (error) {
@@ -26,7 +26,7 @@ exports.searchBooks = searchBooks;
 const getBookDetails = async (req, res) => {
     try {
         const { googleBooksId } = req.params;
-        const book = await googlebookapi_1.GoogleBooksService.getBookById(googleBooksId);
+        const book = await bookSearch_service_1.BookSearchService.getBookDetails(googleBooksId);
         res.json({ success: true, data: book });
     }
     catch (error) {

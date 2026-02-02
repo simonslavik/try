@@ -8,9 +8,9 @@ const express_1 = __importDefault(require("express"));
 const userBooksRoutes_1 = __importDefault(require("../../src/routes/userBooksRoutes"));
 const database_1 = __importDefault(require("../../src/config/database"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const googlebookapi_1 = require("../../utils/googlebookapi");
+const googleBooks_service_1 = require("../../src/services/googleBooks.service");
 // Mock Google Books API
-jest.mock('../../utils/googlebookapi');
+jest.mock('../../src/services/googleBooks.service');
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use('/v1/user-books', userBooksRoutes_1.default);
@@ -32,7 +32,7 @@ describe('User Books Integration Tests', () => {
     });
     beforeEach(() => {
         // Mock Google Books API for all tests
-        googlebookapi_1.GoogleBooksService.getBookById.mockImplementation((googleBooksId) => ({
+        googleBooks_service_1.GoogleBooksService.getBookById.mockImplementation((googleBooksId) => ({
             title: 'Test Book',
             author: 'Test Author',
             description: 'Test Description',
