@@ -3,6 +3,10 @@ import express, { Express } from 'express';
 import userBooksRoutes from '../../src/routes/userBooksRoutes';
 import prisma from '../../src/config/database';
 import jwt from 'jsonwebtoken';
+import { GoogleBooksService } from '../../utils/googlebookapi';
+
+// Mock Google Books API
+jest.mock('../../utils/googlebookapi');
 
 const app: Express = express();
 app.use(express.json());
@@ -19,8 +23,7 @@ describe('User Books Integration Tests', () => {
     authToken = jwt.sign(
       { 
         userId: testUserId, 
-        email: 'test@example.com',
-        role: 'user'
+        email: 'test@example.com'
       },
       process.env.JWT_SECRET || 'test-secret'
     );
@@ -29,6 +32,19 @@ describe('User Books Integration Tests', () => {
     await prisma.userBook.deleteMany({
       where: { userId: testUserId }
     });
+  });
+
+  beforeEach(() => {
+    // Mock Google Books API for all tests
+    (GoogleBooksService.getBookById as jest.Mock).mockImplementation((googleBooksId: string) => ({
+      title: 'Test Book',
+      author: 'Test Author',
+      description: 'Test Description',
+      coverUrl: 'http://example.com/cover.jpg',
+      pageCount: 200,
+      isbn: '1234567890',
+      googleBooksId: googleBooksId // Use the provided ID
+    }));
   });
 
   afterAll(async () => {
@@ -52,7 +68,7 @@ describe('User Books Integration Tests', () => {
         .get('/v1/user-books')
         .expect(401);
 
-      expect(response.body).toHaveProperty('error');
+      expect(response.body).toHaveProperty('message');
     });
 
     it('should return empty array for new user', async () => {
@@ -188,7 +204,7 @@ describe('User Books Integration Tests', () => {
   describe('PUT /v1/user-books/:bookId', () => {
     let bookIdToUpdate: string;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       // Add a book to update
       const response = await request(app)
         .post('/v1/user-books')
@@ -203,7 +219,7 @@ describe('User Books Integration Tests', () => {
 
     it('should update book status', async () => {
       const response = await request(app)
-        .put(`/v1/user-books/${bookIdToUpdate}`)
+        .patch(`/v1/user-books/${bookIdToUpdate}`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           status: 'completed',
@@ -219,7 +235,7 @@ describe('User Books Integration Tests', () => {
 
     it('should return 404 for non-existent book', async () => {
       const response = await request(app)
-        .put('/v1/user-books/non-existent-book-id')
+        .patch('/v1/user-books/non-existent-book-id')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           status: 'completed'
@@ -231,7 +247,7 @@ describe('User Books Integration Tests', () => {
 
     it('should allow partial updates', async () => {
       const response = await request(app)
-        .put(`/v1/user-books/${bookIdToUpdate}`)
+        .patch(`/v1/user-books/${bookIdToUpdate}`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           rating: 4 // Only update rating
@@ -243,8 +259,8 @@ describe('User Books Integration Tests', () => {
     });
   });
 
-  describe('DELETE /v1/user-books/:bookId', () => {
-    let bookIdToDelete: string;
+  describe('DELETE /v1/user-books/:userBookId', () => {
+    let userBookIdToDelete: string;
 
     beforeEach(async () => {
       // Add a book to delete
@@ -256,12 +272,12 @@ describe('User Books Integration Tests', () => {
           status: 'reading'
         });
 
-      bookIdToDelete = response.body.data.bookId;
+      userBookIdToDelete = response.body.data.id;
     });
 
     it('should delete book from library', async () => {
       const response = await request(app)
-        .delete(`/v1/user-books/${bookIdToDelete}`)
+        .delete(`/v1/user-books/${userBookIdToDelete}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
@@ -274,7 +290,7 @@ describe('User Books Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`);
 
       const deletedBook = getResponse.body.data.find(
-        (book: any) => book.bookId === bookIdToDelete
+        (book: any) => book.id === userBookIdToDelete
       );
       expect(deletedBook).toBeUndefined();
     });

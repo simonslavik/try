@@ -259,7 +259,7 @@ describe('UserBooksController', () => {
 
       expect(statusMock).toHaveBeenCalledWith(404);
       expect(jsonMock).toHaveBeenCalledWith({
-        error: 'Book not found in your library'
+        error: 'Book not found in your library. Please add it first.'
       });
     });
 

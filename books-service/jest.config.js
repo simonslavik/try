@@ -16,5 +16,6 @@ module.exports = {
   moduleFileExtensions: ['ts', 'js', 'json'],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   testTimeout: 10000,
-  globalTeardown: '<rootDir>/tests/teardown.ts'
+  globalTeardown: '<rootDir>/tests/teardown.ts',
+  watchman: false
 };
