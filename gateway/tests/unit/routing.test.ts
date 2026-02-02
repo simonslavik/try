@@ -93,11 +93,7 @@ describe('Gateway Routing Tests', () => {
 
   describe('URL Path Transformation', () => {
     const transformPath = (incomingPath: string, routePattern: string): string => {
-      // Remove the gateway prefix and keep the service-specific path
-      const prefix = routePattern.replace('*', '');
-      if (incomingPath.startsWith(prefix)) {
-        return '/api' + incomingPath.substring(prefix.length - 1);
-      }
+      // Simply return the incoming path as-is (gateway forwards with full path)
       return incomingPath;
     };
 
