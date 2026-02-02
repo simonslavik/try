@@ -1,11 +1,13 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
+import { ReadingProgressService } from '../services/readingProgress.service';
+import { BookClubBooksRepository } from '../repositories/bookClubBooks.repository';
 import prisma from '../config/database';
 import {
   bookClubBookIdParamSchema,
   postsBookProgressSchema,
   bookClubBookReviewSchema
-} from '../../utils/validation';
+} from '../utils/validation';
 
 /**
  * Get user's reading progress for a bookclub book

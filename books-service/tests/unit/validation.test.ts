@@ -3,7 +3,7 @@ import {
   updateBookSchema,
   addBookForBookClubSchema,
   updateBookClubBookSchema
-} from '../../utils/validation';
+} from '../../src/utils/validation';
 
 describe('Validation Schemas', () => {
   describe('addBookSchema', () => {

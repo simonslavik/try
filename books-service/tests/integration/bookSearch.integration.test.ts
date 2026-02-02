@@ -1,10 +1,10 @@
 import request from 'supertest';
 import express, { Express } from 'express';
 import bookSearchRoutes from '../../src/routes/bookSearchRoutes';
-import { GoogleBooksService } from '../../utils/googlebookapi';
+import { GoogleBooksService } from '../../src/services/googleBooks.service';
 
 // Mock Google Books API
-jest.mock('../../utils/googlebookapi');
+jest.mock('../../src/services/googleBooks.service');
 
 const app: Express = express();
 app.use(express.json());

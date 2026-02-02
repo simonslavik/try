@@ -7,7 +7,7 @@ import {
   removeUserBook
 } from '../../../src/controllers/userBooksController';
 import prisma from '../../../src/config/database';
-import { GoogleBooksService } from '../../../utils/googlebookapi';
+import { GoogleBooksService } from '../../../src/services/googleBooks.service';
 
 // Mock dependencies
 jest.mock('../../../src/config/database', () => ({
@@ -26,7 +26,7 @@ jest.mock('../../../src/config/database', () => ({
   }
 }));
 
-jest.mock('../../../utils/googlebookapi');
+jest.mock('../../../src/services/googleBooks.service');
 
 describe('UserBooksController', () => {
   let mockReq: Partial<AuthRequest>;
@@ -239,7 +239,8 @@ describe('UserBooksController', () => {
             userId: 'test-user-123',
             bookId: 'book-1'
           }
-        }
+        },
+        include: { book: true }
       });
 
       expect(prisma.userBook.update).toHaveBeenCalled();

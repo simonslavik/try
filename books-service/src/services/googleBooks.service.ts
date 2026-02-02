@@ -1,7 +1,8 @@
 import axios from 'axios';
+import logger from '../utils/logger';
 
 const GOOGLE_BOOKS_API = 'https://www.googleapis.com/books/v1/volumes';
-const API_KEY = process.env.GOOGLE_BOOKS_API_KEY; // Optional, higher rate limits with key
+const API_KEY = process.env.GOOGLE_BOOKS_API_KEY;
 
 interface GoogleBook {
   id: string;
@@ -21,8 +22,21 @@ interface GoogleBook {
   };
 }
 
+interface BookData {
+  googleBooksId: string;
+  title: string;
+  author: string;
+  coverUrl: string | null;
+  description: string | null;
+  pageCount: number | null;
+  isbn: string | null;
+}
+
 export class GoogleBooksService {
-  static async searchBooks(query: string, maxResults: number = 20) {
+  /**
+   * Search books from Google Books API
+   */
+  static async searchBooks(query: string, maxResults: number = 20): Promise<BookData[]> {
     try {
       const params: any = {
         q: query,
@@ -47,13 +61,16 @@ export class GoogleBooksService {
           (id) => id.type === 'ISBN_13' || id.type === 'ISBN_10'
         )?.identifier || null
       })) || [];
-    } catch (error) {
-      console.error('Google Books API error:', error);
+    } catch (error: any) {
+      logger.error('Google Books API search error:', { error: error.message, query });
       throw new Error('Failed to search books');
     }
   }
 
-  static async getBookById(googleBooksId: string) {
+  /**
+   * Get book details by Google Books ID
+   */
+  static async getBookById(googleBooksId: string): Promise<BookData> {
     try {
       const params: any = {};
       if (API_KEY) params.key = API_KEY;
@@ -72,8 +89,8 @@ export class GoogleBooksService {
           (id: any) => id.type === 'ISBN_13' || id.type === 'ISBN_10'
         )?.identifier || null
       };
-    } catch (error) {
-      console.error('Google Books API error:', error);
+    } catch (error: any) {
+      logger.error('Google Books API get book error:', { error: error.message, googleBooksId });
       throw new Error('Failed to fetch book details');
     }
   }
