@@ -1,9 +1,6 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middleware/authMiddleware.js';
-import { generateInviteCode } from '../utils/inviteCodeGenerator.js';
-
-const prisma = new PrismaClient();
+import { InviteService } from '../services/invite.service.js';
 
 // Get invite for a bookclub
 export const getInvite = async (req: AuthRequest, res: Response) => {
@@ -11,50 +8,15 @@ export const getInvite = async (req: AuthRequest, res: Response) => {
     const { bookClubId } = req.params;
     const userId = req.user!.userId;
 
-    // Check if bookclub exists and user is creator or member
-    const bookClub = await prisma.bookClub.findUnique({
-      where: { id: bookClubId }
-    });
-
-    if (!bookClub) {
-      return res.status(404).json({ error: 'Book club not found' });
-    }
-
-    if (bookClub.creatorId !== userId && !bookClub.members.includes(userId)) {
-      return res.status(403).json({ error: 'Only book club members can view invite' });
-    }
-
-    // Get existing invite or create one
-    let invite = await prisma.bookClubInvite.findFirst({
-      where: { bookClubId }
-    });
-
-    if (!invite) {
-      // Generate unique invite code
-      let code = generateInviteCode();
-      let existing = await prisma.bookClubInvite.findUnique({ where: { code } });
-      while (existing) {
-        code = generateInviteCode();
-        existing = await prisma.bookClubInvite.findUnique({ where: { code } });
-      }
-
-      invite = await prisma.bookClubInvite.create({
-        data: {
-          bookClubId,
-          code,
-          createdBy: userId,
-          expiresAt: null,
-          maxUses: null
-        }
-      });
-
-      console.log(`📨 Invite created: ${code} for bookclub ${bookClub.name}`);
-    }
+    const invite = await InviteService.getInvite(bookClubId, userId);
 
     res.json({ success: true, invite });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching invite:', error);
-    res.status(500).json({ error: 'Failed to fetch invite' });
+    let statusCode = 500;
+    if (error.message === 'Book club not found') statusCode = 404;
+    if (error.message === 'Only book club members can view invite') statusCode = 403;
+    res.status(statusCode).json({ error: error.message || 'Failed to fetch invite' });
   }
 };
 
@@ -64,58 +26,8 @@ export const joinViaInvite = async (req: AuthRequest, res: Response) => {
     const { code } = req.params;
     const userId = req.user!.userId;
 
-    // Find invite
-    const invite = await prisma.bookClubInvite.findUnique({
-      where: { code },
-      include: { bookClub: true }
-    });
+    const bookClub = await InviteService.joinViaInvite(code, userId);
 
-    if (!invite) {
-      return res.status(404).json({ error: 'Invalid invite code' });
-    }
-
-    // Check if expired
-    if (invite.expiresAt && invite.expiresAt < new Date()) {
-      return res.status(400).json({ error: 'This invite has expired' });
-    }
-
-    // Check if max uses reached
-    if (invite.maxUses && invite.currentUses >= invite.maxUses) {
-      return res.status(400).json({ error: 'This invite has reached its maximum uses' });
-    }
-
-    // Check if user is already a member
-    const bookClub = await prisma.bookClub.findUnique({
-      where: { id: invite.bookClubId }
-    });
-
-    if (!bookClub) {
-      return res.status(404).json({ error: 'Book club not found' });
-    }
-
-    if (bookClub.members.includes(userId) || bookClub.creatorId === userId) {
-      return res.status(400).json({ error: 'You are already a member of this book club' });
-    }
-
-    // Add user to bookclub
-    await prisma.bookClub.update({
-      where: { id: invite.bookClubId },
-      data: {
-        members: {
-          push: userId
-        }
-      }
-    });
-
-    // Increment invite uses
-    await prisma.bookClubInvite.update({
-      where: { id: invite.id },
-      data: {
-        currentUses: { increment: 1 }
-      }
-    });
-
-    console.log(`✅ User ${userId} joined bookclub ${bookClub.name} via invite ${code}`);
     res.json({ 
       success: true, 
       message: 'Successfully joined book club',
@@ -125,9 +37,12 @@ export const joinViaInvite = async (req: AuthRequest, res: Response) => {
         imageUrl: bookClub.imageUrl
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error joining via invite:', error);
-    res.status(500).json({ error: 'Failed to join book club' });
+    let statusCode = 500;
+    if (error.message === 'Invalid invite code' || error.message === 'Book club not found') statusCode = 404;
+    if (error.message.includes('expired') || error.message.includes('maximum uses') || error.message.includes('already a member')) statusCode = 400;
+    res.status(statusCode).json({ error: error.message || 'Failed to join book club' });
   }
 };
 
@@ -136,6 +51,10 @@ export const getInviteInfo = async (req: Request, res: Response) => {
   try {
     const { code } = req.params;
 
+    // This needs direct DB access for public endpoint
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+    
     const invite = await prisma.bookClubInvite.findUnique({
       where: { code }
     });
@@ -169,7 +88,7 @@ export const getInviteInfo = async (req: Request, res: Response) => {
         name: bookClub.name,
         imageUrl: bookClub.imageUrl,
         category: bookClub.category,
-        memberCount: bookClub.members.length + 1 // +1 for creator
+        memberCount: bookClub.members.length
       },
       invite: {
         expiresAt: invite.expiresAt,
@@ -177,7 +96,7 @@ export const getInviteInfo = async (req: Request, res: Response) => {
         currentUses: invite.currentUses
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching invite info:', error);
     res.status(500).json({ error: 'Failed to fetch invite info' });
   }

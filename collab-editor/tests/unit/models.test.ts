@@ -19,10 +19,10 @@ describe('BookClub Model Tests', () => {
       const bookClubResult = await prisma.bookClub.create({
         data: {
           name: 'Test BookClub',
-          description: 'A test bookclub',
           creatorId: testUserId,
           members: [testUserId],
-          isPublic: true
+          isPublic: true,
+          category: 'General'
         }
       });
 
@@ -31,7 +31,6 @@ describe('BookClub Model Tests', () => {
       expect(bookClubResult).toBeDefined();
       expect(bookClubResult.id).toBeDefined();
       expect(bookClubResult.name).toBe('Test BookClub');
-      expect(bookClubResult.description).toBeDefined();
       expect(bookClubResult.creatorId).toBe(testUserId);
       expect(bookClubResult.members).toContain(testUserId);
       expect(bookClubResult.isPublic).toBe(true);
@@ -41,7 +40,6 @@ describe('BookClub Model Tests', () => {
       const bookClubResult = await prisma.bookClub.create({
         data: {
           name: 'Private BookClub',
-          description: 'A private bookclub',
           creatorId: testUserId,
           members: [testUserId],
           isPublic: false
@@ -55,7 +53,6 @@ describe('BookClub Model Tests', () => {
       const bookClubResult = await prisma.bookClub.create({
         data: {
           name: 'BookClub with Image',
-          description: 'Test',
           creatorId: testUserId,
           members: [testUserId],
           imageUrl: '/uploads/test-image.jpg'
@@ -69,7 +66,6 @@ describe('BookClub Model Tests', () => {
       const bookClubResult = await prisma.bookClub.create({
         data: {
           name: 'Fiction BookClub',
-          description: 'For fiction lovers',
           creatorId: testUserId,
           members: [testUserId],
           category: 'Fiction'
@@ -90,13 +86,13 @@ describe('BookClub Model Tests', () => {
       expect(updated.name).toBe('Updated Name');
     });
 
-    it('should update description', async () => {
+    it('should update category', async () => {
       const updated = await prisma.bookClub.update({
         where: { id: createdBookClubId },
-        data: { description: 'Updated description' }
+        data: { category: 'Updated category' }
       });
 
-      expect(updated.description).toBe('Updated description');
+      expect(updated.category).toBe('Updated category');
     });
 
     it('should add members', async () => {
@@ -180,7 +176,6 @@ describe('BookClub Model Tests', () => {
       const toDelete = await prisma.bookClub.create({
         data: {
           name: 'To Delete',
-          description: 'Will be deleted',
           creatorId: testUserId,
           members: [testUserId]
         }
@@ -209,7 +204,6 @@ describe('Room Model Tests', () => {
     const testBookClub = await prisma.bookClub.create({
       data: {
         name: 'Room Test BookClub',
-        description: 'For testing rooms',
         creatorId: testUserId,
         members: [testUserId]
       }
@@ -244,16 +238,15 @@ describe('Room Model Tests', () => {
       expect(roomResult.bookClubId).toBe(testBookClubId);
     });
 
-    it('should handle optional description', async () => {
+    it('should create a room with custom name', async () => {
       const roomResult = await prisma.room.create({
         data: {
           name: 'Spoilers',
-          description: 'Spoiler discussions only',
           bookClubId: testBookClubId
         }
       });
 
-      expect(roomResult.description).toBe('Spoiler discussions only');
+      expect(roomResult.name).toBe('Spoilers');
     });
   });
 
