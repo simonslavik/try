@@ -4,7 +4,7 @@ import { createServer } from 'http';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { PrismaClient } from '@prisma/client';
+import prisma from './config/database.js';
 import { authMiddleware, optionalAuthMiddleware } from './middleware/authMiddleware.js';
 
 // Routes
@@ -19,16 +19,25 @@ import { setupWebSocket } from './websocket/index.js';
 import { activeBookClubs } from './websocket/types.js';
 import { setActiveBookClubs } from './controllers/bookClubController.js';
 
+// New utilities
+import { logger } from './utils/logger.js';
+import { requestLogger } from './middleware/requestLogger.js';
+import { metricsMiddleware, getMetrics } from './utils/metrics.js';
+import { setupGracefulShutdown } from './utils/gracefulShutdown.js';
+import { healthCheck, readinessCheck, livenessCheck } from './controllers/healthController.js';
+import { AppError } from './utils/errors.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-const prisma = new PrismaClient();
 
-// Middleware
+// Middleware - order matters!
 app.use(cors());
 app.use(express.json());
+app.use(requestLogger); // HTTP request logging
+app.use(metricsMiddleware); // Prometheus metrics
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
@@ -42,20 +51,11 @@ setupWebSocket(wss);
 // Share active bookclubs with controller
 setActiveBookClubs(activeBookClubs);
 
-// Health check
-app.get('/health', async (req, res) => {
-  const totalBookClubs = await prisma.bookClub.count();
-  res.json({ 
-    status: 'healthy',
-    service: 'bookclub-service',
-    totalBookClubs,
-    activeBookClubs: activeBookClubs.size,
-    totalActiveClients: Array.from(activeBookClubs.values()).reduce(
-      (sum: number, club) => sum + club.clients.size, 
-      0
-    )
-  });
-});
+// Health and monitoring endpoints
+app.get('/health', healthCheck);
+app.get('/health/ready', readinessCheck);
+app.get('/health/live', livenessCheck);
+app.get('/metrics', getMetrics);
 
 // Routes
 app.use('/bookclubs', bookClubRoutes);
@@ -71,22 +71,41 @@ app.delete('/events/:eventId', authMiddleware, deleteEvent);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Error:', err);
+  // Handle custom AppError instances
+  if (err instanceof AppError) {
+    logger.error('Application Error', { 
+      message: err.message, 
+      statusCode: err.statusCode,
+      path: req.path,
+      method: req.method,
+    });
+    return res.status(err.statusCode).json({ 
+      error: err.message,
+      statusCode: err.statusCode,
+    });
+  }
+
+  // Handle unknown errors
+  logger.error('Unexpected Error', { 
+    error: err,
+    path: req.path,
+    method: req.method,
+  });
+  
   res.status(err.status || 500).json({ 
-    error: err.message || 'Internal server error' 
+    error: err.message || 'Internal server error',
+    statusCode: err.status || 500,
   });
 });
 
 // Start server
 server.listen(PORT, () => {
-  console.log(`🚀 BookClub Service running on port ${PORT}`);
-  console.log(`📡 WebSocket server ready for connections`);
-  console.log(`💾 Connected to database`);
+  logger.success(`BookClub Service running on port ${PORT}`);
+  logger.info(`WebSocket server ready for connections`);
+  logger.info(`Connected to database`);
+  logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  logger.info(`Metrics available at /metrics`);
 });
 
-// Graceful shutdown
-process.on('SIGINT', async () => {
-  console.log('\n🛑 Shutting down gracefully...');
-  await prisma.$disconnect();
-  process.exit(0);
-});
+// Setup graceful shutdown
+setupGracefulShutdown(server, wss);

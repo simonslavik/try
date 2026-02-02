@@ -1,6 +1,7 @@
 import { BookClubRepository } from '../repositories/bookClub.repository.js';
 import { InviteRepository } from '../repositories/invite.repository.js';
 import { generateInviteCode } from '../utils/inviteCodeGenerator.js';
+import { NotFoundError, ForbiddenError, BadRequestError } from '../utils/errors.js';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -60,7 +61,7 @@ export class BookClubService {
    */
   static async create(userId: string, data: CreateBookClubDto) {
     if (!data.name || data.name.trim() === '') {
-      throw new Error('Book club name is required');
+      throw new BadRequestError('Book club name is required');
     }
 
     const inviteCode = await this.generateUniqueInviteCode();
@@ -85,7 +86,7 @@ export class BookClubService {
     const bookClub = await BookClubRepository.findById(bookClubId, true);
     
     if (!bookClub) {
-      throw new Error('Book club not found');
+      throw new NotFoundError('Book club not found');
     }
 
     // Fetch full user details for members
@@ -108,11 +109,11 @@ export class BookClubService {
     const bookClub = await BookClubRepository.findById(bookClubId);
     
     if (!bookClub) {
-      throw new Error('Book club not found');
+      throw new NotFoundError('Book club not found');
     }
-    
+
     if (bookClub.creatorId !== userId) {
-      throw new Error('Only the book club creator can update the book club');
+      throw new ForbiddenError('Only the book club creator can update the book club');
     }
 
     const updateData: any = {};
@@ -225,15 +226,15 @@ export class BookClubService {
     const bookClub = await BookClubRepository.findById(bookClubId);
     
     if (!bookClub) {
-      throw new Error('Book club not found');
+      throw new NotFoundError('Book club not found');
     }
-    
+
     if (bookClub.creatorId !== userId) {
-      throw new Error('Only the book club creator can delete images');
+      throw new ForbiddenError('Only the book club creator can delete images');
     }
-    
+
     if (!bookClub.imageUrl) {
-      throw new Error('Book club has no image to delete');
+      throw new BadRequestError('Book club has no image to delete');
     }
     
     // Delete image file
