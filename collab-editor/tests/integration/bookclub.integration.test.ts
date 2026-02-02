@@ -346,13 +346,13 @@ describe('BookClub API Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           name: 'Updated Name',
-          description: 'Updated description'
+          category: 'Updated category'
         })
         .expect(200);
 
       expect(response.body.success).toBe(true);
       expect(response.body.bookClub.name).toBe('Updated Name');
-      expect(response.body.bookClub.description).toBe('Updated description');
+      expect(response.body.bookClub.category).toBe('Updated category');
     });
 
     it('should return 403 if not creator', async () => {
