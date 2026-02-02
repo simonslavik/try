@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middleware/authMiddleware.js';
-
-const prisma = new PrismaClient();
+import { RoomService } from '../services/room.service.js';
 
 // Create a new room
 export const createRoom = async (req: AuthRequest, res: Response) => {
@@ -11,35 +9,16 @@ export const createRoom = async (req: AuthRequest, res: Response) => {
     const { name } = req.body;
     const userId = req.user!.userId;
     
-    if (!name || name.trim() === '') {
-      return res.status(400).json({ error: 'Room name is required' });
-    }
+    const room = await RoomService.create(bookClubId, userId, { name });
     
-    // Check if user is a member of the bookclub
-    const bookClub = await prisma.bookClub.findUnique({
-      where: { id: bookClubId }
-    });
-    
-    if (!bookClub) {
-      return res.status(404).json({ error: 'Book club not found' });
-    }
-    
-    if (!bookClub.members.includes(userId)) {
-      return res.status(403).json({ error: 'You must be a member to create rooms' });
-    }
-    
-    const room = await prisma.room.create({
-      data: {
-        name: name.trim(),
-        bookClubId
-      }
-    });
-    
-    console.log(`📁 Room created in book club ${bookClubId}: ${room.name}`);
     res.json({ room, message: 'Room created successfully' });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating room:', error);
-    res.status(500).json({ error: 'Failed to create room' });
+    let statusCode = 500;
+    if (error.message === 'Room name is required') statusCode = 400;
+    if (error.message === 'Book club not found') statusCode = 404;
+    if (error.message === 'You must be a member to create rooms') statusCode = 403;
+    res.status(statusCode).json({ error: error.message || 'Failed to create room' });
   }
 };
 
@@ -48,13 +27,10 @@ export const getRooms = async (req: Request, res: Response) => {
   try {
     const { bookClubId } = req.params;
     
-    const rooms = await prisma.room.findMany({
-      where: { bookClubId },
-      orderBy: { createdAt: 'asc' }
-    });
+    const rooms = await RoomService.getRooms(bookClubId);
     
     res.json({ rooms });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching rooms:', error);
     res.status(500).json({ error: 'Failed to fetch rooms' });
   }
@@ -65,17 +41,10 @@ export const getRoomMessages = async (req: Request, res: Response) => {
   try {
     const { roomId } = req.params;
     
-    const messages = await prisma.message.findMany({
-      where: { roomId },
-      orderBy: { createdAt: 'asc' },
-      take: 100,
-      include: {
-        attachments: true
-      }
-    });
+    const messages = await RoomService.getRoomMessages(roomId);
     
     res.json({ messages });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching messages:', error);
     res.status(500).json({ error: 'Failed to fetch messages' });
   }
@@ -87,44 +56,15 @@ export const deleteRoom = async (req: AuthRequest, res: Response) => {
     const { bookClubId, roomId } = req.params;
     const userId = req.user!.userId;
     
-    const bookClub = await prisma.bookClub.findUnique({
-      where: { id: bookClubId }
-    });
+    await RoomService.delete(bookClubId, roomId, userId);
     
-    if (!bookClub) {
-      return res.status(404).json({ error: 'Book club not found' });
-    }
-    
-    // Only creator can delete rooms
-    if (bookClub.creatorId !== userId) {
-      return res.status(403).json({ error: 'Only the book club creator can delete rooms' });
-    }
-    
-    const room = await prisma.room.findUnique({
-      where: { id: roomId }
-    });
-    
-    if (!room) {
-      return res.status(404).json({ error: 'Room not found' });
-    }
-    
-    // Prevent deletion of the last room
-    const roomCount = await prisma.room.count({
-      where: { bookClubId }
-    });
-    
-    if (roomCount <= 1) {
-      return res.status(400).json({ error: 'Cannot delete the last room in a book club' });
-    }
-    
-    await prisma.room.delete({
-      where: { id: roomId }
-    });
-    
-    console.log(`🗑️  Room ${roomId} deleted from book club ${bookClubId}`);
     res.json({ message: 'Room deleted successfully' });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error deleting room:', error);
-    res.status(500).json({ error: 'Failed to delete room' });
+    let statusCode = 500;
+    if (error.message === 'Book club not found' || error.message === 'Room not found') statusCode = 404;
+    if (error.message === 'Only the book club creator can delete rooms') statusCode = 403;
+    if (error.message === 'Cannot delete the last room' || error.message === 'Cannot delete the general room') statusCode = 400;
+    res.status(statusCode).json({ error: error.message || 'Failed to delete room' });
   }
 };

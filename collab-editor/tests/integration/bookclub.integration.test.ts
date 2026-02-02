@@ -55,7 +55,7 @@ const createTestApp = (): Express => {
   // Create bookclub
   app.post('/bookclubs', authMiddleware, async (req: any, res) => {
     try {
-      const { name, description, isPublic, category } = req.body;
+      const { name, isPublic, category } = req.body;
 
       if (!name) {
         return res.status(400).json({ error: 'Name is required' });
@@ -64,11 +64,10 @@ const createTestApp = (): Express => {
       const bookClubResult = await prisma.bookClub.create({
         data: {
           name,
-          description,
           creatorId: req.user.userId,
           members: [req.user.userId],
           isPublic: isPublic ?? true,
-          category
+          category: category || 'General'
         }
       });
 
