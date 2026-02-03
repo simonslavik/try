@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiSearch, FiFilter, FiUsers, FiBook, FiX } from 'react-icons/fi';
-import HomePageHeader from '../../components/HomePageHeader';
+import HomePageHeader from '../../components/layout/Header';
 import { AuthContext } from '../../context';
 
 const categories = [
