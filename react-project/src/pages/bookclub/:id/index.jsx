@@ -1,13 +1,13 @@
 import { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import AuthContext from '../../../context';
-import MyBookClubsSidebar from '../../../components/BookClub/MyBookClubsSidebar';
-import SideBarRooms from '../../../components/BookClub/SideBar/SideBarRooms';
-import DMSidebar from '../../../components/BookClub/SideBar/DMSidebar';
-import DMChat from '../../../components/BookClub/MainChatArea/DMChat';
-import AddCurrentBookModal from '../../../components/BookClub/Modals/AddCurrentBookModal';
-import CurrentBookDetailsModal from '../../../components/BookClub/Modals/CurrentBookDetailsModal';
-import AddBookToBookclubModal from '../../../components/BookClub/Modals/AddBookToBookclubModal';
+import MyBookClubsSidebar from '../../../components/features/bookclub/MyBookClubsSidebar';
+import SideBarRooms from '../../../components/features/bookclub/SideBar/SideBarRooms';
+import DMSidebar from '../../../components/features/bookclub/SideBar/DMSidebar';
+import DMChat from '../../../components/features/bookclub/MainChatArea/DMChat';
+import AddCurrentBookModal from '../../../components/features/bookclub/Modals/AddCurrentBookModal';
+import CurrentBookDetailsModal from '../../../components/features/bookclub/Modals/CurrentBookDetailsModal';
+import AddBookToBookclubModal from '../../../components/features/bookclub/Modals/AddBookToBookclubModal';
 
 // Function to convert URLs in text to clickable links
 const linkifyText = (text) => {
@@ -32,15 +32,15 @@ const linkifyText = (text) => {
     return part;
   });
 };
-import CalendarView from '../../../components/BookClub/MainChatArea/CalendarView';
-import AddEventModal from '../../../components/BookClub/Modals/AddEventModal';
-import BookSuggestionsView from '../../../components/BookClub/MainChatArea/BookSuggestionsView';
-import BookClubBookView from '../../../components/BookClub/MainChatArea/BookClubBookView';
-import BookClubChat from '../../../components/BookClub/MainChatArea/BookClubChat';
-import ConnectedUsersSidebar from '../../../components/BookClub/ConnectedUsersSidebar';
-import MessageInput from '../../../components/BookClub/MessageInput';
-import BookclubHeader from '../../../components/BookClub/MainChatArea/BookclubHeader';
-import InviteModal from '../../../components/Modals/InviteModal';
+import CalendarView from '../../../components/features/bookclub/MainChatArea/CalendarView';
+import AddEventModal from '../../../components/features/bookclub/Modals/AddEventModal';
+import BookSuggestionsView from '../../../components/features/bookclub/MainChatArea/BookSuggestionsView';
+import BookClubBookView from '../../../components/features/bookclub/MainChatArea/BookClubBookView';
+import BookClubChat from '../../../components/features/bookclub/MainChatArea/BookClubChat';
+import ConnectedUsersSidebar from '../../../components/features/bookclub/ConnectedUsersSidebar';
+import MessageInput from '../../../components/features/bookclub/MessageInput';
+import BookclubHeader from '../../../components/features/bookclub/MainChatArea/BookclubHeader';
+import InviteModal from '../../../components/common/modals/InviteModal';
 import { useBookclubWebSocket } from '../../../hooks/useBookclubWebSocket';
 
 

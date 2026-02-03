@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AuthContext from '../../../context';
-import HomePageHeader from '../../../components/HomePageHeader';
+import HomePageHeader from '../../../components/layout/Header';
 import { FiCheck, FiX, FiUsers, FiBook } from 'react-icons/fi';
 
 const InviteJoinPage = () => {
