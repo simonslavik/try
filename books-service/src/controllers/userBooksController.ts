@@ -60,7 +60,7 @@ export const updateUserBook = async (req: AuthRequest, res: Response): Promise<v
     const userBook = await UserBooksService.updateUserBook(req.user!.userId, bookId as string, {
       status,
       rating,
-      review
+      review,
     });
 
     res.json({ success: true, data: userBook });
@@ -96,7 +96,7 @@ export const deleteUserBook = async (req: AuthRequest, res: Response): Promise<v
 
     if (!existingUserBook) {
       res.status(404).json({
-        error: 'Book not found in your library'
+        error: 'Book not found in your library',
       });
       return;
     }
@@ -104,7 +104,7 @@ export const deleteUserBook = async (req: AuthRequest, res: Response): Promise<v
     // Verify the book belongs to the requesting user
     if (existingUserBook.userId !== req.user!.userId) {
       res.status(403).json({
-        error: 'You can only delete books from your own library'
+        error: 'You can only delete books from your own library',
       });
       return;
     }

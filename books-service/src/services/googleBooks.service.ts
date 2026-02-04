@@ -56,26 +56,28 @@ export class GoogleBooksService {
       const params: any = {
         q: query,
         maxResults,
-        printType: 'books'
+        printType: 'books',
       };
-      
+
       if (API_KEY) {
         params.key = API_KEY;
       }
 
       const response = await axios.get(GOOGLE_BOOKS_API, { params });
-      
-      const books = response.data.items?.map((item: GoogleBook) => ({
-        googleBooksId: item.id,
-        title: item.volumeInfo.title,
-        author: item.volumeInfo.authors?.join(', ') || 'Unknown Author',
-        coverUrl: item.volumeInfo.imageLinks?.thumbnail || null,
-        description: item.volumeInfo.description || null,
-        pageCount: item.volumeInfo.pageCount || null,
-        isbn: item.volumeInfo.industryIdentifiers?.find(
-          (id) => id.type === 'ISBN_13' || id.type === 'ISBN_10'
-        )?.identifier || null
-      })) || [];
+
+      const books =
+        response.data.items?.map((item: GoogleBook) => ({
+          googleBooksId: item.id,
+          title: item.volumeInfo.title,
+          author: item.volumeInfo.authors?.join(', ') || 'Unknown Author',
+          coverUrl: item.volumeInfo.imageLinks?.thumbnail || null,
+          description: item.volumeInfo.description || null,
+          pageCount: item.volumeInfo.pageCount || null,
+          isbn:
+            item.volumeInfo.industryIdentifiers?.find(
+              (id) => id.type === 'ISBN_13' || id.type === 'ISBN_10'
+            )?.identifier || null,
+        })) || [];
 
       // Cache the results
       if (redis && redis.isOpen && books.length > 0) {
@@ -121,9 +123,10 @@ export class GoogleBooksService {
         coverUrl: book.volumeInfo.imageLinks?.thumbnail || null,
         description: book.volumeInfo.description || null,
         pageCount: book.volumeInfo.pageCount || null,
-        isbn: book.volumeInfo.industryIdentifiers?.find(
-          (id: any) => id.type === 'ISBN_13' || id.type === 'ISBN_10'
-        )?.identifier || null
+        isbn:
+          book.volumeInfo.industryIdentifiers?.find(
+            (id: any) => id.type === 'ISBN_13' || id.type === 'ISBN_10'
+          )?.identifier || null,
       };
 
       // Cache the result

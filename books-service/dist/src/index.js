@@ -10,6 +10,7 @@ const helmet_1 = __importDefault(require("helmet"));
 const logger_1 = __importDefault(require("./utils/logger"));
 const errorHandler_1 = __importDefault(require("./middleware/errorHandler"));
 const metrics_1 = require("./middleware/metrics");
+const redis_1 = require("./config/redis");
 const bookSearchRoutes_1 = __importDefault(require("./routes/bookSearchRoutes"));
 const userBooksRoutes_1 = __importDefault(require("./routes/userBooksRoutes"));
 const bookClubBooksRoutes_1 = __importDefault(require("./routes/bookClubBooksRoutes"));
@@ -33,7 +34,7 @@ app.get('/health', (req, res) => {
     res.json({
         status: 'healthy',
         service: 'books-service',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
     });
 });
 // Metrics endpoint for Prometheus
@@ -46,6 +47,10 @@ app.use('/v1/bookclub-books', readingProgressRoutes_1.default);
 app.use('/v1/bookclub', bookSuggestionsRoutes_1.default);
 // Error handling middleware (must be last)
 app.use(errorHandler_1.default);
+// Initialize Redis connection
+(0, redis_1.connectRedis)().catch((_error) => {
+    logger_1.default.warn('Books service starting without Redis cache');
+});
 // Start server
 app.listen(PORT, () => {
     logger_1.default.info(`📚 Books service running on http://localhost:${PORT}`);

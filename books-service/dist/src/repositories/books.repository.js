@@ -11,7 +11,7 @@ class BooksRepository {
      */
     static async findByGoogleBooksId(googleBooksId) {
         return await database_1.default.book.findUnique({
-            where: { googleBooksId }
+            where: { googleBooksId },
         });
     }
     /**
@@ -21,7 +21,7 @@ class BooksRepository {
         return await database_1.default.book.upsert({
             where: { googleBooksId },
             update: {},
-            create: bookData
+            create: bookData,
         });
     }
     /**
@@ -29,7 +29,7 @@ class BooksRepository {
      */
     static async findById(bookId) {
         return await database_1.default.book.findUnique({
-            where: { id: bookId }
+            where: { id: bookId },
         });
     }
 }

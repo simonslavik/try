@@ -16,14 +16,14 @@ const authMiddleware = async (req, res, next) => {
         const authHeader = req.headers.authorization;
         if (!authHeader) {
             return res.status(401).json({
-                message: 'No authorization token provided'
+                message: 'No authorization token provided',
             });
         }
         // Expected format: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
         const parts = authHeader.split(' ');
         if (parts.length !== 2 || parts[0] !== 'Bearer') {
             return res.status(401).json({
-                message: 'Invalid authorization format. Expected: Bearer <token>'
+                message: 'Invalid authorization format. Expected: Bearer <token>',
             });
         }
         const token = parts[1];
@@ -33,7 +33,7 @@ const authMiddleware = async (req, res, next) => {
         req.user = {
             userId: decoded.userId,
             email: decoded.email,
-            role: decoded.role || 'user'
+            role: decoded.role || 'user',
         };
         // Continue to next middleware/controller
         next();
@@ -41,18 +41,18 @@ const authMiddleware = async (req, res, next) => {
     catch (error) {
         if (error.name === 'TokenExpiredError') {
             return res.status(401).json({
-                message: 'Token expired. Please refresh your token.'
+                message: 'Token expired. Please refresh your token.',
             });
         }
         if (error.name === 'JsonWebTokenError') {
             return res.status(401).json({
-                message: 'Invalid token'
+                message: 'Invalid token',
             });
         }
         console.error('Auth middleware error:', error);
         return res.status(500).json({
             message: 'Authentication error',
-            error: error.message
+            error: error.message,
         });
     }
 };

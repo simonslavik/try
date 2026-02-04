@@ -7,7 +7,7 @@ export class ReadingProgressRepository {
   static async findByBookClubBook(bookClubBookId: string) {
     return await prisma.readingProgress.findMany({
       where: { bookClubBookId },
-      orderBy: { updatedAt: 'desc' }
+      orderBy: { updatedAt: 'desc' },
     });
   }
 
@@ -18,9 +18,9 @@ export class ReadingProgressRepository {
     return await prisma.readingProgress.findMany({
       where: {
         userId,
-        bookClubBookId
+        bookClubBookId,
       },
-      orderBy: { updatedAt: 'desc' }
+      orderBy: { updatedAt: 'desc' },
     });
   }
 
@@ -29,7 +29,7 @@ export class ReadingProgressRepository {
    */
   static async create(data: any) {
     return await prisma.readingProgress.create({
-      data
+      data,
     });
   }
 }

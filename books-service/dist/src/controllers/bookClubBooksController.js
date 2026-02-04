@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteBookClubBook = exports.updateBookClubBook = exports.addBookClubBook = exports.getBookClubBooks = void 0;
+exports.getBatchCurrentBooks = exports.deleteBookClubBook = exports.updateBookClubBook = exports.addBookClubBook = exports.getBookClubBooks = void 0;
 const bookClubBooks_service_1 = require("../services/bookClubBooks.service");
 const validation_1 = require("../utils/validation");
 /**
@@ -68,7 +68,7 @@ const updateBookClubBook = async (req, res) => {
         const bookClubBook = await bookClubBooks_service_1.BookClubBooksService.updateBookClubBook(bookClubId, bookId, {
             status,
             startDate: startDate ? new Date(startDate) : undefined,
-            endDate: endDate ? new Date(endDate) : undefined
+            endDate: endDate ? new Date(endDate) : undefined,
         });
         res.json({ success: true, data: bookClubBook });
     }
@@ -103,3 +103,21 @@ const deleteBookClubBook = async (req, res) => {
     }
 };
 exports.deleteBookClubBook = deleteBookClubBook;
+/**
+ * Get current books for multiple bookclubs (batch)
+ */
+const getBatchCurrentBooks = async (req, res) => {
+    try {
+        const { bookClubIds } = req.body;
+        if (!Array.isArray(bookClubIds)) {
+            res.status(400).json({ error: 'bookClubIds must be an array' });
+            return;
+        }
+        const currentBooks = await bookClubBooks_service_1.BookClubBooksService.getBatchCurrentBooks(bookClubIds);
+        res.json({ success: true, currentBooks });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+exports.getBatchCurrentBooks = getBatchCurrentBooks;

@@ -14,16 +14,13 @@ export const getSuggestions = async (req: AuthRequest, res: Response): Promise<v
     const suggestions = await prisma.bookSuggestion.findMany({
       where: {
         bookClubId: bookClubId as string,
-        status: 'pending'
+        status: 'pending',
       },
       include: {
         book: true,
-        votes: true
+        votes: true,
       },
-      orderBy: [
-        { upvotes: 'desc' },
-        { createdAt: 'desc' }
-      ]
+      orderBy: [{ upvotes: 'desc' }, { createdAt: 'desc' }],
     });
 
     const suggestionsWithUserVote = suggestions.map((s: any) => {
@@ -34,8 +31,8 @@ export const getSuggestions = async (req: AuthRequest, res: Response): Promise<v
         userVote: userVote?.voteType || null,
         suggestedBy: {
           id: s.suggestedById,
-          name: 'User'
-        }
+          name: 'User',
+        },
       };
     });
 
@@ -66,8 +63,8 @@ export const createSuggestion = async (req: AuthRequest, res: Response): Promise
         where: {
           bookClubId: bookClubId as string,
           bookId: book.id,
-          status: 'pending'
-        }
+          status: 'pending',
+        },
       });
 
       if (existing) {
@@ -89,9 +86,9 @@ export const createSuggestion = async (req: AuthRequest, res: Response): Promise
         ...suggestion,
         suggestedBy: {
           id: req.user!.userId,
-          name: req.user!.name || 'User'
-        }
-      }
+          name: req.user!.name || 'User',
+        },
+      },
     });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -115,21 +112,21 @@ export const voteSuggestion = async (req: AuthRequest, res: Response): Promise<v
       where: {
         suggestionId_userId: {
           suggestionId: suggestionId as string,
-          userId: req.user!.userId
-        }
+          userId: req.user!.userId,
+        },
       },
       update: { voteType },
       create: {
         suggestionId: suggestionId as string,
         userId: req.user!.userId,
-        voteType
-      }
+        voteType,
+      },
     });
 
     const voteCounts = await prisma.bookSuggestionVote.groupBy({
       by: ['voteType'],
       where: { suggestionId: suggestionId as string },
-      _count: true
+      _count: true,
     });
 
     const upvotes = voteCounts.find((v: any) => v.voteType === 'upvote')?._count || 0;
@@ -137,7 +134,7 @@ export const voteSuggestion = async (req: AuthRequest, res: Response): Promise<v
 
     await prisma.bookSuggestion.update({
       where: { id: suggestionId as string },
-      data: { upvotes, downvotes }
+      data: { upvotes, downvotes },
     });
 
     res.json({ success: true, data: vote });
@@ -161,7 +158,7 @@ export const acceptSuggestion = async (req: AuthRequest, res: Response): Promise
 
     const suggestion = await prisma.bookSuggestion.findUnique({
       where: { id: suggestionId as string },
-      include: { book: true }
+      include: { book: true },
     });
 
     if (!suggestion) {
@@ -171,7 +168,7 @@ export const acceptSuggestion = async (req: AuthRequest, res: Response): Promise
 
     await prisma.bookClubBook.updateMany({
       where: { bookClubId: bookClubId as string, status: 'current' },
-      data: { status: 'completed' }
+      data: { status: 'completed' },
     });
 
     const bookClubBook = await prisma.bookClubBook.create({
@@ -181,14 +178,14 @@ export const acceptSuggestion = async (req: AuthRequest, res: Response): Promise
         status: 'current',
         startDate: new Date(startDate),
         endDate: new Date(endDate),
-        addedById: req.user!.userId
+        addedById: req.user!.userId,
       },
-      include: { book: true }
+      include: { book: true },
     });
 
     await prisma.bookSuggestion.update({
       where: { id: suggestionId as string },
-      data: { status: 'accepted' }
+      data: { status: 'accepted' },
     });
 
     res.json({ success: true, data: bookClubBook });
@@ -205,7 +202,7 @@ export const deleteSuggestion = async (req: AuthRequest, res: Response): Promise
     const { suggestionId } = req.params;
 
     const suggestion = await prisma.bookSuggestion.findUnique({
-      where: { id: suggestionId as string }
+      where: { id: suggestionId as string },
     });
 
     if (!suggestion) {

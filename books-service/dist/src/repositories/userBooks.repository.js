@@ -16,7 +16,7 @@ class UserBooksRepository {
         return await database_1.default.userBook.findMany({
             where,
             include: { book: true },
-            orderBy: { updatedAt: 'desc' }
+            orderBy: { updatedAt: 'desc' },
         });
     }
     /**
@@ -27,10 +27,19 @@ class UserBooksRepository {
             where: {
                 userId_bookId: {
                     userId,
-                    bookId
-                }
+                    bookId,
+                },
             },
-            include: { book: true }
+            include: { book: true },
+        });
+    }
+    /**
+     * Find user book by its primary key (id)
+     */
+    static async findById(userBookId) {
+        return await database_1.default.userBook.findUnique({
+            where: { id: userBookId },
+            include: { book: true },
         });
     }
     /**
@@ -39,15 +48,15 @@ class UserBooksRepository {
     static async upsert(userId, bookId, data) {
         return await database_1.default.userBook.upsert({
             where: {
-                userId_bookId: { userId, bookId }
+                userId_bookId: { userId, bookId },
             },
             update: data,
             create: {
                 userId,
                 bookId,
-                ...data
+                ...data,
             },
-            include: { book: true }
+            include: { book: true },
         });
     }
     /**
@@ -56,10 +65,10 @@ class UserBooksRepository {
     static async update(userId, bookId, data) {
         return await database_1.default.userBook.update({
             where: {
-                userId_bookId: { userId, bookId }
+                userId_bookId: { userId, bookId },
             },
             data,
-            include: { book: true }
+            include: { book: true },
         });
     }
     /**
@@ -68,8 +77,16 @@ class UserBooksRepository {
     static async delete(userId, bookId) {
         return await database_1.default.userBook.delete({
             where: {
-                userId_bookId: { userId, bookId }
-            }
+                userId_bookId: { userId, bookId },
+            },
+        });
+    }
+    /**
+     * Delete user book by its primary key (id)
+     */
+    static async deleteById(userBookId) {
+        return await database_1.default.userBook.delete({
+            where: { id: userBookId },
         });
     }
 }

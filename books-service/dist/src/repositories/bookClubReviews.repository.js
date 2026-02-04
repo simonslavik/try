@@ -14,9 +14,9 @@ class BookClubReviewsRepository {
             where: {
                 bookClubBookId_userId: {
                     bookClubBookId,
-                    userId
-                }
-            }
+                    userId,
+                },
+            },
         });
     }
     /**
@@ -25,7 +25,7 @@ class BookClubReviewsRepository {
     static async findByBookClubBook(bookClubBookId) {
         return await database_1.default.bookClubBookReview.findMany({
             where: { bookClubBookId },
-            orderBy: { updatedAt: 'desc' }
+            orderBy: { updatedAt: 'desc' },
         });
     }
     /**
@@ -36,15 +36,15 @@ class BookClubReviewsRepository {
             where: {
                 bookClubBookId_userId: {
                     bookClubBookId,
-                    userId
-                }
+                    userId,
+                },
             },
             update: data,
             create: {
                 userId,
                 bookClubBookId,
-                ...data
-            }
+                ...data,
+            },
         });
     }
 }

@@ -35,7 +35,7 @@ class BookSuggestionsService {
                 bookClubId,
                 bookId: book.id,
                 suggestedById: userId,
-                reason: reason || null
+                reason: reason || null,
             });
             logger_1.default.info('Book suggested:', { bookClubId, bookId: book.id, userId });
             return suggestion;

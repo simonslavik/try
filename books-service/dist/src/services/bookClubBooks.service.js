@@ -37,13 +37,17 @@ class BookClubBooksService {
                 status,
                 startDate: startDate || null,
                 endDate: endDate || null,
-                addedById: userId
+                addedById: userId,
             });
             logger_1.default.info('Book added to bookclub:', { bookClubId, bookId: book.id, status });
             return bookClubBook;
         }
         catch (error) {
-            logger_1.default.error('Error adding bookclub book:', { error: error.message, bookClubId, googleBooksId });
+            logger_1.default.error('Error adding bookclub book:', {
+                error: error.message,
+                bookClubId,
+                googleBooksId,
+            });
             throw error;
         }
     }
@@ -88,6 +92,25 @@ class BookClubBooksService {
         }
         catch (error) {
             logger_1.default.error('Error deleting bookclub book:', { error: error.message, bookClubId, bookId });
+            throw error;
+        }
+    }
+    /**
+     * Get current books for multiple bookclubs (batch operation)
+     */
+    static async getBatchCurrentBooks(bookClubIds) {
+        try {
+            const results = await Promise.all(bookClubIds.map(async (bookClubId) => {
+                const books = await bookClubBooks_repository_1.BookClubBooksRepository.findByBookClubId(bookClubId, 'current');
+                return {
+                    bookClubId,
+                    currentBook: books.length > 0 ? books[0] : null,
+                };
+            }));
+            return results;
+        }
+        catch (error) {
+            logger_1.default.error('Error fetching batch current books:', { error: error.message });
             throw error;
         }
     }

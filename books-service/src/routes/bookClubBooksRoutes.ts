@@ -13,23 +13,23 @@ router.get('/:bookClubId/books', bookClubBooksController.getBookClubBooks);
 
 // Protected routes - require MODERATOR role or higher
 router.post(
-  '/:bookClubId/books', 
-  authMiddleware, 
-  requireBookClubRole('MODERATOR'), 
+  '/:bookClubId/books',
+  authMiddleware,
+  requireBookClubRole('MODERATOR'),
   bookClubBooksController.addBookClubBook
 );
 
 router.patch(
-  '/:bookClubId/books/:bookId', 
-  authMiddleware, 
-  requireBookClubRole('MODERATOR'), 
+  '/:bookClubId/books/:bookId',
+  authMiddleware,
+  requireBookClubRole('MODERATOR'),
   bookClubBooksController.updateBookClubBook
 );
 
 router.delete(
-  '/:bookClubId/books/:bookId', 
-  authMiddleware, 
-  requireBookClubRole('MODERATOR'), 
+  '/:bookClubId/books/:bookId',
+  authMiddleware,
+  requireBookClubRole('MODERATOR'),
   bookClubBooksController.deleteBookClubBook
 );
 

@@ -6,7 +6,7 @@ export class BooksRepository {
    */
   static async findByGoogleBooksId(googleBooksId: string) {
     return await prisma.book.findUnique({
-      where: { googleBooksId }
+      where: { googleBooksId },
     });
   }
 
@@ -17,7 +17,7 @@ export class BooksRepository {
     return await prisma.book.upsert({
       where: { googleBooksId },
       update: {},
-      create: bookData
+      create: bookData,
     });
   }
 
@@ -26,7 +26,7 @@ export class BooksRepository {
    */
   static async findById(bookId: string) {
     return await prisma.book.findUnique({
-      where: { id: bookId }
+      where: { id: bookId },
     });
   }
 }

@@ -12,18 +12,18 @@ const httpRequestDuration = new promClient.Histogram({
   name: 'http_request_duration_seconds',
   help: 'Duration of HTTP requests in seconds',
   labelNames: ['method', 'route', 'status_code'],
-  buckets: [0.1, 0.5, 1, 2, 5]
+  buckets: [0.1, 0.5, 1, 2, 5],
 });
 
 const httpRequestTotal = new promClient.Counter({
   name: 'http_requests_total',
   help: 'Total number of HTTP requests',
-  labelNames: ['method', 'route', 'status_code']
+  labelNames: ['method', 'route', 'status_code'],
 });
 
 const activeConnections = new promClient.Gauge({
   name: 'active_connections',
-  help: 'Number of active connections'
+  help: 'Number of active connections',
 });
 
 // Register custom metrics
@@ -44,7 +44,7 @@ export const metricsMiddleware = (req: Request, res: Response, next: NextFunctio
     const labels = {
       method: req.method,
       route,
-      status_code: res.statusCode
+      status_code: res.statusCode,
     };
 
     httpRequestDuration.observe(labels, duration);

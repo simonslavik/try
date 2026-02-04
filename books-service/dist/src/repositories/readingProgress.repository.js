@@ -12,7 +12,7 @@ class ReadingProgressRepository {
     static async findByBookClubBook(bookClubBookId) {
         return await database_1.default.readingProgress.findMany({
             where: { bookClubBookId },
-            orderBy: { updatedAt: 'desc' }
+            orderBy: { updatedAt: 'desc' },
         });
     }
     /**
@@ -22,9 +22,9 @@ class ReadingProgressRepository {
         return await database_1.default.readingProgress.findMany({
             where: {
                 userId,
-                bookClubBookId
+                bookClubBookId,
             },
-            orderBy: { updatedAt: 'desc' }
+            orderBy: { updatedAt: 'desc' },
         });
     }
     /**
@@ -32,7 +32,7 @@ class ReadingProgressRepository {
      */
     static async create(data) {
         return await database_1.default.readingProgress.create({
-            data
+            data,
         });
     }
 }

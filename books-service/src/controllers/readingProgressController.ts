@@ -1,12 +1,10 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
-import { ReadingProgressService } from '../services/readingProgress.service';
-import { BookClubBooksRepository } from '../repositories/bookClubBooks.repository';
 import prisma from '../config/database';
 import {
   bookClubBookIdParamSchema,
   postsBookProgressSchema,
-  bookClubBookReviewSchema
+  bookClubBookReviewSchema,
 } from '../utils/validation';
 
 /**
@@ -23,12 +21,12 @@ export const getReadingProgress = async (req: AuthRequest, res: Response): Promi
     const { bookClubBookId } = req.params;
 
     const existingBookClubBook = await prisma.bookClubBook.findUnique({
-      where: { id: bookClubBookId as string }
+      where: { id: bookClubBookId as string },
     });
 
     if (!existingBookClubBook) {
       res.status(404).json({
-        error: 'Book not found in bookclub'
+        error: 'Book not found in bookclub',
       });
       return;
     }
@@ -37,14 +35,14 @@ export const getReadingProgress = async (req: AuthRequest, res: Response): Promi
       where: {
         bookClubBookId_userId: {
           bookClubBookId: bookClubBookId as string,
-          userId: req.user!.userId
-        }
+          userId: req.user!.userId,
+        },
       },
       include: {
         bookClubBook: {
-          include: { book: true }
-        }
-      }
+          include: { book: true },
+        },
+      },
     });
 
     res.json({ success: true, data: progress });
@@ -75,7 +73,7 @@ export const updateReadingProgress = async (req: AuthRequest, res: Response): Pr
 
     const bookClubBook = await prisma.bookClubBook.findUnique({
       where: { id: bookClubBookId as string },
-      include: { book: true }
+      include: { book: true },
     });
 
     if (!bookClubBook) {
@@ -90,22 +88,22 @@ export const updateReadingProgress = async (req: AuthRequest, res: Response): Pr
       where: {
         bookClubBookId_userId: {
           bookClubBookId: bookClubBookId as string,
-          userId: req.user!.userId
-        }
+          userId: req.user!.userId,
+        },
       },
       update: {
         pagesRead,
         percentage,
         notes,
-        lastReadDate: new Date()
+        lastReadDate: new Date(),
       },
       create: {
         bookClubBookId: bookClubBookId as string,
         userId: req.user!.userId,
         pagesRead,
         percentage,
-        notes
-      }
+        notes,
+      },
     });
 
     res.json({ success: true, data: progress });
@@ -135,7 +133,7 @@ export const addOrUpdateReview = async (req: AuthRequest, res: Response): Promis
     const { rating, reviewText } = req.body;
 
     const bookClubBook = await prisma.bookClubBook.findUnique({
-      where: { id: bookClubBookId as string }
+      where: { id: bookClubBookId as string },
     });
 
     if (!bookClubBook) {
@@ -147,19 +145,19 @@ export const addOrUpdateReview = async (req: AuthRequest, res: Response): Promis
       where: {
         bookClubBookId_userId: {
           bookClubBookId: bookClubBookId as string,
-          userId: req.user!.userId
-        }
+          userId: req.user!.userId,
+        },
       },
       update: {
         rating,
-        reviewText: reviewText || null
+        reviewText: reviewText || null,
       },
       create: {
         bookClubBookId: bookClubBookId as string,
         userId: req.user!.userId,
         rating,
-        reviewText: reviewText || null
-      }
+        reviewText: reviewText || null,
+      },
     });
 
     res.json({ success: true, data: review });
@@ -183,20 +181,21 @@ export const getReviews = async (req: AuthRequest, res: Response): Promise<void>
 
     const reviews = await prisma.bookClubBookReview.findMany({
       where: { bookClubBookId: bookClubBookId as string },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
 
-    const averageRating = reviews.length > 0
-      ? reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / reviews.length
-      : 0;
+    const averageRating =
+      reviews.length > 0
+        ? reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / reviews.length
+        : 0;
 
     res.json({
       success: true,
       data: {
         reviews,
         averageRating: Math.round(averageRating * 10) / 10,
-        totalReviews: reviews.length
-      }
+        totalReviews: reviews.length,
+      },
     });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -220,9 +219,9 @@ export const deleteReview = async (req: AuthRequest, res: Response): Promise<voi
       where: {
         bookClubBookId_userId: {
           bookClubBookId: bookClubBookId as string,
-          userId: req.user!.userId
-        }
-      }
+          userId: req.user!.userId,
+        },
+      },
     });
 
     res.json({ success: true, message: 'Review deleted successfully' });

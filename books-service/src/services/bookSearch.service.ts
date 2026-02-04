@@ -8,20 +8,20 @@ export class BookSearchService {
    */
   private static formatSearchQuery(query: string): string {
     const trimmedQuery = query.trim();
-    
+
     // Check if query already has special operators
     const hasOperator = /^(intitle:|inauthor:|inpublisher:|subject:|isbn:)/i.test(trimmedQuery);
-    
+
     if (hasOperator) {
       return trimmedQuery;
     }
-    
+
     // Check if it looks like an ISBN (10 or 13 digits, possibly with hyphens)
     const isbnPattern = /^[\d-]{10,17}$/;
     if (isbnPattern.test(trimmedQuery.replace(/[-\s]/g, ''))) {
       return `isbn:${trimmedQuery.replace(/[-\s]/g, '')}`;
     }
-    
+
     // Default: treat as title search
     return `intitle:${trimmedQuery}`;
   }
@@ -37,14 +37,14 @@ export class BookSearchService {
 
       // Format the query for better results
       const formattedQuery = this.formatSearchQuery(query);
-      
+
       const maxResults = Math.min(limit, 40); // Google Books API limit
       const books = await GoogleBooksService.searchBooks(formattedQuery, maxResults);
-      
-      logger.info('Books search completed:', { 
+
+      logger.info('Books search completed:', {
         originalQuery: query,
         formattedQuery,
-        resultsCount: books.length 
+        resultsCount: books.length,
       });
       return books;
     } catch (error: any) {
@@ -59,7 +59,7 @@ export class BookSearchService {
   static async getBookDetails(googleBooksId: string) {
     try {
       const book = await GoogleBooksService.getBookById(googleBooksId);
-      
+
       logger.info('Book details fetched:', { googleBooksId });
       return book;
     } catch (error: any) {

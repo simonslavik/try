@@ -16,8 +16,8 @@ export const connectRedis = async () => {
             return new Error('Too many retries');
           }
           return Math.min(retries * 100, 3000);
-        }
-      }
+        },
+      },
     });
 
     redisClient.on('error', (err: any) => {

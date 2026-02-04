@@ -8,9 +8,9 @@ export class BookSuggestionsRepository {
     return await prisma.bookSuggestion.findMany({
       where: { bookClubId },
       include: {
-        book: true
+        book: true,
       },
-      orderBy: { updatedAt: 'desc' }
+      orderBy: { updatedAt: 'desc' },
     });
   }
 
@@ -21,8 +21,8 @@ export class BookSuggestionsRepository {
     return await prisma.bookSuggestion.create({
       data,
       include: {
-        book: true
-      }
+        book: true,
+      },
     });
   }
 
@@ -31,7 +31,7 @@ export class BookSuggestionsRepository {
    */
   static async delete(suggestionId: string) {
     return await prisma.bookSuggestion.delete({
-      where: { id: suggestionId }
+      where: { id: suggestionId },
     });
   }
 }
