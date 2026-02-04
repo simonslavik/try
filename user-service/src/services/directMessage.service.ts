@@ -1,5 +1,6 @@
 import { DirectMessageRepository } from '../repositories/directMessage.repository.js';
 import { FriendshipRepository } from '../repositories/friendship.repository.js';
+import { UserRepository } from '../repositories/user.repository.js';
 import { logger } from '../utils/logger.js';
 
 /**
@@ -15,12 +16,7 @@ export class DirectMessageService {
     content: string,
     attachments?: any[]
   ) {
-    // Check if users are friends
-    const areFriends = await FriendshipRepository.areFriends(senderId, receiverId);
-    if (!areFriends) {
-      throw new Error('NOT_FRIENDS');
-    }
-
+    // Allow DMs without friendship requirement (bookclub members can DM each other)
     // Create message
     const message = await DirectMessageRepository.create(
       senderId,
@@ -48,12 +44,7 @@ export class DirectMessageService {
     limit = 50,
     offset = 0
   ) {
-    // Check if users are friends
-    const areFriends = await FriendshipRepository.areFriends(userId, partnerId);
-    if (!areFriends) {
-      throw new Error('NOT_FRIENDS');
-    }
-
+    // Allow DMs without friendship requirement (bookclub members can DM each other)
     const messages = await DirectMessageRepository.getConversation(
       userId,
       partnerId,
@@ -61,14 +52,45 @@ export class DirectMessageService {
       offset
     );
 
-    return messages;
+    // Get other user info
+    const otherUser = await UserRepository.findById(partnerId);
+
+    return {
+      messages,
+      otherUser: otherUser ? {
+        id: otherUser.id,
+        name: otherUser.username,
+        email: otherUser.email,
+        profileImage: otherUser.profilePicture
+      } : null
+    };
   }
 
   /**
    * Get all conversations for a user
    */
   static async getUserConversations(userId: string) {
-    return await DirectMessageRepository.getUserConversations(userId);
+    const conversations = await DirectMessageRepository.getUserConversations(userId);
+    
+    // Fetch user details for each conversation partner
+    const conversationsWithUserDetails = await Promise.all(
+      conversations.map(async (conv) => {
+        const partner = await UserRepository.findById(conv.partnerId);
+        return {
+          friend: partner ? {
+            id: partner.id,
+            name: partner.username,
+            email: partner.email,
+            profileImage: partner.profilePicture
+          } : null,
+          lastMessage: conv.lastMessage,
+          unreadCount: conv.unreadCount
+        };
+      })
+    );
+    
+    // Filter out conversations where partner user was not found
+    return conversationsWithUserDetails.filter(conv => conv.friend !== null);
   }
 
   /**

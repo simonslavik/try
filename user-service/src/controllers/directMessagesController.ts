@@ -23,7 +23,7 @@ export const getDirectMessages = async (req: Request, res: Response) => {
         const limit = parseInt(req.query.limit as string) || 50;
         const offset = (page - 1) * limit;
 
-        const messages = await DirectMessageService.getConversation(
+        const result = await DirectMessageService.getConversation(
             currentUserId,
             otherUserId,
             limit,
@@ -31,19 +31,21 @@ export const getDirectMessages = async (req: Request, res: Response) => {
         );
 
         // Get total count for pagination
-        const totalCount = messages.length; // Note: This is an approximation, could enhance service to return actual total
-
+        const totalCount = result.messages?.length || 0;
         const totalPages = Math.ceil(totalCount / limit);
 
         return res.status(200).json({
             success: true,
-            data: messages,
+            data: {
+                messages: result.messages || [],
+                otherUser: result.otherUser || null
+            },
             pagination: {
                 page,
                 limit,
                 totalCount,
                 totalPages,
-                hasMore: messages.length === limit
+                hasMore: result.messages?.length === limit
             }
         });
     } catch (error: any) {

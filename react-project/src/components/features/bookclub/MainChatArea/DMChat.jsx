@@ -99,7 +99,6 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth }) => {
           >
             {otherUser.name}
           </h2>
-          <p className="text-gray-400 text-sm">{otherUser.email}</p>
         </div>
       </div>
 

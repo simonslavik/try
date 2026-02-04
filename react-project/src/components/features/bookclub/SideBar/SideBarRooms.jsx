@@ -44,6 +44,9 @@ const SideBarRooms = ({
     }, [bookClub]);
 
     useEffect(() => {
+        // Clear current book when switching bookclubs
+        setCurrentBook(null);
+        
         const fetchCurrentBook = async () => {
             if (!bookClub?.id || !auth?.token) return;
             
@@ -59,9 +62,12 @@ const SideBarRooms = ({
                 const data = await response.json();
                 if (data.success && data.data && data.data.length > 0) {
                     setCurrentBook(data.data[0]);
+                } else {
+                    setCurrentBook(null);
                 }
             } catch (err) {
                 console.error('Error fetching current book:', err);
+                setCurrentBook(null);
             }
         };
 
