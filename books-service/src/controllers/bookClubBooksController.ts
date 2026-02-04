@@ -5,7 +5,7 @@ import {
   bookClubIdParamSchema,
   bookIdParamSchema,
   addBookForBookClubSchema,
-  updateBookClubBookSchema
+  updateBookClubBookSchema,
 } from '../utils/validation';
 
 /**
@@ -16,7 +16,10 @@ export const getBookClubBooks = async (req: Request, res: Response): Promise<voi
     const { bookClubId } = req.params;
     const { status } = req.query;
 
-    const books = await BookClubBooksService.getBookClubBooks(bookClubId as string, status as string);
+    const books = await BookClubBooksService.getBookClubBooks(
+      bookClubId as string,
+      status as string
+    );
     res.json({ success: true, data: books });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -90,7 +93,7 @@ export const updateBookClubBook = async (req: AuthRequest, res: Response): Promi
       {
         status,
         startDate: startDate ? new Date(startDate) : undefined,
-        endDate: endDate ? new Date(endDate) : undefined
+        endDate: endDate ? new Date(endDate) : undefined,
       }
     );
 

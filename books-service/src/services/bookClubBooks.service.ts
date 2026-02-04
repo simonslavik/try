@@ -41,13 +41,17 @@ export class BookClubBooksService {
         status,
         startDate: startDate || null,
         endDate: endDate || null,
-        addedById: userId
+        addedById: userId,
       });
 
       logger.info('Book added to bookclub:', { bookClubId, bookId: book.id, status });
       return bookClubBook;
     } catch (error: any) {
-      logger.error('Error adding bookclub book:', { error: error.message, bookClubId, googleBooksId });
+      logger.error('Error adding bookclub book:', {
+        error: error.message,
+        bookClubId,
+        googleBooksId,
+      });
       throw error;
     }
   }
@@ -63,7 +67,7 @@ export class BookClubBooksService {
     try {
       // Check if book exists in bookclub
       const existingBookClubBook = await BookClubBooksRepository.findOne(bookClubId, bookId);
-      
+
       if (!existingBookClubBook) {
         throw new Error('Book not found in this bookclub. Please add it first.');
       }
@@ -74,7 +78,7 @@ export class BookClubBooksService {
       if (data.endDate) updatedData.endDate = data.endDate;
 
       const updatedBook = await BookClubBooksRepository.update(bookClubId, bookId, updatedData);
-      
+
       logger.info('Bookclub book updated:', { bookClubId, bookId });
       return updatedBook;
     } catch (error: any) {
@@ -90,13 +94,13 @@ export class BookClubBooksService {
     try {
       // Check if book exists in bookclub
       const existingBookClubBook = await BookClubBooksRepository.findOne(bookClubId, bookId);
-      
+
       if (!existingBookClubBook) {
         throw new Error('Book not found in this bookclub');
       }
 
       await BookClubBooksRepository.delete(bookClubId, bookId);
-      
+
       logger.info('Bookclub book deleted:', { bookClubId, bookId });
     } catch (error: any) {
       logger.error('Error deleting bookclub book:', { error: error.message, bookClubId, bookId });
@@ -114,11 +118,11 @@ export class BookClubBooksService {
           const books = await BookClubBooksRepository.findByBookClubId(bookClubId, 'current');
           return {
             bookClubId,
-            currentBook: books.length > 0 ? books[0] : null
+            currentBook: books.length > 0 ? books[0] : null,
           };
         })
       );
-      
+
       return results;
     } catch (error: any) {
       logger.error('Error fetching batch current books:', { error: error.message });

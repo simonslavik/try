@@ -4,7 +4,7 @@ import {
   getUserBooks,
   addUserBook,
   updateUserBook,
-  removeUserBook
+  removeUserBook,
 } from '../../../src/controllers/userBooksController';
 import prisma from '../../../src/config/database';
 import { GoogleBooksService } from '../../../src/services/googleBooks.service';
@@ -18,12 +18,12 @@ jest.mock('../../../src/config/database', () => ({
       upsert: jest.fn(),
       findUnique: jest.fn(),
       update: jest.fn(),
-      delete: jest.fn()
+      delete: jest.fn(),
     },
     book: {
-      upsert: jest.fn()
-    }
-  }
+      upsert: jest.fn(),
+    },
+  },
 }));
 
 jest.mock('../../../src/services/googleBooks.service');
@@ -39,20 +39,20 @@ describe('UserBooksController', () => {
     statusMock = jest.fn().mockReturnValue({ json: jsonMock });
 
     mockReq = {
-      user: { 
-        userId: 'test-user-123', 
+      user: {
+        userId: 'test-user-123',
         email: 'test@example.com',
         role: 'user',
-        name: 'Test User'
+        name: 'Test User',
       },
       query: {},
       params: {},
-      body: {}
+      body: {},
     };
 
     mockRes = {
       json: jsonMock,
-      status: statusMock
+      status: statusMock,
     };
 
     jest.clearAllMocks();
@@ -66,8 +66,8 @@ describe('UserBooksController', () => {
           userId: 'test-user-123',
           bookId: 'book-1',
           status: 'reading',
-          book: { id: 'book-1', title: 'Test Book' }
-        }
+          book: { id: 'book-1', title: 'Test Book' },
+        },
       ];
 
       (prisma.userBook.findMany as jest.Mock).mockResolvedValue(mockBooks);
@@ -77,12 +77,12 @@ describe('UserBooksController', () => {
       expect(prisma.userBook.findMany).toHaveBeenCalledWith({
         where: { userId: 'test-user-123' },
         include: { book: true },
-        orderBy: { updatedAt: 'desc' }
+        orderBy: { updatedAt: 'desc' },
       });
 
       expect(jsonMock).toHaveBeenCalledWith({
         success: true,
-        data: mockBooks
+        data: mockBooks,
       });
     });
 
@@ -95,8 +95,8 @@ describe('UserBooksController', () => {
           userId: 'test-user-123',
           bookId: 'book-1',
           status: 'reading',
-          book: { id: 'book-1', title: 'Test Book' }
-        }
+          book: { id: 'book-1', title: 'Test Book' },
+        },
       ];
 
       (prisma.userBook.findMany as jest.Mock).mockResolvedValue(mockBooks);
@@ -106,20 +106,18 @@ describe('UserBooksController', () => {
       expect(prisma.userBook.findMany).toHaveBeenCalledWith({
         where: { userId: 'test-user-123', status: 'reading' },
         include: { book: true },
-        orderBy: { updatedAt: 'desc' }
+        orderBy: { updatedAt: 'desc' },
       });
     });
 
     it('should handle errors', async () => {
-      (prisma.userBook.findMany as jest.Mock).mockRejectedValue(
-        new Error('Database error')
-      );
+      (prisma.userBook.findMany as jest.Mock).mockRejectedValue(new Error('Database error'));
 
       await getUserBooks(mockReq as AuthRequest, mockRes as Response);
 
       expect(statusMock).toHaveBeenCalledWith(500);
       expect(jsonMock).toHaveBeenCalledWith({
-        error: 'Database error'
+        error: 'Database error',
       });
     });
   });
@@ -130,7 +128,7 @@ describe('UserBooksController', () => {
         googleBooksId: 'abc123',
         status: 'reading',
         rating: 4,
-        review: 'Great book'
+        review: 'Great book',
       };
 
       const mockGoogleBook = {
@@ -141,12 +139,12 @@ describe('UserBooksController', () => {
         coverUrl: 'http://example.com/cover.jpg',
         pageCount: 300,
         publishedDate: '2020-01-01',
-        isbn: '1234567890'
+        isbn: '1234567890',
       };
 
       const mockBook = {
         id: 'book-1',
-        ...mockGoogleBook
+        ...mockGoogleBook,
       };
 
       const mockUserBook = {
@@ -156,7 +154,7 @@ describe('UserBooksController', () => {
         status: 'reading',
         rating: 4,
         review: 'Great book',
-        book: mockBook
+        book: mockBook,
       };
 
       (GoogleBooksService.getBookById as jest.Mock).mockResolvedValue(mockGoogleBook);
@@ -170,39 +168,35 @@ describe('UserBooksController', () => {
       expect(prisma.userBook.upsert).toHaveBeenCalled();
       expect(jsonMock).toHaveBeenCalledWith({
         success: true,
-        data: mockUserBook
+        data: mockUserBook,
       });
     });
 
     it('should return 400 for invalid data', async () => {
       mockReq.body = {
         googleBooksId: 'abc123',
-        status: 'invalid_status'
+        status: 'invalid_status',
       };
 
       await addUserBook(mockReq as AuthRequest, mockRes as Response);
 
       expect(statusMock).toHaveBeenCalledWith(400);
-      expect(jsonMock).toHaveBeenCalledWith(
-        expect.objectContaining({ error: expect.any(String) })
-      );
+      expect(jsonMock).toHaveBeenCalledWith(expect.objectContaining({ error: expect.any(String) }));
     });
 
     it('should handle Google Books API errors', async () => {
       mockReq.body = {
         googleBooksId: 'abc123',
-        status: 'reading'
+        status: 'reading',
       };
 
-      (GoogleBooksService.getBookById as jest.Mock).mockRejectedValue(
-        new Error('Book not found')
-      );
+      (GoogleBooksService.getBookById as jest.Mock).mockRejectedValue(new Error('Book not found'));
 
       await addUserBook(mockReq as AuthRequest, mockRes as Response);
 
       expect(statusMock).toHaveBeenCalledWith(500);
       expect(jsonMock).toHaveBeenCalledWith({
-        error: 'Book not found'
+        error: 'Book not found',
       });
     });
   });
@@ -212,20 +206,20 @@ describe('UserBooksController', () => {
       mockReq.params = { bookId: 'book-1' };
       mockReq.body = {
         status: 'completed',
-        rating: 5
+        rating: 5,
       };
 
       const existingBook = {
         id: 'user-book-1',
         userId: 'test-user-123',
         bookId: 'book-1',
-        status: 'reading'
+        status: 'reading',
       };
 
       const updatedBook = {
         ...existingBook,
         status: 'completed',
-        rating: 5
+        rating: 5,
       };
 
       (prisma.userBook.findUnique as jest.Mock).mockResolvedValue(existingBook);
@@ -237,16 +231,16 @@ describe('UserBooksController', () => {
         where: {
           userId_bookId: {
             userId: 'test-user-123',
-            bookId: 'book-1'
-          }
+            bookId: 'book-1',
+          },
         },
-        include: { book: true }
+        include: { book: true },
       });
 
       expect(prisma.userBook.update).toHaveBeenCalled();
       expect(jsonMock).toHaveBeenCalledWith({
         success: true,
-        data: updatedBook
+        data: updatedBook,
       });
     });
 
@@ -260,7 +254,7 @@ describe('UserBooksController', () => {
 
       expect(statusMock).toHaveBeenCalledWith(404);
       expect(jsonMock).toHaveBeenCalledWith({
-        error: 'Book not found in your library. Please add it first.'
+        error: 'Book not found in your library. Please add it first.',
       });
     });
 
@@ -281,7 +275,7 @@ describe('UserBooksController', () => {
       const existingBook = {
         id: 'user-book-1',
         userId: 'test-user-123',
-        bookId: 'book-1'
+        bookId: 'book-1',
       };
 
       (prisma.userBook.findUnique as jest.Mock).mockResolvedValue(existingBook);
@@ -293,14 +287,14 @@ describe('UserBooksController', () => {
         where: {
           userId_bookId: {
             userId: 'test-user-123',
-            bookId: 'book-1'
-          }
-        }
+            bookId: 'book-1',
+          },
+        },
       });
 
       expect(jsonMock).toHaveBeenCalledWith({
         success: true,
-        message: 'Book removed from library'
+        message: 'Book removed from library',
       });
     });
 
@@ -313,7 +307,7 @@ describe('UserBooksController', () => {
 
       expect(statusMock).toHaveBeenCalledWith(404);
       expect(jsonMock).toHaveBeenCalledWith({
-        error: 'Book not found in your library'
+        error: 'Book not found in your library',
       });
     });
   });

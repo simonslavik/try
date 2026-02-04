@@ -16,16 +16,13 @@ const getSuggestions = async (req, res) => {
         const suggestions = await database_1.default.bookSuggestion.findMany({
             where: {
                 bookClubId: bookClubId,
-                status: 'pending'
+                status: 'pending',
             },
             include: {
                 book: true,
-                votes: true
+                votes: true,
             },
-            orderBy: [
-                { upvotes: 'desc' },
-                { createdAt: 'desc' }
-            ]
+            orderBy: [{ upvotes: 'desc' }, { createdAt: 'desc' }],
         });
         const suggestionsWithUserVote = suggestions.map((s) => {
             const userVote = s.votes.find((v) => v.userId === req.user.userId);
@@ -34,8 +31,8 @@ const getSuggestions = async (req, res) => {
                 userVote: userVote?.voteType || null,
                 suggestedBy: {
                     id: s.suggestedById,
-                    name: 'User'
-                }
+                    name: 'User',
+                },
             };
         });
         res.json({ success: true, data: suggestionsWithUserVote });
@@ -63,8 +60,8 @@ const createSuggestion = async (req, res) => {
                 where: {
                     bookClubId: bookClubId,
                     bookId: book.id,
-                    status: 'pending'
-                }
+                    status: 'pending',
+                },
             });
             if (existing) {
                 res.status(400).json({ error: 'This book has already been suggested' });
@@ -78,9 +75,9 @@ const createSuggestion = async (req, res) => {
                 ...suggestion,
                 suggestedBy: {
                     id: req.user.userId,
-                    name: req.user.name || 'User'
-                }
-            }
+                    name: req.user.name || 'User',
+                },
+            },
         });
     }
     catch (error) {
@@ -103,26 +100,26 @@ const voteSuggestion = async (req, res) => {
             where: {
                 suggestionId_userId: {
                     suggestionId: suggestionId,
-                    userId: req.user.userId
-                }
+                    userId: req.user.userId,
+                },
             },
             update: { voteType },
             create: {
                 suggestionId: suggestionId,
                 userId: req.user.userId,
-                voteType
-            }
+                voteType,
+            },
         });
         const voteCounts = await database_1.default.bookSuggestionVote.groupBy({
             by: ['voteType'],
             where: { suggestionId: suggestionId },
-            _count: true
+            _count: true,
         });
         const upvotes = voteCounts.find((v) => v.voteType === 'upvote')?._count || 0;
         const downvotes = voteCounts.find((v) => v.voteType === 'downvote')?._count || 0;
         await database_1.default.bookSuggestion.update({
             where: { id: suggestionId },
-            data: { upvotes, downvotes }
+            data: { upvotes, downvotes },
         });
         res.json({ success: true, data: vote });
     }
@@ -144,7 +141,7 @@ const acceptSuggestion = async (req, res) => {
         }
         const suggestion = await database_1.default.bookSuggestion.findUnique({
             where: { id: suggestionId },
-            include: { book: true }
+            include: { book: true },
         });
         if (!suggestion) {
             res.status(404).json({ error: 'Suggestion not found' });
@@ -152,7 +149,7 @@ const acceptSuggestion = async (req, res) => {
         }
         await database_1.default.bookClubBook.updateMany({
             where: { bookClubId: bookClubId, status: 'current' },
-            data: { status: 'completed' }
+            data: { status: 'completed' },
         });
         const bookClubBook = await database_1.default.bookClubBook.create({
             data: {
@@ -161,13 +158,13 @@ const acceptSuggestion = async (req, res) => {
                 status: 'current',
                 startDate: new Date(startDate),
                 endDate: new Date(endDate),
-                addedById: req.user.userId
+                addedById: req.user.userId,
             },
-            include: { book: true }
+            include: { book: true },
         });
         await database_1.default.bookSuggestion.update({
             where: { id: suggestionId },
-            data: { status: 'accepted' }
+            data: { status: 'accepted' },
         });
         res.json({ success: true, data: bookClubBook });
     }
@@ -183,7 +180,7 @@ const deleteSuggestion = async (req, res) => {
     try {
         const { suggestionId } = req.params;
         const suggestion = await database_1.default.bookSuggestion.findUnique({
-            where: { id: suggestionId }
+            where: { id: suggestionId },
         });
         if (!suggestion) {
             res.status(404).json({ error: 'Suggestion not found' });

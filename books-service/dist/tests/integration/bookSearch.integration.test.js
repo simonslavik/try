@@ -27,7 +27,7 @@ describe('Book Search Integration Tests', () => {
                     coverUrl: 'http://example.com/cover1.jpg',
                     pageCount: 200,
                     publishedDate: '2020-01-01',
-                    isbn: '1234567890'
+                    isbn: '1234567890',
                 },
                 {
                     googleBooksId: 'book2',
@@ -37,47 +37,38 @@ describe('Book Search Integration Tests', () => {
                     coverUrl: 'http://example.com/cover2.jpg',
                     pageCount: 300,
                     publishedDate: '2021-01-01',
-                    isbn: '0987654321'
-                }
+                    isbn: '0987654321',
+                },
             ];
             googleBooks_service_1.GoogleBooksService.searchBooks.mockResolvedValue(mockSearchResults);
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/search?q=test')
-                .expect(200);
+            const response = await (0, supertest_1.default)(app).get('/v1/books/search?q=test').expect(200);
             expect(response.body.success).toBe(true);
             expect(response.body.data).toHaveLength(2);
             expect(response.body.data[0].title).toBe('Test Book 1');
-            expect(googleBooks_service_1.GoogleBooksService.searchBooks).toHaveBeenCalledWith('test', 20);
+            expect(googleBooks_service_1.GoogleBooksService.searchBooks).toHaveBeenCalledWith('intitle:test', 20);
         });
         it('should return 400 if query is missing', async () => {
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/search')
-                .expect(400);
+            const response = await (0, supertest_1.default)(app).get('/v1/books/search').expect(400);
             expect(response.body.error).toContain('Query parameter');
         });
         it('should handle search errors', async () => {
             googleBooks_service_1.GoogleBooksService.searchBooks.mockRejectedValue(new Error('API error'));
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/search?q=test')
-                .expect(500);
+            const response = await (0, supertest_1.default)(app).get('/v1/books/search?q=test').expect(500);
             expect(response.body.error).toBe('API error');
         });
         it('should return empty array for no results', async () => {
             googleBooks_service_1.GoogleBooksService.searchBooks.mockResolvedValue([]);
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/search?q=nonexistent')
-                .expect(200);
+            const response = await (0, supertest_1.default)(app).get('/v1/books/search?q=nonexistent').expect(200);
             expect(response.body.success).toBe(true);
             expect(response.body.data).toEqual([]);
         });
         it('should handle empty query string', async () => {
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/search?q=')
-                .expect(400);
+            const response = await (0, supertest_1.default)(app).get('/v1/books/search?q=').expect(400);
             expect(response.body.error).toContain('Query parameter');
         });
         it('should handle special characters in query', async () => {
-            const mockResults = [{
+            const mockResults = [
+                {
                     googleBooksId: 'cpp1',
                     title: 'C++ Programming',
                     author: 'Test Author',
@@ -85,43 +76,34 @@ describe('Book Search Integration Tests', () => {
                     coverUrl: 'http://example.com/cover.jpg',
                     pageCount: 300,
                     publishedDate: '2020-01-01',
-                    isbn: '1234567890'
-                }];
+                    isbn: '1234567890',
+                },
+            ];
             googleBooks_service_1.GoogleBooksService.searchBooks.mockResolvedValue(mockResults);
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/search?q=C%2B%2B')
-                .expect(200);
+            const response = await (0, supertest_1.default)(app).get('/v1/books/search?q=C%2B%2B').expect(200);
             expect(response.body.success).toBe(true);
-            expect(googleBooks_service_1.GoogleBooksService.searchBooks).toHaveBeenCalledWith('C++', 20);
+            expect(googleBooks_service_1.GoogleBooksService.searchBooks).toHaveBeenCalledWith('intitle:C++', 20);
         });
         it('should handle unicode characters in query', async () => {
             googleBooks_service_1.GoogleBooksService.searchBooks.mockResolvedValue([]);
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/search?q=日本語')
-                .expect(200);
+            const response = await (0, supertest_1.default)(app).get('/v1/books/search?q=日本語').expect(200);
             expect(response.body.success).toBe(true);
-            expect(googleBooks_service_1.GoogleBooksService.searchBooks).toHaveBeenCalledWith('日本語', 20);
+            expect(googleBooks_service_1.GoogleBooksService.searchBooks).toHaveBeenCalledWith('intitle:日本語', 20);
         });
         it('should handle very long query strings', async () => {
             const longQuery = 'a'.repeat(500);
             googleBooks_service_1.GoogleBooksService.searchBooks.mockResolvedValue([]);
-            const response = await (0, supertest_1.default)(app)
-                .get(`/v1/books/search?q=${longQuery}`)
-                .expect(200);
+            const response = await (0, supertest_1.default)(app).get(`/v1/books/search?q=${longQuery}`).expect(200);
             expect(response.body.success).toBe(true);
         });
         it('should handle whitespace in query', async () => {
             googleBooks_service_1.GoogleBooksService.searchBooks.mockResolvedValue([]);
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/search?q=test%20book%20title')
-                .expect(200);
-            expect(googleBooks_service_1.GoogleBooksService.searchBooks).toHaveBeenCalledWith('test book title', 20);
+            await (0, supertest_1.default)(app).get('/v1/books/search?q=test%20book%20title').expect(200);
+            expect(googleBooks_service_1.GoogleBooksService.searchBooks).toHaveBeenCalledWith('intitle:test book title', 20);
         });
         it('should handle network timeout', async () => {
             googleBooks_service_1.GoogleBooksService.searchBooks.mockRejectedValue(new Error('Network timeout'));
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/search?q=test')
-                .expect(500);
+            const response = await (0, supertest_1.default)(app).get('/v1/books/search?q=test').expect(500);
             expect(response.body.error).toBe('Network timeout');
         });
         it('should handle malformed API response', async () => {
@@ -130,16 +112,15 @@ describe('Book Search Integration Tests', () => {
                     googleBooksId: 'book1',
                     title: 'Test Book',
                     // Missing required fields
-                }
+                },
             ]);
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/search?q=test')
-                .expect(200);
+            const response = await (0, supertest_1.default)(app).get('/v1/books/search?q=test').expect(200);
             expect(response.body.success).toBe(true);
             expect(response.body.data).toHaveLength(1);
         });
         it('should handle single result', async () => {
-            const mockResult = [{
+            const mockResult = [
+                {
                     googleBooksId: 'book1',
                     title: 'Single Book',
                     author: 'Author',
@@ -147,12 +128,11 @@ describe('Book Search Integration Tests', () => {
                     coverUrl: 'http://example.com/cover.jpg',
                     pageCount: 200,
                     publishedDate: '2020-01-01',
-                    isbn: '1234567890'
-                }];
+                    isbn: '1234567890',
+                },
+            ];
             googleBooks_service_1.GoogleBooksService.searchBooks.mockResolvedValue(mockResult);
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/search?q=single')
-                .expect(200);
+            const response = await (0, supertest_1.default)(app).get('/v1/books/search?q=single').expect(200);
             expect(response.body.success).toBe(true);
             expect(response.body.data).toHaveLength(1);
         });
@@ -165,12 +145,10 @@ describe('Book Search Integration Tests', () => {
                 coverUrl: `http://example.com/cover${i}.jpg`,
                 pageCount: 200,
                 publishedDate: '2020-01-01',
-                isbn: `123456789${i}`
+                isbn: `123456789${i}`,
             }));
             googleBooks_service_1.GoogleBooksService.searchBooks.mockResolvedValue(largeResults);
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/search?q=popular')
-                .expect(200);
+            const response = await (0, supertest_1.default)(app).get('/v1/books/search?q=popular').expect(200);
             expect(response.body.success).toBe(true);
             expect(response.body.data).toHaveLength(40);
         });
@@ -185,21 +163,17 @@ describe('Book Search Integration Tests', () => {
                 coverUrl: 'http://example.com/cover.jpg',
                 pageCount: 250,
                 publishedDate: '2020-01-01',
-                isbn: '1234567890'
+                isbn: '1234567890',
             };
             googleBooks_service_1.GoogleBooksService.getBookById.mockResolvedValue(mockBook);
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/google/abc123')
-                .expect(200);
+            const response = await (0, supertest_1.default)(app).get('/v1/books/google/abc123').expect(200);
             expect(response.body.success).toBe(true);
             expect(response.body.data.title).toBe('Test Book');
             expect(googleBooks_service_1.GoogleBooksService.getBookById).toHaveBeenCalledWith('abc123');
         });
         it('should return 500 for non-existent book', async () => {
             googleBooks_service_1.GoogleBooksService.getBookById.mockRejectedValue(new Error('Book not found'));
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/google/nonexistent')
-                .expect(500);
+            const response = await (0, supertest_1.default)(app).get('/v1/books/google/nonexistent').expect(500);
             expect(response.body.error).toBe('Book not found');
         });
         it('should handle book ID with special characters', async () => {
@@ -211,20 +185,16 @@ describe('Book Search Integration Tests', () => {
                 coverUrl: 'http://example.com/cover.jpg',
                 pageCount: 250,
                 publishedDate: '2020-01-01',
-                isbn: '1234567890'
+                isbn: '1234567890',
             };
             googleBooks_service_1.GoogleBooksService.getBookById.mockResolvedValue(mockBook);
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/google/abc-123_xyz')
-                .expect(200);
+            const response = await (0, supertest_1.default)(app).get('/v1/books/google/abc-123_xyz').expect(200);
             expect(response.body.success).toBe(true);
             expect(response.body.data.googleBooksId).toBe('abc-123_xyz');
         });
         it('should handle API timeout for book lookup', async () => {
             googleBooks_service_1.GoogleBooksService.getBookById.mockRejectedValue(new Error('Request timeout'));
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/google/timeout123')
-                .expect(500);
+            const response = await (0, supertest_1.default)(app).get('/v1/books/google/timeout123').expect(500);
             expect(response.body.error).toBe('Request timeout');
         });
         it('should handle book with missing optional fields', async () => {
@@ -236,12 +206,10 @@ describe('Book Search Integration Tests', () => {
                 coverUrl: '',
                 pageCount: 0,
                 publishedDate: '',
-                isbn: ''
+                isbn: '',
             };
             googleBooks_service_1.GoogleBooksService.getBookById.mockResolvedValue(mockBook);
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/google/minimal123')
-                .expect(200);
+            const response = await (0, supertest_1.default)(app).get('/v1/books/google/minimal123').expect(200);
             expect(response.body.success).toBe(true);
             expect(response.body.data.title).toBe('Minimal Book');
         });
@@ -255,12 +223,10 @@ describe('Book Search Integration Tests', () => {
                 coverUrl: 'http://example.com/cover.jpg',
                 pageCount: 100,
                 publishedDate: '2020-01-01',
-                isbn: '1234567890'
+                isbn: '1234567890',
             };
             googleBooks_service_1.GoogleBooksService.getBookById.mockResolvedValue(mockBook);
-            const response = await (0, supertest_1.default)(app)
-                .get(`/v1/books/google/${longId}`)
-                .expect(200);
+            const response = await (0, supertest_1.default)(app).get(`/v1/books/google/${longId}`).expect(200);
             expect(response.body.success).toBe(true);
         });
         it('should handle numeric book IDs', async () => {
@@ -272,12 +238,10 @@ describe('Book Search Integration Tests', () => {
                 coverUrl: 'http://example.com/cover.jpg',
                 pageCount: 100,
                 publishedDate: '2020-01-01',
-                isbn: '1234567890'
+                isbn: '1234567890',
             };
             googleBooks_service_1.GoogleBooksService.getBookById.mockResolvedValue(mockBook);
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/google/12345')
-                .expect(200);
+            const response = await (0, supertest_1.default)(app).get('/v1/books/google/12345').expect(200);
             expect(response.body.success).toBe(true);
             expect(response.body.data.googleBooksId).toBe('12345');
         });
@@ -290,12 +254,10 @@ describe('Book Search Integration Tests', () => {
                 coverUrl: null,
                 pageCount: null,
                 publishedDate: null,
-                isbn: null
+                isbn: null,
             };
             googleBooks_service_1.GoogleBooksService.getBookById.mockResolvedValue(mockBook);
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/books/google/null123')
-                .expect(200);
+            const response = await (0, supertest_1.default)(app).get('/v1/books/google/null123').expect(200);
             expect(response.body.success).toBe(true);
         });
     });

@@ -52,7 +52,7 @@ const updateUserBook = async (req, res) => {
         const userBook = await userBooks_service_1.UserBooksService.updateUserBook(req.user.userId, bookId, {
             status,
             rating,
-            review
+            review,
         });
         res.json({ success: true, data: userBook });
     }
@@ -84,21 +84,21 @@ const deleteUserBook = async (req, res) => {
     try {
         const { userBookId } = req.params;
         // Check if book exists and belongs to user
-        const existingUserBook = await userBooks_repository_1.UserBooksRepository.findOne(req.user.userId, userBookId);
+        const existingUserBook = await userBooks_repository_1.UserBooksRepository.findById(userBookId);
         if (!existingUserBook) {
             res.status(404).json({
-                error: 'Book not found in your library'
+                error: 'Book not found in your library',
             });
             return;
         }
         // Verify the book belongs to the requesting user
         if (existingUserBook.userId !== req.user.userId) {
             res.status(403).json({
-                error: 'You can only delete books from your own library'
+                error: 'You can only delete books from your own library',
             });
             return;
         }
-        await userBooks_service_1.UserBooksService.deleteUserBook(req.user.userId, userBookId);
+        await userBooks_repository_1.UserBooksRepository.deleteById(userBookId);
         res.json({ success: true, message: 'Book removed from library' });
     }
     catch (error) {

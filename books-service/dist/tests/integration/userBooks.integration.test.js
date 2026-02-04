@@ -23,11 +23,11 @@ describe('User Books Integration Tests', () => {
         testUserId = 'integration-test-user-' + Date.now();
         authToken = jsonwebtoken_1.default.sign({
             userId: testUserId,
-            email: 'test@example.com'
+            email: 'test@example.com',
         }, process.env.JWT_SECRET || 'test-secret');
         // Clean up any existing test data
         await database_1.default.userBook.deleteMany({
-            where: { userId: testUserId }
+            where: { userId: testUserId },
         });
     });
     beforeEach(() => {
@@ -39,26 +39,24 @@ describe('User Books Integration Tests', () => {
             coverUrl: 'http://example.com/cover.jpg',
             pageCount: 200,
             isbn: '1234567890',
-            googleBooksId: googleBooksId // Use the provided ID
+            googleBooksId: googleBooksId, // Use the provided ID
         }));
     });
     afterAll(async () => {
         // Cleanup
         await database_1.default.userBook.deleteMany({
-            where: { userId: testUserId }
+            where: { userId: testUserId },
         });
         if (testBookId) {
             await database_1.default.book.deleteMany({
-                where: { id: testBookId }
+                where: { id: testBookId },
             });
         }
         await database_1.default.$disconnect();
     });
     describe('GET /v1/user-books', () => {
         it('should return 401 without auth token', async () => {
-            const response = await (0, supertest_1.default)(app)
-                .get('/v1/user-books')
-                .expect(401);
+            const response = await (0, supertest_1.default)(app).get('/v1/user-books').expect(401);
             expect(response.body).toHaveProperty('message');
         });
         it('should return empty array for new user', async () => {
@@ -77,7 +75,7 @@ describe('User Books Integration Tests', () => {
                 .send({
                 googleBooksId: 'test-book-123',
                 status: 'reading',
-                rating: 4
+                rating: 4,
             });
             expect(addResponse.status).toBe(200);
             // Then filter by status
@@ -99,7 +97,7 @@ describe('User Books Integration Tests', () => {
                 googleBooksId: 'test-google-book-456',
                 status: 'want_to_read',
                 rating: 3,
-                review: 'Looking forward to reading this'
+                review: 'Looking forward to reading this',
             })
                 .expect(200);
             expect(response.body.success).toBe(true);
@@ -113,7 +111,7 @@ describe('User Books Integration Tests', () => {
                 .post('/v1/user-books')
                 .set('Authorization', `Bearer ${authToken}`)
                 .send({
-                status: 'reading'
+                status: 'reading',
                 // Missing googleBooksId
             })
                 .expect(400);
@@ -125,7 +123,7 @@ describe('User Books Integration Tests', () => {
                 .set('Authorization', `Bearer ${authToken}`)
                 .send({
                 googleBooksId: 'test-123',
-                status: 'invalid_status'
+                status: 'invalid_status',
             })
                 .expect(400);
             expect(response.body.error).toContain('Status must be one of');
@@ -137,7 +135,7 @@ describe('User Books Integration Tests', () => {
                 .send({
                 googleBooksId: 'test-123',
                 status: 'reading',
-                rating: 6 // Invalid
+                rating: 6, // Invalid
             })
                 .expect(400);
             expect(response.body.error).toContain('Rating cannot exceed 5');
@@ -151,7 +149,7 @@ describe('User Books Integration Tests', () => {
                 .send({
                 googleBooksId,
                 status: 'reading',
-                rating: 3
+                rating: 3,
             })
                 .expect(200);
             const firstBookId = firstResponse.body.data.id;
@@ -162,7 +160,7 @@ describe('User Books Integration Tests', () => {
                 .send({
                 googleBooksId,
                 status: 'completed',
-                rating: 5
+                rating: 5,
             })
                 .expect(200);
             // Should update, not create new
@@ -180,7 +178,7 @@ describe('User Books Integration Tests', () => {
                 .set('Authorization', `Bearer ${authToken}`)
                 .send({
                 googleBooksId: 'test-update-' + Date.now(),
-                status: 'reading'
+                status: 'reading',
             });
             bookIdToUpdate = response.body.data.bookId;
         });
@@ -191,7 +189,7 @@ describe('User Books Integration Tests', () => {
                 .send({
                 status: 'completed',
                 rating: 5,
-                review: 'Finished it!'
+                review: 'Finished it!',
             })
                 .expect(200);
             expect(response.body.success).toBe(true);
@@ -203,7 +201,7 @@ describe('User Books Integration Tests', () => {
                 .patch('/v1/user-books/non-existent-book-id')
                 .set('Authorization', `Bearer ${authToken}`)
                 .send({
-                status: 'completed'
+                status: 'completed',
             })
                 .expect(404);
             expect(response.body.error).toContain('not found');
@@ -213,7 +211,7 @@ describe('User Books Integration Tests', () => {
                 .patch(`/v1/user-books/${bookIdToUpdate}`)
                 .set('Authorization', `Bearer ${authToken}`)
                 .send({
-                rating: 4 // Only update rating
+                rating: 4, // Only update rating
             })
                 .expect(200);
             expect(response.body.success).toBe(true);
@@ -229,7 +227,7 @@ describe('User Books Integration Tests', () => {
                 .set('Authorization', `Bearer ${authToken}`)
                 .send({
                 googleBooksId: 'test-delete-' + Date.now(),
-                status: 'reading'
+                status: 'reading',
             });
             userBookIdToDelete = response.body.data.id;
         });
@@ -257,9 +255,7 @@ describe('User Books Integration Tests', () => {
     });
     describe('Authentication', () => {
         it('should reject requests without token', async () => {
-            await (0, supertest_1.default)(app)
-                .get('/v1/user-books')
-                .expect(401);
+            await (0, supertest_1.default)(app).get('/v1/user-books').expect(401);
         });
         it('should reject requests with invalid token', async () => {
             await (0, supertest_1.default)(app)

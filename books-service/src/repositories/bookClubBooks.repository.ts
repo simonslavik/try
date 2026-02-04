@@ -12,9 +12,9 @@ export class BookClubBooksRepository {
       where,
       include: {
         book: true,
-        readingProgress: true
+        readingProgress: true,
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   }
 
@@ -24,9 +24,9 @@ export class BookClubBooksRepository {
   static async findOne(bookClubId: string, bookId: string) {
     return await prisma.bookClubBook.findUnique({
       where: {
-        bookClubId_bookId: { bookClubId, bookId }
+        bookClubId_bookId: { bookClubId, bookId },
       },
-      include: { book: true }
+      include: { book: true },
     });
   }
 
@@ -36,7 +36,7 @@ export class BookClubBooksRepository {
   static async create(data: any) {
     return await prisma.bookClubBook.create({
       data,
-      include: { book: true }
+      include: { book: true },
     });
   }
 
@@ -46,10 +46,10 @@ export class BookClubBooksRepository {
   static async update(bookClubId: string, bookId: string, data: any) {
     return await prisma.bookClubBook.update({
       where: {
-        bookClubId_bookId: { bookClubId, bookId }
+        bookClubId_bookId: { bookClubId, bookId },
       },
       data,
-      include: { book: true }
+      include: { book: true },
     });
   }
 
@@ -59,8 +59,8 @@ export class BookClubBooksRepository {
   static async delete(bookClubId: string, bookId: string) {
     return await prisma.bookClubBook.delete({
       where: {
-        bookClubId_bookId: { bookClubId, bookId }
-      }
+        bookClubId_bookId: { bookClubId, bookId },
+      },
     });
   }
 }

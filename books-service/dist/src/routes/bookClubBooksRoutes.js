@@ -35,12 +35,15 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const authMiddleware_1 = require("../middleware/authMiddleware");
+const bookclubRoleMiddleware_1 = require("../middleware/bookclubRoleMiddleware");
 const bookClubBooksController = __importStar(require("../controllers/bookClubBooksController"));
 const router = (0, express_1.Router)();
+// Batch endpoint for fetching current books (public)
+router.post('/batch-current-books', bookClubBooksController.getBatchCurrentBooks);
 // Get books for a bookclub (public)
 router.get('/:bookClubId/books', bookClubBooksController.getBookClubBooks);
-// Protected routes
-router.post('/:bookClubId/books', authMiddleware_1.authMiddleware, bookClubBooksController.addBookClubBook);
-router.patch('/:bookClubId/books/:bookId', authMiddleware_1.authMiddleware, bookClubBooksController.updateBookClubBook);
-router.delete('/:bookClubId/books/:bookId', authMiddleware_1.authMiddleware, bookClubBooksController.deleteBookClubBook);
+// Protected routes - require MODERATOR role or higher
+router.post('/:bookClubId/books', authMiddleware_1.authMiddleware, (0, bookclubRoleMiddleware_1.requireBookClubRole)('MODERATOR'), bookClubBooksController.addBookClubBook);
+router.patch('/:bookClubId/books/:bookId', authMiddleware_1.authMiddleware, (0, bookclubRoleMiddleware_1.requireBookClubRole)('MODERATOR'), bookClubBooksController.updateBookClubBook);
+router.delete('/:bookClubId/books/:bookId', authMiddleware_1.authMiddleware, (0, bookclubRoleMiddleware_1.requireBookClubRole)('MODERATOR'), bookClubBooksController.deleteBookClubBook);
 exports.default = router;

@@ -1,5 +1,5 @@
 import { ReadingProgressRepository } from '../repositories/readingProgress.repository';
-import { BookClubBooksRepository } from '../repositories/bookClubBooks.repository';
+
 import { BookClubReviewsRepository } from '../repositories/bookClubReviews.repository';
 import logger from '../utils/logger';
 
@@ -30,13 +30,17 @@ export class ReadingProgressService {
         userId,
         bookClubBookId,
         pagesRead,
-        notes: notes || null
+        notes: notes || null,
       });
 
       logger.info('Reading progress posted:', { userId, bookClubBookId, pagesRead });
       return progress;
     } catch (error: any) {
-      logger.error('Error posting reading progress:', { error: error.message, userId, bookClubBookId });
+      logger.error('Error posting reading progress:', {
+        error: error.message,
+        userId,
+        bookClubBookId,
+      });
       throw error;
     }
   }
@@ -65,7 +69,7 @@ export class ReadingProgressService {
     try {
       const review = await BookClubReviewsRepository.upsert(userId, bookClubBookId, {
         rating,
-        reviewText: reviewText || null
+        reviewText: reviewText || null,
       });
 
       logger.info('Review posted:', { userId, bookClubBookId, rating });

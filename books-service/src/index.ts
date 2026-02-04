@@ -34,7 +34,7 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
     service: 'books-service',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
@@ -52,7 +52,7 @@ app.use('/v1/bookclub', bookSuggestionsRoutes);
 app.use(errorHandler);
 
 // Initialize Redis connection
-connectRedis().catch((error) => {
+connectRedis().catch((_error) => {
   logger.warn('Books service starting without Redis cache');
 });
 

@@ -8,7 +8,7 @@ describe('Validation Schemas', () => {
                 googleBooksId: 'abc123',
                 status: 'reading',
                 rating: 4,
-                review: 'Great book!'
+                review: 'Great book!',
             };
             const { error, value } = validation_1.addBookSchema.validate(validData);
             expect(error).toBeUndefined();
@@ -16,7 +16,7 @@ describe('Validation Schemas', () => {
         });
         it('should require googleBooksId', () => {
             const invalidData = {
-                status: 'reading'
+                status: 'reading',
             };
             const { error } = validation_1.addBookSchema.validate(invalidData);
             expect(error).toBeDefined();
@@ -24,7 +24,7 @@ describe('Validation Schemas', () => {
         });
         it('should require status', () => {
             const invalidData = {
-                googleBooksId: 'abc123'
+                googleBooksId: 'abc123',
             };
             const { error } = validation_1.addBookSchema.validate(invalidData);
             expect(error).toBeDefined();
@@ -33,7 +33,7 @@ describe('Validation Schemas', () => {
         it('should validate status values', () => {
             const invalidData = {
                 googleBooksId: 'abc123',
-                status: 'invalid_status'
+                status: 'invalid_status',
             };
             const { error } = validation_1.addBookSchema.validate(invalidData);
             expect(error).toBeDefined();
@@ -43,7 +43,7 @@ describe('Validation Schemas', () => {
             const invalidData = {
                 googleBooksId: 'abc123',
                 status: 'reading',
-                rating: 6
+                rating: 6,
             };
             const { error } = validation_1.addBookSchema.validate(invalidData);
             expect(error).toBeDefined();
@@ -53,7 +53,7 @@ describe('Validation Schemas', () => {
             const invalidData = {
                 googleBooksId: 'abc123',
                 status: 'reading',
-                review: 'a'.repeat(1001)
+                review: 'a'.repeat(1001),
             };
             const { error } = validation_1.addBookSchema.validate(invalidData);
             expect(error).toBeDefined();
@@ -62,7 +62,7 @@ describe('Validation Schemas', () => {
         it('should allow optional rating and review', () => {
             const validData = {
                 googleBooksId: 'abc123',
-                status: 'reading'
+                status: 'reading',
             };
             const { error } = validation_1.addBookSchema.validate(validData);
             expect(error).toBeUndefined();
@@ -73,21 +73,21 @@ describe('Validation Schemas', () => {
             const validData = {
                 status: 'completed',
                 rating: 5,
-                review: 'Excellent!'
+                review: 'Excellent!',
             };
             const { error } = validation_1.updateBookSchema.validate(validData);
             expect(error).toBeUndefined();
         });
         it('should allow partial updates', () => {
             const validData = {
-                status: 'reading'
+                status: 'reading',
             };
             const { error } = validation_1.updateBookSchema.validate(validData);
             expect(error).toBeUndefined();
         });
         it('should validate rating in updates', () => {
             const invalidData = {
-                rating: 0
+                rating: 0,
             };
             const { error } = validation_1.updateBookSchema.validate(invalidData);
             expect(error).toBeDefined();
@@ -100,14 +100,14 @@ describe('Validation Schemas', () => {
                 googleBooksId: 'abc123',
                 status: 'current',
                 startDate: new Date('2026-01-01'),
-                endDate: new Date('2026-02-01')
+                endDate: new Date('2026-02-01'),
             };
             const { error } = validation_1.addBookForBookClubSchema.validate(validData);
             expect(error).toBeUndefined();
         });
         it('should require googleBooksId', () => {
             const invalidData = {
-                status: 'current'
+                status: 'current',
             };
             const { error } = validation_1.addBookForBookClubSchema.validate(invalidData);
             expect(error).toBeDefined();
@@ -115,7 +115,7 @@ describe('Validation Schemas', () => {
         it('should validate status values for bookclub', () => {
             const invalidData = {
                 googleBooksId: 'abc123',
-                status: 'reading' // Not valid for bookclub
+                status: 'reading', // Not valid for bookclub
             };
             const { error } = validation_1.addBookForBookClubSchema.validate(invalidData);
             expect(error).toBeDefined();
@@ -123,7 +123,7 @@ describe('Validation Schemas', () => {
         });
         it('should allow optional dates', () => {
             const validData = {
-                googleBooksId: 'abc123'
+                googleBooksId: 'abc123',
             };
             const { error } = validation_1.addBookForBookClubSchema.validate(validData);
             expect(error).toBeUndefined();

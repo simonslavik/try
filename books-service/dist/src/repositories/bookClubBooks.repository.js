@@ -17,9 +17,9 @@ class BookClubBooksRepository {
             where,
             include: {
                 book: true,
-                readingProgress: true
+                readingProgress: true,
             },
-            orderBy: { createdAt: 'desc' }
+            orderBy: { createdAt: 'desc' },
         });
     }
     /**
@@ -28,9 +28,9 @@ class BookClubBooksRepository {
     static async findOne(bookClubId, bookId) {
         return await database_1.default.bookClubBook.findUnique({
             where: {
-                bookClubId_bookId: { bookClubId, bookId }
+                bookClubId_bookId: { bookClubId, bookId },
             },
-            include: { book: true }
+            include: { book: true },
         });
     }
     /**
@@ -39,7 +39,7 @@ class BookClubBooksRepository {
     static async create(data) {
         return await database_1.default.bookClubBook.create({
             data,
-            include: { book: true }
+            include: { book: true },
         });
     }
     /**
@@ -48,10 +48,10 @@ class BookClubBooksRepository {
     static async update(bookClubId, bookId, data) {
         return await database_1.default.bookClubBook.update({
             where: {
-                bookClubId_bookId: { bookClubId, bookId }
+                bookClubId_bookId: { bookClubId, bookId },
             },
             data,
-            include: { book: true }
+            include: { book: true },
         });
     }
     /**
@@ -60,8 +60,8 @@ class BookClubBooksRepository {
     static async delete(bookClubId, bookId) {
         return await database_1.default.bookClubBook.delete({
             where: {
-                bookClubId_bookId: { bookClubId, bookId }
-            }
+                bookClubId_bookId: { bookClubId, bookId },
+            },
         });
     }
 }

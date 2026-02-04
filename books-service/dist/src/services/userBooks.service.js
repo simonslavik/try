@@ -34,7 +34,7 @@ class UserBooksService {
             const userBook = await userBooks_repository_1.UserBooksRepository.upsert(userId, book.id, {
                 status,
                 rating,
-                review
+                review,
             });
             logger_1.default.info('Book added to user library:', { userId, bookId: book.id, status });
             return userBook;

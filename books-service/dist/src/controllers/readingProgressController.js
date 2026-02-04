@@ -18,11 +18,11 @@ const getReadingProgress = async (req, res) => {
         }
         const { bookClubBookId } = req.params;
         const existingBookClubBook = await database_1.default.bookClubBook.findUnique({
-            where: { id: bookClubBookId }
+            where: { id: bookClubBookId },
         });
         if (!existingBookClubBook) {
             res.status(404).json({
-                error: 'Book not found in bookclub'
+                error: 'Book not found in bookclub',
             });
             return;
         }
@@ -30,14 +30,14 @@ const getReadingProgress = async (req, res) => {
             where: {
                 bookClubBookId_userId: {
                     bookClubBookId: bookClubBookId,
-                    userId: req.user.userId
-                }
+                    userId: req.user.userId,
+                },
             },
             include: {
                 bookClubBook: {
-                    include: { book: true }
-                }
-            }
+                    include: { book: true },
+                },
+            },
         });
         res.json({ success: true, data: progress });
     }
@@ -65,7 +65,7 @@ const updateReadingProgress = async (req, res) => {
         const { pagesRead, notes } = req.body;
         const bookClubBook = await database_1.default.bookClubBook.findUnique({
             where: { id: bookClubBookId },
-            include: { book: true }
+            include: { book: true },
         });
         if (!bookClubBook) {
             res.status(404).json({ error: 'Book not found' });
@@ -77,22 +77,22 @@ const updateReadingProgress = async (req, res) => {
             where: {
                 bookClubBookId_userId: {
                     bookClubBookId: bookClubBookId,
-                    userId: req.user.userId
-                }
+                    userId: req.user.userId,
+                },
             },
             update: {
                 pagesRead,
                 percentage,
                 notes,
-                lastReadDate: new Date()
+                lastReadDate: new Date(),
             },
             create: {
                 bookClubBookId: bookClubBookId,
                 userId: req.user.userId,
                 pagesRead,
                 percentage,
-                notes
-            }
+                notes,
+            },
         });
         res.json({ success: true, data: progress });
     }
@@ -119,7 +119,7 @@ const addOrUpdateReview = async (req, res) => {
         const { bookClubBookId } = req.params;
         const { rating, reviewText } = req.body;
         const bookClubBook = await database_1.default.bookClubBook.findUnique({
-            where: { id: bookClubBookId }
+            where: { id: bookClubBookId },
         });
         if (!bookClubBook) {
             res.status(404).json({ error: 'Book not found in bookclub' });
@@ -129,19 +129,19 @@ const addOrUpdateReview = async (req, res) => {
             where: {
                 bookClubBookId_userId: {
                     bookClubBookId: bookClubBookId,
-                    userId: req.user.userId
-                }
+                    userId: req.user.userId,
+                },
             },
             update: {
                 rating,
-                reviewText: reviewText || null
+                reviewText: reviewText || null,
             },
             create: {
                 bookClubBookId: bookClubBookId,
                 userId: req.user.userId,
                 rating,
-                reviewText: reviewText || null
-            }
+                reviewText: reviewText || null,
+            },
         });
         res.json({ success: true, data: review });
     }
@@ -163,7 +163,7 @@ const getReviews = async (req, res) => {
         const { bookClubBookId } = req.params;
         const reviews = await database_1.default.bookClubBookReview.findMany({
             where: { bookClubBookId: bookClubBookId },
-            orderBy: { createdAt: 'desc' }
+            orderBy: { createdAt: 'desc' },
         });
         const averageRating = reviews.length > 0
             ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
@@ -173,8 +173,8 @@ const getReviews = async (req, res) => {
             data: {
                 reviews,
                 averageRating: Math.round(averageRating * 10) / 10,
-                totalReviews: reviews.length
-            }
+                totalReviews: reviews.length,
+            },
         });
     }
     catch (error) {
@@ -197,9 +197,9 @@ const deleteReview = async (req, res) => {
             where: {
                 bookClubBookId_userId: {
                     bookClubBookId: bookClubBookId,
-                    userId: req.user.userId
-                }
-            }
+                    userId: req.user.userId,
+                },
+            },
         });
         res.json({ success: true, message: 'Review deleted successfully' });
     }

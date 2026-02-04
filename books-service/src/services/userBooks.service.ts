@@ -37,7 +37,7 @@ export class UserBooksService {
       const userBook = await UserBooksRepository.upsert(userId, book.id, {
         status,
         rating,
-        review
+        review,
       });
 
       logger.info('Book added to user library:', { userId, bookId: book.id, status });
@@ -59,13 +59,13 @@ export class UserBooksService {
     try {
       // Check if book exists in user's library
       const existingUserBook = await UserBooksRepository.findOne(userId, bookId);
-      
+
       if (!existingUserBook) {
         throw new Error('Book not found in your library. Please add it first.');
       }
 
       const updatedBook = await UserBooksRepository.update(userId, bookId, data);
-      
+
       logger.info('User book updated:', { userId, bookId });
       return updatedBook;
     } catch (error: any) {
@@ -81,13 +81,13 @@ export class UserBooksService {
     try {
       // Check if book exists in user's library
       const existingUserBook = await UserBooksRepository.findOne(userId, bookId);
-      
+
       if (!existingUserBook) {
         throw new Error('Book not found in your library');
       }
 
       await UserBooksRepository.delete(userId, bookId);
-      
+
       logger.info('User book deleted:', { userId, bookId });
     } catch (error: any) {
       logger.error('Error deleting user book:', { error: error.message, userId, bookId });

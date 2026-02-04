@@ -13,9 +13,9 @@ class BookSuggestionsRepository {
         return await database_1.default.bookSuggestion.findMany({
             where: { bookClubId },
             include: {
-                book: true
+                book: true,
             },
-            orderBy: { updatedAt: 'desc' }
+            orderBy: { updatedAt: 'desc' },
         });
     }
     /**
@@ -25,8 +25,8 @@ class BookSuggestionsRepository {
         return await database_1.default.bookSuggestion.create({
             data,
             include: {
-                book: true
-            }
+                book: true,
+            },
         });
     }
     /**
@@ -34,7 +34,7 @@ class BookSuggestionsRepository {
      */
     static async delete(suggestionId) {
         return await database_1.default.bookSuggestion.delete({
-            where: { id: suggestionId }
+            where: { id: suggestionId },
         });
     }
 }

@@ -9,9 +9,9 @@ export class BookClubReviewsRepository {
       where: {
         bookClubBookId_userId: {
           bookClubBookId,
-          userId
-        }
-      }
+          userId,
+        },
+      },
     });
   }
 
@@ -21,7 +21,7 @@ export class BookClubReviewsRepository {
   static async findByBookClubBook(bookClubBookId: string) {
     return await prisma.bookClubBookReview.findMany({
       where: { bookClubBookId },
-      orderBy: { updatedAt: 'desc' }
+      orderBy: { updatedAt: 'desc' },
     });
   }
 
@@ -33,15 +33,15 @@ export class BookClubReviewsRepository {
       where: {
         bookClubBookId_userId: {
           bookClubBookId,
-          userId
-        }
+          userId,
+        },
       },
       update: data,
       create: {
         userId,
         bookClubBookId,
-        ...data
-      }
+        ...data,
+      },
     });
   }
 }

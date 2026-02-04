@@ -37,7 +37,7 @@ export class BookSuggestionsService {
         bookClubId,
         bookId: book.id,
         suggestedById: userId,
-        reason: reason || null
+        reason: reason || null,
       });
 
       logger.info('Book suggested:', { bookClubId, bookId: book.id, userId });
@@ -55,7 +55,7 @@ export class BookSuggestionsService {
     try {
       // Note: Add authorization check if needed (verify userId is the suggester)
       await BookSuggestionsRepository.delete(suggestionId);
-      
+
       logger.info('Book suggestion deleted:', { suggestionId, userId });
     } catch (error: any) {
       logger.error('Error deleting suggestion:', { error: error.message, suggestionId });

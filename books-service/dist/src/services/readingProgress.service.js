@@ -29,13 +29,17 @@ class ReadingProgressService {
                 userId,
                 bookClubBookId,
                 pagesRead,
-                notes: notes || null
+                notes: notes || null,
             });
             logger_1.default.info('Reading progress posted:', { userId, bookClubBookId, pagesRead });
             return progress;
         }
         catch (error) {
-            logger_1.default.error('Error posting reading progress:', { error: error.message, userId, bookClubBookId });
+            logger_1.default.error('Error posting reading progress:', {
+                error: error.message,
+                userId,
+                bookClubBookId,
+            });
             throw error;
         }
     }
@@ -58,7 +62,7 @@ class ReadingProgressService {
         try {
             const review = await bookClubReviews_repository_1.BookClubReviewsRepository.upsert(userId, bookClubBookId, {
                 rating,
-                reviewText: reviewText || null
+                reviewText: reviewText || null,
             });
             logger_1.default.info('Review posted:', { userId, bookClubBookId, rating });
             return review;

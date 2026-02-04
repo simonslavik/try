@@ -11,7 +11,7 @@ export class UserBooksRepository {
     return await prisma.userBook.findMany({
       where,
       include: { book: true },
-      orderBy: { updatedAt: 'desc' }
+      orderBy: { updatedAt: 'desc' },
     });
   }
 
@@ -23,10 +23,10 @@ export class UserBooksRepository {
       where: {
         userId_bookId: {
           userId,
-          bookId
-        }
+          bookId,
+        },
       },
-      include: { book: true }
+      include: { book: true },
     });
   }
 
@@ -36,7 +36,7 @@ export class UserBooksRepository {
   static async findById(userBookId: string) {
     return await prisma.userBook.findUnique({
       where: { id: userBookId },
-      include: { book: true }
+      include: { book: true },
     });
   }
 
@@ -46,15 +46,15 @@ export class UserBooksRepository {
   static async upsert(userId: string, bookId: string, data: any) {
     return await prisma.userBook.upsert({
       where: {
-        userId_bookId: { userId, bookId }
+        userId_bookId: { userId, bookId },
       },
       update: data,
       create: {
         userId,
         bookId,
-        ...data
+        ...data,
       },
-      include: { book: true }
+      include: { book: true },
     });
   }
 
@@ -64,10 +64,10 @@ export class UserBooksRepository {
   static async update(userId: string, bookId: string, data: any) {
     return await prisma.userBook.update({
       where: {
-        userId_bookId: { userId, bookId }
+        userId_bookId: { userId, bookId },
       },
       data,
-      include: { book: true }
+      include: { book: true },
     });
   }
 
@@ -77,8 +77,8 @@ export class UserBooksRepository {
   static async delete(userId: string, bookId: string) {
     return await prisma.userBook.delete({
       where: {
-        userId_bookId: { userId, bookId }
-      }
+        userId_bookId: { userId, bookId },
+      },
     });
   }
 
@@ -87,7 +87,7 @@ export class UserBooksRepository {
    */
   static async deleteById(userBookId: string) {
     return await prisma.userBook.delete({
-      where: { id: userBookId }
+      where: { id: userBookId },
     });
   }
 }

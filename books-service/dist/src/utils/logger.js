@@ -13,8 +13,8 @@ const transports = [
             const { timestamp, level, message, service, ...meta } = info;
             const metaStr = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : '';
             return `${timestamp} [${service}] ${level}: ${message}${metaStr}`;
-        }))
-    })
+        })),
+    }),
 ];
 // Add Loki transport in production or when LOKI_HOST is set
 if (!isDevelopment || process.env.LOKI_HOST) {
@@ -26,13 +26,13 @@ if (!isDevelopment || process.env.LOKI_HOST) {
         replaceTimestamp: true,
         onConnectionError: (err) => {
             console.error('Loki connection error:', err);
-        }
+        },
     }));
 }
 const logger = winston_1.default.createLogger({
     level: isDevelopment ? 'debug' : 'info',
     defaultMeta: { service: 'books-service' },
     format: winston_1.default.format.combine(winston_1.default.format.timestamp(), winston_1.default.format.errors({ stack: true }), winston_1.default.format.json()),
-    transports
+    transports,
 });
 exports.default = logger;
