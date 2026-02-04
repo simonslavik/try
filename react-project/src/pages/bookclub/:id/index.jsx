@@ -41,8 +41,13 @@ import ConnectedUsersSidebar from '../../../components/features/bookclub/Connect
 import MessageInput from '../../../components/features/bookclub/MessageInput';
 import BookclubHeader from '../../../components/features/bookclub/MainChatArea/BookclubHeader';
 import InviteModal from '../../../components/common/modals/InviteModal';
+import AdminApprovalPanel from '../../../components/features/bookclub/AdminApprovalPanel';
+import InviteLinkManager from '../../../components/features/bookclub/InviteLinkManager';
+import MemberManagement from '../../../components/features/bookclub/MemberManagement';
 import { useBookclubWebSocket } from '../../../hooks/useBookclubWebSocket';
 import { messageModerationAPI } from '../../../api/messageModeration.api';
+import { bookclubAPI } from '../../../api/bookclub.api';
+import { FiX, FiSettings as FiSettingsIcon, FiLock, FiUnlock, FiEyeOff } from 'react-icons/fi';
 
 
 const BookClub = () => {
@@ -74,6 +79,17 @@ const BookClub = () => {
   const [showBooksHistory, setShowBooksHistory] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  
+  // Settings form states
+  const [settingsForm, setSettingsForm] = useState({
+    name: '',
+    description: '',
+    category: '',
+    visibility: 'PUBLIC',
+    requiresApproval: false
+  });
+  const [savingSettings, setSavingSettings] = useState(false);
   
   // Books states
   const [bookclubBooks, setBookclubBooks] = useState({ current: [], upcoming: [], completed: [] });
@@ -158,8 +174,42 @@ const BookClub = () => {
     setShowBooksHistory(false);
     setShowCalendar(false);
     setShowSuggestions(false);
+    setShowSettings(false);
     setBookclubBooks({ current: [], upcoming: [], completed: [] });
   }, [bookClubId]);
+
+  // Populate settings form when bookClub loads
+  useEffect(() => {
+    if (bookClub) {
+      setSettingsForm({
+        name: bookClub.name || '',
+        description: bookClub.description || '',
+        category: bookClub.category || '',
+        visibility: bookClub.visibility || 'PUBLIC',
+        requiresApproval: bookClub.requiresApproval || false
+      });
+    }
+  }, [bookClub]);
+
+  // Handle settings form submission
+  const handleSaveSettings = async (e) => {
+    e.preventDefault();
+    setSavingSettings(true);
+    try {
+      await bookclubAPI.updateBookclubSettings(bookClubId, {
+        ...settingsForm,
+        requiresApproval: settingsForm.visibility === 'PRIVATE' ? settingsForm.requiresApproval : false
+      });
+      alert('Settings updated successfully!');
+      // Refresh bookclub data
+      const response = await bookclubAPI.getBookclubPreview(bookClubId);
+      setBookClub(response.data);
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to update settings');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
 
   // Fetch bookclub books history
   const fetchBookclubBooks = async () => {
@@ -886,18 +936,190 @@ const BookClub = () => {
               showBooksHistory={showBooksHistory}
               showCalendar={showCalendar}
               showSuggestions={showSuggestions}
+              showSettings={showSettings}
               currentRoom={currentRoom}
               auth={auth}
               onInviteClick={() => {
                 console.log('Invite button clicked!');
                 setShowInviteModal(true);
               }}
-              bookClubId={bookClubId}
+              onSettingsClick={() => {
+                setShowBooksHistory(false);
+                setShowCalendar(false);
+                setShowSuggestions(false);
+                setShowSettings(true);
+              }}
               userRole={userRole}
             />
 
-            {/* Content Area - Calendar, Books History, Suggestions, or Messages */}
-            {showCalendar ? (
+            {/* Content Area - Settings, Calendar, Books History, Suggestions, or Messages */}
+            {showSettings ? (
+              <div className="flex-1 overflow-y-auto bg-gray-900 p-6">
+                {/* Settings Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <FiSettingsIcon className="w-6 h-6 text-purple-400" />
+                    <h2 className="text-2xl font-bold text-white">Bookclub Settings</h2>
+                  </div>
+                  <button
+                    onClick={() => setShowSettings(false)}
+                    className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                  >
+                    <FiX className="w-6 h-6 text-gray-400 hover:text-white" />
+                  </button>
+                </div>
+
+                {/* Settings Form */}
+                <div className="bg-gray-800 rounded-xl p-6 mb-6">
+                  <h3 className="text-xl font-bold text-white mb-6">General Settings</h3>
+                  <form onSubmit={handleSaveSettings} className="space-y-6">
+                    {/* Name */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-300 mb-2">Bookclub Name</label>
+                      <input
+                        type="text"
+                        value={settingsForm.name}
+                        onChange={(e) => setSettingsForm({...settingsForm, name: e.target.value})}
+                        className="w-full px-4 py-3 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                        required
+                      />
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-300 mb-2">Description</label>
+                      <textarea
+                        value={settingsForm.description}
+                        onChange={(e) => setSettingsForm({...settingsForm, description: e.target.value})}
+                        rows={4}
+                        className="w-full px-4 py-3 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-purple-500 outline-none resize-none"
+                      />
+                    </div>
+
+                    {/* Category */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-300 mb-2">Category</label>
+                      <select
+                        value={settingsForm.category}
+                        onChange={(e) => setSettingsForm({...settingsForm, category: e.target.value})}
+                        className="w-full px-4 py-3 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                      >
+                        <option value="">Select a category</option>
+                        <option value="Fiction">Fiction</option>
+                        <option value="Non-Fiction">Non-Fiction</option>
+                        <option value="Mystery">Mystery</option>
+                        <option value="Romance">Romance</option>
+                        <option value="Science Fiction">Science Fiction</option>
+                        <option value="Fantasy">Fantasy</option>
+                        <option value="Thriller">Thriller</option>
+                        <option value="Biography">Biography</option>
+                        <option value="Self-Help">Self-Help</option>
+                        <option value="History">History</option>
+                        <option value="Poetry">Poetry</option>
+                        <option value="Young Adult">Young Adult</option>
+                        <option value="Classic Literature">Classic Literature</option>
+                        <option value="Horror">Horror</option>
+                        <option value="Philosophy">Philosophy</option>
+                      </select>
+                    </div>
+
+                    {/* Visibility */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-300 mb-3">Visibility</label>
+                      <div className="space-y-3">
+                        <label className="flex items-center gap-3 p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-650">
+                          <input
+                            type="radio"
+                            value="PUBLIC"
+                            checked={settingsForm.visibility === 'PUBLIC'}
+                            onChange={(e) => setSettingsForm({...settingsForm, visibility: e.target.value})}
+                            className="w-4 h-4"
+                          />
+                          <FiUnlock className="text-green-400" />
+                          <div>
+                            <span className="font-semibold text-white">Public</span>
+                            <p className="text-sm text-gray-400">Anyone can see and join instantly</p>
+                          </div>
+                        </label>
+                        <label className="flex items-center gap-3 p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-650">
+                          <input
+                            type="radio"
+                            value="PRIVATE"
+                            checked={settingsForm.visibility === 'PRIVATE'}
+                            onChange={(e) => setSettingsForm({...settingsForm, visibility: e.target.value})}
+                            className="w-4 h-4"
+                          />
+                          <FiLock className="text-yellow-400" />
+                          <div>
+                            <span className="font-semibold text-white">Private</span>
+                            <p className="text-sm text-gray-400">Anyone can see, join requires approval</p>
+                          </div>
+                        </label>
+                        <label className="flex items-center gap-3 p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-650">
+                          <input
+                            type="radio"
+                            value="INVITE_ONLY"
+                            checked={settingsForm.visibility === 'INVITE_ONLY'}
+                            onChange={(e) => setSettingsForm({...settingsForm, visibility: e.target.value})}
+                            className="w-4 h-4"
+                          />
+                          <FiEyeOff className="text-purple-400" />
+                          <div>
+                            <span className="font-semibold text-white">Invite Only</span>
+                            <p className="text-sm text-gray-400">Only visible to members, join via invite</p>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Approval Checkbox */}
+                    {settingsForm.visibility === 'PRIVATE' && (
+                      <div className="bg-gray-700 p-4 rounded-lg">
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={settingsForm.requiresApproval}
+                            onChange={(e) => setSettingsForm({...settingsForm, requiresApproval: e.target.checked})}
+                            className="w-5 h-5"
+                          />
+                          <span className="font-semibold text-white">Require admin approval for join requests</span>
+                        </label>
+                      </div>
+                    )}
+
+                    {/* Submit Button */}
+                    <button
+                      type="submit"
+                      disabled={savingSettings}
+                      className={`w-full px-6 py-3 rounded-xl font-semibold transition-colors ${
+                        savingSettings
+                          ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                          : 'bg-purple-600 text-white hover:bg-purple-700'
+                      }`}
+                    >
+                      {savingSettings ? 'Saving...' : 'Save Settings'}
+                    </button>
+                  </form>
+                </div>
+
+                {/* Admin Panels */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                  <AdminApprovalPanel bookclubId={bookClubId} userRole={userRole} />
+                  <InviteLinkManager bookclubId={bookClubId} userRole={userRole} />
+                </div>
+
+                {/* Member Management */}
+                <MemberManagement
+                  bookclub={bookClub}
+                  currentUserId={auth?.user?.id}
+                  currentUserRole={userRole}
+                  onMemberUpdate={async () => {
+                    const response = await bookclubAPI.getBookclubPreview(bookClubId);
+                    setBookClub(response.data);
+                  }}
+                />
+              </div>
+            ) : showCalendar ? (
               <div className="flex-1 overflow-hidden">
                 <CalendarView
                   bookClubId={bookClubId}
@@ -937,7 +1159,7 @@ const BookClub = () => {
             )}
 
             {/* Message Input - Only show when not viewing special views */}
-            {!showBooksHistory && !showCalendar && !showSuggestions && auth?.user ? (
+            {!showBooksHistory && !showCalendar && !showSuggestions && !showSettings && auth?.user ? (
               <MessageInput
                 newMessage={newMessage}
                 setNewMessage={setNewMessage}
@@ -949,7 +1171,7 @@ const BookClub = () => {
                 onSubmit={handleSendMessage}
                 auth={auth}
               />
-            ) : !showBooksHistory && !showCalendar && !showSuggestions ? (
+            ) : !showBooksHistory && !showCalendar && !showSuggestions && !showSettings ? (
               <div className="bg-gray-800 border-t border-gray-700 p-4 text-center">
                 <p className="text-gray-400">
                   Please <button onClick={() => navigate('/login', { state: { from: `/bookclub/${bookClubId}` } })} className="text-purple-400 hover:underline">log in</button> to chat
