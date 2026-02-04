@@ -476,4 +476,29 @@ export class BookClubController {
       res.status(500).json({ success: false, message: 'Failed to delete club' });
     }
   }
+
+  /**
+   * Verify member role (for inter-service communication)
+   */
+  static async verifyMemberRole(req: Request, res: Response) {
+    try {
+      const { id, userId } = req.params;
+
+      const membership = await BookClubService.getMembership(id, userId);
+
+      if (!membership) {
+        return res.status(404).json({ success: false, message: 'Member not found' });
+      }
+
+      res.json({ 
+        success: true, 
+        role: membership.role, 
+        status: membership.status 
+      });
+    } catch (error: any) {
+      logger.error('ERROR_VERIFY_ROLE', { error: error.message, clubId: id });
+      res.status(500).json({ success: false, message: 'Failed to verify role' });
+    }
+  }
 }
+

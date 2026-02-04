@@ -68,6 +68,9 @@ router.post('/:id/invites', authMiddleware, BookClubController.createInvite);
 router.delete('/:id/invites/:inviteId', authMiddleware, BookClubController.deleteInvite);
 
 // ===== MEMBER MANAGEMENT (Admin/Owner only) =====
+// Verify member role (for inter-service communication)
+router.get('/:id/members/:userId/verify-role', BookClubController.verifyMemberRole);
+
 // Remove member
 router.delete('/:id/members/:userId', authMiddleware, BookClubController.removeMember);
 

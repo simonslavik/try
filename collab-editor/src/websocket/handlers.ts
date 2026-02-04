@@ -1,6 +1,6 @@
 import { WebSocket } from 'ws';
 import { v4 as uuidv4 } from 'uuid';
-import { PrismaClient, MembershipStatus } from '@prisma/client';
+import { PrismaClient, MembershipStatus, BookClubRole } from '@prisma/client';
 import { verifyWebSocketToken } from '../utils/websocketAuth.js';
 import { 
   Client, 
@@ -467,5 +467,145 @@ export const handleDisconnect = (client: Client) => {
   if (activeClub.clients.size === 0) {
     activeBookClubs.delete(client.bookClubId);
     console.log(`🧹 Active book club ${client.bookClubId} cleaned up (no connected users)`);
+  }
+};
+
+export const handleDeleteMessage = async (message: any, currentClient: Client | null) => {
+  if (!currentClient || !currentClient.bookClubId) return;
+
+  const { messageId } = message;
+  const activeClub = activeBookClubs.get(currentClient.bookClubId);
+  if (!activeClub) return;
+
+  try {
+    // Get message to verify it exists and get room info
+    const messageToDelete = await prisma.message.findUnique({
+      where: { id: messageId },
+      include: { room: true }
+    });
+
+    if (!messageToDelete) {
+      currentClient.ws.send(JSON.stringify({
+        type: 'error',
+        message: 'Message not found'
+      }));
+      return;
+    }
+
+    // Check if user has MODERATOR+ permission or owns the message
+    const isOwnMessage = messageToDelete.userId === currentClient.userId;
+    let hasPermission = isOwnMessage;
+
+    if (!isOwnMessage) {
+      const membership = await prisma.bookClubMember.findUnique({
+        where: {
+          bookClubId_userId: {
+            bookClubId: currentClient.bookClubId,
+            userId: currentClient.userId
+          }
+        }
+      });
+
+      const roleHierarchy = {
+        [BookClubRole.OWNER]: 4,
+        [BookClubRole.ADMIN]: 3,
+        [BookClubRole.MODERATOR]: 2,
+        [BookClubRole.MEMBER]: 1
+      };
+
+      hasPermission = membership ? roleHierarchy[membership.role] >= roleHierarchy[BookClubRole.MODERATOR] : false;
+    }
+
+    if (!hasPermission) {
+      currentClient.ws.send(JSON.stringify({
+        type: 'error',
+        message: 'You need MODERATOR role or higher to delete other users\' messages'
+      }));
+      return;
+    }
+
+    // Soft delete the message
+    const deletedMessage = await prisma.message.update({
+      where: { id: messageId },
+      data: {
+        deletedAt: new Date(),
+        deletedBy: currentClient.userId,
+        content: '[Message deleted]'
+      }
+    });
+
+    // Broadcast deletion to all users in the room
+    broadcastToBookClub(activeClub, {
+      type: 'message-deleted',
+      messageId,
+      deletedBy: currentClient.userId
+    });
+
+    console.log(`🗑️ Message ${messageId} deleted by ${currentClient.username}`);
+  } catch (error) {
+    console.error('Error deleting message:', error);
+    currentClient.ws.send(JSON.stringify({
+      type: 'error',
+      message: 'Failed to delete message'
+    }));
+  }
+};
+
+export const handlePinMessage = async (message: any, currentClient: Client | null) => {
+  if (!currentClient || !currentClient.bookClubId) return;
+
+  const { messageId, isPinned } = message;
+  const activeClub = activeBookClubs.get(currentClient.bookClubId);
+  if (!activeClub) return;
+
+  try {
+    // Check if user has MODERATOR+ permission
+    const membership = await prisma.bookClubMember.findUnique({
+      where: {
+        bookClubId_userId: {
+          bookClubId: currentClient.bookClubId,
+          userId: currentClient.userId
+        }
+      }
+    });
+
+    const roleHierarchy = {
+      [BookClubRole.OWNER]: 4,
+      [BookClubRole.ADMIN]: 3,
+      [BookClubRole.MODERATOR]: 2,
+      [BookClubRole.MEMBER]: 1
+    };
+
+    const hasPermission = membership ? roleHierarchy[membership.role] >= roleHierarchy[BookClubRole.MODERATOR] : false;
+
+    if (!hasPermission) {
+      currentClient.ws.send(JSON.stringify({
+        type: 'error',
+        message: 'You need MODERATOR role or higher to pin messages'
+      }));
+      return;
+    }
+
+    // Update message pin status
+    const pinnedMessage = await prisma.message.update({
+      where: { id: messageId },
+      data: { isPinned }
+    });
+
+    // Broadcast pin status to all users in the room
+    broadcastToBookClub(activeClub, {
+      type: 'message-pinned',
+      messageId,
+      isPinned,
+      pinnedBy: currentClient.userId
+    });
+
+    console.log(`📌 Message ${messageId} ${isPinned ? 'pinned' : 'unpinned'} by ${currentClient.username}`);
+  } catch (error) {
+    console.error('Error pinning message:', error);
+    currentClient.ws.send(JSON.stringify({
+      type: 'error',
+      message: 'Failed to pin message'
+    }));
   }
 };

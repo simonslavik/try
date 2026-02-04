@@ -6,6 +6,8 @@ import {
   handleSwitchRoom,
   handleChatMessage,
   handleDMMessage,
+  handleDeleteMessage,
+  handlePinMessage,
   handleDisconnect
 } from './handlers.js';
 
@@ -42,6 +44,14 @@ export const setupWebSocket = (wss: WebSocketServer) => {
           
           case 'dm-message':
             handleDMMessage(message, currentClient);
+            break;
+          
+          case 'delete-message':
+            handleDeleteMessage(message, currentClient);
+            break;
+          
+          case 'pin-message':
+            handlePinMessage(message, currentClient);
             break;
           
           default:

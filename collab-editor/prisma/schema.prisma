@@ -129,10 +129,14 @@ model Message {
   userId      String // User ID from user-service
   username    String // Cached username for display
   content     String?
+  isPinned    Boolean    @default(false)
+  deletedAt   DateTime?
+  deletedBy   String? // User ID who deleted the message
   createdAt   DateTime   @default(now())
   attachments ChatFile[]
 
   @@index([roomId, createdAt])
+  @@index([roomId, isPinned])
   @@map("messages")
 }
 
