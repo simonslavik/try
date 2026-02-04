@@ -13,6 +13,7 @@ import roomRoutes from './routes/roomRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
 import inviteRoutes from './routes/inviteRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
+import messageModerationRoutes from './routes/messageModerationRoutes.js';
 
 // WebSocket setup
 import { setupWebSocket } from './websocket/index.js';
@@ -63,6 +64,7 @@ app.use('/bookclubs/:bookClubId/rooms', roomRoutes);
 app.use('/bookclubs/:bookClubId/events', eventRoutes);
 app.use('/invites', inviteRoutes);
 app.use('/upload', uploadRoutes);
+app.use('/moderation', messageModerationRoutes);
 
 // Also mount event routes at top level for update/delete by eventId
 import { updateEvent, deleteEvent } from './controllers/eventController.js';

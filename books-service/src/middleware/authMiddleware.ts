@@ -9,6 +9,7 @@ export interface AuthRequest extends Request {
         role: string;
         name?: string;
     };
+    bookClubRole?: 'OWNER' | 'ADMIN' | 'MODERATOR' | 'MEMBER';
 }
 
 declare global {
@@ -20,6 +21,7 @@ declare global {
                 role: string;
                 name?: string;
             };
+            bookClubRole?: 'OWNER' | 'ADMIN' | 'MODERATOR' | 'MEMBER';
         }
     }
 }

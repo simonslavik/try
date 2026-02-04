@@ -119,11 +119,39 @@ const BookClub = () => {
 
   // Extract user's role from bookClubMembers
   useEffect(() => {
-    if (bookClubMembers && auth?.user?.id) {
-      const membership = bookClubMembers.find(m => m.userId === auth.user.id);
-      setUserRole(membership?.role || null);
+    if (!auth?.user?.id) return;
+    
+    console.log('UserRole Debug:', {
+      bookClubMembers,
+      authUserId: auth.user.id,
+      bookClubData: bookClub,
+      creatorId: bookClub?.creatorId
+    });
+    
+    // First check if user is the creator
+    if (bookClub?.creatorId === auth.user.id) {
+      console.log('✅ User is creator, setting OWNER role');
+      setUserRole('OWNER');
+      return;
     }
-  }, [bookClubMembers, auth?.user?.id]);
+    
+    // Otherwise check membership in bookClubMembers
+    if (bookClubMembers && bookClubMembers.length > 0) {
+      console.log('BookClub Members details:', bookClubMembers.map(m => ({
+        userId: m.userId,
+        role: m.role,
+        matches: m.userId === auth.user.id
+      })));
+      
+      const membership = bookClubMembers.find(m => m.userId === auth.user.id);
+      console.log('Membership found:', membership);
+      if (membership) {
+        setUserRole(membership.role);
+      } else {
+        setUserRole(null);
+      }
+    }
+  }, [bookClubMembers, auth?.user?.id, bookClub]);
 
   // Reset books history and calendar view when bookClubId changes
   useEffect(() => {
@@ -864,6 +892,8 @@ const BookClub = () => {
                 console.log('Invite button clicked!');
                 setShowInviteModal(true);
               }}
+              bookClubId={bookClubId}
+              userRole={userRole}
             />
 
             {/* Content Area - Calendar, Books History, Suggestions, or Messages */}

@@ -406,12 +406,49 @@ export class BookClubService {
     const hasPermission = await this.checkPermission(clubId, userId, BookClubRole.ADMIN);
     if (!hasPermission) throw new Error('INSUFFICIENT_PERMISSIONS');
 
-    return await prisma.membershipRequest.findMany({
+    const requests = await prisma.membershipRequest.findMany({
       where: {
         bookClubId: clubId,
         status: RequestStatus.PENDING
       },
       orderBy: { createdAt: 'asc' }
+    });
+
+    // Fetch user details from user-service
+    const userIds = [...new Set(requests.map(r => r.userId))];
+    let userMap = new Map<string, any>();
+    
+    if (userIds.length > 0) {
+      try {
+        const userResponse = await fetch(`${process.env.USER_SERVICE_URL || 'http://user-service:3001'}/users/batch`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userIds })
+        });
+        
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          if (userData.success && Array.isArray(userData.users)) {
+            userMap = new Map(userData.users.map((u: any) => [u.id, u]));
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch user details for requests:', error);
+      }
+    }
+
+    // Attach user details to requests
+    return requests.map(request => {
+      const user = userMap.get(request.userId);
+      return {
+        ...request,
+        user: user ? {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          profilePicture: user.profilePicture
+        } : null
+      };
     });
   }
 

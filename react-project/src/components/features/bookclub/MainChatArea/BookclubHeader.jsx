@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiHash, FiSettings, FiCalendar, FiUserPlus } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 
 const BookclubHeader = ({ 
   showBooksHistory, 
@@ -7,8 +8,23 @@ const BookclubHeader = ({
   showSuggestions, 
   currentRoom,
   auth,
-  onInviteClick
+  onInviteClick,
+  bookClubId,
+  userRole
 }) => {
+  const navigate = useNavigate();
+  
+  // Debug logging
+  console.log('BookclubHeader Debug:', {
+    userRole,
+    hasAuth: !!auth?.user,
+    showBooksHistory,
+    showCalendar,
+    showSuggestions,
+    isOwnerOrAdmin: userRole === 'OWNER' || userRole === 'ADMIN',
+    shouldShowSettings: auth?.user && !showBooksHistory && !showCalendar && !showSuggestions && (userRole === 'OWNER' || userRole === 'ADMIN')
+  });
+  
   return (
     <div className="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between">
       <div className="flex items-center gap-2">
@@ -39,9 +55,16 @@ const BookclubHeader = ({
             Invite
           </button>
         )}
-        {auth?.user && !showBooksHistory && !showCalendar && !showSuggestions && (
-          <button className="text-gray-400 hover:text-white">
-            <FiSettings />
+        {auth?.user && !showBooksHistory && !showCalendar && !showSuggestions && (userRole === 'OWNER' || userRole === 'ADMIN') && (
+          <button 
+            onClick={() => {
+              console.log('Settings clicked - navigating to:', `/bookclub-settings/${bookClubId}`);
+              navigate(`/bookclub-settings/${bookClubId}`);
+            }}
+            className="text-gray-400 hover:text-white transition-colors"
+            title="Bookclub Settings"
+          >
+            <FiSettings size={20} />
           </button>
         )}
       </div>

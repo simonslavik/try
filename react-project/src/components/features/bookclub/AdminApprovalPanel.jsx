@@ -17,10 +17,14 @@ const AdminApprovalPanel = ({ bookclubId, userRole }) => {
 
   const fetchPendingRequests = async () => {
     try {
+      console.log('Fetching pending requests for bookclub:', bookclubId);
       const response = await bookclubAPI.getPendingRequests(bookclubId);
+      console.log('Pending requests response:', response);
+      console.log('Requests data:', response.data);
       setRequests(response.data || []);
     } catch (error) {
       console.error('Failed to fetch pending requests:', error);
+      console.error('Error details:', error.response?.data);
     } finally {
       setLoading(false);
     }
@@ -95,11 +99,21 @@ const AdminApprovalPanel = ({ bookclubId, userRole }) => {
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-blue-400 rounded-full flex items-center justify-center text-white font-bold">
-                  {request.userId?.charAt(0)?.toUpperCase() || '?'}
-                </div>
+                {request.user?.profilePicture ? (
+                  <img 
+                    src={request.user.profilePicture} 
+                    alt={request.user.username}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-blue-400 rounded-full flex items-center justify-center text-white font-bold">
+                    {request.user?.username?.charAt(0)?.toUpperCase() || request.userId?.charAt(0)?.toUpperCase() || '?'}
+                  </div>
+                )}
                 <div>
-                  <p className="font-semibold text-gray-900 font-outfit">User ID: {request.userId}</p>
+                  <p className="font-semibold text-gray-900 font-outfit">
+                    {request.user?.username || `User ${request.userId.slice(0, 8)}`}
+                  </p>
                   <p className="text-sm text-gray-500 font-outfit">
                     {new Date(request.createdAt).toLocaleDateString()}
                   </p>
