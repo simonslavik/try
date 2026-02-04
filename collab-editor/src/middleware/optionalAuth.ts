@@ -20,7 +20,16 @@ export const optionalAuth = (req: Request, res: Response, next: NextFunction) =>
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any;
-      (req as any).user = { id: decoded.id };
+      logger.debug('Token decoded in optionalAuth', { decoded, hasId: !!decoded.id, hasUserId: !!decoded.userId });
+      
+      // Support both 'id' and 'userId' fields in token
+      const userId = decoded.userId || decoded.id;
+      
+      if (userId) {
+        (req as any).user = { userId };
+      } else {
+        logger.warn('Token decoded but no userId/id found', { decoded });
+      }
     } catch (error) {
       // Invalid token - continue without user (don't reject)
       logger.debug('Invalid token in optional auth', { error: error instanceof Error ? error.message : 'Unknown error' });
