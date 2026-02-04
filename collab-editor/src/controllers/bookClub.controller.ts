@@ -68,7 +68,17 @@ export class BookClubController {
       const { id } = req.params;
       const userId = (req as any).user?.userId;
 
+      logger.info('GET_CLUB_PREVIEW', { 
+        clubId: id, 
+        userId, 
+        hasUser: !!(req as any).user,
+        userObject: (req as any).user,
+        authHeader: req.headers.authorization ? 'present' : 'missing'
+      });
+
       const preview = await BookClubService.getClubPreview(id, userId);
+
+      logger.info('PREVIEW_RESULT', { clubId: id, isMember: preview.isMember, creatorId: preview.creatorId });
 
       res.json({ success: true, data: preview });
     } catch (error: any) {

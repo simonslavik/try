@@ -212,25 +212,45 @@ export class BookClubService {
       }
     }
 
-    const isMember = membership?.status === MembershipStatus.ACTIVE;
+    // Creator is always a member, even if not in membership table
+    logger.info('CHECKING_MEMBERSHIP', { userId, creatorId: club.creatorId, isCreator: userId === club.creatorId, hasMembership: !!membership });
+    const isMember = (userId === club.creatorId) || (membership?.status === MembershipStatus.ACTIVE);
+    logger.info('IS_MEMBER_RESULT', { isMember });
 
     // Fetch user details for members
+    // Always include creator in the list even if not in members table
     const memberUserIds = club.members.map(m => m.userId);
+    const allUserIds = new Set([...memberUserIds, club.creatorId]);
     let membersWithDetails = [];
 
-    if (memberUserIds.length > 0) {
+    logger.info('FETCHING_MEMBER_DETAILS', { 
+      clubId, 
+      memberUserIds, 
+      creatorId: club.creatorId,
+      allUserIds: Array.from(allUserIds),
+      memberCount: club.members.length
+    });
+
+    if (allUserIds.size > 0) {
       try {
         const userServiceUrl = process.env.USER_SERVICE_URL || 'http://user-service:3001';
-        const response = await fetch(`${userServiceUrl}/api/users/batch`, {
+        const requestBody = { userIds: Array.from(allUserIds) };
+        logger.info('CALLING_USER_SERVICE', { url: `${userServiceUrl}/users/batch`, requestBody });
+        
+        const response = await fetch(`${userServiceUrl}/users/batch`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userIds: memberUserIds })
+          body: JSON.stringify(requestBody)
         });
+
+        logger.info('USER_SERVICE_RESPONSE', { status: response.status, ok: response.ok });
 
         if (response.ok) {
           const userData = await response.json();
+          logger.info('USER_DATA_RECEIVED', { userCount: userData.users?.length });
           const userMap = new Map(userData.users.map((u: any) => [u.id, u]));
           
+          // Map existing members with their details
           membersWithDetails = club.members.map(member => {
             const user = userMap.get(member.userId);
             return {
@@ -241,6 +261,26 @@ export class BookClubService {
               joinedAt: member.joinedAt
             };
           });
+          
+          // Add creator if not already in members list
+          const creatorInMembers = membersWithDetails.some(m => m.id === club.creatorId);
+          logger.info('CREATOR_CHECK', { creatorInMembers, membersWithDetailsCount: membersWithDetails.length });
+          if (!creatorInMembers) {
+            const creatorUser = userMap.get(club.creatorId);
+            logger.info('ADDING_CREATOR', { found: !!creatorUser, creatorId: club.creatorId });
+            if (creatorUser) {
+              membersWithDetails.unshift({
+                id: club.creatorId,
+                username: creatorUser.username,
+                profileImage: creatorUser.profilePicture || null,
+                role: BookClubRole.OWNER,
+                joinedAt: club.createdAt
+              });
+            }
+          }
+          logger.info('FINAL_MEMBERS_LIST', { count: membersWithDetails.length });
+        } else {
+          logger.error('USER_SERVICE_ERROR', { status: response.status, statusText: response.statusText });
         }
       } catch (error) {
         logger.error('Failed to fetch user details for members', { error });

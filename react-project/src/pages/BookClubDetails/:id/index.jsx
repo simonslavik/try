@@ -36,9 +36,13 @@ const BookClubPage = () => {
                 const response = await fetch(`http://localhost:3000/v1/bookclubs/${bookClubId}/preview`, { headers });
                 const responseData = await response.json();
                 
+                console.log('📚 BookClub Preview Response:', responseData);
+                
                 if (response.ok) {
                     // Handle new response format { success: true, data: {...} }
                     const data = responseData.success ? responseData.data : responseData;
+                    console.log('📚 BookClub Data:', data);
+                    console.log('👥 Members:', data.members);
                     setBookClub(data);
                     setConnectedUsers(data.connectedUsers || []);
                     setBookClubMembers(data.members || []);
@@ -188,17 +192,57 @@ const BookClubPage = () => {
 
                             {/* Action Button */}
                             <button
-                                onClick={() => {
-                                    if (auth?.user) {
-                                        // If user is a member, go directly to bookclub
-                                        if (bookClub?.isMember) {
-                                            navigate(`/bookclub/${bookClubId}`);
-                                        } else {
-                                            // Navigate to preview/join page
-                                            navigate(`/bookclubpage/${bookClubId}`);
-                                        }
-                                    } else {
+                                onClick={async () => {
+                                    if (!auth?.user) {
                                         setOpenLogin(true);
+                                        return;
+                                    }
+                                    
+                                    // If already a member, enter bookclub
+                                    if (bookClub?.isMember) {
+                                        navigate(`/bookclub/${bookClubId}`);
+                                        return;
+                                    }
+                                    
+                                    // If not a member, try to join
+                                    try {
+                                        if (bookClub?.visibility === 'PUBLIC') {
+                                            // Join public bookclub directly
+                                            const response = await fetch(`http://localhost:3000/v1/bookclubs/${bookClubId}/join`, {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Authorization': `Bearer ${auth.token}`,
+                                                    'Content-Type': 'application/json'
+                                                }
+                                            });
+                                            const data = await response.json();
+                                            if (response.ok) {
+                                                // Successfully joined, navigate to bookclub
+                                                navigate(`/bookclub/${bookClubId}`);
+                                            } else {
+                                                alert(data.message || 'Failed to join bookclub');
+                                            }
+                                        } else {
+                                            // Request to join private bookclub
+                                            const response = await fetch(`http://localhost:3000/v1/bookclubs/${bookClubId}/request`, {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Authorization': `Bearer ${auth.token}`,
+                                                    'Content-Type': 'application/json'
+                                                }
+                                            });
+                                            const data = await response.json();
+                                            if (response.ok) {
+                                                alert('Join request sent! Wait for admin approval.');
+                                                // Refresh page to update status
+                                                window.location.reload();
+                                            } else {
+                                                alert(data.message || 'Failed to send join request');
+                                            }
+                                        }
+                                    } catch (error) {
+                                        console.error('Error joining bookclub:', error);
+                                        alert('Failed to join bookclub');
                                     }
                                 }}
                                 className="px-8 py-4 bg-white text-purple-600 rounded-xl font-semibold hover:bg-purple-50 transition-all transform hover:scale-105 shadow-xl flex items-center gap-2"
