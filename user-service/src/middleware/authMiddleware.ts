@@ -28,6 +28,17 @@ interface TokenPayload {
  */
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        // Check for internal service-to-service authentication via X-User-Id header
+        const internalUserId = req.headers['x-user-id'] as string;
+        if (internalUserId) {
+            // Internal service call (e.g., from collab-editor WebSocket)
+            req.user = {
+                userId: internalUserId,
+                email: '' // Not needed for internal calls
+            };
+            return next();
+        }
+
         // Get token from Authorization header
         const authHeader = req.headers.authorization;
 

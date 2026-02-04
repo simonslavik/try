@@ -114,6 +114,7 @@ const BookClub = () => {
   const [dmMessages, setDmMessages] = useState([]);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [friends, setFriends] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState(null);
   
   // User's role in the current bookclub
   const [userRole, setUserRole] = useState(null);
@@ -317,6 +318,13 @@ const BookClub = () => {
     }
   }, [bookClubId, auth]);
 
+  // Fetch bookclub books when bookClubId changes
+  useEffect(() => {
+    if (bookClubId && auth?.token) {
+      fetchBookclubBooks();
+    }
+  }, [bookClubId, auth?.token]);
+
   // Fetch my bookclubs only once on mount (not on bookClubId change to prevent reordering)
   useEffect(() => {
     if (auth?.user) {
@@ -336,7 +344,7 @@ const BookClub = () => {
 
   // DM WebSocket connection
   useEffect(() => {
-    if (!auth?.user?.id || !auth?.user?.name) return;
+    if (!auth?.user?.id || !auth?.user?.name || !auth?.token) return;
 
     const ws = new WebSocket('ws://localhost:4000');
     dmWs.current = ws;
@@ -346,7 +354,8 @@ const BookClub = () => {
       ws.send(JSON.stringify({
         type: 'join-dm',
         userId: auth.user.id,
-        username: auth.user.name
+        username: auth.user.name,
+        token: auth.token
       }));
     };
 
@@ -356,6 +365,11 @@ const BookClub = () => {
       switch (data.type) {
         case 'dm-joined':
           console.log('✅ Joined DM connection');
+          break;
+          
+        case 'auth-error':
+          console.error('❌ DM auth failed:', data.message);
+          // Don't show alert for auth errors, just log them
           break;
           
         case 'dm-sent':
@@ -404,11 +418,13 @@ const BookClub = () => {
         ws.close();
       }
     };
-  }, [auth?.user?.id, auth?.user?.name, currentDMUser]);
+  }, [auth?.user?.id, auth?.user?.name, auth?.token, currentDMUser]);
 
   // Fetch conversations when switching to DM mode
   const fetchConversations = async () => {
     if (!auth?.token) return;
+    
+    console.log('📋 Fetching conversations...');
     
     try {
       const response = await fetch('http://localhost:3000/v1/messages/conversations', {
@@ -416,8 +432,11 @@ const BookClub = () => {
       });
       const data = await response.json();
       
+      console.log('📋 Conversations response:', data);
+      
       if (response.ok) {
         // Backend returns { success: true, data: [...conversations] }
+        console.log('✅ Setting conversations:', data.data);
         setConversations(data.data || []);
       } else {
         console.error('Failed to fetch conversations:', data.message);
@@ -475,13 +494,19 @@ const BookClub = () => {
   const fetchDMMessages = async (userId) => {
     if (!auth?.token) return;
     
+    console.log('🔍 Fetching DM messages for userId:', userId);
+    
     try {
       const response = await fetch(`http://localhost:3000/v1/messages/${userId}`, {
         headers: { Authorization: `Bearer ${auth.token}` }
       });
       const data = await response.json();
       
+      console.log('📨 DM Response:', data);
+      
       if (response.ok) {
+        console.log('✅ Setting messages:', data.data.messages);
+        console.log('✅ Setting currentDMUser:', data.data.otherUser);
         setDmMessages(data.data.messages || []);
         setCurrentDMUser(data.data.otherUser);
       } else {
@@ -749,25 +774,33 @@ const BookClub = () => {
   };
 
   const handleStartDM = async (userId) => {
+    console.log('🚀 Starting DM with userId:', userId);
     setViewMode('dm');
+    
     await fetchDMMessages(userId);
     
-    // If user is not in conversations yet, add them temporarily
-    if (!conversations.some(conv => conv.friend?.id === userId)) {
-      const userInfo = bookClubMembers.find(member => member.id === userId);
-      if (userInfo) {
-        setConversations(prev => [{
-          friend: {
-            id: userInfo.id,
-            name: userInfo.username,
-            email: userInfo.email || '',
-            profileImage: userInfo.profileImage
-          },
-          lastMessage: null,
-          unreadCount: 0
-        }, ...prev]);
+    // Ensure user is in conversations list (either from API response or bookClubMembers)
+    setTimeout(() => {
+      if (!conversations.some(conv => conv.friend?.id === userId)) {
+        console.log('⚠️ User not in conversations, adding from bookClubMembers');
+        const userInfo = bookClubMembers.find(member => member.id === userId);
+        console.log('Found user info:', userInfo);
+        if (userInfo) {
+          setConversations(prev => [{
+            friend: {
+              id: userInfo.id,
+              name: userInfo.username,
+              email: userInfo.email || '',
+              profileImage: userInfo.profileImage
+            },
+            lastMessage: null,
+            unreadCount: 0
+          }, ...prev]);
+        }
+      } else {
+        console.log('✅ User already in conversations');
       }
-    }
+    }, 100);
     
     setSelectedUserId(null);
   };
