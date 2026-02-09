@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import logger from '../utils/logger';
 
 // Extend Express Request to include user property
 export interface AuthRequest extends Request {
@@ -88,7 +89,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
       });
     }
 
-    console.error('Auth middleware error:', error);
+    logger.error('Auth middleware error:', { error: error.message, stack: error.stack });
     return res.status(500).json({
       message: 'Authentication error',
       error: error.message,

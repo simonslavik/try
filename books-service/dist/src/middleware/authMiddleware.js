@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authMiddleware = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const logger_1 = __importDefault(require("../utils/logger"));
 /**
  * Middleware to verify JWT access token
  * Extracts token from Authorization header and verifies it
@@ -49,7 +50,7 @@ const authMiddleware = async (req, res, next) => {
                 message: 'Invalid token',
             });
         }
-        console.error('Auth middleware error:', error);
+        logger_1.default.error('Auth middleware error:', { error: error.message, stack: error.stack });
         return res.status(500).json({
             message: 'Authentication error',
             error: error.message,
