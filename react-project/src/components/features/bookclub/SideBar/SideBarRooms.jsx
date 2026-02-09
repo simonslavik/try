@@ -19,7 +19,6 @@ const SideBarRooms = ({
     fileInputRef,
     handleImageUpload,
     handleDeleteImage,
-    onNameUpdate,
     onOpenDM,
     setAddCurrentBookState,
     addCurrentBookState,
@@ -33,15 +32,8 @@ const SideBarRooms = ({
     showSuggestions
 }) => {
     const navigate = useNavigate();
-    const [editingName, setEditingName] = useState(false);
-    const [newName, setNewName] = useState(bookClub?.name || '');
     const [currentBook, setCurrentBook] = useState(null);
-    const nameInputRef = useRef(null);
     const [displayBooksSection, setDisplayBooksSection] = useState(true);
-
-    useEffect(() => {
-        setNewName(bookClub?.name || '');
-    }, [bookClub]);
 
     useEffect(() => {
         // Clear current book when switching bookclubs
@@ -94,69 +86,6 @@ const SideBarRooms = ({
         return Math.round(percentage);
     };
 
-    const handleNameDoubleClick = () => {
-        if (auth?.user && auth.user.id === bookClub?.creatorId) {
-            setEditingName(true);
-            setTimeout(() => {
-                if (nameInputRef.current) {
-                    nameInputRef.current.focus();
-                }
-            }, 0);
-        }
-    };
-
-    const handleNameChange = (e) => {
-        setNewName(e.target.value);
-    };
-
-    const handleNameBlur = async () => {
-        await saveNameChange();
-    };
-
-    const handleNameKeyDown = async (e) => {
-        if (e.key === 'Enter') {
-            await saveNameChange();
-        } else if (e.key === 'Escape') {
-            setEditingName(false);
-            setNewName(bookClub?.name || '');
-        }
-    };
-
-    const saveNameChange = async () => {
-        if (!newName.trim() || newName === bookClub?.name) {
-            setEditingName(false);
-            setNewName(bookClub?.name || '');
-            return;
-        }
-
-        try {
-            const response = await fetch(`http://localhost:3000/v1/editor/bookclubs/${bookClub.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${auth.token}`
-                },
-                body: JSON.stringify({ name: newName.trim() })
-            });
-
-            const data = await response.json();
-            
-            if (response.ok && onNameUpdate) {
-                onNameUpdate(data.bookClub.name);
-                setEditingName(false);
-            } else {
-                alert(data.error || 'Failed to update book club name');
-                setEditingName(false);
-                setNewName(bookClub?.name || '');
-            }
-        } catch (err) {
-            console.error('Error updating book club name:', err);
-            alert('Failed to update book club name');
-            setEditingName(false);
-            setNewName(bookClub?.name || '');
-        }
-    };
-
     if (!bookClub) {
         return (
             <div className="w-64 bg-gray-800 border-r border-gray-700 flex items-center justify-center h-full">
@@ -180,35 +109,12 @@ const SideBarRooms = ({
                 handleDeleteImage={handleDeleteImage}
               />
               
-              {editingName ? (
-                <input
-                  ref={nameInputRef}
-                  type="text"
-                  value={newName}
-                  onChange={handleNameChange}
-                  onBlur={handleNameBlur}
-                  onKeyDown={handleNameKeyDown}
-                  className="text-white font-bold text-lg bg-gray-700 px-2 py-1 rounded border border-purple-500 focus:outline-none w-full"
-                />
-              ) : (
-                <div className="flex items-center">
-                  <h2 
-                    className={`text-white font-bold text-lg truncate ${
-                      auth?.user && auth.user.id === bookClub?.creatorId 
-                        ? 'cursor-pointer hover:text-purple-400' 
-                        : ''
-                    }`}
-                    
-                    onClick={() => navigate(`/bookclubpage/${bookClub?.id}`)}
-                  >
-                    {bookClub?.name}
-                  </h2>
-                  {auth?.user && auth.user.id === bookClub?.creatorId ? <button onClick={handleNameDoubleClick} className="ml-2 text-gray-400 hover:text-white">
-                    <FiPlus size={14} />
-                  </button> : null}
-                  
-                </div>
-              )}
+              <h2 
+                className="text-white font-bold text-lg truncate cursor-pointer hover:text-purple-400"
+                onClick={() => navigate(`/bookclubpage/${bookClub?.id}`)}
+              >
+                {bookClub?.name}
+              </h2>
             </div>
 
             {/* Toggle Books Section Button */}

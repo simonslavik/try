@@ -247,16 +247,17 @@ export class BookClubService {
 
         if (response.ok) {
           const userData = await response.json();
-          logger.info('USER_DATA_RECEIVED', { userCount: userData.users?.length });
+          logger.info('USER_DATA_RECEIVED', { userCount: userData.users?.length, rawData: userData });
           const userMap = new Map(userData.users.map((u: any) => [u.id, u]));
           
           // Map existing members with their details
           membersWithDetails = club.members.map(member => {
             const user = userMap.get(member.userId);
+            logger.info('MAPPING_MEMBER', { userId: member.userId, user, username: user?.username });
             return {
               id: member.userId,
               username: user?.username || 'Unknown User',
-              profileImage: user?.profilePicture || null,
+              profileImage: user?.profileImage || null,
               role: member.role,
               joinedAt: member.joinedAt
             };
@@ -267,18 +268,18 @@ export class BookClubService {
           logger.info('CREATOR_CHECK', { creatorInMembers, membersWithDetailsCount: membersWithDetails.length });
           if (!creatorInMembers) {
             const creatorUser = userMap.get(club.creatorId);
-            logger.info('ADDING_CREATOR', { found: !!creatorUser, creatorId: club.creatorId });
+            logger.info('ADDING_CREATOR', { found: !!creatorUser, creatorId: club.creatorId, creatorUser });
             if (creatorUser) {
               membersWithDetails.unshift({
                 id: club.creatorId,
                 username: creatorUser.username,
-                profileImage: creatorUser.profilePicture || null,
+                profileImage: creatorUser.profileImage || null,
                 role: BookClubRole.OWNER,
                 joinedAt: club.createdAt
               });
             }
           }
-          logger.info('FINAL_MEMBERS_LIST', { count: membersWithDetails.length });
+          logger.info('FINAL_MEMBERS_LIST', { count: membersWithDetails.length, members: membersWithDetails });
         } else {
           logger.error('USER_SERVICE_ERROR', { status: response.status, statusText: response.statusText });
         }

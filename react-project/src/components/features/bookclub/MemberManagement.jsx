@@ -18,6 +18,16 @@ const MemberManagement = ({ bookclub, currentUserId, currentUserRole, onMemberUp
   const isOwner = currentUserRole === 'OWNER';
   const isAdmin = ['OWNER', 'ADMIN'].includes(currentUserRole);
 
+  // Debug logging
+  console.log('MemberManagement Debug:', {
+    bookclub,
+    members: bookclub?.members,
+    memberCount: bookclub?.members?.length,
+    currentUserId,
+    currentUserRole,
+    firstMember: bookclub?.members?.[0]
+  });
+
   const handleRoleChange = async (userId, newRole) => {
     if (!isOwner) {
       alert('Only the owner can change roles');
@@ -59,8 +69,25 @@ const MemberManagement = ({ bookclub, currentUserId, currentUserRole, onMemberUp
     const aIndex = ROLE_ORDER.indexOf(a.role);
     const bIndex = ROLE_ORDER.indexOf(b.role);
     if (aIndex !== bIndex) return aIndex - bIndex;
-    return new Date(a.joinedAt) - new Date(b.joinedAt);
+    return new Date(a.joinedAt || 0) - new Date(b.joinedAt || 0);
   });
+
+  console.log('Sorted Members:', sortedMembers);
+
+  if (!bookclub || !bookclub.members || bookclub.members.length === 0) {
+    return (
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <FiUsers className="w-6 h-6 text-purple-600" />
+          <h3 className="text-xl font-bold text-gray-900 font-display">Members</h3>
+          <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-semibold">
+            0
+          </span>
+        </div>
+        <p className="text-gray-500 text-center py-8">No members found</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
@@ -74,10 +101,11 @@ const MemberManagement = ({ bookclub, currentUserId, currentUserRole, onMemberUp
 
       <div className="space-y-2">
         {sortedMembers.map((member) => {
-          const isCurrentUser = member.userId === currentUserId;
-          const canChangeRole = isOwner && !isCurrentUser && member.role !== 'OWNER';
-          const canRemove = isAdmin && !isCurrentUser && member.role !== 'OWNER';
-          const isProcessing = processingUserId === member.userId;
+          const memberRole = member.role || 'MEMBER';
+          const isCurrentUser = member.id === currentUserId;
+          const canChangeRole = isOwner && !isCurrentUser && memberRole !== 'OWNER';
+          const canRemove = isAdmin && !isCurrentUser && memberRole !== 'OWNER';
+          const isProcessing = processingUserId === member.id;
 
           return (
             <div
@@ -88,13 +116,22 @@ const MemberManagement = ({ bookclub, currentUserId, currentUserRole, onMemberUp
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 flex-1">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-blue-400 rounded-full flex items-center justify-center text-white font-bold">
-                    {member.userId?.charAt(0)?.toUpperCase() || '?'}
-                  </div>
+                  <img
+                    src={
+                      member.profileImage
+                        ? (member.profileImage.startsWith('http') 
+                            ? member.profileImage 
+                            : `http://localhost:3001${member.profileImage}`)
+                        : '/images/default.webp'
+                    }
+                    alt={member.username}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-purple-200"
+                    onError={(e) => { e.target.src = '/images/default.webp'; }}
+                  />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <p className="font-semibold text-gray-900 font-outfit">
-                        User ID: {member.userId}
+                        {member.username || 'Unknown User'}
                       </p>
                       {isCurrentUser && (
                         <span className="bg-purple-200 text-purple-800 px-2 py-0.5 rounded text-xs font-semibold">
@@ -103,7 +140,10 @@ const MemberManagement = ({ bookclub, currentUserId, currentUserRole, onMemberUp
                       )}
                     </div>
                     <p className="text-sm text-gray-500 font-outfit">
-                      Joined {new Date(member.joinedAt).toLocaleDateString()}
+                      {member.joinedAt 
+                        ? `Joined ${new Date(member.joinedAt).toLocaleDateString()}` 
+                        : 'Member'
+                      }
                     </p>
                   </div>
                 </div>
@@ -113,24 +153,24 @@ const MemberManagement = ({ bookclub, currentUserId, currentUserRole, onMemberUp
                   {canChangeRole ? (
                     <div className="relative">
                       <button
-                        onClick={() => setShowRoleDropdown(showRoleDropdown === member.userId ? null : member.userId)}
+                        onClick={() => setShowRoleDropdown(showRoleDropdown === member.id ? null : member.id)}
                         disabled={isProcessing}
                         className={`px-3 py-1.5 rounded-lg border-2 font-semibold text-sm flex items-center gap-1 transition-colors ${
-                          ROLE_COLORS[member.role]
+                          ROLE_COLORS[memberRole]
                         } ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80'}`}
                       >
-                        {member.role}
+                        {memberRole}
                         <FiChevronDown className="w-4 h-4" />
                       </button>
 
-                      {showRoleDropdown === member.userId && (
+                      {showRoleDropdown === member.id && (
                         <div className="absolute right-0 top-full mt-1 bg-white border-2 border-gray-200 rounded-lg shadow-xl z-10 min-w-[140px]">
                           {ROLE_ORDER.filter(role => role !== 'OWNER').map(role => (
                             <button
                               key={role}
-                              onClick={() => handleRoleChange(member.userId, role)}
+                              onClick={() => handleRoleChange(member.id, role)}
                               className={`w-full px-4 py-2 text-left text-sm font-semibold hover:bg-gray-50 transition-colors ${
-                                role === member.role ? 'bg-purple-50 text-purple-700' : 'text-gray-700'
+                                role === memberRole ? 'bg-purple-50 text-purple-700' : 'text-gray-700'
                               } ${role === 'ADMIN' ? 'rounded-t-lg' : ''} ${role === 'MEMBER' ? 'rounded-b-lg' : ''}`}
                             >
                               {role}
@@ -140,15 +180,15 @@ const MemberManagement = ({ bookclub, currentUserId, currentUserRole, onMemberUp
                       )}
                     </div>
                   ) : (
-                    <span className={`px-3 py-1.5 rounded-lg border-2 font-semibold text-sm ${ROLE_COLORS[member.role]}`}>
-                      {member.role}
+                    <span className={`px-3 py-1.5 rounded-lg border-2 font-semibold text-sm ${ROLE_COLORS[memberRole]}`}>
+                      {memberRole}
                     </span>
                   )}
 
                   {/* Remove button */}
                   {canRemove && (
                     <button
-                      onClick={() => handleRemoveMember(member.userId)}
+                      onClick={() => handleRemoveMember(member.id)}
                       disabled={isProcessing}
                       className={`p-2 rounded-lg transition-colors ${
                         isProcessing
