@@ -1140,12 +1140,23 @@ const BookClub = () => {
 
                 {/* Member Management */}
                 <MemberManagement
-                  bookclub={bookClub}
+                  bookclub={{
+                    ...bookClub,
+                    members: bookClubMembers.map(member => {
+                      // Find matching member from bookClub.members to get role
+                      const memberWithRole = bookClub?.members?.find(m => m.userId === member.id);
+                      return {
+                        ...member,
+                        role: memberWithRole?.role || (member.id === bookClub?.creatorId ? 'OWNER' : 'MEMBER')
+                      };
+                    })
+                  }}
                   currentUserId={auth?.user?.id}
                   currentUserRole={userRole}
                   onMemberUpdate={async () => {
                     const response = await bookclubAPI.getBookclubPreview(bookClubId);
                     setBookClub(response.data);
+                    setBookClubMembers(response.data.members || []);
                   }}
                 />
               </div>
