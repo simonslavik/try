@@ -30,6 +30,23 @@ const linkifyText = (text) => {
   });
 };
 
+// Function to format timestamp smartly
+const formatTimestamp = (timestamp) => {
+  const messageDate = new Date(timestamp);
+  const today = new Date();
+  
+  // Check if message is from today
+  const isToday = messageDate.toDateString() === today.toDateString();
+  
+  if (isToday) {
+    // Show only time for today's messages
+    return messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  } else {
+    // Show date and time for older messages
+    return `${messageDate.toLocaleDateString()} ${messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  }
+};
+
 const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }) => {
     const messagesEndRef = useRef(null);
     const [messageMenuId, setMessageMenuId] = useState(null);
@@ -70,6 +87,15 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
           }));
         }
         await messageModerationAPI.deleteMessage(messageId);
+        
+        // Update local state immediately - ensure there's always text to show
+        setMessages(prevMessages => 
+          prevMessages.map(msg => 
+            msg.id === messageId 
+              ? { ...msg, text: '[Message deleted]', deletedAt: new Date().toISOString(), attachments: [], isPinned: false }
+              : msg
+          )
+        );
       } catch (error) {
         console.error('Error deleting message:', error);
         alert('Failed to delete message');
@@ -91,6 +117,15 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
         } else {
           await messageModerationAPI.pinMessage(messageId);
         }
+        
+        // Update local state immediately
+        setMessages(prevMessages => 
+          prevMessages.map(msg => 
+            msg.id === messageId 
+              ? { ...msg, isPinned: !isPinned }
+              : msg
+          )
+        );
       } catch (error) {
         console.error('Error pinning message:', error);
         alert('Failed to pin message');
@@ -120,7 +155,7 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
                     ) : (
                       <>
                         {/* Debug: Log message data */}
-                        {console.log('Message:', msg.id, 'Text:', msg.text, 'Attachments:', msg.attachments)}
+                        {console.log('Message:', msg.id, 'Text:', msg.text, 'Attachments:', msg.attachments, 'DeletedAt:', msg.deletedAt, 'Type of deletedAt:', typeof msg.deletedAt)}
                         {msg.userId === auth?.user?.id ? (
                           <div className="flex gap-3 justify-end group">
                             <div className="text-right max-w-md self-end relative">
@@ -130,57 +165,48 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
                                   <span>Pinned</span>
                                 </div>
                               )}
-                              <div className="relative">
-                                {msg.text && (
-                                  <div className={`bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl px-4 py-3 shadow-lg mb-2 ${msg.deletedAt ? 'opacity-60 italic' : ''}`}>
-                                    <p className="text-white break-words font-medium">{msg.text ? linkifyText(msg.text) : ''}</p>
-                                  </div>
-                                )}
-                                {!msg.deletedAt && (
-                                  <button
-                                    onClick={(e) => toggleMessageMenu(msg.id, e)}
-                                    className="absolute -left-8 top-2 p-1.5 rounded-lg bg-gray-700/80 hover:bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity"
-                                  >
-                                    <FiMoreVertical className="w-4 h-4 text-gray-300" />
-                                  </button>
-                                )}
-                                {messageMenuId === msg.id && (
-                                  <div ref={menuRef} className="absolute left-0 top-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 min-w-[160px]">
-                                    {canModerate && (
-                                      <button onClick={() => handlePinMessage(msg.id, msg.isPinned)} className="w-full px-4 py-2 text-left text-sm text-gray-200 hover:bg-gray-700 flex items-center gap-2 rounded-t-lg">
-                                        <BsPinAngle className="w-4 h-4" />
-                                        {msg.isPinned ? 'Unpin message' : 'Pin message'}
-                                      </button>
-                                    )}
-                                    <button onClick={() => handleDeleteMessage(msg.id)} className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-700 flex items-center gap-2 rounded-b-lg">
-                                      <FiTrash2 className="w-4 h-4" />
-                                      Delete message
+                              {msg.text && (
+                                <div className={`bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl px-4 py-3 shadow-lg mb-1 ${msg.deletedAt ? 'opacity-60 italic' : ''}`}>
+                                  <p className="text-white break-words font-medium">{msg.text ? linkifyText(msg.text) : ''}</p>
+                                </div>
+                              )}
+                              {!msg.deletedAt && (
+                                <button
+                                  onClick={(e) => toggleMessageMenu(msg.id, e)}
+                                  className="absolute -left-8 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-gray-700/80 hover:bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <FiMoreVertical className="w-4 h-4 text-gray-300" />
+                                </button>
+                              )}
+                              {messageMenuId === msg.id && (
+                                <div ref={menuRef} className="absolute left-[-85px] top-[80%] mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 min-w-[160px]">
+                                  {canModerate && (
+                                    <button onClick={() => handlePinMessage(msg.id, msg.isPinned)} className="w-full px-4 py-2 text-left text-sm text-gray-200 hover:bg-gray-700 flex items-center gap-2 rounded-t-lg">
+                                      <BsPinAngle className="w-4 h-4" />
+                                      {msg.isPinned ? 'Unpin message' : 'Pin message'}
                                     </button>
-                                  </div>
-                                )}
-                              </div>
+                                  )}
+                                  <button onClick={() => handleDeleteMessage(msg.id)} className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-700 flex items-center gap-2 rounded-b-lg">
+                                    <FiTrash2 className="w-4 h-4" />
+                                    Delete message
+                                  </button>
+                                </div>
+                              )}
                               {msg.attachments && msg.attachments.length > 0 && !msg.deletedAt ? (
-                                <div className="flex flex-col gap-2">
+                                <div className="flex flex-col gap-2 mb-1">
                                   {msg.attachments.map((attachment) => (
                                     <MessageAttachment
                                       key={attachment.id}
                                       attachment={attachment}
-                                      canDelete={true}
-                                      onDelete={async () => {
-                                        try {
-                                          await fetch(`http://localhost:4000/chat-files/${attachment.id}`, {
-                                            method: 'DELETE',
-                                            headers: { 'Authorization': `Bearer ${auth.token}` }
-                                          });
-                                        } catch (err) {
-                                          console.error('Error deleting file:', err);
-                                        }
-                                      }}
+                                      canDelete={false}
                                       auth={auth}
                                     />
                                   ))}
                                 </div>
                               ) : null}
+                              <span className="text-xs text-gray-500 block text-right mt-1">
+                                {formatTimestamp(msg.timestamp)}
+                              </span>
                             </div>
                           </div>
                         ) : (
@@ -191,9 +217,6 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
                             <div className="flex-1 relative">
                               <div className="flex items-baseline gap-2 mb-1">
                                 <span className="font-bold text-white">{msg.username}</span>
-                                <span className="text-xs text-gray-500">
-                                  {new Date(msg.timestamp).toLocaleTimeString()}
-                                </span>
                                 {msg.isPinned && (
                                   <span className="flex items-center gap-1 text-xs text-yellow-400">
                                     <BsPinAngle className="w-3 h-3" />
@@ -201,33 +224,34 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
                                   </span>
                                 )}
                               </div>
-                              <div className="relative">
-                                {msg.text && <p className={`text-gray-200 break-words leading-relaxed mb-2 ${msg.deletedAt ? 'italic text-gray-500' : ''}`}>{msg.text ? linkifyText(msg.text) : ''}</p>}
-                                {msg.attachments && msg.attachments.length > 0 && !msg.deletedAt ? (
-                                  <div className="flex flex-col gap-2">
-                                    {msg.attachments.map((attachment) => (
-                                      <MessageAttachment key={attachment.id} attachment={attachment} canDelete={false} auth={auth} />
-                                    ))}
-                                  </div>
-                                ) : null}
-                                {canModerate && !msg.deletedAt && (
-                                  <button onClick={(e) => toggleMessageMenu(msg.id, e)} className="absolute -right-8 top-0 p-1.5 rounded-lg bg-gray-700/80 hover:bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <FiMoreVertical className="w-4 h-4 text-gray-300" />
+                              {msg.text && <p className={`text-gray-200 break-words leading-relaxed mb-2 ${msg.deletedAt ? 'italic text-gray-500' : ''}`}>{msg.text ? linkifyText(msg.text) : ''}</p>}
+                              {msg.attachments && msg.attachments.length > 0 && !msg.deletedAt ? (
+                                <div className="flex flex-col gap-2 mb-1">
+                                  {msg.attachments.map((attachment) => (
+                                    <MessageAttachment key={attachment.id} attachment={attachment} canDelete={false} auth={auth} />
+                                  ))}
+                                </div>
+                              ) : null}
+                              <span className="text-xs text-gray-500 block mb-1">
+                                {formatTimestamp(msg.timestamp)}
+                              </span>
+                              {canModerate && !msg.deletedAt && (
+                                <button onClick={(e) => toggleMessageMenu(msg.id, e)} className="absolute -right-8 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-gray-700/80 hover:bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <FiMoreVertical className="w-4 h-4 text-gray-300" />
+                                </button>
+                              )}
+                              {messageMenuId === msg.id && canModerate && (
+                                <div ref={menuRef} className="absolute right-0 top-1/2 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 min-w-[160px]">
+                                  <button onClick={() => handlePinMessage(msg.id, msg.isPinned)} className="w-full px-4 py-2 text-left text-sm text-gray-200 hover:bg-gray-700 flex items-center gap-2 rounded-t-lg">
+                                    <BsPinAngle className="w-4 h-4" />
+                                    {msg.isPinned ? 'Unpin message' : 'Pin message'}
                                   </button>
-                                )}
-                                {messageMenuId === msg.id && canModerate && (
-                                  <div ref={menuRef} className="absolute right-0 top-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 min-w-[160px]">
-                                    <button onClick={() => handlePinMessage(msg.id, msg.isPinned)} className="w-full px-4 py-2 text-left text-sm text-gray-200 hover:bg-gray-700 flex items-center gap-2 rounded-t-lg">
-                                      <BsPinAngle className="w-4 h-4" />
-                                      {msg.isPinned ? 'Unpin message' : 'Pin message'}
-                                    </button>
                                     <button onClick={() => handleDeleteMessage(msg.id)} className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-700 flex items-center gap-2 rounded-b-lg">
                                       <FiTrash2 className="w-4 h-4" />
                                       Delete message
                                     </button>
                                   </div>
                                 )}
-                              </div>
                             </div>
                           </div>
                         )}

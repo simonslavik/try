@@ -1,5 +1,7 @@
 import { RoomRepository } from '../repositories/room.repository.js';
 import { BookClubRepository } from '../repositories/bookClub.repository.js';
+import prisma from '../config/database.js';
+import { MembershipStatus } from '@prisma/client';
 
 interface CreateRoomDto {
   name: string;
@@ -21,7 +23,17 @@ export class RoomService {
       throw new Error('Book club not found');
     }
     
-    if (!bookClub.members.includes(userId)) {
+    // Check membership using BookClubMember table
+    const membership = await prisma.bookClubMember.findUnique({
+      where: {
+        bookClubId_userId: {
+          bookClubId,
+          userId
+        }
+      }
+    });
+
+    if (!membership || membership.status !== MembershipStatus.ACTIVE) {
       throw new Error('You must be a member to create rooms');
     }
 
