@@ -1,5 +1,6 @@
 import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import { FiPaperclip, FiX, FiFile, FiImage } from 'react-icons/fi';
+import { uploadChatFile } from '../../api/upload.api';
 
 const FileUpload = forwardRef(({ onFilesSelected, auth, disabled = false }, ref) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -21,19 +22,8 @@ const FileUpload = forwardRef(({ onFilesSelected, auth, disabled = false }, ref)
       try {
         for (const file of selectedFiles) {
           console.log('FileUpload: Uploading file:', file.name, 'Size:', file.size);
-          const formData = new FormData();
-          formData.append('file', file);
 
-          const response = await fetch('http://localhost:4000/upload/chat-file', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${auth.token}`
-            },
-            body: formData
-          });
-
-          console.log('FileUpload: Response status:', response.status);
-          const data = await response.json();
+          const data = await uploadChatFile(file);
           console.log('FileUpload: Response data:', data);
           
           if (data.success) {

@@ -86,6 +86,9 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId) =>
                 text: msg.content,
                 timestamp: msg.createdAt,
                 userId: msg.userId,
+                isPinned: msg.isPinned,
+                deletedAt: msg.deletedAt,
+                deletedBy: msg.deletedBy,
                 attachments: msg.attachments || []
               })));
               setConnectedUsers(data.users || []);
@@ -101,6 +104,9 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId) =>
                 text: data.message.content,
                 timestamp: data.message.createdAt,
                 userId: data.message.userId,
+                isPinned: data.message.isPinned || false,
+                deletedAt: data.message.deletedAt,
+                deletedBy: data.message.deletedBy,
                 attachments: data.message.attachments || []
               }]);
               break;

@@ -40,13 +40,14 @@ export class MessageModerationController {
         });
       }
 
-      // Soft delete: mark as deleted instead of actually deleting
+      // Soft delete: mark as deleted and unpin if pinned
       const updatedMessage = await prisma.message.update({
         where: { id: messageId },
         data: {
           deletedAt: new Date(),
           deletedBy: userId,
-          content: '[Message deleted]'
+          content: '[Message deleted]',
+          isPinned: false
         }
       });
 

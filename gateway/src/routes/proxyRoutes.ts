@@ -56,6 +56,24 @@ const SERVICES: ServiceConfig[] = [
     pathTransform: (path: string) => path.replace(/^\/v1/, ''),
   },
   
+  // Moderation - Routes to Collab Editor Service
+  { 
+    envVar: 'COLLAB_EDITOR_URL', 
+    route: '/moderation', 
+    name: 'Moderation Service', 
+    requireAuth: true, 
+    pathTransform: (path: string) => path,
+  },
+  
+  // Upload - Routes to Collab Editor Service
+  { 
+    envVar: 'COLLAB_EDITOR_URL', 
+    route: '/upload', 
+    name: 'Upload Service', 
+    requireAuth: true, 
+    pathTransform: (path: string) => path,
+  },
+  
   // Books Service routes
   { 
     envVar: 'BOOKS_SERVICE_URL', 

@@ -136,14 +136,24 @@ export const handleJoin = (
       });
 
       // Get recent messages for the current room
+      console.log('📨 Fetching messages with deletedAt field...');
       const recentMessages = await prisma.message.findMany({
         where: { roomId: targetRoomId },
         orderBy: { createdAt: 'asc' },
         take: 100,
-        include: {
+        select: {
+          id: true,
+          content: true,
+          userId: true,
+          username: true,
+          isPinned: true,
+          deletedAt: true,
+          deletedBy: true,
+          createdAt: true,
           attachments: true
         }
       });
+      console.log('📨 Sample message:', recentMessages[0]);
 
       // Fetch all active member details from user service
       const activeMembers = await prisma.bookClubMember.findMany({
@@ -176,7 +186,7 @@ export const handleJoin = (
       }
 
       // Send initial data to new user
-      ws.send(JSON.stringify({
+      const initPayload = {
         type: 'init',
         clientId,
         bookClub,
@@ -189,7 +199,9 @@ export const handleJoin = (
           username: c.username,
           roomId: c.roomId
         }))
-      }));
+      };
+      console.log('📤 Sending init with message sample:', initPayload.messages[0]);
+      ws.send(JSON.stringify(initPayload));
 
       // Notify others that someone joined (including updated members if new)
       if (wasNewMember) {
@@ -248,7 +260,15 @@ export const handleSwitchRoom = (message: any, currentClient: Client | null) => 
         where: { roomId },
         orderBy: { createdAt: 'asc' },
         take: 100,
-        include: {
+        select: {
+          id: true,
+          content: true,
+          userId: true,
+          username: true,
+          isPinned: true,
+          deletedAt: true,
+          deletedBy: true,
+          createdAt: true,
           attachments: true
         }
       });
@@ -524,13 +544,14 @@ export const handleDeleteMessage = async (message: any, currentClient: Client | 
       return;
     }
 
-    // Soft delete the message
+    // Soft delete the message and unpin if pinned
     const deletedMessage = await prisma.message.update({
       where: { id: messageId },
       data: {
         deletedAt: new Date(),
         deletedBy: currentClient.userId,
-        content: '[Message deleted]'
+        content: '[Message deleted]',
+        isPinned: false
       }
     });
 

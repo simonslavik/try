@@ -33,7 +33,9 @@ const initializeApp = async (): Promise<Express> => {
     allowedHeaders: ['Content-Type', 'Authorization']
   }));
   
-  app.use(express.json());
+  // Increase body size limit for file uploads
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
   // Initialize Redis connection
   const redisClient = await initializeRedis();
