@@ -21,5 +21,8 @@ COPY src ./src/
 # Expose port
 EXPOSE 3002
 
-# Run migrations and start server
-CMD npx prisma migrate deploy && npm run dev
+# Build TypeScript
+RUN npm run build
+
+# Run migrations and start server in production mode
+CMD npx prisma migrate deploy && npm start
