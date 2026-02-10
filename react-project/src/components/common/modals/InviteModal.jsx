@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { FiX, FiCopy, FiTrash2, FiCheck, FiLink, FiUsers, FiSearch } from 'react-icons/fi';
 import AuthContext from '../../../context';
+import { bookclubAPI } from '../../../api/bookclub.api';
 
-const InviteModal = ({ bookClubId, bookClubName, onClose }) => {
+const InviteModal = ({ bookClubId, bookClubName, bookClubMembers = [], onClose }) => {
   const { auth } = useContext(AuthContext);
   const [invite, setInvite] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,29 +25,74 @@ const InviteModal = ({ bookClubId, bookClubName, onClose }) => {
   const fetchInvite = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${GATEWAY_URL}/v1/editor/bookclubs/${bookClubId}/invite`, {
-        headers: { Authorization: `Bearer ${auth.token}` }
-      });
-      const data = await response.json();
-      if (data.success) {
-        setInvite(data.invite);
+      console.log('Fetching invites for bookclub:', bookClubId);
+      
+      const response = await bookclubAPI.getInvites(bookClubId);
+      console.log('Invites response:', response);
+      
+      if (response.data && response.data.length > 0) {
+        // Use the first active invite, or just the first one
+        const activeInvite = response.data.find(inv => {
+          const notExpired = !inv.expiresAt || new Date(inv.expiresAt) > new Date();
+          const notMaxedOut = !inv.maxUses || inv.currentUses < inv.maxUses;
+          return notExpired && notMaxedOut;
+        }) || response.data[0];
+        
+        setInvite(activeInvite);
+        console.log('Using invite:', activeInvite);
+      } else {
+        // No invites exist, create one
+        console.log('No invites found, creating one...');
+        await createInvite();
       }
     } catch (error) {
-      console.error('Error fetching invite:', error);
+      console.error('Error fetching invites:', error);
+      // If we get a 403 or similar, try to create one anyway
+      if (error.response?.status === 404 || error.response?.status === 403) {
+        await createInvite();
+      }
     } finally {
       setLoading(false);
     }
   };
 
+  const createInvite = async () => {
+    try {
+      console.log('Creating invite for bookclub:', bookClubId);
+      
+      // Create a permanent invite (no maxUses, no expiry)
+      const response = await bookclubAPI.createInvite(bookClubId, {});
+      console.log('Create invite response:', response);
+      
+      if (response.data) {
+        setInvite(response.data);
+        console.log('Invite created successfully:', response.data);
+      }
+    } catch (error) {
+      console.error('Error creating invite:', error);
+      alert('Failed to create invite link. You may not have permission.');
+    }
+  };
+
   const fetchFriends = async () => {
     try {
-      const response = await fetch(`${GATEWAY_URL}/v1/friends/list`, {
+      const response = await fetch('http://localhost:3000/v1/friends/list', {
         headers: { Authorization: `Bearer ${auth.token}` }
       });
       const data = await response.json();
+      console.log('Friends API Response:', data);
       if (response.ok) {
-        setFriends(data.data || []);
-        setSearchResults(data.data || []);
+        // Extract the actual friend data from the response
+        // API returns array of objects like: { friendshipId, friend: { id, username, ... }, since }
+        const friendsList = (data.data || []).map(item => {
+          // If item has a 'friend' property, use that, otherwise use the item itself
+          const friendData = item.friend || item;
+          console.log('Processing friend item:', item, 'Extracted:', friendData);
+          return friendData;
+        });
+        console.log('Processed Friends List:', friendsList);
+        setFriends(friendsList);
+        setSearchResults(friendsList);
       } else {
         setFriends([]);
         setSearchResults([]);
@@ -59,7 +105,8 @@ const InviteModal = ({ bookClubId, bookClubName, onClose }) => {
   };
 
   const copyInviteLink = () => {
-    const link = `${window.location.origin}/invite/${invite.code}`;
+    const inviteCode = invite.code || invite.inviteCode;
+    const link = `${window.location.origin}/invite/${inviteCode}`;
     navigator.clipboard.writeText(link);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -75,17 +122,19 @@ const InviteModal = ({ bookClubId, bookClubName, onClose }) => {
       }
       
       if (!invite) {
-        alert('Invite link not available');
+        console.error('No invite available. Invite state:', invite);
+        alert('Invite link not available. Please try closing and reopening the modal.');
         return;
       }
 
-      const inviteLink = `${window.location.origin}/invite/${invite.code}`;
+      const inviteCode = invite.code || invite.inviteCode;
+      const inviteLink = `${window.location.origin}/invite/${inviteCode}`;
       const message = `You've been invited to join "${bookClubName}"! Click here to join: ${inviteLink}`;
 
-      console.log('Sending DM to:', userId, 'Token exists:', !!auth.token);
+      console.log('Sending DM to:', userId, 'with invite link:', inviteLink);
 
       // Send DM with invite
-      const dmResponse = await fetch(`${GATEWAY_URL}/v1/messages`, {
+      const dmResponse = await fetch('http://localhost:3000/v1/messages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -124,11 +173,15 @@ const InviteModal = ({ bookClubId, bookClubName, onClose }) => {
       setSearchResults(friends);
     } else {
       const filtered = friends.filter(friend =>
-        friend.name.toLowerCase().includes(query.toLowerCase()) ||
-        friend.email.toLowerCase().includes(query.toLowerCase())
+        (friend.username || friend.name || '').toLowerCase().includes(query.toLowerCase()) ||
+        (friend.email || '').toLowerCase().includes(query.toLowerCase())
       );
       setSearchResults(filtered);
     }
+  };
+
+  const isMember = (friendId) => {
+    return bookClubMembers.some(member => member.id === friendId || member.userId === friendId);
   };
 
   return (
@@ -148,19 +201,19 @@ const InviteModal = ({ bookClubId, bookClubName, onClose }) => {
         {/* Content */}
         <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(80vh - 100px)' }}>
           {loading ? (
-            <div className="text-center py-8 text-gray-500">Loading...</div>
+            <div className="text-center py-8 text-gray-500">Loading invite link...</div>
           ) : (
             <>
               {/* Invite Link Section */}
-              {invite && (
+              {invite ? (
                 <div className="mb-6 p-5 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border-2 border-purple-200">
                   <div className="flex items-center gap-2 mb-3">
                     <FiLink className="text-purple-600" size={20} />
                     <h3 className="font-semibold text-gray-900">Permanent Invite Link</h3>
                   </div>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="flex-1 bg-white px-4 py-3 rounded-lg border border-gray-300 font-mono text-sm text-purple-600">
-                      {window.location.origin}/invite/{invite.code}
+                    <div className="flex-1 bg-white px-4 py-3 rounded-lg border border-gray-300 font-mono text-sm text-purple-600 break-all">
+                      {window.location.origin}/invite/{invite.code || invite.inviteCode}
                     </div>
                     <button
                       onClick={copyInviteLink}
@@ -183,6 +236,13 @@ const InviteModal = ({ bookClubId, bookClubName, onClose }) => {
                     Uses: {invite.currentUses} • Never expires • Share with anyone!
                   </p>
                 </div>
+              ) : (
+                <div className="mb-6 p-5 bg-red-50 rounded-lg border-2 border-red-200">
+                  <p className="text-red-700 font-semibold">Unable to load invite link</p>
+                  <p className="text-sm text-red-600 mt-1">
+                    Please close this modal and try again. If the problem persists, you may not have permission to create invites.
+                  </p>
+                </div>
               )}
 
               {/* Friends Section */}
@@ -190,6 +250,9 @@ const InviteModal = ({ bookClubId, bookClubName, onClose }) => {
                 <div className="flex items-center gap-2 mb-4">
                   <FiUsers className="text-gray-600" size={20} />
                   <h3 className="font-semibold text-gray-900">Send to Friends</h3>
+                  {!invite && (
+                    <span className="text-xs text-gray-500">(Invite link required)</span>
+                  )}
                 </div>
 
                 {/* Friend Search */}
@@ -213,34 +276,58 @@ const InviteModal = ({ bookClubId, bookClubName, onClose }) => {
                   </p>
                 ) : (
                   <div className="space-y-2 max-h-64 overflow-y-auto">
-                    {searchResults.map(friend => (
-                      <div
-                        key={friend.id}
-                        className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={friend.profileImage 
-                              ? `http://localhost:3001${friend.profileImage}` 
-                              : '/images/default.webp'}
-                            alt={friend.name}
-                            className="w-10 h-10 rounded-full object-cover"
-                            onError={(e) => { e.target.src = '/images/default.webp'; }}
-                          />
-                          <div>
-                            <div className="font-medium text-gray-900">{friend.name}</div>
-                            <div className="text-sm text-gray-600">{friend.email}</div>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => sendDMInvite(friend.id, friend.name)}
-                          disabled={sendingInvites.has(friend.id)}
-                          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:bg-gray-400"
+                    {searchResults.map(friend => {
+                      console.log('Friend from searchResults:', friend);
+                      const isAlreadyMember = isMember(friend.id);
+                      const friendName = friend.username || friend.name || 'Unknown User';
+                      const friendImage = friend.profileImage 
+                        ? (friend.profileImage.startsWith('http') 
+                            ? friend.profileImage 
+                            : `http://localhost:3001${friend.profileImage}`)
+                        : '/images/default.webp';
+                      
+                      console.log('Rendering friend:', { 
+                        friendId: friend.id,
+                        friendUsername: friend.username,
+                        friendName: friend.name,
+                        friendEmail: friend.email,
+                        friendProfileImage: friend.profileImage,
+                        computed: { friendName, friendImage, isAlreadyMember }
+                      });
+                      
+                      return (
+                        <div
+                          key={friend.id}
+                          className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                         >
-                          {sendingInvites.has(friend.id) ? 'Sending...' : 'Send Invite'}
-                        </button>
-                      </div>
-                    ))}
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={friendImage}
+                              alt={friendName}
+                              className="w-10 h-10 rounded-full object-cover border-2 border-purple-200"
+                              onError={(e) => { e.target.src = '/images/default.webp'; }}
+                            />
+                            <div>
+                              <div className="font-semibold text-gray-900">{friendName}</div>
+                              <div className="text-sm text-gray-500">{friend.email}</div>
+                            </div>
+                          </div>
+                          {isAlreadyMember ? (
+                            <span className="px-4 py-2 bg-green-100 text-green-700 border-2 border-green-300 rounded-lg font-semibold text-sm">
+                              Member
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => sendDMInvite(friend.id, friendName)}
+                              disabled={sendingInvites.has(friend.id)}
+                              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:bg-gray-400 font-semibold"
+                            >
+                              {sendingInvites.has(friend.id) ? 'Sending...' : 'Send Invite'}
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>

@@ -74,7 +74,8 @@ export const getInviteInfo = async (req: Request, res: Response) => {
     }
 
     const bookClub = await prisma.bookClub.findUnique({
-      where: { id: invite.bookClubId }
+      where: { id: invite.bookClubId },
+      include: { members: true }
     });
 
     if (!bookClub) {
@@ -88,7 +89,7 @@ export const getInviteInfo = async (req: Request, res: Response) => {
         name: bookClub.name,
         imageUrl: bookClub.imageUrl,
         category: bookClub.category,
-        memberCount: bookClub.members.length
+        memberCount: bookClub.members?.length || 0
       },
       invite: {
         expiresAt: invite.expiresAt,
