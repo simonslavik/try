@@ -218,7 +218,7 @@ const Home = () => {
                                 </div>
                             </button>
                         ) : (
-                            <div className="flex gap-4 overflow-x-auto">
+                            <div className="flex gap-4 overflow-x-auto pb-4 w-full scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 hover:scrollbar-thumb-gray-500">
                                 {myCreatedBookClubs.map(bookClub => (
                                     <div 
                                         key={bookClub.id}
