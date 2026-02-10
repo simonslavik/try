@@ -53,6 +53,24 @@ export class BookClubService {
       ]
     };
 
+    // If user is authenticated, also include INVITE_ONLY clubs they created or are members of
+    if (userId) {
+      where.OR.push({
+        visibility: ClubVisibility.INVITE_ONLY,
+        OR: [
+          { creatorId: userId },
+          { 
+            members: {
+              some: {
+                userId: userId,
+                status: MembershipStatus.ACTIVE
+              }
+            }
+          }
+        ]
+      });
+    }
+
     if (category) {
       where.category = category;
     }

@@ -46,8 +46,64 @@ const ProfilePage = () => {
     setSelectedBook(null);
   };
 
+  // Fetch books function that can be reused
+  const fetchBooks = async () => {
+    try {
+      const favoriteBooksResponse = await fetch(`${GATEWAY_URL}/v1/user-books?status=favorite`, {
+        headers: auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}
+      });
+      if (favoriteBooksResponse.ok) {
+        const data2 = await favoriteBooksResponse.json();
+        if (data2.success) {
+          setFavoriteBooks(data2.data || []);
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to fetch favorite books:', err);
+    }
 
+    try {
+      const booksImReadingResponse = await fetch(`${GATEWAY_URL}/v1/user-books?status=reading`, {
+        headers: auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}
+      });
+      if (booksImReadingResponse.ok) {
+        const data3 = await booksImReadingResponse.json();
+        if (data3.success) {
+          setBooksImReading(data3.data || []);
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to fetch reading books:', err);
+    }
 
+    try {
+      const booksToReadResponse = await fetch(`${GATEWAY_URL}/v1/user-books?status=want_to_read`, {
+        headers: auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}
+      });
+      if (booksToReadResponse.ok) {
+        const data4 = await booksToReadResponse.json();
+        if (data4.success) {
+          setBooksToRead(data4.data || []);
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to fetch want_to_read books:', err);
+    }
+
+    try {
+      const booksReadResponse = await fetch(`${GATEWAY_URL}/v1/user-books?status=completed`, {
+        headers: auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}
+      });
+      if (booksReadResponse.ok) {
+        const data5 = await booksReadResponse.json();
+        if (data5.success) {
+          setBooksRead(data5.data || []);
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to fetch completed books:', err);
+    }
+  };
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -110,62 +166,8 @@ const ProfilePage = () => {
           }
         }
 
-        // Fetch books with error handling
-        try {
-          const favoriteBooksResponse = await fetch(`${GATEWAY_URL}/v1/user-books?status=favorite`, {
-            headers: auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}
-          });
-          if (favoriteBooksResponse.ok) {
-            const data2 = await favoriteBooksResponse.json();
-            if (data2.success) {
-              setFavoriteBooks(data2.data || []);
-            }
-          }
-        } catch (err) {
-          console.warn('Failed to fetch favorite books:', err);
-        }
-
-        try {
-          const booksImReadingResponse = await fetch(`${GATEWAY_URL}/v1/user-books?status=reading`, {
-            headers: auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}
-          });
-          if (booksImReadingResponse.ok) {
-            const data3 = await booksImReadingResponse.json();
-            if (data3.success) {
-              setBooksImReading(data3.data || []);
-            }
-          }
-        } catch (err) {
-          console.warn('Failed to fetch reading books:', err);
-        }
-
-        try {
-          const booksToReadResponse = await fetch(`${GATEWAY_URL}/v1/user-books?status=want_to_read`, {
-            headers: auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}
-          });
-          if (booksToReadResponse.ok) {
-            const data4 = await booksToReadResponse.json();
-            if (data4.success) {
-              setBooksToRead(data4.data || []);
-            }
-          }
-        } catch (err) {
-          console.warn('Failed to fetch want_to_read books:', err);
-        }
-
-        try {
-          const booksReadResponse = await fetch(`${GATEWAY_URL}/v1/user-books?status=completed`, {
-            headers: auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}
-          });
-          if (booksReadResponse.ok) {
-            const data5 = await booksReadResponse.json();
-            if (data5.success) {
-              setBooksRead(data5.data || []);
-            }
-          }
-        } catch (err) {
-          console.warn('Failed to fetch completed books:', err);
-        } 
+        // Fetch books
+        await fetchBooks(); 
         
         // Fetch current user's bookclubs for messaging functionality
         if (auth?.user?.id && !isOwnProfile) {
@@ -295,6 +297,7 @@ const ProfilePage = () => {
         // Remove the book from local state
         setFavoriteBooks(prev => prev.filter(ub => ub.id !== userBookId));
         setBooksImReading(prev => prev.filter(ub => ub.id !== userBookId));
+        setBooksToRead(prev => prev.filter(ub => ub.id !== userBookId));
         setBooksRead(prev => prev.filter(ub => ub.id !== userBookId));
       } else {
         const errorData = await response.json();
@@ -884,9 +887,9 @@ const ProfilePage = () => {
         {showAddBookModal && (
           <AddBookToLibraryModal
             onClose={() => setShowAddBookModal(false)}
-            onBookAdded={() => {
-              // Refresh the profile page to show new books
-              window.location.reload();
+            onBookAdded={async () => {
+              // Refetch books to show newly added books (modal stays open)
+              await fetchBooks();
             }}
           />
         )}

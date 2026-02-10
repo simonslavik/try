@@ -66,6 +66,11 @@ const AddBookToLibraryModal = ({ onClose, onBookAdded }) => {
         setAddedBooks(prev => ({ ...prev, [googleBooksId]: status }));
         setSuccessMessage(`✓ Book added to ${status.replace('_', ' ')}!`);
         setTimeout(() => setSuccessMessage(''), 2000);
+        
+        // Notify parent component that a book was added
+        if (onBookAdded) {
+          onBookAdded();
+        }
       } else {
         setError(data.error || 'Failed to add book');
       }

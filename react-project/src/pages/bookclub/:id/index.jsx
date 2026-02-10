@@ -657,6 +657,8 @@ const BookClub = () => {
       
       if (response.ok) {
         setRooms(prev => [...prev, data.room]);
+        // Redirect to the newly created room
+        switchRoom(data.room);
       } else {
         alert(data.error || 'Failed to create room');
       }
