@@ -43,6 +43,14 @@ const ConnectedUsersSidebar = ({
   console.log('ConnectedUsersSidebar - friends:', friends);
   console.log('ConnectedUsersSidebar - friends length:', friends.length);
 
+  // Sort users by role hierarchy: OWNER > ADMIN > MODERATOR > MEMBER
+  const roleOrder = { OWNER: 1, ADMIN: 2, MODERATOR: 3, MEMBER: 4 };
+  const sortedMembers = [...bookClubMembers].sort((a, b) => {
+    const orderA = roleOrder[a.role] || 5;
+    const orderB = roleOrder[b.role] || 5;
+    return orderA - orderB;
+  });
+
   return (
     <div className="w-44 bg-gray-800 border-l border-gray-700 p-2">
       <div className="flex items-center gap-2 px-2 py-1 mb-2">
@@ -52,7 +60,7 @@ const ConnectedUsersSidebar = ({
         </h3>
       </div>
       <div className="max-h-screen overflow-y-auto w-full space-y-2">
-        {bookClubMembers.map(user => {
+        {sortedMembers.map(user => {
           const isOnline = connectedUsers.some(connectedUser => connectedUser.userId === user.id);
           const isCurrentUser = user.id === auth?.user?.id;
           const isFriend = friends.some(f => f.friend?.id === user.id);

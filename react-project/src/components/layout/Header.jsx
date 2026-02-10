@@ -232,15 +232,7 @@ const HomePageHeader = () => {
                 </button>
                 </div>
                 <button 
-                    onClick={() => {
-                        if (userBookClubs.length > 0) {
-                            // Navigate to first bookclub in DM mode
-                            navigate(`/bookclub/${userBookClubs[0].id}`, { state: { viewMode: 'dm' } });
-                        } else {
-                            // Fallback to messages page if no bookclubs
-                            navigate(`/messages${auth?.user ? `/${auth.user.id}` : ''}`);
-                        }
-                    }}
+                    onClick={() => navigate('/dm')}
                     className="flex items-center ml-4 border-2 border-gray-200 rounded-full cursor-pointer p-2 hover:bg-gray-100 border-t-indigo-400 "
                 >
                     <span className="ml-2 font-medium">OpenBookClubs</span>
@@ -416,11 +408,7 @@ const HomePageHeader = () => {
                     <div className="py-2">
                         <button 
                             onClick={() => {
-                                if (userBookClubs.length > 0) {
-                                    navigate(`/bookclub/${userBookClubs[0].id}`, { state: { viewMode: 'dm' } });
-                                } else {
-                                    navigate(`/messages${auth?.user ? `/${auth.user.id}` : ''}`);
-                                }
+                                navigate('/dm');
                                 setShowMobileMenu(false);
                             }}
                             className="w-full px-4 py-3 text-left hover:bg-gray-50 transition flex items-center gap-3 border-b border-gray-100"

@@ -61,15 +61,6 @@ router.post('/:id/requests/:requestId/reject', authMiddleware, BookClubControlle
 // Get shareable invite (Any member)
 router.get('/:id/invite', authMiddleware, BookClubController.getShareableInvite);
 
-// Get all invites (Admin/Owner only)
-router.get('/:id/invites', authMiddleware, BookClubController.getInvites);
-
-// Create invite
-router.post('/:id/invites', authMiddleware, BookClubController.createInvite);
-
-// Delete invite
-router.delete('/:id/invites/:inviteId', authMiddleware, BookClubController.deleteInvite);
-
 // ===== MEMBER MANAGEMENT (Admin/Owner only) =====
 // Verify member role (for inter-service communication)
 router.get('/:id/members/:userId/verify-role', BookClubController.verifyMemberRole);
