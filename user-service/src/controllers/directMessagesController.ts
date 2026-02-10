@@ -125,3 +125,43 @@ export const getConversations = async (req: Request, res: Response) => {
         throw error;
     }
 };
+
+/**
+ * Delete a direct message (only sender can delete)
+ */
+export const deleteDirectMessage = async (req: Request, res: Response) => {
+    try {
+        const currentUserId = req.user?.userId;
+        const { messageId } = req.params;
+
+        if (!currentUserId) {
+            throw new UnauthorizedError('User not authenticated');
+        }
+
+        if (!messageId) {
+            throw new BadRequestError('Message ID is required');
+        }
+
+        await DirectMessageService.deleteMessage(currentUserId, messageId);
+
+        logger.info({
+            type: 'DM_DELETED',
+            userId: currentUserId,
+            messageId
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Message deleted successfully'
+        });
+    } catch (error: any) {
+        if (error instanceof ForbiddenError || error instanceof BadRequestError) {
+            throw error;
+        }
+        logError(error, 'Delete direct message error', { 
+            userId: req.user?.userId,
+            messageId: req.params.messageId
+        });
+        throw error;
+    }
+};

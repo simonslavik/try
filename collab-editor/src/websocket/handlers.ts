@@ -458,6 +458,37 @@ export const handleDMMessage = async (message: any, currentClient: Client | null
   }
 };
 
+export const handleDeleteDMMessage = async (message: any, currentClient: Client | null) => {
+  if (!currentClient || !currentClient.isDMConnection) return;
+
+  const { messageId } = message;
+  
+  try {
+    // Note: The actual deletion is handled by the HTTP DELETE endpoint
+    // This handler just broadcasts the deletion to other connected clients
+    
+    // Notify all active DM clients about the deletion (except sender who already knows)
+    activeDMClients.forEach((client) => {
+      if (client.ws.readyState === WebSocket.OPEN && client.userId !== currentClient.userId) {
+        client.ws.send(JSON.stringify({
+          type: 'dm-deleted',
+          messageId
+        }));
+      }
+    });
+
+    console.log(`🗑️ DM deletion broadcasted by ${currentClient.username}: ${messageId}`);
+  } catch (error) {
+    console.error('Error broadcasting DM deletion:', error);
+    if (currentClient && currentClient.ws.readyState === WebSocket.OPEN) {
+      currentClient.ws.send(JSON.stringify({
+        type: 'error',
+        message: error instanceof Error ? error.message : 'Failed to broadcast deletion'
+      }));
+    }
+  }
+};
+
 export const handleDisconnect = (client: Client) => {
   // Handle DM disconnection
   if (client.isDMConnection) {

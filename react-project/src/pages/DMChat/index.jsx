@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import AuthContext from '../../context';
 import MyBookClubsSidebar from '../../components/features/bookclub/MyBookClubsSidebar';
 import DMSidebar from '../../components/features/bookclub/SideBar/DMSidebar';
@@ -8,6 +8,7 @@ import DMChat from '../../components/features/bookclub/MainChatArea/DMChat';
 const DMChatPage = () => {
   const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { userId } = useParams();
   
   const [conversations, setConversations] = useState([]);
   const [currentDMUser, setCurrentDMUser] = useState(null);
@@ -87,6 +88,26 @@ const DMChatPage = () => {
           
           fetchConversations();
           break;
+                  case 'dm-deleted':
+          // Handle message deletion from WebSocket
+          setDmMessages(prev => 
+            prev.map(msg => 
+              msg.id === data.messageId 
+                ? { ...msg, content: '[Message deleted]', deletedAt: new Date().toISOString(), attachments: [] }
+                : msg
+            )
+          );
+          break;
+                  case 'dm-deleted':
+          // Handle message deletion from WebSocket
+          setDmMessages(prev => 
+            prev.map(msg => 
+              msg.id === data.messageId 
+                ? { ...msg, content: '[Message deleted]', deletedAt: new Date().toISOString(), attachments: [] }
+                : msg
+            )
+          );
+          break;
           
         case 'error':
           console.error('WebSocket error:', data.message);
@@ -152,14 +173,21 @@ const DMChatPage = () => {
     fetchFriends();
   }, [auth]);
 
+  // Handle userId from URL params
+  useEffect(() => {
+    if (userId && auth?.token) {
+      handleSelectDMConversation(userId);
+    }
+  }, [userId, auth?.token]);
+
   // Check for DM intent from sessionStorage
   useEffect(() => {
     const dmIntent = sessionStorage.getItem('openDM');
     if (dmIntent && auth?.user) {
       try {
-        const { userId } = JSON.parse(dmIntent);
+        const { userId: intentUserId } = JSON.parse(dmIntent);
         sessionStorage.removeItem('openDM');
-        handleSelectDMConversation(userId);
+        navigate(`/dm/${intentUserId}`);
       } catch (err) {
         console.error('Error parsing DM intent:', err);
         sessionStorage.removeItem('openDM');
@@ -194,6 +222,7 @@ const DMChatPage = () => {
   };
 
   const handleSelectDMConversation = async (userId) => {
+    navigate(`/dm/${userId}`, { replace: true });
     await fetchDMMessages(userId);
   };
 
@@ -247,6 +276,8 @@ const DMChatPage = () => {
           messages={dmMessages}
           onSendMessage={handleSendDM}
           auth={auth}
+          setMessages={setDmMessages}
+          dmWs={dmWs}
         />
       </div>
     </div>

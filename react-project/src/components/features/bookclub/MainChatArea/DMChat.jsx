@@ -28,7 +28,7 @@ const linkifyText = (text) => {
   });
 };
 
-const DMChat = ({ otherUser, messages, onSendMessage, auth }) => {
+const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs }) => {
   const [newMessage, setNewMessage] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState(false);
@@ -63,6 +63,14 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth }) => {
     if (!confirm('Are you sure you want to delete this message?')) return;
     
     try {
+      // Send WebSocket notification
+      if (dmWs?.current && dmWs.current.readyState === WebSocket.OPEN) {
+        dmWs.current.send(JSON.stringify({
+          type: 'delete-dm-message',
+          messageId
+        }));
+      }
+      
       // Call DM delete API endpoint
       const response = await fetch(`http://localhost:3000/v1/messages/${messageId}`, {
         method: 'DELETE',
@@ -72,8 +80,14 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth }) => {
       });
 
       if (response.ok) {
-        // Message deleted successfully - could update local state or refetch
-        alert('Message deleted');
+        // Update local state immediately
+        setMessages(prevMessages => 
+          prevMessages.map(msg => 
+            msg.id === messageId 
+              ? { ...msg, content: '[Message deleted]', deletedAt: new Date().toISOString(), attachments: [] }
+              : msg
+          )
+        );
       } else {
         const data = await response.json();
         alert(data.error || 'Failed to delete message');
@@ -181,18 +195,18 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth }) => {
             >
               <div className="flex flex-col gap-2 max-w-xs lg:max-w-md relative">
                 {msg.content && (
-                  <div className={`px-4 py-2 rounded-2xl break-words ${
+                  <div className={`px-4 py-2 rounded-2xl break-words ${msg.deletedAt ? 'opacity-60' : ''} ${
                       msg.senderId === auth?.user?.id
                       ? 'bg-purple-600 text-white'
                       : 'bg-gray-700 text-gray-200'
                   }`}>
-                      <p>{linkifyText(msg.content)}</p>
+                      <p className={msg.deletedAt ? 'italic text-gray-300' : ''}>{linkifyText(msg.content)}</p>
                       <p className="text-xs opacity-70 mt-1">
                       {new Date(msg.createdAt).toLocaleTimeString()}
                       </p>
                   </div>
                 )}
-                {msg.attachments && msg.attachments.length > 0 && (
+                {msg.attachments && msg.attachments.length > 0 && !msg.deletedAt && (
                   <div className="flex flex-col gap-2">
                     {msg.attachments.map((attachment, attIdx) => (
                       <MessageAttachment 
@@ -204,16 +218,18 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth }) => {
                   </div>
                 )}
                 {/* Three-dot menu button */}
-                <button
-                  onClick={(e) => toggleMessageMenu(msg.id, e)}
-                  className={`absolute top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-gray-700/80 hover:bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity ${
-                    msg.senderId === auth?.user?.id ? '-left-8' : '-right-8'
-                  }`}
-                >
-                  <FiMoreVertical className="w-4 h-4 text-gray-300" />
-                </button>
+                {!msg.deletedAt && (
+                  <button
+                    onClick={(e) => toggleMessageMenu(msg.id, e)}
+                    className={`absolute top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-gray-700/80 hover:bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity ${
+                      msg.senderId === auth?.user?.id ? '-left-8' : '-right-8'
+                    }`}
+                  >
+                    <FiMoreVertical className="w-4 h-4 text-gray-300" />
+                  </button>
+                )}
                 {/* Delete menu */}
-                {messageMenuId === msg.id && (
+                {messageMenuId === msg.id && !msg.deletedAt && (
                   <div 
                     ref={menuRef} 
                     className={`absolute ${

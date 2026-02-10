@@ -2,6 +2,7 @@ import { DirectMessageRepository } from '../repositories/directMessage.repositor
 import { FriendshipRepository } from '../repositories/friendship.repository.js';
 import { UserRepository } from '../repositories/user.repository.js';
 import { logger } from '../utils/logger.js';
+import { NotFoundError, ForbiddenError } from '../utils/errors.js';
 
 /**
  * Service layer for direct message operations
@@ -139,12 +140,12 @@ export class DirectMessageService {
     const message = await DirectMessageRepository.findById(messageId);
 
     if (!message) {
-      throw new Error('MESSAGE_NOT_FOUND');
+      throw new NotFoundError('Message not found');
     }
 
     // Only sender can delete
     if (message.senderId !== userId) {
-      throw new Error('UNAUTHORIZED');
+      throw new ForbiddenError('You can only delete your own messages');
     }
 
     await DirectMessageRepository.delete(messageId);
