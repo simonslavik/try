@@ -1166,6 +1166,7 @@ const BookClub = () => {
           <InviteModal
             bookClubId={bookClubId}
             bookClubName={bookClub?.name}
+            bookClubMembers={mappedBookClubMembers}
             onClose={() => setShowInviteModal(false)}
           />
         )}

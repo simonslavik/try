@@ -24,13 +24,16 @@ const InviteJoinPage = () => {
   const fetchInviteInfo = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${GATEWAY_URL}/v1/editor/invites/${code}`);
+      console.log('Fetching invite info for code:', code);
+      const response = await fetch(`${GATEWAY_URL}/v1/invites/${code}`);
       const data = await response.json();
+
+      console.log('Invite info response:', data);
 
       if (response.ok && data.success) {
         setInviteInfo(data);
       } else {
-        setError(data.error || 'Invalid invite link');
+        setError(data.error || data.message || 'Invalid invite link');
       }
     } catch (err) {
       console.error('Error fetching invite:', err);
@@ -50,7 +53,8 @@ const InviteJoinPage = () => {
 
     try {
       setJoining(true);
-      const response = await fetch(`${GATEWAY_URL}/v1/editor/invites/${code}/join`, {
+      console.log('Joining via invite code:', code);
+      const response = await fetch(`${GATEWAY_URL}/v1/invites/${code}/join`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${auth.token}`
@@ -58,6 +62,7 @@ const InviteJoinPage = () => {
       });
 
       const data = await response.json();
+      console.log('Join response:', data);
 
       if (response.ok && data.success) {
         setJoined(true);
@@ -66,7 +71,7 @@ const InviteJoinPage = () => {
           navigate(`/bookclub/${data.bookClub.id}`);
         }, 2000);
       } else {
-        setError(data.error || 'Failed to join book club');
+        setError(data.error || data.message || 'Failed to join book club');
       }
     } catch (err) {
       console.error('Error joining bookclub:', err);

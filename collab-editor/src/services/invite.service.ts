@@ -75,32 +75,38 @@ export class InviteService {
     }
 
     // Check if user is already a member
-    const bookClub = await BookClubRepository.findById(invite.bookClubId);
+    const existingMember = await prisma.bookClubMember.findFirst({
+      where: {
+        bookClubId: invite.bookClubId,
+        userId: userId
+      }
+    });
 
-    if (!bookClub) {
-      throw new Error('Book club not found');
-    }
-
-    if (bookClub.members.includes(userId) || bookClub.creatorId === userId) {
+    if (existingMember) {
       throw new Error('You are already a member of this book club');
     }
 
-    // Add user to bookclub
-    const updatedBookClub = await prisma.bookClub.update({
-      where: { id: invite.bookClubId },
+    // Check if user is the creator
+    if (invite.bookClub.creatorId === userId) {
+      throw new Error('You are already a member of this book club');
+    }
+
+    // Add user as a member
+    await prisma.bookClubMember.create({
       data: {
-        members: {
-          push: userId
-        }
+        bookClubId: invite.bookClubId,
+        userId: userId,
+        role: 'MEMBER',
+        status: 'ACTIVE'
       }
     });
 
     // Increment invite uses
     await InviteRepository.incrementUses(invite.id);
 
-    console.log(`👥 User ${userId} joined book club ${bookClub.name} via invite ${code}`);
+    console.log(`👥 User ${userId} joined book club ${invite.bookClub.name} via invite ${code}`);
 
-    return updatedBookClub;
+    return invite.bookClub;
   }
 
   /**
