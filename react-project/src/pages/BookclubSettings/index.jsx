@@ -4,7 +4,6 @@ import { FiArrowLeft, FiSettings, FiLock, FiUnlock, FiEyeOff } from 'react-icons
 import { bookclubAPI } from '../../api/bookclub.api';
 import HomePageHeader from '../../components/layout/Header';
 import AdminApprovalPanel from '../../components/features/bookclub/AdminApprovalPanel';
-import InviteLinkManager from '../../components/features/bookclub/InviteLinkManager';
 import MemberManagement from '../../components/features/bookclub/MemberManagement';
 
 const BookclubSettings = () => {
@@ -277,9 +276,8 @@ const BookclubSettings = () => {
           </div>
 
           {/* Admin Panels */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div className="mb-6">
             <AdminApprovalPanel bookclubId={id} userRole={membership?.role} />
-            <InviteLinkManager bookclubId={id} userRole={membership?.role} />
           </div>
 
           {/* Member Management */}

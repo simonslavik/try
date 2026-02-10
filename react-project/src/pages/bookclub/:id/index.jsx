@@ -1003,7 +1003,6 @@ const BookClub = () => {
                 {/* Admin Panels */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                   <AdminApprovalPanel bookclubId={bookClubId} userRole={userRole} />
-                  <InviteLinkManager bookclubId={bookClubId} userRole={userRole} />
                 </div>
 
                 {/* Member Management */}

@@ -292,47 +292,6 @@ export class BookClubController {
   }
 
   /**
-   * Create invite link (Admin/Owner only)
-   */
-  static async createInvite(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const userId = (req as any).user.userId;
-      const { maxUses, expiresInDays } = req.body;
-
-      const invite = await BookClubService.createInvite(id, userId, maxUses, expiresInDays);
-
-      res.status(201).json({ success: true, data: invite });
-    } catch (error: any) {
-      if (error.message === 'INSUFFICIENT_PERMISSIONS') {
-        return res.status(403).json({ success: false, message: 'You do not have permission to create invites' });
-      }
-      logger.error('ERROR_CREATE_INVITE', { error: error.message, clubId: id });
-      res.status(500).json({ success: false, message: 'Failed to create invite' });
-    }
-  }
-
-  /**
-   * Get all invites (Admin/Owner only)
-   */
-  static async getInvites(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const userId = (req as any).user.userId;
-
-      const invites = await BookClubService.getInvites(id, userId);
-
-      res.json({ success: true, data: invites });
-    } catch (error: any) {
-      if (error.message === 'INSUFFICIENT_PERMISSIONS') {
-        return res.status(403).json({ success: false, message: 'You do not have permission to view invites' });
-      }
-      logger.error('ERROR_GET_INVITES', { error: error.message, clubId: id });
-      res.status(500).json({ success: false, message: 'Failed to get invites' });
-    }
-  }
-
-  /**
    * Get shareable invite (Any member)
    */
   static async getShareableInvite(req: Request, res: Response) {

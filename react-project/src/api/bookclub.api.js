@@ -156,24 +156,6 @@ export const bookclubAPI = {
     return response.data;
   },
 
-  // Get all invites (Admin/Owner only)
-  getInvites: async (bookclubId) => {
-    const response = await apiClient.get(`/v1/bookclubs/${bookclubId}/invites`);
-    return response.data;
-  },
-
-  // Create invite link (Admin/Owner only)
-  createInvite: async (bookclubId, { maxUses, expiresInDays }) => {
-    const response = await apiClient.post(`/v1/bookclubs/${bookclubId}/invites`, { maxUses, expiresInDays });
-    return response.data;
-  },
-
-  // Delete invite (Admin/Owner only)
-  deleteInvite: async (bookclubId, inviteId) => {
-    const response = await apiClient.delete(`/v1/bookclubs/${bookclubId}/invites/${inviteId}`);
-    return response.data;
-  },
-
   // Join via invite code
   joinByInviteCode: async (code) => {
     const response = await apiClient.post(`/v1/bookclubs/join-by-invite/${code}`);

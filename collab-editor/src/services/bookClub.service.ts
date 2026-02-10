@@ -402,11 +402,20 @@ export class BookClubService {
           create: {
             name: 'general'
           }
+        },
+        invites: {
+          create: {
+            code: crypto.randomBytes(8).toString('hex'),
+            createdBy: userId,
+            expiresAt: null,
+            maxUses: null
+          }
         }
       },
       include: {
         members: true,
-        rooms: true
+        rooms: true,
+        invites: true
       }
     });
 
@@ -679,68 +688,21 @@ export class BookClubService {
   }
 
   /**
-   * Create invite link (Admin/Owner only)
-   */
-  static async createInvite(
-    clubId: string,
-    userId: string,
-    maxUses?: number,
-    expiresInDays?: number
-  ) {
-    const hasPermission = await this.checkPermission(clubId, userId, BookClubRole.ADMIN);
-    if (!hasPermission) throw new Error('INSUFFICIENT_PERMISSIONS');
-
-    const code = crypto.randomBytes(8).toString('hex');
-    const expiresAt = expiresInDays
-      ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000)
-      : null;
-
-    const invite = await prisma.bookClubInvite.create({
-      data: {
-        bookClubId: clubId,
-        createdBy: userId,
-        code,
-        maxUses,
-        expiresAt
-      }
-    });
-
-    logger.info('INVITE_CREATED', { clubId, userId, code });
-
-    return invite;
-  }
-
-  /**
-   * Get all invites for a club (Admin/Owner only)
-   */
-  static async getInvites(clubId: string, userId: string) {
-    const hasPermission = await this.checkPermission(clubId, userId, BookClubRole.ADMIN);
-    if (!hasPermission) throw new Error('INSUFFICIENT_PERMISSIONS');
-
-    return await prisma.bookClubInvite.findMany({
-      where: { bookClubId: clubId },
-      orderBy: { createdAt: 'desc' }
-    });
-  }
-
-  /**
-   * Get default/shareable invite for any member
+   * Get shareable invite for any member
    */
   static async getShareableInvite(clubId: string, userId: string) {
     // Check if user is a member
     const isMember = await this.checkPermission(clubId, userId, BookClubRole.MEMBER);
     if (!isMember) throw new Error('INSUFFICIENT_PERMISSIONS');
 
-    // Get the first active invite (usually the default permanent one)
+    // Get the permanent invite (created with bookclub)
     const invite = await prisma.bookClubInvite.findFirst({
       where: { 
         bookClubId: clubId,
-        OR: [
-          { expiresAt: null },
-          { expiresAt: { gt: new Date() } }
-        ]
+        expiresAt: null,  // Only permanent invites
+        maxUses: null     // With unlimited uses
       },
-      orderBy: { createdAt: 'asc' } // Get oldest first (the default one)
+      orderBy: { createdAt: 'asc' }
     });
 
     return invite;
