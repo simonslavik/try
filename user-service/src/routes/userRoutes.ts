@@ -4,7 +4,7 @@ import { getProfileById, updateMyProfile, getUserById, listUsers, getUsersByIds 
 import { authMiddleware, optionalAuthMiddleware } from '../middleware/authMiddleware.js';
 import { addProfileImage, deleteProfileImage, upload } from '../controllers/profileImageController.js';
 import { sendFriendRequest, acceptFriendRequest, rejectFriendRequest, removeFriend, listFriends, listFriendRequests} from '../controllers/friendsController.js';
-import { getDirectMessages, sendDirectMessage, getConversations } from '../controllers/directMessagesController.js';
+import { getDirectMessages, sendDirectMessage, getConversations, deleteDirectMessage } from '../controllers/directMessagesController.js';
 import { googleAuth } from '../controllers/googleAuthController.js';
 import { forgotPassword, resetPassword, verifyEmail, resendVerification, changePassword } from '../controllers/authController.js';
 import { validateRequest } from '../middleware/validateRequest.js';
@@ -80,5 +80,6 @@ userRoutes.get('/friends/requests', validateRequest(paginationSchema, 'query'), 
 userRoutes.get('/messages/conversations', authMiddleware, asyncHandler(getConversations));
 userRoutes.get('/messages/:otherUserId', validateRequest(otherUserIdParamSchema, 'params'), validateRequest(paginationSchema, 'query'), authMiddleware, asyncHandler(getDirectMessages));
 userRoutes.post('/messages', validateRequest(sendDirectMessageSchema), authMiddleware, asyncHandler(sendDirectMessage)); // Require authentication for direct HTTP calls
+userRoutes.delete('/messages/:messageId', authMiddleware, asyncHandler(deleteDirectMessage));
 
 export default userRoutes;

@@ -3,8 +3,6 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import AuthContext from '../../../context';
 import MyBookClubsSidebar from '../../../components/features/bookclub/MyBookClubsSidebar';
 import SideBarRooms from '../../../components/features/bookclub/SideBar/SideBarRooms';
-import DMSidebar from '../../../components/features/bookclub/SideBar/DMSidebar';
-import DMChat from '../../../components/features/bookclub/MainChatArea/DMChat';
 import AddCurrentBookModal from '../../../components/features/bookclub/Modals/AddCurrentBookModal';
 import CurrentBookDetailsModal from '../../../components/features/bookclub/Modals/CurrentBookDetailsModal';
 import AddBookToBookclubModal from '../../../components/features/bookclub/Modals/AddBookToBookclubModal';
@@ -56,9 +54,6 @@ const BookClub = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Mode state - check if navigation state specifies DM mode
-  const [viewMode, setViewMode] = useState(location.state?.viewMode || 'bookclub'); // 'bookclub' or 'dm'
-  
   // Bookclub states
   const [bookClub, setBookClub] = useState(null);
   const [rooms, setRooms] = useState([]);
@@ -109,18 +104,9 @@ const BookClub = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState(false);
   
-  // DM states
-  const [conversations, setConversations] = useState([]);
-  const [currentDMUser, setCurrentDMUser] = useState(null);
-  const [dmMessages, setDmMessages] = useState([]);
-  const [sendingMessage, setSendingMessage] = useState(false);
-  const [friends, setFriends] = useState([]);
-  const [selectedUserId, setSelectedUserId] = useState(null);
-  
   // User's role in the current bookclub
   const [userRole, setUserRole] = useState(null);
   
-  const dmWs = useRef(null);
   const fileInputRef = useRef(null);
   const fileUploadRef = useRef(null);
 
@@ -349,235 +335,13 @@ const BookClub = () => {
     }
   }, [auth]);
 
-  // DM WebSocket connection
-  useEffect(() => {
-    if (!auth?.user?.id || !auth?.user?.name || !auth?.token) return;
 
-    const ws = new WebSocket('ws://localhost:4000');
-    dmWs.current = ws;
 
-    ws.onopen = () => {
-      console.log('📨 DM WebSocket connected');
-      ws.send(JSON.stringify({
-        type: 'join-dm',
-        userId: auth.user.id,
-        username: auth.user.name,
-        token: auth.token
-      }));
-    };
 
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      
-      switch (data.type) {
-        case 'dm-joined':
-          console.log('✅ Joined DM connection');
-          break;
-          
-        case 'auth-error':
-          console.error('❌ DM auth failed:', data.message);
-          // Don't show alert for auth errors, just log them
-          break;
-          
-        case 'dm-sent':
-          // Message we sent was confirmed - add it if not already in list
-          setDmMessages(prev => {
-            if (prev.find(m => m.id === data.message.id)) return prev;
-            return [...prev, data.message];
-          });
-          setSendingMessage(false);
-          break;
-          
-        case 'dm-received':
-          // New message received from someone else
-          const newMsg = data.message;
-          
-          // Update messages if this is the active conversation
-          if (currentDMUser && (newMsg.senderId === currentDMUser.id || newMsg.receiverId === currentDMUser.id)) {
-            setDmMessages(prev => {
-              if (prev.find(m => m.id === newMsg.id)) return prev;
-              return [...prev, newMsg];
-            });
-          }
-          
-          // Update conversations list
-          fetchConversations();
-          break;
-          
-        case 'error':
-          console.error('WebSocket error:', data.message);
-          setSendingMessage(false);
-          alert(data.message || 'Failed to send message');
-          break;
-      }
-    };
 
-    ws.onerror = (error) => {
-      console.error('DM WebSocket error:', error);
-    };
 
-    ws.onclose = () => {
-      console.log('📪 DM WebSocket disconnected');
-    };
 
-    return () => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.close();
-      }
-    };
-  }, [auth?.user?.id, auth?.user?.name, auth?.token, currentDMUser]);
 
-  // Fetch conversations when switching to DM mode
-  const fetchConversations = async () => {
-    if (!auth?.token) return;
-    
-    console.log('📋 Fetching conversations...');
-    
-    try {
-      const response = await fetch('http://localhost:3000/v1/messages/conversations', {
-        headers: { Authorization: `Bearer ${auth.token}` }
-      });
-      const data = await response.json();
-      
-      console.log('📋 Conversations response:', data);
-      
-      if (response.ok) {
-        // Backend returns { success: true, data: [...conversations] }
-        console.log('✅ Setting conversations:', data.data);
-        setConversations(data.data || []);
-      } else {
-        console.error('Failed to fetch conversations:', data.message);
-      }
-    } catch (err) {
-      console.error('Error fetching conversations:', err);
-    }
-  };
-
-  // Fetch friends list
-  const fetchFriends = async () => {
-    if (!auth?.token) return;
-    
-    try {
-      const response = await fetch('http://localhost:3000/v1/friends/list', {
-        headers: { Authorization: `Bearer ${auth.token}` }
-      });
-      const data = await response.json();
-      
-      if (response.ok) {
-        setFriends(data.data || []);
-      } else {
-        console.error('Failed to fetch friends:', data.message);
-      }
-    } catch (err) {
-      console.error('Error fetching friends:', err);
-    }
-  };
-
-  useEffect(() => {
-    if (viewMode === 'dm') {
-      fetchConversations();
-      fetchFriends();
-    }
-  }, [viewMode, auth]);
-
-  // Check for DM intent from sessionStorage
-  useEffect(() => {
-    const dmIntent = sessionStorage.getItem('openDM');
-    if (dmIntent && auth?.user) {
-      try {
-        const { userId } = JSON.parse(dmIntent);
-        // Clear the intent
-        sessionStorage.removeItem('openDM');
-        // Open DM with the user
-        handleStartDM(userId);
-      } catch (err) {
-        console.error('Error parsing DM intent:', err);
-        sessionStorage.removeItem('openDM');
-      }
-    }
-  }, [bookClubId, auth]);
-
-  // Fetch messages for selected DM conversation
-  const fetchDMMessages = async (userId) => {
-    if (!auth?.token) return;
-    
-    console.log('🔍 Fetching DM messages for userId:', userId);
-    
-    try {
-      const response = await fetch(`http://localhost:3000/v1/messages/${userId}`, {
-        headers: { Authorization: `Bearer ${auth.token}` }
-      });
-      const data = await response.json();
-      
-      console.log('📨 DM Response:', data);
-      
-      if (response.ok) {
-        console.log('✅ Setting messages:', data.data.messages);
-        console.log('✅ Setting currentDMUser:', data.data.otherUser);
-        // Reverse messages so oldest appear first (top), newest at bottom
-        const messagesInOrder = [...(data.data.messages || [])].reverse();
-        setDmMessages(messagesInOrder);
-        setCurrentDMUser(data.data.otherUser);
-      } else {
-        console.error('Failed to fetch messages:', data.message);
-        // If fetch fails, try to find user in conversations or bookClubMembers
-        const userFromConv = conversations.find(c => c.friend?.id === userId)?.friend;
-        const userFromMembers = bookClubMembers.find(m => m.id === userId);
-        if (userFromConv) {
-          setCurrentDMUser(userFromConv);
-          setDmMessages([]);
-        } else if (userFromMembers) {
-          setCurrentDMUser({
-            id: userFromMembers.id,
-            name: userFromMembers.username,
-            email: userFromMembers.email || '',
-            profileImage: userFromMembers.profileImage
-          });
-          setDmMessages([]);
-        }
-      }
-    } catch (err) {
-      console.error('Error fetching DM messages:', err);
-      // Fallback: try to set user from conversations or members
-      const userFromConv = conversations.find(c => c.friend?.id === userId)?.friend;
-      const userFromMembers = bookClubMembers.find(m => m.id === userId);
-      if (userFromConv) {
-        setCurrentDMUser(userFromConv);
-        setDmMessages([]);
-      } else if (userFromMembers) {
-        setCurrentDMUser({
-          id: userFromMembers.id,
-          name: userFromMembers.username,
-          email: userFromMembers.email || '',
-          profileImage: userFromMembers.profileImage
-        });
-        setDmMessages([]);
-      }
-    }
-  };
-
-  const handleSelectDMConversation = async (userId) => {
-    await fetchDMMessages(userId);
-  };
-
-  const handleSendDM = (content, attachments = []) => {
-    if ((!content || !content.trim()) && attachments.length === 0) {
-      return;
-    }
-    
-    if (sendingMessage || !dmWs.current || dmWs.current.readyState !== WebSocket.OPEN || !currentDMUser) {
-      return;
-    }
-
-    setSendingMessage(true);
-    
-    dmWs.current.send(JSON.stringify({
-      type: 'dm-message',
-      receiverId: currentDMUser.id,
-      content: content?.trim() || '',
-      attachments: attachments
-    }));
-  };
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -794,8 +558,6 @@ const BookClub = () => {
       
       if (response.ok) {
         alert('Friend request sent!');
-        // Refetch friends to update UI
-        await fetchFriends();
         setSelectedUserId(null);
       } else {
         console.error('Friend request failed:', data);
@@ -805,29 +567,6 @@ const BookClub = () => {
       console.error('Error sending friend request:', err);
       alert('Failed to send friend request: ' + err.message);
     }
-  };
-
-  const handleStartDM = async (userId) => {
-    console.log('🚀 Starting DM with userId:', userId);
-    setViewMode('dm');
-    
-    // Check if conversation already exists
-    const existingConversation = conversations.find(conv => conv.friend?.id === userId);
-    
-    if (existingConversation) {
-      console.log('✅ Conversation already exists, selecting it');
-      await fetchDMMessages(userId);
-      setSelectedUserId(null);
-      return;
-    }
-    
-    // Fetch messages (this will create a new conversation if needed)
-    await fetchDMMessages(userId);
-    
-    // Refresh conversations to include the new one
-    await fetchConversations();
-    
-    setSelectedUserId(null);
   };
 
   // Calendar event handlers
@@ -919,111 +658,89 @@ const BookClub = () => {
           <MyBookClubsSidebar 
             bookClubs={myBookClubs} 
             currentBookClubId={bookClubId}
-            viewMode={viewMode}
             onSelectBookClub={(id) => {
-              setViewMode('bookclub');
               navigate(`/bookclub/${id}`);
             }}
             onOpenDM={() => navigate('/dm')}
             auth={auth}
           />
           
-          {/* Conditional Sidebar - Bookclub Rooms or DM Conversations */}
-          {viewMode === 'dm' ? (
-            <DMSidebar
-              conversations={conversations}
-              friends={friends}
-              currentConversation={currentDMUser?.id}
-              onSelectConversation={handleSelectDMConversation}
-              onStartConversation={handleSelectDMConversation}
-              onBackToBookclub={() => setViewMode('bookclub')}
-              auth={auth}
-            />
-          ) : (
-            <SideBarRooms
-              bookClub={bookClub}
-              rooms={rooms}
-              currentRoom={currentRoom}
-              switchRoom={switchRoom}
-              handleCreateRoom={handleCreateRoom}
-              auth={auth}
-              uploadingImage={uploadingImage}
-              fileInputRef={fileInputRef}
-              handleImageUpload={handleImageUpload}
-              handleDeleteImage={handleDeleteImage}
-              onNameUpdate={(newName) => setBookClub(prev => ({ ...prev, name: newName }))}
-              onOpenDM={() => navigate('/dm')}
-              setAddCurrentBookState={setAddCurrentBookState}
-              addCurrentBookState={addCurrentBookState}
-              onCurrentBookClick={(bookData) => {
-                setCurrentBookData(bookData);
-                setCurrentBookDetailsOpen(true);
-              }}
-              onShowBooksHistory={handleShowBooksHistory}
-              setShowBooksHistory={setShowBooksHistory}
-              showBooksHistory={showBooksHistory}
-              onShowCalendar={() => {
-                setShowCalendar(true);
-                setShowBooksHistory(false);
-                setShowSuggestions(false);
-                setShowSettings(false);
-                setCurrentRoom(null);
-              }}
-              showCalendar={showCalendar}
-              onShowSuggestions={() => {
-                setShowSuggestions(true);
-                setShowBooksHistory(false);
-                setShowCalendar(false);
-                setShowSettings(false);
-                setCurrentRoom(null);
-              }}
-              showSuggestions={showSuggestions}
-            />
-          )}
+          {/* Bookclub Rooms Sidebar */}
+          <SideBarRooms
+            bookClub={bookClub}
+            rooms={rooms}
+            currentRoom={currentRoom}
+            switchRoom={switchRoom}
+            handleCreateRoom={handleCreateRoom}
+            auth={auth}
+            uploadingImage={uploadingImage}
+            fileInputRef={fileInputRef}
+            handleImageUpload={handleImageUpload}
+            handleDeleteImage={handleDeleteImage}
+            onNameUpdate={(newName) => setBookClub(prev => ({ ...prev, name: newName }))}
+            onOpenDM={() => navigate('/dm')}
+            setAddCurrentBookState={setAddCurrentBookState}
+            addCurrentBookState={addCurrentBookState}
+            onCurrentBookClick={(bookData) => {
+              setCurrentBookData(bookData);
+              setCurrentBookDetailsOpen(true);
+            }}
+            onShowBooksHistory={handleShowBooksHistory}
+            setShowBooksHistory={setShowBooksHistory}
+            showBooksHistory={showBooksHistory}
+            onShowCalendar={() => {
+              setShowCalendar(true);
+              setShowBooksHistory(false);
+              setShowSuggestions(false);
+              setShowSettings(false);
+              setCurrentRoom(null);
+            }}
+            showCalendar={showCalendar}
+            onShowSuggestions={() => {
+              setShowSuggestions(true);
+              setShowBooksHistory(false);
+              setShowCalendar(false);
+              setShowSettings(false);
+              setCurrentRoom(null);
+            }}
+            showSuggestions={showSuggestions}
+          />
         </div>
         
         <div className="flex flex-1">
-        {/* Main Chat Area - Conditional rendering based on mode */}
-        {viewMode === 'dm' ? (
-          <DMChat
-            otherUser={currentDMUser}
-            messages={dmMessages}
-            onSendMessage={handleSendDM}
+        {/* Main Chat Area */}
+        <div className="flex flex-col flex-1">
+          {/* Room Header */}
+          <BookclubHeader 
+            showBooksHistory={showBooksHistory}
+            showCalendar={showCalendar}
+            showSuggestions={showSuggestions}
+            showSettings={showSettings}
+            currentRoom={currentRoom}
             auth={auth}
+            onInviteClick={() => {
+              console.log('Invite button clicked!');
+              setShowInviteModal(true);
+            }}
+            onSettingsClick={() => {
+              // Store current view state before opening settings
+              setPreviousView({
+                showBooksHistory,
+                showCalendar,
+                showSuggestions
+              });
+              setShowBooksHistory(false);
+              setShowCalendar(false);
+              setShowSuggestions(false);
+              setShowSettings(true);
+            }}
+            userRole={userRole}
           />
-        ) : (
-          <div className="flex flex-col flex-1">
-            {/* Room Header */}
-            <BookclubHeader 
-              showBooksHistory={showBooksHistory}
-              showCalendar={showCalendar}
-              showSuggestions={showSuggestions}
-              showSettings={showSettings}
-              currentRoom={currentRoom}
-              auth={auth}
-              onInviteClick={() => {
-                console.log('Invite button clicked!');
-                setShowInviteModal(true);
-              }}
-              onSettingsClick={() => {
-                // Store current view state before opening settings
-                setPreviousView({
-                  showBooksHistory,
-                  showCalendar,
-                  showSuggestions
-                });
-                setShowBooksHistory(false);
-                setShowCalendar(false);
-                setShowSuggestions(false);
-                setShowSettings(true);
-              }}
-              userRole={userRole}
-            />
 
-            {/* Content Area - Settings, Calendar, Books History, Suggestions, or Messages */}
-            {showSettings ? (
-              <div className="flex-1 overflow-y-auto bg-gray-900 p-6">
-                {/* Settings Header */}
+          {/* Content Area - Settings, Calendar, Books History, Suggestions, or Messages */}
+          {showSettings ? (
+            <div className="flex-1 overflow-y-auto bg-gray-900 p-6">
+              {/* Settings Header */}
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
                     <FiSettingsIcon className="w-6 h-6 text-purple-400" />
@@ -1310,9 +1027,8 @@ const BookClub = () => {
 
           </div>
           )}
-          {/* Connected Users - only show in bookclub mode */}
-          {viewMode === 'bookclub' && (
-            <ConnectedUsersSidebar
+          {/* Connected Users Sidebar */}
+          <ConnectedUsersSidebar
               bookClubMembers={bookClubMembers.map(member => {
                 // bookClubMembers from WebSocket might have: id, userId, username, email, profileImage
                 // bookClub.members has: userId, role
@@ -1327,12 +1043,9 @@ const BookClub = () => {
                 return mappedMember;
               })}
               connectedUsers={connectedUsers}
-              friends={friends}
               auth={auth}
               onSendFriendRequest={handleSendFriendRequest}
-              onStartDM={handleStartDM}
             />
-          )}
         </div>
 
 

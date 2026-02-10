@@ -29,10 +29,9 @@ const RoleBadge = ({ role }) => {
 const ConnectedUsersSidebar = ({ 
   bookClubMembers, 
   connectedUsers, 
-  friends, 
+  friends = [], 
   auth,
-  onSendFriendRequest,
-  onStartDM
+  onSendFriendRequest
 }) => {
   const navigate = useNavigate();
   const [selectedUserId, setSelectedUserId] = useState(null);
@@ -122,7 +121,7 @@ const ConnectedUsersSidebar = ({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      onStartDM(user.id);
+                      navigate(`/dm/${user.id}`);
                       setSelectedUserId(null);
                     }}
                     className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-600 transition-colors border-t border-gray-600"

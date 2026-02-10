@@ -42,7 +42,7 @@ function App() {
           <BookclubSettings />
         </ProtectedRoute>
       }/>
-      <Route path="/dm" element={
+      <Route path="/dm/:userId?" element={
         <ProtectedRoute>
           <DMChatPage />
         </ProtectedRoute>
