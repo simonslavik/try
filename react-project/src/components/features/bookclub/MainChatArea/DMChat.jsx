@@ -38,6 +38,33 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs })
   const menuRef = useRef(null);
   const navigate = useNavigate();
 
+  // Helper function to check if messages should be grouped
+  const shouldGroupMessages = (currentMsg, previousMsg, nextMsg) => {
+    if (!previousMsg || !currentMsg) return { groupWithPrevious: false, isLastInGroup: true };
+    
+    // Check if from same user
+    if (currentMsg.senderId !== previousMsg.senderId) {
+      return { groupWithPrevious: false, isLastInGroup: !nextMsg || nextMsg.senderId !== currentMsg.senderId };
+    }
+    
+    // Check time difference (5 minutes = 300000 milliseconds)
+    const currentTime = new Date(currentMsg.createdAt).getTime();
+    const previousTime = new Date(previousMsg.createdAt).getTime();
+    const timeDiff = currentTime - previousTime;
+    
+    const groupWithPrevious = timeDiff <= 300000; // 5 minutes
+    
+    // Check if this is the last message in the group
+    let isLastInGroup = true;
+    if (nextMsg && nextMsg.senderId === currentMsg.senderId) {
+      const nextTime = new Date(nextMsg.createdAt).getTime();
+      const nextTimeDiff = nextTime - currentTime;
+      isLastInGroup = nextTimeDiff > 300000;
+    }
+    
+    return { groupWithPrevious, isLastInGroup };
+  };
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -195,10 +222,17 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs })
             <p className="text-sm">No messages yet. Start the conversation!</p>
           </div>
         ) : (
-          messages.map((msg, idx) => (
+          messages.map((msg, idx) => {
+            const previousMsg = idx > 0 ? messages[idx - 1] : null;
+            const nextMsg = idx < messages.length - 1 ? messages[idx + 1] : null;
+            const { groupWithPrevious, isLastInGroup } = shouldGroupMessages(msg, previousMsg, nextMsg);
+            
+            return (
             <div 
               key={msg.id || idx} 
-              className={`flex gap-3 group ${msg.senderId === auth?.user?.id ? 'justify-end' : 'justify-start'}`}
+              className={`flex gap-3 group ${
+                msg.senderId === auth?.user?.id ? 'justify-end' : 'justify-start'
+              } ${groupWithPrevious ? 'mt-1' : 'mt-3'}`}
             >
               <div className="flex flex-col gap-2 max-w-xs lg:max-w-md relative">
                 {msg.content && (
@@ -208,9 +242,11 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs })
                       : 'bg-gray-700 text-gray-200'
                   }`}>
                       <p className={msg.deletedAt ? 'italic text-gray-300' : ''}>{linkifyText(msg.content)}</p>
-                      <p className="text-xs opacity-70 mt-1">
-                      {new Date(msg.createdAt).toLocaleTimeString()}
-                      </p>
+                      {isLastInGroup && (
+                        <p className="text-xs opacity-70 mt-1">
+                          {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      )}
                   </div>
                 )}
                 {msg.attachments && msg.attachments.length > 0 && !msg.deletedAt && (
@@ -254,7 +290,8 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs })
                 )}
               </div>
             </div>
-          ))
+            );
+          })
         )}
         <div ref={messagesEndRef} />
       </div>

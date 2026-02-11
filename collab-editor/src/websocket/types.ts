@@ -4,6 +4,7 @@ export interface Client {
   id: string;
   userId: string;
   username: string;
+  profileImage?: string | null;
   ws: WebSocket;
   bookClubId?: string;
   roomId?: string;

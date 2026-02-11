@@ -56,6 +56,38 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
     // Check if user is MODERATOR or higher
     const canModerate = userRole && ['OWNER', 'ADMIN', 'MODERATOR'].includes(userRole);
 
+    // Helper function to check if messages should be grouped
+    const shouldGroupMessages = (currentMsg, previousMsg, nextMsg) => {
+      if (!previousMsg || !currentMsg) return { groupWithPrevious: false, isLastInGroup: true };
+      
+      // Don't group system messages or deleted messages
+      if (currentMsg.type === 'system' || previousMsg.type === 'system') {
+        return { groupWithPrevious: false, isLastInGroup: !nextMsg || nextMsg.userId !== currentMsg.userId };
+      }
+      
+      // Check if from same user
+      if (currentMsg.userId !== previousMsg.userId) {
+        return { groupWithPrevious: false, isLastInGroup: !nextMsg || nextMsg.userId !== currentMsg.userId };
+      }
+      
+      // Check time difference (5 minutes = 300000 milliseconds)
+      const currentTime = new Date(currentMsg.timestamp).getTime();
+      const previousTime = new Date(previousMsg.timestamp).getTime();
+      const timeDiff = currentTime - previousTime;
+      
+      const groupWithPrevious = timeDiff <= 300000; // 5 minutes
+      
+      // Check if this is the last message in the group
+      let isLastInGroup = true;
+      if (nextMsg && nextMsg.userId === currentMsg.userId) {
+        const nextTime = new Date(nextMsg.timestamp).getTime();
+        const nextTimeDiff = nextTime - currentTime;
+        isLastInGroup = nextTimeDiff > 300000;
+      }
+      
+      return { groupWithPrevious, isLastInGroup };
+    };
+
     // Close menu when clicking outside
     useEffect(() => {
       const handleClickOutside = (event) => {
@@ -147,8 +179,13 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
                   <p className="text-xs mt-1">Start a conversation!</p>
                 </div>
               ) : (
-                messages.map((msg, idx) => (
-                  <div key={msg.id || idx} className="flex flex-col">
+                messages.map((msg, idx) => {
+                  const previousMsg = idx > 0 ? messages[idx - 1] : null;
+                  const nextMsg = idx < messages.length - 1 ? messages[idx + 1] : null;
+                  const { groupWithPrevious, isLastInGroup } = shouldGroupMessages(msg, previousMsg, nextMsg);
+                  
+                  return (
+                  <div key={msg.id || idx} className={`flex flex-col ${groupWithPrevious ? 'mt-1' : 'mt-3'}`}>
                     {msg.type === 'system' ? (
                       <div className="text-center">
                         <span className="text-xs text-gray-500 italic">{msg.text}</span>
@@ -156,7 +193,7 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
                     ) : (
                       <>
                         {/* Debug: Log message data */}
-                        {console.log('Message:', msg.id, 'Text:', msg.text, 'Attachments:', msg.attachments, 'DeletedAt:', msg.deletedAt, 'Type of deletedAt:', typeof msg.deletedAt)}
+                        {console.log('Message:', msg.id, 'Text:', msg.text, 'ProfileImage:', msg.profileImage, 'Attachments:', msg.attachments, 'DeletedAt:', msg.deletedAt, 'Type of deletedAt:', typeof msg.deletedAt)}
                         {msg.userId === auth?.user?.id ? (
                           <div className="flex gap-3 justify-end group">
                             <div className="text-right max-w-md self-end relative">
@@ -207,16 +244,24 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
                                   ))}
                                 </div>
                               ) : null}
-                              <span className="text-xs text-gray-500 block text-right mt-1">
-                                {formatTimestamp(msg.timestamp)}
-                              </span>
+                              {isLastInGroup && (
+                                <span className="text-xs text-gray-500 block text-right mt-1">
+                                  {formatTimestamp(msg.timestamp)}
+                                </span>
+                              )}
                             </div>
                           </div>
                         ) : (
                           <div className="flex gap-3 group">
-                            <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold flex-shrink-0 self-end">
-                              {msg.username?.[0]?.toUpperCase()}
-                            </div>
+                            <img 
+                              src={msg.profileImage 
+                                ? `http://localhost:3001${msg.profileImage}` 
+                                : '/images/default.webp'
+                              } 
+                              alt={msg.username} 
+                              className="w-10 h-10 rounded-full object-cover flex-shrink-0 self-end"
+                              onError={(e) => { e.target.src = '/images/default.webp'; }}
+                            />
                             <div className="max-w-md relative">
                               <div className="flex items-baseline gap-2 mb-1">
                                 <span className="font-bold text-white">{msg.username}</span>
@@ -240,9 +285,14 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
                                   </div>
                                 ) : null}
                               </div>
-                              {showFullDateId === msg.id && (
+                              {isLastInGroup && showFullDateId === msg.id && (
                                 <span className="text-xs text-gray-500 block mt-1">
                                   {new Date(msg.timestamp).toLocaleString()}
+                                </span>
+                              )}
+                              {isLastInGroup && showFullDateId !== msg.id && (
+                                <span className="text-xs text-gray-500 block mt-1">
+                                  {formatTimestamp(msg.timestamp)}
                                 </span>
                               )}
                               {(canModerate || msg.userId === auth?.user?.id) && !msg.deletedAt && (
@@ -272,7 +322,8 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
                       </>
                     )}
                   </div>
-                ))
+                  );
+                })
               )}
               <div ref={messagesEndRef} />
             </div>

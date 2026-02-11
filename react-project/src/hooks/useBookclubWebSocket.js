@@ -62,6 +62,7 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId) =>
         }
         
         const username = auth.user.name || 'Anonymous';
+        const profileImage = auth.user.profileImage || null;
         currentRoomIdRef.current = currentRoom.id;
         currentBookClubIdRef.current = bookClubId;
         socket.send(JSON.stringify({
@@ -69,6 +70,7 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId) =>
           bookClubId: bookClubId,
           userId: auth.user.id,
           username: username,
+          profileImage: profileImage,
           roomId: currentRoom.id,
           token: auth.token
         }));
@@ -83,6 +85,7 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId) =>
               setMessages(data.messages.map(msg => ({
                 id: msg.id,
                 username: msg.username,
+                profileImage: msg.profileImage,
                 text: msg.content,
                 timestamp: msg.createdAt,
                 userId: msg.userId,
@@ -101,6 +104,7 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId) =>
               setMessages(prev => [...prev, {
                 id: data.message.id,
                 username: data.message.username,
+                profileImage: data.message.profileImage,
                 text: data.message.content,
                 timestamp: data.message.createdAt,
                 userId: data.message.userId,
