@@ -6,7 +6,7 @@ const GATEWAY_URL = 'http://localhost:3000';
 
 const CurrentBookDetailsModal = ({ bookClubId, currentBookData, onClose, onBookUpdated, onBookRemoved }) => {
   const { auth } = useContext(AuthContext);
-  const [activeTab, setActiveTab] = useState('details'); // 'details', 'schedule', 'progress', 'reviews'
+  const [activeTab, setActiveTab] = useState('details'); // 'details', 'schedule'
   
   // Schedule editing state
   const [editingSchedule, setEditingSchedule] = useState(false);
@@ -383,28 +383,6 @@ const CurrentBookDetailsModal = ({ bookClubId, currentBookData, onClose, onBookU
           >
             <FiCalendar className="inline mr-2" size={18} />
             Schedule
-          </button>
-          <button
-            onClick={() => setActiveTab('progress')}
-            className={`flex-1 px-6 py-3 font-medium transition-colors ${
-              activeTab === 'progress'
-                ? 'bg-white text-purple-600 border-b-2 border-purple-600'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-          >
-            <FiBarChart2 className="inline mr-2" size={18} />
-            Progress
-          </button>
-          <button
-            onClick={() => setActiveTab('reviews')}
-            className={`flex-1 px-6 py-3 font-medium transition-colors ${
-              activeTab === 'reviews'
-                ? 'bg-white text-purple-600 border-b-2 border-purple-600'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-          >
-            <FiStar className="inline mr-2" size={18} />
-            Reviews
           </button>
         </div>
 
