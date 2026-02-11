@@ -1,4 +1,5 @@
 import { GoogleBooksService } from './googleBooks.service';
+import { ValidationError } from '../utils/errors';
 import logger from '../utils/logger';
 
 export class BookSearchService {
@@ -30,41 +31,32 @@ export class BookSearchService {
    * Search books using Google Books API
    */
   static async searchBooks(query: string, limit: number = 20) {
-    try {
-      if (!query || query.trim() === '') {
-        throw new Error('Search query is required');
-      }
-
-      // Format the query for better results
-      const formattedQuery = this.formatSearchQuery(query);
-
-      const maxResults = Math.min(limit, 40); // Google Books API limit
-      const books = await GoogleBooksService.searchBooks(formattedQuery, maxResults);
-
-      logger.info('Books search completed:', {
-        originalQuery: query,
-        formattedQuery,
-        resultsCount: books.length,
-      });
-      return books;
-    } catch (error: any) {
-      logger.error('Error searching books:', { error: error.message, query });
-      throw error;
+    if (!query || query.trim() === '') {
+      throw new ValidationError('Search query is required');
     }
+
+    const formattedQuery = this.formatSearchQuery(query);
+    const maxResults = Math.min(limit, 40); // Google Books API limit
+    const books = await GoogleBooksService.searchBooks(formattedQuery, maxResults);
+
+    logger.info('Books search completed:', {
+      originalQuery: query,
+      formattedQuery,
+      resultsCount: books.length,
+    });
+    return books;
   }
 
   /**
    * Get book details by Google Books ID
    */
   static async getBookDetails(googleBooksId: string) {
-    try {
-      const book = await GoogleBooksService.getBookById(googleBooksId);
-
-      logger.info('Book details fetched:', { googleBooksId });
-      return book;
-    } catch (error: any) {
-      logger.error('Error fetching book details:', { error: error.message, googleBooksId });
-      throw error;
+    if (!googleBooksId) {
+      throw new ValidationError('Google Books ID is required');
     }
+
+    const book = await GoogleBooksService.getBookById(googleBooksId);
+    logger.info('Book details fetched:', { googleBooksId });
+    return book;
   }
 }

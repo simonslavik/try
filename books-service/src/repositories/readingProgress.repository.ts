@@ -12,15 +12,50 @@ export class ReadingProgressRepository {
   }
 
   /**
-   * Find user's progress for a bookclub book
+   * Find user's progress for a specific bookclub book (unique compound key)
    */
-  static async findByUserAndBook(userId: string, bookClubBookId: string) {
-    return await prisma.readingProgress.findMany({
+  static async findUserProgress(userId: string, bookClubBookId: string) {
+    return await prisma.readingProgress.findUnique({
       where: {
-        userId,
-        bookClubBookId,
+        bookClubBookId_userId: {
+          bookClubBookId,
+          userId,
+        },
       },
-      orderBy: { updatedAt: 'desc' },
+      include: {
+        bookClubBook: {
+          include: { book: true },
+        },
+      },
+    });
+  }
+
+  /**
+   * Upsert reading progress for a user on a bookclub book
+   */
+  static async upsertProgress(
+    userId: string,
+    bookClubBookId: string,
+    data: { pagesRead: number; notes?: string | null }
+  ) {
+    return await prisma.readingProgress.upsert({
+      where: {
+        bookClubBookId_userId: {
+          bookClubBookId,
+          userId,
+        },
+      },
+      update: {
+        pagesRead: data.pagesRead,
+        notes: data.notes,
+        lastReadDate: new Date(),
+      },
+      create: {
+        bookClubBookId,
+        userId,
+        pagesRead: data.pagesRead,
+        notes: data.notes,
+      },
     });
   }
 

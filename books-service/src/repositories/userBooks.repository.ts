@@ -1,18 +1,26 @@
 import prisma from '../config/database';
+import { UserBookStatus } from '@prisma/client';
 
 export class UserBooksRepository {
   /**
-   * Find user's books with optional status filter
+   * Find user's books with optional status filter and pagination
    */
-  static async findByUserId(userId: string, status?: string) {
+  static async findByUserId(userId: string, status?: UserBookStatus, skip?: number, take?: number) {
     const where: any = { userId };
     if (status) where.status = status;
 
-    return await prisma.userBook.findMany({
-      where,
-      include: { book: true },
-      orderBy: { updatedAt: 'desc' },
-    });
+    const [data, total] = await Promise.all([
+      prisma.userBook.findMany({
+        where,
+        include: { book: true },
+        orderBy: { updatedAt: 'desc' },
+        ...(skip !== undefined && { skip }),
+        ...(take !== undefined && { take }),
+      }),
+      prisma.userBook.count({ where }),
+    ]);
+
+    return { data, total };
   }
 
   /**

@@ -12,6 +12,7 @@ interface GoogleBook {
     title: string;
     authors?: string[];
     description?: string;
+    publishedDate?: string;
     imageLinks?: {
       thumbnail?: string;
       smallThumbnail?: string;
@@ -32,6 +33,7 @@ interface BookData {
   description: string | null;
   pageCount: number | null;
   isbn: string | null;
+  publishedDate: string | null;
 }
 
 export class GoogleBooksService {
@@ -77,6 +79,7 @@ export class GoogleBooksService {
             item.volumeInfo.industryIdentifiers?.find(
               (id) => id.type === 'ISBN_13' || id.type === 'ISBN_10'
             )?.identifier || null,
+          publishedDate: item.volumeInfo.publishedDate || null,
         })) || [];
 
       // Cache the results
@@ -127,6 +130,7 @@ export class GoogleBooksService {
           book.volumeInfo.industryIdentifiers?.find(
             (id: any) => id.type === 'ISBN_13' || id.type === 'ISBN_10'
           )?.identifier || null,
+        publishedDate: book.volumeInfo.publishedDate || null,
       };
 
       // Cache the result

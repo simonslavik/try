@@ -21,14 +21,14 @@ export class BookClubReviewsRepository {
   static async findByBookClubBook(bookClubBookId: string) {
     return await prisma.bookClubBookReview.findMany({
       where: { bookClubBookId },
-      orderBy: { updatedAt: 'desc' },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
   /**
    * Create or update review
    */
-  static async upsert(userId: string, bookClubBookId: string, data: any) {
+  static async upsert(userId: string, bookClubBookId: string, data: { rating: number; reviewText?: string | null }) {
     return await prisma.bookClubBookReview.upsert({
       where: {
         bookClubBookId_userId: {
@@ -36,11 +36,29 @@ export class BookClubReviewsRepository {
           userId,
         },
       },
-      update: data,
+      update: {
+        rating: data.rating,
+        reviewText: data.reviewText ?? null,
+      },
       create: {
         userId,
         bookClubBookId,
-        ...data,
+        rating: data.rating,
+        reviewText: data.reviewText ?? null,
+      },
+    });
+  }
+
+  /**
+   * Delete review by user and bookclub book
+   */
+  static async delete(userId: string, bookClubBookId: string) {
+    return await prisma.bookClubBookReview.delete({
+      where: {
+        bookClubBookId_userId: {
+          bookClubBookId,
+          userId,
+        },
       },
     });
   }

@@ -50,10 +50,18 @@ const BookSuggestionsView = ({ bookClubId, auth }) => {
           body: JSON.stringify({ voteType })
         }
       );
-      
+
       if (response.ok) {
-        // Refresh suggestions
-        fetchBookSuggestions();
+        const data = await response.json();
+        const { vote, upvotes, downvotes } = data.data;
+        // Update only the voted suggestion using actual server counts
+        setBookSuggestions((prev) =>
+          prev.map((s) =>
+            s.id !== suggestionId
+              ? s
+              : { ...s, upvotes, downvotes, userVote: vote.voteType }
+          )
+        );
       }
     } catch (err) {
       console.error('Error voting:', err);
@@ -139,8 +147,8 @@ const BookSuggestionsView = ({ bookClubId, auth }) => {
                   </div>
                 )}
 
-                {/* Voting Section */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-700">
+                {/* Voting Section - stopPropagation prevents card onClick from firing */}
+                <div onClick={(e) => e.stopPropagation()} className="flex items-center justify-between pt-4 border-t border-gray-700">
                   <div className="flex items-center gap-4">
                     <button
                       onClick={() => handleVote(suggestion.id, 'upvote')}
@@ -218,7 +226,6 @@ const BookSuggestionsView = ({ bookClubId, auth }) => {
           auth={auth}
           onClose={() => setSelectedSuggestion(null)}
           onDeleted={fetchBookSuggestions}
-          onVote={fetchBookSuggestions}
         />
       )}
     </div>

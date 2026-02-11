@@ -6,6 +6,7 @@ import logger from './utils/logger';
 import errorHandler from './middleware/errorHandler';
 import { metricsMiddleware, metricsEndpoint } from './middleware/metrics';
 import { connectRedis } from './config/redis';
+import prisma from './config/database';
 import bookSearchRoutes from './routes/bookSearchRoutes';
 import userBooksRoutes from './routes/userBooksRoutes';
 import bookClubBooksRoutes from './routes/bookClubBooksRoutes';
@@ -18,7 +19,7 @@ const PORT = process.env.PORT || 3002;
 // Security Middleware
 app.use(helmet());
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10kb' }));
 
 // Metrics middleware
 app.use(metricsMiddleware);
@@ -29,17 +30,33 @@ app.use((req, res, next) => {
   next();
 });
 
-// Health check
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'healthy',
-    service: 'books-service',
-    timestamp: new Date().toISOString(),
-  });
+// Health check with DB connectivity
+app.get('/health', async (_req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({
+      status: 'healthy',
+      service: 'books-service',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+    });
+  } catch {
+    res.status(503).json({
+      status: 'unhealthy',
+      service: 'books-service',
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 
-// Metrics endpoint for Prometheus
-app.get('/metrics', metricsEndpoint);
+// Metrics endpoint for Prometheus (internal only)
+app.get('/metrics', (req, res, next) => {
+  // Block requests coming from browser origins (external)
+  if (req.headers.origin) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+  next();
+}, metricsEndpoint);
 
 // API Routes
 app.use('/v1/books', bookSearchRoutes);

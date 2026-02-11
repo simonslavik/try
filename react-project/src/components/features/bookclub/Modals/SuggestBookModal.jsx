@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { FiX, FiSearch, FiBook } from 'react-icons/fi';
 
+const GATEWAY_URL = 'http://localhost:3000';
+
 const SuggestBookModal = ({ isOpen, onClose, bookClubId, auth, onBookSuggested }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -19,7 +21,7 @@ const SuggestBookModal = ({ isOpen, onClose, bookClubId, auth, onBookSuggested }
 
     try {
       const response = await fetch(
-        `http://localhost:3000/v1/books/search?q=${encodeURIComponent(searchQuery)}&maxResults=10`
+        `${GATEWAY_URL}/v1/books/search?q=${encodeURIComponent(searchQuery)}&limit=10`
       );
       const data = await response.json();
 

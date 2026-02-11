@@ -1,19 +1,59 @@
 import { BookSuggestionsRepository } from '../repositories/bookSuggestions.repository';
 import { BooksRepository } from '../repositories/books.repository';
 import { GoogleBooksService } from './googleBooks.service';
+import { VoteType } from '@prisma/client';
+import { NotFoundError, ConflictError, ForbiddenError } from '../utils/errors';
 import logger from '../utils/logger';
 
 export class BookSuggestionsService {
   /**
-   * Get suggestions for a bookclub
+   * Get pending suggestions for a bookclub with user vote info
    */
-  static async getBookSuggestions(bookClubId: string) {
+  static async getSuggestions(bookClubId: string, userId: string, page: number = 1, limit: number = 20) {
+    const result = await BookSuggestionsRepository.findPendingByBookClubId(bookClubId, page, limit);
+
+    // Collect unique user IDs to fetch names from user-service
+    const userIds = [...new Set(result.suggestions.map((s: any) => s.suggestedById))];
+    let userMap: Record<string, string> = {};
+
     try {
-      return await BookSuggestionsRepository.findByBookClubId(bookClubId);
-    } catch (error: any) {
-      logger.error('Error fetching book suggestions:', { error: error.message, bookClubId });
-      throw error;
+      const userServiceUrl = process.env.USER_SERVICE_URL || 'http://user-service:3001';
+      const response = await fetch(`${userServiceUrl}/api/users/batch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userIds }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.users) {
+          for (const user of data.users) {
+            userMap[user.id] = user.username || 'Unknown User';
+          }
+        }
+      }
+    } catch (err) {
+      logger.warn('Failed to fetch user names from user-service', err);
     }
+
+    const suggestionsWithUserVote = result.suggestions.map((s: any) => {
+      const userVote = s.votes.find((v: any) => v.userId === userId);
+      return {
+        ...s,
+        userVote: userVote?.voteType || null,
+        suggestedBy: {
+          id: s.suggestedById,
+          name: userMap[s.suggestedById] || 'Unknown User',
+        },
+      };
+    });
+
+    return {
+      data: suggestionsWithUserVote,
+      total: result.total,
+      page: result.page,
+      totalPages: result.totalPages,
+    };
   }
 
   /**
@@ -25,41 +65,93 @@ export class BookSuggestionsService {
     googleBooksId: string,
     reason?: string
   ) {
-    try {
-      // Fetch book data from Google Books API
-      const bookData = await GoogleBooksService.getBookById(googleBooksId);
-
-      // Create or find book in database
-      const book = await BooksRepository.upsert(googleBooksId, bookData);
-
-      // Create suggestion
-      const suggestion = await BookSuggestionsRepository.create({
-        bookClubId,
-        bookId: book.id,
-        suggestedById: userId,
-        reason: reason || null,
-      });
-
-      logger.info('Book suggested:', { bookClubId, bookId: book.id, userId });
-      return suggestion;
-    } catch (error: any) {
-      logger.error('Error suggesting book:', { error: error.message, bookClubId, googleBooksId });
-      throw error;
+    // Check for duplicate suggestion
+    const existingBook = await BooksRepository.findByGoogleBooksId(googleBooksId);
+    if (existingBook) {
+      const existing = await BookSuggestionsRepository.findPendingByBookAndClub(bookClubId, existingBook.id);
+      if (existing) {
+        throw new ConflictError('This book has already been suggested');
+      }
     }
+
+    // Fetch book data from Google Books API and upsert
+    const bookData = await GoogleBooksService.getBookById(googleBooksId);
+    const book = await BooksRepository.upsert(googleBooksId, bookData);
+
+    // Create suggestion
+    const suggestion = await BookSuggestionsRepository.create({
+      bookClubId,
+      bookId: book.id,
+      suggestedById: userId,
+      reason: reason || null,
+    });
+
+    logger.info('Book suggested:', { bookClubId, bookId: book.id, userId });
+    return suggestion;
   }
 
   /**
-   * Delete book suggestion
+   * Vote on a suggestion (upvote/downvote) with atomic count update
+   */
+  static async vote(suggestionId: string, userId: string, voteType: VoteType) {
+    // Verify suggestion exists
+    const suggestion = await BookSuggestionsRepository.findById(suggestionId);
+    if (!suggestion) {
+      throw new NotFoundError('Suggestion', suggestionId);
+    }
+
+    const result = await BookSuggestionsRepository.upsertVoteWithCounts(
+      suggestionId,
+      userId,
+      voteType
+    );
+
+    logger.info('Vote recorded:', { suggestionId, userId, voteType });
+    return result;
+  }
+
+  /**
+   * Accept a suggestion and make it the current book (transactional)
+   */
+  static async acceptSuggestion(
+    bookClubId: string,
+    suggestionId: string,
+    userId: string,
+    startDate: Date,
+    endDate: Date
+  ) {
+    const suggestion = await BookSuggestionsRepository.findById(suggestionId);
+    if (!suggestion) {
+      throw new NotFoundError('Suggestion', suggestionId);
+    }
+
+    const bookClubBook = await BookSuggestionsRepository.acceptSuggestion(
+      bookClubId,
+      suggestionId,
+      suggestion.bookId,
+      userId,
+      startDate,
+      endDate
+    );
+
+    logger.info('Suggestion accepted:', { bookClubId, suggestionId, bookId: suggestion.bookId });
+    return bookClubBook;
+  }
+
+  /**
+   * Delete a suggestion (only by the user who suggested it)
    */
   static async deleteSuggestion(suggestionId: string, userId: string) {
-    try {
-      // Note: Add authorization check if needed (verify userId is the suggester)
-      await BookSuggestionsRepository.delete(suggestionId);
-
-      logger.info('Book suggestion deleted:', { suggestionId, userId });
-    } catch (error: any) {
-      logger.error('Error deleting suggestion:', { error: error.message, suggestionId });
-      throw error;
+    const suggestion = await BookSuggestionsRepository.findById(suggestionId);
+    if (!suggestion) {
+      throw new NotFoundError('Suggestion', suggestionId);
     }
+
+    if (suggestion.suggestedById !== userId) {
+      throw new ForbiddenError('You can only delete your own suggestions');
+    }
+
+    await BookSuggestionsRepository.delete(suggestionId);
+    logger.info('Book suggestion deleted:', { suggestionId, userId });
   }
 }

@@ -1,19 +1,31 @@
 import { BookClubBooksRepository } from '../repositories/bookClubBooks.repository';
 import { BooksRepository } from '../repositories/books.repository';
 import { GoogleBooksService } from './googleBooks.service';
+import { BookClubBookStatus } from '@prisma/client';
+import { NotFoundError } from '../utils/errors';
 import logger from '../utils/logger';
 
 export class BookClubBooksService {
   /**
-   * Get books for a bookclub
+   * Get books for a bookclub (with pagination)
    */
-  static async getBookClubBooks(bookClubId: string, status?: string) {
-    try {
-      return await BookClubBooksRepository.findByBookClubId(bookClubId, status);
-    } catch (error: any) {
-      logger.error('Error fetching bookclub books:', { error: error.message, bookClubId, status });
-      throw error;
-    }
+  static async getBookClubBooks(
+    bookClubId: string,
+    status?: BookClubBookStatus,
+    page: number = 1,
+    limit: number = 20
+  ) {
+    const skip = (page - 1) * limit;
+    const { data, total } = await BookClubBooksRepository.findByBookClubId(bookClubId, status, skip, limit);
+    return {
+      data,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   /**
@@ -23,37 +35,28 @@ export class BookClubBooksService {
     bookClubId: string,
     userId: string,
     googleBooksId: string,
-    status: string = 'upcoming',
+    status: BookClubBookStatus = BookClubBookStatus.upcoming,
     startDate?: Date,
     endDate?: Date
   ) {
-    try {
-      // Fetch book data from Google Books API
-      const bookData = await GoogleBooksService.getBookById(googleBooksId);
+    // Fetch book data from Google Books API
+    const bookData = await GoogleBooksService.getBookById(googleBooksId);
 
-      // Create or find book in database
-      const book = await BooksRepository.upsert(googleBooksId, bookData);
+    // Create or find book in database
+    const book = await BooksRepository.upsert(googleBooksId, bookData);
 
-      // Add to bookclub
-      const bookClubBook = await BookClubBooksRepository.create({
-        bookClubId,
-        bookId: book.id,
-        status,
-        startDate: startDate || null,
-        endDate: endDate || null,
-        addedById: userId,
-      });
+    // Add to bookclub
+    const bookClubBook = await BookClubBooksRepository.create({
+      bookClubId,
+      bookId: book.id,
+      status,
+      startDate: startDate || null,
+      endDate: endDate || null,
+      addedById: userId,
+    });
 
-      logger.info('Book added to bookclub:', { bookClubId, bookId: book.id, status });
-      return bookClubBook;
-    } catch (error: any) {
-      logger.error('Error adding bookclub book:', {
-        error: error.message,
-        bookClubId,
-        googleBooksId,
-      });
-      throw error;
-    }
+    logger.info('Book added to bookclub:', { bookClubId, bookId: book.id, status });
+    return bookClubBook;
   }
 
   /**
@@ -62,71 +65,46 @@ export class BookClubBooksService {
   static async updateBookClubBook(
     bookClubId: string,
     bookId: string,
-    data: { status?: string; startDate?: Date; endDate?: Date }
+    data: { status?: BookClubBookStatus; startDate?: Date; endDate?: Date }
   ) {
-    try {
-      // Check if book exists in bookclub
-      const existingBookClubBook = await BookClubBooksRepository.findOne(bookClubId, bookId);
-
-      if (!existingBookClubBook) {
-        throw new Error('Book not found in this bookclub. Please add it first.');
-      }
-
-      const updatedData: any = {};
-      if (data.status) updatedData.status = data.status;
-      if (data.startDate) updatedData.startDate = data.startDate;
-      if (data.endDate) updatedData.endDate = data.endDate;
-
-      const updatedBook = await BookClubBooksRepository.update(bookClubId, bookId, updatedData);
-
-      logger.info('Bookclub book updated:', { bookClubId, bookId });
-      return updatedBook;
-    } catch (error: any) {
-      logger.error('Error updating bookclub book:', { error: error.message, bookClubId, bookId });
-      throw error;
+    const existingBookClubBook = await BookClubBooksRepository.findOne(bookClubId, bookId);
+    if (!existingBookClubBook) {
+      throw new NotFoundError('Book in this bookclub');
     }
+
+    const updatedData: any = {};
+    if (data.status) updatedData.status = data.status;
+    if (data.startDate) updatedData.startDate = data.startDate;
+    if (data.endDate) updatedData.endDate = data.endDate;
+
+    const updatedBook = await BookClubBooksRepository.update(bookClubId, bookId, updatedData);
+    logger.info('Bookclub book updated:', { bookClubId, bookId });
+    return updatedBook;
   }
 
   /**
    * Delete book from bookclub
    */
   static async deleteBookClubBook(bookClubId: string, bookId: string) {
-    try {
-      // Check if book exists in bookclub
-      const existingBookClubBook = await BookClubBooksRepository.findOne(bookClubId, bookId);
-
-      if (!existingBookClubBook) {
-        throw new Error('Book not found in this bookclub');
-      }
-
-      await BookClubBooksRepository.delete(bookClubId, bookId);
-
-      logger.info('Bookclub book deleted:', { bookClubId, bookId });
-    } catch (error: any) {
-      logger.error('Error deleting bookclub book:', { error: error.message, bookClubId, bookId });
-      throw error;
+    const existingBookClubBook = await BookClubBooksRepository.findOne(bookClubId, bookId);
+    if (!existingBookClubBook) {
+      throw new NotFoundError('Book in this bookclub');
     }
+
+    await BookClubBooksRepository.delete(bookClubId, bookId);
+    logger.info('Bookclub book deleted:', { bookClubId, bookId });
   }
 
   /**
-   * Get current books for multiple bookclubs (batch operation)
+   * Get current books for multiple bookclubs (single query instead of N)
    */
   static async getBatchCurrentBooks(bookClubIds: string[]) {
-    try {
-      const results = await Promise.all(
-        bookClubIds.map(async (bookClubId) => {
-          const books = await BookClubBooksRepository.findByBookClubId(bookClubId, 'current');
-          return {
-            bookClubId,
-            currentBook: books.length > 0 ? books[0] : null,
-          };
-        })
-      );
+    const currentBooks = await BookClubBooksRepository.findCurrentByBookClubIds(bookClubIds);
 
-      return results;
-    } catch (error: any) {
-      logger.error('Error fetching batch current books:', { error: error.message });
-      throw error;
-    }
+    // Map results back to each bookClubId, filling nulls for clubs with no current book
+    return bookClubIds.map((bookClubId) => ({
+      bookClubId,
+      currentBook: currentBooks.find((b) => b.bookClubId === bookClubId) || null,
+    }));
   }
 }
