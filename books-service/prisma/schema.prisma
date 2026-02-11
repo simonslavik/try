@@ -7,6 +7,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ── Enums ──────────────────────────────────────────────
+
+enum BookClubBookStatus {
+  current
+  upcoming
+  completed
+}
+
+enum UserBookStatus {
+  favorite
+  reading
+  want_to_read
+  completed
+}
+
+enum SuggestionStatus {
+  pending
+  accepted
+  rejected
+}
+
+enum VoteType {
+  upvote
+  downvote
+}
+
+// ── Models ─────────────────────────────────────────────
+
 model Book {
   id            String  @id @default(uuid())
   title         String
@@ -16,6 +44,7 @@ model Book {
   pageCount     Int?
   isbn          String?
   googleBooksId String? @unique
+  publishedDate String?
 
   bookClubBooks BookClubBook[]
   userBooks     UserBook[]
@@ -26,13 +55,13 @@ model Book {
 }
 
 model BookClubBook {
-  id         String    @id @default(uuid())
+  id         String             @id @default(uuid())
   bookClubId String
   bookId     String
-  status     String // 'current', 'upcoming', 'completed'
+  status     BookClubBookStatus // current, upcoming, completed
   startDate  DateTime?
   endDate    DateTime?
-  addedById  String // User who added the book
+  addedById  String
 
   book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
@@ -45,14 +74,15 @@ model BookClubBook {
   @@unique([bookClubId, bookId])
   @@index([bookClubId])
   @@index([status])
+  @@index([bookClubId, status])
 }
 
 model UserBook {
-  id     String  @id @default(uuid())
+  id     String         @id @default(uuid())
   userId String
   bookId String
-  status String // 'favorite', 'reading', 'want_to_read', 'completed'
-  rating Int? // 1-5 stars
+  status UserBookStatus // favorite, reading, want_to_read, completed
+  rating Int?
   review String?
 
   book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
@@ -63,6 +93,7 @@ model UserBook {
   @@unique([userId, bookId])
   @@index([userId])
   @@index([status])
+  @@index([userId, status])
 }
 
 model ReadingProgress {
@@ -70,7 +101,6 @@ model ReadingProgress {
   bookClubBookId String
   userId         String
   pagesRead      Int      @default(0)
-  percentage     Int      @default(0) // Calculated field for progress bar
   lastReadDate   DateTime @default(now())
   notes          String?
 
@@ -86,7 +116,7 @@ model BookClubBookReview {
   id             String  @id @default(uuid())
   bookClubBookId String
   userId         String
-  rating         Int // 1-5 stars
+  rating         Int
   reviewText     String?
 
   bookClubBook BookClubBook @relation(fields: [bookClubBookId], references: [id], onDelete: Cascade)
@@ -100,29 +130,31 @@ model BookClubBookReview {
 }
 
 model BookSuggestion {
-  id            String   @id @default(uuid())
+  id            String           @id @default(uuid())
   bookClubId    String
   bookId        String
   suggestedById String
   reason        String?
-  status        String   @default("pending") // pending, accepted, rejected
-  upvotes       Int      @default(0)
-  downvotes     Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  status        SuggestionStatus @default(pending)
+  upvotes       Int              @default(0)
+  downvotes     Int              @default(0)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 
   book  Book                 @relation(fields: [bookId], references: [id], onDelete: Cascade)
   votes BookSuggestionVote[]
 
   @@index([bookClubId])
   @@index([status])
+  @@index([bookClubId, status])
+  @@index([suggestedById])
 }
 
 model BookSuggestionVote {
   id           String   @id @default(uuid())
   suggestionId String
   userId       String
-  voteType     String // upvote, downvote
+  voteType     VoteType // upvote, downvote
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

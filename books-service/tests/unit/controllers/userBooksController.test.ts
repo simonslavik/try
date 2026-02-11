@@ -1,314 +1,142 @@
-import { Response } from 'express';
+import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../../../src/middleware/authMiddleware';
 import {
   getUserBooks,
   addUserBook,
   updateUserBook,
-  removeUserBook,
+  deleteUserBook,
 } from '../../../src/controllers/userBooksController';
-import prisma from '../../../src/config/database';
-import { GoogleBooksService } from '../../../src/services/googleBooks.service';
+import { UserBooksService } from '../../../src/services/userBooks.service';
 
-// Mock dependencies
-jest.mock('../../../src/config/database', () => ({
-  __esModule: true,
-  default: {
-    userBook: {
-      findMany: jest.fn(),
-      upsert: jest.fn(),
-      findUnique: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-    },
-    book: {
-      upsert: jest.fn(),
-    },
-  },
-}));
-
-jest.mock('../../../src/services/googleBooks.service');
+jest.mock('../../../src/services/userBooks.service');
 
 describe('UserBooksController', () => {
   let mockReq: Partial<AuthRequest>;
   let mockRes: Partial<Response>;
+  let mockNext: jest.Mock;
   let jsonMock: jest.Mock;
-  let statusMock: jest.Mock;
 
   beforeEach(() => {
     jsonMock = jest.fn();
-    statusMock = jest.fn().mockReturnValue({ json: jsonMock });
+    mockNext = jest.fn();
 
     mockReq = {
-      user: {
-        userId: 'test-user-123',
-        email: 'test@example.com',
-        role: 'user',
-        name: 'Test User',
-      },
+      user: { userId: 'user-1', email: 'test@test.com', role: 'user' },
       query: {},
       params: {},
       body: {},
     };
 
-    mockRes = {
-      json: jsonMock,
-      status: statusMock,
-    };
+    mockRes = { json: jsonMock } as Partial<Response>;
 
     jest.clearAllMocks();
   });
 
   describe('getUserBooks', () => {
-    it('should return all user books when no status filter', async () => {
-      const mockBooks = [
-        {
-          id: '1',
-          userId: 'test-user-123',
-          bookId: 'book-1',
-          status: 'reading',
-          book: { id: 'book-1', title: 'Test Book' },
-        },
-      ];
+    it('should return paginated user books', async () => {
+      const result = {
+        data: [{ id: '1', status: 'reading' }],
+        pagination: { page: 1, limit: 20, total: 1, totalPages: 1 },
+      };
+      (UserBooksService.getUserBooks as jest.Mock).mockResolvedValue(result);
 
-      (prisma.userBook.findMany as jest.Mock).mockResolvedValue(mockBooks);
+      await getUserBooks(mockReq as AuthRequest, mockRes as Response, mockNext);
 
-      await getUserBooks(mockReq as AuthRequest, mockRes as Response);
-
-      expect(prisma.userBook.findMany).toHaveBeenCalledWith({
-        where: { userId: 'test-user-123' },
-        include: { book: true },
-        orderBy: { updatedAt: 'desc' },
-      });
-
-      expect(jsonMock).toHaveBeenCalledWith({
-        success: true,
-        data: mockBooks,
-      });
+      expect(UserBooksService.getUserBooks).toHaveBeenCalledWith('user-1', undefined, 1, 20);
+      expect(jsonMock).toHaveBeenCalledWith({ success: true, ...result });
     });
 
-    it('should filter books by status', async () => {
-      mockReq.query = { status: 'reading' };
+    it('should pass status filter and pagination', async () => {
+      mockReq.query = { status: 'reading', page: '3', limit: '5' };
+      (UserBooksService.getUserBooks as jest.Mock).mockResolvedValue({ data: [], pagination: {} });
 
-      const mockBooks = [
-        {
-          id: '1',
-          userId: 'test-user-123',
-          bookId: 'book-1',
-          status: 'reading',
-          book: { id: 'book-1', title: 'Test Book' },
-        },
-      ];
+      await getUserBooks(mockReq as AuthRequest, mockRes as Response, mockNext);
 
-      (prisma.userBook.findMany as jest.Mock).mockResolvedValue(mockBooks);
-
-      await getUserBooks(mockReq as AuthRequest, mockRes as Response);
-
-      expect(prisma.userBook.findMany).toHaveBeenCalledWith({
-        where: { userId: 'test-user-123', status: 'reading' },
-        include: { book: true },
-        orderBy: { updatedAt: 'desc' },
-      });
+      expect(UserBooksService.getUserBooks).toHaveBeenCalledWith('user-1', 'reading', 3, 5);
     });
 
-    it('should handle errors', async () => {
-      (prisma.userBook.findMany as jest.Mock).mockRejectedValue(new Error('Database error'));
+    it('should call next(error) on failure', async () => {
+      const error = new Error('fail');
+      (UserBooksService.getUserBooks as jest.Mock).mockRejectedValue(error);
 
-      await getUserBooks(mockReq as AuthRequest, mockRes as Response);
+      await getUserBooks(mockReq as AuthRequest, mockRes as Response, mockNext);
 
-      expect(statusMock).toHaveBeenCalledWith(500);
-      expect(jsonMock).toHaveBeenCalledWith({
-        error: 'Database error',
-      });
+      expect(mockNext).toHaveBeenCalledWith(error);
+      expect(jsonMock).not.toHaveBeenCalled();
     });
   });
 
   describe('addUserBook', () => {
-    it('should add a book to user library', async () => {
-      mockReq.body = {
-        googleBooksId: 'abc123',
-        status: 'reading',
-        rating: 4,
-        review: 'Great book',
-      };
+    it('should add a book and return success', async () => {
+      mockReq.body = { googleBooksId: 'g1', status: 'reading', rating: 4, review: 'good' };
+      const userBook = { id: 'ub-1', status: 'reading', rating: 4 };
+      (UserBooksService.addUserBook as jest.Mock).mockResolvedValue(userBook);
 
-      const mockGoogleBook = {
-        googleBooksId: 'abc123',
-        title: 'Test Book',
-        author: 'Test Author',
-        description: 'Test description',
-        coverUrl: 'http://example.com/cover.jpg',
-        pageCount: 300,
-        publishedDate: '2020-01-01',
-        isbn: '1234567890',
-      };
+      await addUserBook(mockReq as AuthRequest, mockRes as Response, mockNext);
 
-      const mockBook = {
-        id: 'book-1',
-        ...mockGoogleBook,
-      };
-
-      const mockUserBook = {
-        id: 'user-book-1',
-        userId: 'test-user-123',
-        bookId: 'book-1',
-        status: 'reading',
-        rating: 4,
-        review: 'Great book',
-        book: mockBook,
-      };
-
-      (GoogleBooksService.getBookById as jest.Mock).mockResolvedValue(mockGoogleBook);
-      (prisma.book.upsert as jest.Mock).mockResolvedValue(mockBook);
-      (prisma.userBook.upsert as jest.Mock).mockResolvedValue(mockUserBook);
-
-      await addUserBook(mockReq as AuthRequest, mockRes as Response);
-
-      expect(GoogleBooksService.getBookById).toHaveBeenCalledWith('abc123');
-      expect(prisma.book.upsert).toHaveBeenCalled();
-      expect(prisma.userBook.upsert).toHaveBeenCalled();
-      expect(jsonMock).toHaveBeenCalledWith({
-        success: true,
-        data: mockUserBook,
-      });
+      expect(UserBooksService.addUserBook).toHaveBeenCalledWith('user-1', 'g1', 'reading', 4, 'good');
+      expect(jsonMock).toHaveBeenCalledWith({ success: true, data: userBook });
     });
 
-    it('should return 400 for invalid data', async () => {
-      mockReq.body = {
-        googleBooksId: 'abc123',
-        status: 'invalid_status',
-      };
+    it('should call next(error) on failure', async () => {
+      mockReq.body = { googleBooksId: 'g1', status: 'reading' };
+      const error = new Error('API error');
+      (UserBooksService.addUserBook as jest.Mock).mockRejectedValue(error);
 
-      await addUserBook(mockReq as AuthRequest, mockRes as Response);
+      await addUserBook(mockReq as AuthRequest, mockRes as Response, mockNext);
 
-      expect(statusMock).toHaveBeenCalledWith(400);
-      expect(jsonMock).toHaveBeenCalledWith(expect.objectContaining({ error: expect.any(String) }));
-    });
-
-    it('should handle Google Books API errors', async () => {
-      mockReq.body = {
-        googleBooksId: 'abc123',
-        status: 'reading',
-      };
-
-      (GoogleBooksService.getBookById as jest.Mock).mockRejectedValue(new Error('Book not found'));
-
-      await addUserBook(mockReq as AuthRequest, mockRes as Response);
-
-      expect(statusMock).toHaveBeenCalledWith(500);
-      expect(jsonMock).toHaveBeenCalledWith({
-        error: 'Book not found',
-      });
+      expect(mockNext).toHaveBeenCalledWith(error);
     });
   });
 
   describe('updateUserBook', () => {
-    it('should update user book status', async () => {
-      mockReq.params = { bookId: 'book-1' };
-      mockReq.body = {
+    it('should update and return success', async () => {
+      mockReq.params = { bookId: 'b1' };
+      mockReq.body = { status: 'completed', rating: 5 };
+      const updated = { id: 'ub-1', status: 'completed', rating: 5 };
+      (UserBooksService.updateUserBook as jest.Mock).mockResolvedValue(updated);
+
+      await updateUserBook(mockReq as AuthRequest, mockRes as Response, mockNext);
+
+      expect(UserBooksService.updateUserBook).toHaveBeenCalledWith('user-1', 'b1', {
         status: 'completed',
         rating: 5,
-      };
-
-      const existingBook = {
-        id: 'user-book-1',
-        userId: 'test-user-123',
-        bookId: 'book-1',
-        status: 'reading',
-      };
-
-      const updatedBook = {
-        ...existingBook,
-        status: 'completed',
-        rating: 5,
-      };
-
-      (prisma.userBook.findUnique as jest.Mock).mockResolvedValue(existingBook);
-      (prisma.userBook.update as jest.Mock).mockResolvedValue(updatedBook);
-
-      await updateUserBook(mockReq as AuthRequest, mockRes as Response);
-
-      expect(prisma.userBook.findUnique).toHaveBeenCalledWith({
-        where: {
-          userId_bookId: {
-            userId: 'test-user-123',
-            bookId: 'book-1',
-          },
-        },
-        include: { book: true },
+        review: undefined,
       });
-
-      expect(prisma.userBook.update).toHaveBeenCalled();
-      expect(jsonMock).toHaveBeenCalledWith({
-        success: true,
-        data: updatedBook,
-      });
+      expect(jsonMock).toHaveBeenCalledWith({ success: true, data: updated });
     });
 
-    it('should return 404 if book not found in user library', async () => {
-      mockReq.params = { bookId: 'book-1' };
+    it('should call next(error) on failure', async () => {
+      mockReq.params = { bookId: 'b1' };
       mockReq.body = { status: 'completed' };
+      const error = new Error('not found');
+      (UserBooksService.updateUserBook as jest.Mock).mockRejectedValue(error);
 
-      (prisma.userBook.findUnique as jest.Mock).mockResolvedValue(null);
+      await updateUserBook(mockReq as AuthRequest, mockRes as Response, mockNext);
 
-      await updateUserBook(mockReq as AuthRequest, mockRes as Response);
-
-      expect(statusMock).toHaveBeenCalledWith(404);
-      expect(jsonMock).toHaveBeenCalledWith({
-        error: 'Book not found in your library. Please add it first.',
-      });
-    });
-
-    it('should validate update data', async () => {
-      mockReq.params = { bookId: 'book-1' };
-      mockReq.body = { rating: 10 }; // Invalid rating
-
-      await updateUserBook(mockReq as AuthRequest, mockRes as Response);
-
-      expect(statusMock).toHaveBeenCalledWith(400);
+      expect(mockNext).toHaveBeenCalledWith(error);
     });
   });
 
-  describe('removeUserBook', () => {
-    it('should remove book from user library', async () => {
-      mockReq.params = { bookId: 'book-1' };
+  describe('deleteUserBook', () => {
+    it('should delete and return success message', async () => {
+      mockReq.params = { userBookId: 'ub-1' };
+      (UserBooksService.deleteUserBookById as jest.Mock).mockResolvedValue(undefined);
 
-      const existingBook = {
-        id: 'user-book-1',
-        userId: 'test-user-123',
-        bookId: 'book-1',
-      };
+      await deleteUserBook(mockReq as AuthRequest, mockRes as Response, mockNext);
 
-      (prisma.userBook.findUnique as jest.Mock).mockResolvedValue(existingBook);
-      (prisma.userBook.delete as jest.Mock).mockResolvedValue(existingBook);
-
-      await removeUserBook(mockReq as AuthRequest, mockRes as Response);
-
-      expect(prisma.userBook.delete).toHaveBeenCalledWith({
-        where: {
-          userId_bookId: {
-            userId: 'test-user-123',
-            bookId: 'book-1',
-          },
-        },
-      });
-
-      expect(jsonMock).toHaveBeenCalledWith({
-        success: true,
-        message: 'Book removed from library',
-      });
+      expect(UserBooksService.deleteUserBookById).toHaveBeenCalledWith('user-1', 'ub-1');
+      expect(jsonMock).toHaveBeenCalledWith({ success: true, message: 'Book removed from library' });
     });
 
-    it('should return 404 if book not in library', async () => {
-      mockReq.params = { bookId: 'book-1' };
+    it('should call next(error) on failure', async () => {
+      mockReq.params = { userBookId: 'ub-1' };
+      const error = new Error('not found');
+      (UserBooksService.deleteUserBookById as jest.Mock).mockRejectedValue(error);
 
-      (prisma.userBook.findUnique as jest.Mock).mockResolvedValue(null);
+      await deleteUserBook(mockReq as AuthRequest, mockRes as Response, mockNext);
 
-      await removeUserBook(mockReq as AuthRequest, mockRes as Response);
-
-      expect(statusMock).toHaveBeenCalledWith(404);
-      expect(jsonMock).toHaveBeenCalledWith({
-        error: 'Book not found in your library',
-      });
+      expect(mockNext).toHaveBeenCalledWith(error);
     });
   });
 });

@@ -92,7 +92,6 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     logger.error('Auth middleware error:', { error: error.message, stack: error.stack });
     return res.status(500).json({
       message: 'Authentication error',
-      error: error.message,
     });
   }
 };
