@@ -95,6 +95,23 @@ export const handleJoin = (
 
       console.log('✅ Membership verified:', { userId, bookClubId, role: membership.role });
 
+      // Fetch user details from user service to get profile image
+      const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:3001/api';
+      let userProfileImage = message.profileImage || null;
+      
+      try {
+        const response = await fetch(`${userServiceUrl}/users/${userId}`);
+        if (response.ok) {
+          const userData: any = await response.json();
+          userProfileImage = userData.profileImage || null;
+          console.log('✅ Fetched user profile image:', userProfileImage);
+        } else {
+          console.warn('Failed to fetch user details, using profileImage from join message');
+        }
+      } catch (error) {
+        console.warn('Error fetching user details, using profileImage from join message:', error);
+      }
+
       // Track if this is a new member (for WebSocket purposes, this is always false since they must already be a member)
       const wasNewMember = false;
 
@@ -116,6 +133,7 @@ export const handleJoin = (
         id: clientId,
         userId: userId,
         username: username || 'Anonymous',
+        profileImage: userProfileImage,
         ws,
         bookClubId,
         roomId: targetRoomId
@@ -146,6 +164,7 @@ export const handleJoin = (
           content: true,
           userId: true,
           username: true,
+          profileImage: true,
           isPinned: true,
           deletedAt: true,
           deletedBy: true,
@@ -164,7 +183,6 @@ export const handleJoin = (
         select: { userId: true }
       });
 
-      const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:3001/api';
       let memberDetails = [];
       const memberIds = activeMembers.map(m => m.userId);
       
@@ -185,13 +203,25 @@ export const handleJoin = (
         console.error('Error fetching member details:', error);
       }
 
+      // Create a map of userId to user details for quick lookup
+      const userDetailsMap = new Map(memberDetails.map((user: any) => [user.id, user]));
+
+      // Enrich messages with profile images from user details
+      const enrichedMessages = recentMessages.map(msg => {
+        const userDetails = userDetailsMap.get(msg.userId);
+        return {
+          ...msg,
+          profileImage: msg.profileImage || userDetails?.profileImage || null
+        };
+      });
+
       // Send initial data to new user
       const initPayload = {
         type: 'init',
         clientId,
         bookClub,
         currentRoomId: targetRoomId,
-        messages: recentMessages,
+        messages: enrichedMessages,
         members: memberDetails,
         users: Array.from(activeClub.clients.values()).map(c => ({
           id: c.id,
@@ -305,6 +335,7 @@ export const handleChatMessage = (message: any, currentClient: Client | null) =>
       roomId: currentClient.roomId,
       userId: currentClient.userId,
       username: currentClient.username,
+      profileImage: currentClient.profileImage,
       content: message.message || null,
       attachments: message.attachments && message.attachments.length > 0 ? {
         connect: message.attachments.map((att: any) => ({ id: att.id }))
