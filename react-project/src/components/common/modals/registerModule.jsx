@@ -17,7 +17,17 @@ const RegisterModule = ({ onClose, onSwitchToLogin }) => {
         const errs = [];
         if (!form.name || form.name.trim().length < 3) errs.push('Name must be at least 3 characters');
         if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.push('Valid email is required');
-        if (!form.password || form.password.length < 8) errs.push('Password must be at least 8 characters');
+        
+        // Enhanced password validation
+        if (!form.password || form.password.length < 8) {
+            errs.push('Password must be at least 8 characters');
+        } else {
+            if (!/[A-Z]/.test(form.password)) errs.push('Password must contain at least one uppercase letter');
+            if (!/[a-z]/.test(form.password)) errs.push('Password must contain at least one lowercase letter');
+            if (!/[0-9]/.test(form.password)) errs.push('Password must contain at least one number');
+            if (!/[!@#$%^&*(),.?":{}|<>]/.test(form.password)) errs.push('Password must contain at least one special character');
+        }
+        
         return errs;
     };
 
@@ -205,6 +215,41 @@ const RegisterModule = ({ onClose, onSwitchToLogin }) => {
                             placeholder="Choose a strong password" 
                             className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none'
                         />
+                        
+                        {/* Password Requirements */}
+                        <div className="mt-2 space-y-1">
+                            <p className="text-xs font-medium text-gray-600">Password must contain:</p>
+                            <div className="flex items-center gap-2">
+                                <div className={`w-1.5 h-1.5 rounded-full ${form.password.length >= 8 ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                                <span className={`text-xs ${form.password.length >= 8 ? 'text-green-600' : 'text-gray-500'}`}>
+                                    At least 8 characters
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className={`w-1.5 h-1.5 rounded-full ${/[A-Z]/.test(form.password) ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                                <span className={`text-xs ${/[A-Z]/.test(form.password) ? 'text-green-600' : 'text-gray-500'}`}>
+                                    One uppercase letter
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className={`w-1.5 h-1.5 rounded-full ${/[a-z]/.test(form.password) ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                                <span className={`text-xs ${/[a-z]/.test(form.password) ? 'text-green-600' : 'text-gray-500'}`}>
+                                    One lowercase letter
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className={`w-1.5 h-1.5 rounded-full ${/[0-9]/.test(form.password) ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                                <span className={`text-xs ${/[0-9]/.test(form.password) ? 'text-green-600' : 'text-gray-500'}`}>
+                                    One number
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className={`w-1.5 h-1.5 rounded-full ${/[!@#$%^&*(),.?":{}|<>]/.test(form.password) ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                                <span className={`text-xs ${/[!@#$%^&*(),.?":{}|<>]/.test(form.password) ? 'text-green-600' : 'text-gray-500'}`}>
+                                    One special character (!@#$%^&*...)
+                                </span>
+                            </div>
+                        </div>
                     </div>
 
                     <button 

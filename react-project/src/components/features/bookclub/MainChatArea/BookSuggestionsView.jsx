@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { FiPlus, FiThumbsUp, FiThumbsDown, FiStar, FiTrash2 } from 'react-icons/fi';
 import SuggestBookModal from '../Modals/SuggestBookModal';
+import BookSuggestionDetailsModal from '../Modals/BookSuggestionDetailsModal';
 
 const BookSuggestionsView = ({ bookClubId, auth }) => {
   const [bookSuggestions, setBookSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showSuggestBook, setShowSuggestBook] = useState(false);
+  const [selectedSuggestion, setSelectedSuggestion] = useState(null);
 
   useEffect(() => {
     fetchBookSuggestions();
@@ -102,7 +104,8 @@ const BookSuggestionsView = ({ bookClubId, auth }) => {
             {bookSuggestions.map((suggestion) => (
               <div
                 key={suggestion.id}
-                className="bg-gray-800 rounded-lg p-5 border border-gray-700 hover:border-purple-500 transition-all"
+                onClick={() => setSelectedSuggestion(suggestion)}
+                className="bg-gray-800 rounded-lg p-5 border border-gray-700 hover:border-purple-500 transition-all cursor-pointer"
               >
                 {/* Book Cover and Info */}
                 <div className="flex gap-4 mb-4">
@@ -204,6 +207,18 @@ const BookSuggestionsView = ({ bookClubId, auth }) => {
           bookClubId={bookClubId}
           auth={auth}
           onBookSuggested={handleBookSuggested}
+        />
+      )}
+
+      {/* Book Suggestion Details Modal */}
+      {selectedSuggestion && (
+        <BookSuggestionDetailsModal
+          suggestion={selectedSuggestion}
+          bookClubId={bookClubId}
+          auth={auth}
+          onClose={() => setSelectedSuggestion(null)}
+          onDeleted={fetchBookSuggestions}
+          onVote={fetchBookSuggestions}
         />
       )}
     </div>

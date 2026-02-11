@@ -662,7 +662,15 @@ const BookClub = () => {
       bookClubDotMembers: bookClub?.members
     });
     
-    return bookClubMembers.map(member => {
+    // Filter out members who are not in bookClub.members (removed members)
+    const activeMembers = bookClubMembers.filter(member => {
+      // If we don't have bookClub.members yet, show all
+      if (!bookClub?.members) return true;
+      // Only show members who exist in the API response (ACTIVE status)
+      return bookClub.members.some(m => m.userId === member.id);
+    });
+    
+    return activeMembers.map(member => {
       // bookClubMembers from WebSocket has: id, username, email, profileImage
       // bookClub.members from API has: id, userId, role, bookClubId
       // Match by: bookClub.members.userId === bookClubMembers.id
