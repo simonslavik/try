@@ -12,6 +12,7 @@ interface User {
 interface TokenPayload {
     userId: string;
     email: string;
+    name: string;
 }
 
 interface Tokens {
@@ -34,7 +35,8 @@ export const generateTokens = async (user: User): Promise<Tokens> => {
     const accessToken = jwt.sign(
         {
             userId: user.id,
-            email: user.email
+            email: user.email,
+            name: user.name
         } as TokenPayload,
         process.env.JWT_SECRET!,
         { 
@@ -154,9 +156,9 @@ export const cleanupExpiredTokens = async (): Promise<number> => {
 /**
  * Generate access token (JWT) for a user
  */
-export const generateAccessToken = (userId: string): string => {
+export const generateAccessToken = (user: User): string => {
     return jwt.sign(
-        { userId } as TokenPayload,
+        { userId: user.id, email: user.email, name: user.name } as TokenPayload,
         process.env.JWT_SECRET!,
         { 
             expiresIn: process.env.JWT_EXPIRATION || DEFAULT_JWT_EXPIRATION 

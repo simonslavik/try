@@ -6,6 +6,7 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedBook, setSelectedBook] = useState(null);
   const [bookClubBooks, setBookClubBooks] = useState([]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -32,7 +33,11 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
 
   const fetchEvents = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/v1/editor/bookclubs/${bookClubId}/events`);
+      const response = await fetch(`http://localhost:3000/v1/editor/bookclubs/${bookClubId}/events`, {
+        headers: {
+          'Authorization': `Bearer ${auth?.token}`
+        }
+      });
       const data = await response.json();
       
       if (response.ok) {
@@ -286,6 +291,7 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
                       <div
                         key={book.id}
                         className={`text-xs p-1 rounded ${getBookStatusColor(book.status)} text-white cursor-pointer hover:opacity-80 transition-opacity border border-white border-opacity-30`}
+                        onClick={() => setSelectedBook({ ...book, clickedDate: date })}
                         title={`${book.book.title} - ${getBookStatusLabel(book, date)}`}
                       >
                         <div className="font-semibold truncate">
@@ -368,6 +374,71 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Book details modal */}
+      {selectedBook && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setSelectedBook(null)}>
+          <div className="bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4 border border-gray-700" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-white text-xl font-bold">{selectedBook.book.title}</h3>
+              <button
+                onClick={() => setSelectedBook(null)}
+                className="text-gray-400 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+
+            {selectedBook.book.thumbnail && (
+              <div className="flex justify-center mb-4">
+                <img
+                  src={selectedBook.book.thumbnail}
+                  alt={selectedBook.book.title}
+                  className="h-40 rounded shadow-lg"
+                />
+              </div>
+            )}
+
+            <div className="space-y-3">
+              {selectedBook.book.authors && (
+                <div>
+                  <span className="text-gray-400 text-sm">Author:</span>
+                  <div className="text-white">{selectedBook.book.authors}</div>
+                </div>
+              )}
+
+              <div>
+                <span className="text-gray-400 text-sm">Status:</span>
+                <div className={`inline-block ml-2 px-2 py-1 rounded text-xs ${getBookStatusColor(selectedBook.status)} text-white`}>
+                  {selectedBook.status?.charAt(0).toUpperCase() + selectedBook.status?.slice(1)}
+                </div>
+              </div>
+
+              {selectedBook.startDate && (
+                <div>
+                  <span className="text-gray-400 text-sm">Start Date:</span>
+                  <div className="text-white">
+                    {new Date(selectedBook.startDate).toLocaleDateString('en-US', {
+                      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {selectedBook.endDate && (
+                <div>
+                  <span className="text-gray-400 text-sm">Due Date:</span>
+                  <div className="text-white">
+                    {new Date(selectedBook.endDate).toLocaleDateString('en-US', {
+                      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
