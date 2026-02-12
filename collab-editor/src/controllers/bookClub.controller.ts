@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { BookClubService } from '../services/bookClub.service.js';
+import { BookClubService } from '../services/bookclub.service.js';
 import logger from '../utils/logger.js';
 import prisma from '../config/database.js';
 
@@ -33,7 +33,7 @@ export class BookClubController {
           );
 
           if (booksResponse.ok) {
-            const booksData = await booksResponse.json();
+            const booksData: any = await booksResponse.json();
             if (booksData.success && Array.isArray(booksData.currentBooks)) {
               booksData.currentBooks.forEach((item: any) => {
                 if (item.currentBook) {
@@ -161,7 +161,7 @@ export class BookClubController {
       if (error.message === 'REQUIRES_APPROVAL') {
         return res.status(400).json({ success: false, message: 'This club requires approval to join' });
       }
-      logger.error('ERROR_JOIN_CLUB', { error: error.message, clubId: id });
+      logger.error('ERROR_JOIN_CLUB', { error: error.message, clubId: req.params.id });
       res.status(500).json({ success: false, message: 'Failed to join club' });
     }
   }
@@ -191,7 +191,7 @@ export class BookClubController {
       if (error.message === 'INVITE_ONLY_CLUB') {
         return res.status(400).json({ success: false, message: 'This club is invite-only' });
       }
-      logger.error('ERROR_REQUEST_JOIN', { error: error.message, clubId: id });
+      logger.error('ERROR_REQUEST_JOIN', { error: error.message, clubId: req.params.id });
       res.status(500).json({ success: false, message: 'Failed to send join request' });
     }
   }
@@ -237,7 +237,7 @@ export class BookClubController {
       if (error.message === 'INSUFFICIENT_PERMISSIONS') {
         return res.status(403).json({ success: false, message: 'You do not have permission to approve requests' });
       }
-      logger.error('ERROR_APPROVE_REQUEST', { error: error.message, clubId: id, requestId });
+      logger.error('ERROR_APPROVE_REQUEST', { error: error.message, clubId: req.params.id, requestId: req.params.requestId });
       res.status(500).json({ success: false, message: 'Failed to approve request' });
     }
   }
@@ -263,7 +263,7 @@ export class BookClubController {
       if (error.message === 'INSUFFICIENT_PERMISSIONS') {
         return res.status(403).json({ success: false, message: 'You do not have permission to reject requests' });
       }
-      logger.error('ERROR_REJECT_REQUEST', { error: error.message, clubId: id, requestId });
+      logger.error('ERROR_REJECT_REQUEST', { error: error.message, clubId: req.params.id, requestId: req.params.requestId });
       res.status(500).json({ success: false, message: 'Failed to reject request' });
     }
   }
@@ -286,7 +286,7 @@ export class BookClubController {
       if (error.message === 'OWNER_MUST_TRANSFER_OWNERSHIP') {
         return res.status(400).json({ success: false, message: 'You must transfer ownership before leaving' });
       }
-      logger.error('ERROR_LEAVE_CLUB', { error: error.message, clubId: id });
+      logger.error('ERROR_LEAVE_CLUB', { error: error.message, clubId: req.params.id });
       res.status(500).json({ success: false, message: 'Failed to leave club' });
     }
   }
@@ -310,7 +310,7 @@ export class BookClubController {
       if (error.message === 'INSUFFICIENT_PERMISSIONS') {
         return res.status(403).json({ success: false, message: 'You must be a member to get invite links' });
       }
-      logger.error('ERROR_GET_SHAREABLE_INVITE', { error: error.message, clubId: id });
+      logger.error('ERROR_GET_SHAREABLE_INVITE', { error: error.message, clubId: req.params.id });
       res.status(500).json({ success: false, message: 'Failed to get invite' });
     }
   }
@@ -333,7 +333,7 @@ export class BookClubController {
       if (error.message === 'INSUFFICIENT_PERMISSIONS') {
         return res.status(403).json({ success: false, message: 'You do not have permission to delete invites' });
       }
-      logger.error('ERROR_DELETE_INVITE', { error: error.message, clubId: id, inviteId });
+      logger.error('ERROR_DELETE_INVITE', { error: error.message, clubId: req.params.id, inviteId: req.params.inviteId });
       res.status(500).json({ success: false, message: 'Failed to delete invite' });
     }
   }
@@ -365,7 +365,7 @@ export class BookClubController {
       if (error.message === 'BANNED_FROM_CLUB') {
         return res.status(403).json({ success: false, message: 'You are banned from this club' });
       }
-      logger.error('ERROR_JOIN_BY_INVITE', { error: error.message, code });
+      logger.error('ERROR_JOIN_BY_INVITE', { error: error.message, code: req.params.code });
       res.status(500).json({ success: false, message: 'Failed to join via invite' });
     }
   }
@@ -391,7 +391,7 @@ export class BookClubController {
       if (error.message === 'INSUFFICIENT_PERMISSIONS') {
         return res.status(403).json({ success: false, message: 'You do not have permission to remove members' });
       }
-      logger.error('ERROR_REMOVE_MEMBER', { error: error.message, clubId: id });
+      logger.error('ERROR_REMOVE_MEMBER', { error: error.message, clubId: req.params.id });
       res.status(500).json({ success: false, message: 'Failed to remove member' });
     }
   }
@@ -418,7 +418,7 @@ export class BookClubController {
       if (error.message === 'INSUFFICIENT_PERMISSIONS') {
         return res.status(403).json({ success: false, message: 'You do not have permission to change roles' });
       }
-      logger.error('ERROR_UPDATE_ROLE', { error: error.message, clubId: id });
+      logger.error('ERROR_UPDATE_ROLE', { error: error.message, clubId: req.params.id });
       res.status(500).json({ success: false, message: 'Failed to update role' });
     }
   }
@@ -446,7 +446,7 @@ export class BookClubController {
       if (error.message === 'INSUFFICIENT_PERMISSIONS') {
         return res.status(403).json({ success: false, message: 'You do not have permission to update this club' });
       }
-      logger.error('ERROR_UPDATE_CLUB', { error: error.message, clubId: id });
+      logger.error('ERROR_UPDATE_CLUB', { error: error.message, clubId: req.params.id });
       res.status(500).json({ success: false, message: 'Failed to update club' });
     }
   }
@@ -466,7 +466,7 @@ export class BookClubController {
       if (error.message === 'INSUFFICIENT_PERMISSIONS') {
         return res.status(403).json({ success: false, message: 'Only the owner can delete this club' });
       }
-      logger.error('ERROR_DELETE_CLUB', { error: error.message, clubId: id });
+      logger.error('ERROR_DELETE_CLUB', { error: error.message, clubId: req.params.id });
       res.status(500).json({ success: false, message: 'Failed to delete club' });
     }
   }
