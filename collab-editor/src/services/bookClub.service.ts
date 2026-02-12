@@ -118,7 +118,7 @@ export class BookClubService {
         });
         
         if (userResponse.ok) {
-          const userData = await userResponse.json();
+          const userData: any = await userResponse.json();
           if (userData.success && Array.isArray(userData.users)) {
             userMap = new Map(userData.users.map((u: any) => [u.id, u]));
           }
@@ -239,7 +239,7 @@ export class BookClubService {
     // Always include creator in the list even if not in members table
     const memberUserIds = club.members.map(m => m.userId);
     const allUserIds = new Set([...memberUserIds, club.creatorId]);
-    let membersWithDetails = [];
+    let membersWithDetails: any[] = [];
 
     logger.info('FETCHING_MEMBER_DETAILS', { 
       clubId, 
@@ -264,9 +264,9 @@ export class BookClubService {
         logger.info('USER_SERVICE_RESPONSE', { status: response.status, ok: response.ok });
 
         if (response.ok) {
-          const userData = await response.json();
+          const userData: any = await response.json();
           logger.info('USER_DATA_RECEIVED', { userCount: userData.users?.length, rawData: userData });
-          const userMap = new Map(userData.users.map((u: any) => [u.id, u]));
+          const userMap: Map<string, any> = new Map(userData.users.map((u: any) => [u.id, u]));
           
           // Map existing members with their details
           membersWithDetails = club.members.map(member => {
@@ -546,7 +546,7 @@ export class BookClubService {
         });
         
         if (userResponse.ok) {
-          const userData = await userResponse.json();
+          const userData: any = await userResponse.json();
           if (userData.success && Array.isArray(userData.users)) {
             userMap = new Map(userData.users.map((u: any) => [u.id, u]));
           }
@@ -849,7 +849,7 @@ export class BookClubService {
     data: {
       name?: string;
       description?: string;
-      imageUrl?: string;
+      imageUrl?: string | null;
       category?: string;
       visibility?: ClubVisibility;
       requiresApproval?: boolean;
