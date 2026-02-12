@@ -8,6 +8,7 @@ declare global {
             user?: {
                 userId: string;
                 email: string;
+                name?: string;
             };
         }
     }
@@ -18,12 +19,14 @@ export interface AuthRequest extends Request {
     user?: {
         userId: string;
         email: string;
+        name?: string;
     };
 }
 
 interface TokenPayload {
     userId: string;
     email: string;
+    name?: string;
     iat: number;
     exp: number;
 }
@@ -68,7 +71,8 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         // Attach user info to request
         req.user = {
             userId: decoded.userId,
-            email: decoded.email
+            email: decoded.email,
+            name: decoded.name
         };
 
         next();
@@ -118,7 +122,8 @@ export const optionalAuthMiddleware = async (req: Request, res: Response, next: 
 
         req.user = {
             userId: decoded.userId,
-            email: decoded.email
+            email: decoded.email,
+            name: decoded.name
         };
 
         next();

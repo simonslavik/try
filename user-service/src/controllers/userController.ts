@@ -79,7 +79,7 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
         }
 
         // Generate new tokens
-        const newAccessToken = generateAccessToken(user.id);
+        const newAccessToken = generateAccessToken(user);
         const newRefreshToken = generateRefreshToken(user.id);
 
         logger.info({

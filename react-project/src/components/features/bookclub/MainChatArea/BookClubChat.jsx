@@ -32,7 +32,9 @@ const linkifyText = (text) => {
 
 // Function to format timestamp smartly
 const formatTimestamp = (timestamp) => {
+  if (!timestamp) return '';
   const messageDate = new Date(timestamp);
+  if (isNaN(messageDate.getTime())) return '';
   const today = new Date();
   
   // Check if message is from today
@@ -58,7 +60,18 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
 
     // Helper function to check if messages should be grouped
     const shouldGroupMessages = (currentMsg, previousMsg, nextMsg) => {
-      if (!previousMsg || !currentMsg) return { groupWithPrevious: false, isLastInGroup: true };
+      if (!currentMsg) return { groupWithPrevious: false, isLastInGroup: true };
+
+      // First message — can't group with previous, but check if next groups with it
+      if (!previousMsg) {
+        let isLastInGroup = true;
+        if (nextMsg && nextMsg.type !== 'system' && nextMsg.userId === currentMsg.userId) {
+          const currentTime = new Date(currentMsg.timestamp).getTime();
+          const nextTime = new Date(nextMsg.timestamp).getTime();
+          isLastInGroup = (nextTime - currentTime) > 300000;
+        }
+        return { groupWithPrevious: false, isLastInGroup };
+      }
       
       // Don't group system messages or deleted messages
       if (currentMsg.type === 'system' || previousMsg.type === 'system') {
@@ -192,8 +205,6 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
                       </div>
                     ) : (
                       <>
-                        {/* Debug: Log message data */}
-                        {console.log('Message:', msg.id, 'Text:', msg.text, 'ProfileImage:', msg.profileImage, 'Attachments:', msg.attachments, 'DeletedAt:', msg.deletedAt, 'Type of deletedAt:', typeof msg.deletedAt)}
                         {msg.userId === auth?.user?.id ? (
                           <div className="flex gap-3 justify-end group">
                             <div className="text-right max-w-md self-end relative">
