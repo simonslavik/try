@@ -138,6 +138,7 @@ model Message {
 
   @@index([roomId, createdAt])
   @@index([roomId, isPinned])
+  @@index([userId])
   @@map("messages")
 }
 
@@ -173,6 +174,7 @@ model BookClubEvent {
   updatedAt   DateTime @updatedAt
 
   @@index([bookClubId, eventDate])
+  @@index([createdBy])
   @@map("bookclub_events")
 }
 

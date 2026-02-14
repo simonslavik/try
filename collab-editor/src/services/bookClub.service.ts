@@ -101,7 +101,8 @@ export class BookClubService {
           }
         }
       },
-      orderBy: { lastActiveAt: 'desc' }
+      orderBy: { lastActiveAt: 'desc' },
+      take: 50
     });
 
     // Fetch user details from user-service for member avatars

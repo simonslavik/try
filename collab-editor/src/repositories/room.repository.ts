@@ -23,10 +23,11 @@ export class RoomRepository {
   /**
    * Find all rooms for a book club
    */
-  static async findByBookClub(bookClubId: string) {
+  static async findByBookClub(bookClubId: string, take = 50) {
     return prisma.room.findMany({
       where: { bookClubId },
-      orderBy: { createdAt: 'asc' }
+      orderBy: { createdAt: 'asc' },
+      take
     });
   }
 

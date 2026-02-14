@@ -167,7 +167,8 @@ export const handleJoin = (
           bookClubId: bookClubId,
           status: MembershipStatus.ACTIVE
         },
-        select: { userId: true }
+        select: { userId: true },
+        take: 200
       });
 
       let memberDetails = [];
