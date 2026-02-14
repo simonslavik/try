@@ -29,10 +29,11 @@ export class EventRepository {
   /**
    * Find all events for a book club
    */
-  static async findByBookClub(bookClubId: string) {
+  static async findByBookClub(bookClubId: string, take = 100) {
     return prisma.bookClubEvent.findMany({
       where: { bookClubId },
-      orderBy: { eventDate: 'asc' }
+      orderBy: { eventDate: 'asc' },
+      take
     });
   }
 

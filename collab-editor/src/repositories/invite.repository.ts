@@ -13,10 +13,11 @@ export class InviteRepository {
   /**
    * Find invites for a book club
    */
-  static async findByBookClub(bookClubId: string) {
+  static async findByBookClub(bookClubId: string, take = 50) {
     return prisma.bookClubInvite.findMany({
       where: { bookClubId },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
+      take
     });
   }
 

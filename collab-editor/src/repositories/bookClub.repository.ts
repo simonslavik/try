@@ -92,10 +92,11 @@ export class BookClubRepository {
   /**
    * Find book clubs by creator
    */
-  static async findByCreator(creatorId: string) {
+  static async findByCreator(creatorId: string, take = 50) {
     return prisma.bookClub.findMany({
       where: { creatorId },
-      orderBy: { updatedAt: 'desc' }
+      orderBy: { updatedAt: 'desc' },
+      take
     });
   }
 
