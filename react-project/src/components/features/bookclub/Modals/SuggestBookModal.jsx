@@ -196,11 +196,13 @@ const SuggestBookModal = ({ isOpen, onClose, bookClubId, auth, onBookSuggested }
           <textarea
             id="reason"
             value={reason}
-            onChange={(e) => setReason(e.target.value)}
+            onChange={(e) => setReason(e.target.value.slice(0, 200))}
+            maxLength={200}
             placeholder="e.g., Great characters, fits our theme, highly recommended..."
             rows={3}
             className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
           />
+          <p className="text-xs text-gray-500 text-right mt-1">{reason.length}/200</p>
         </div>
 
         {/* Action Buttons */}

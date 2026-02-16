@@ -110,8 +110,8 @@ exports.createSuggestionSchema = joi_1.default.object({
     googleBooksId: joi_1.default.string().required().messages({
         'any.required': 'Google Books ID is required',
     }),
-    reason: joi_1.default.string().max(1000).optional().allow('').messages({
-        'string.max': 'Reason cannot exceed 1000 characters',
+    reason: joi_1.default.string().max(200).optional().allow('').messages({
+        'string.max': 'Reason cannot exceed 200 characters',
     }),
 });
 exports.voteSuggestionSchema = joi_1.default.object({
