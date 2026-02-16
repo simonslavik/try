@@ -93,7 +93,8 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId) =>
                 isPinned: msg.isPinned,
                 deletedAt: msg.deletedAt,
                 deletedBy: msg.deletedBy,
-                attachments: msg.attachments || []
+                attachments: msg.attachments || [],
+                reactions: msg.reactions || []
               })));
               setConnectedUsers(data.users || []);
               if (data.members) {
@@ -112,7 +113,8 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId) =>
                 isPinned: data.message.isPinned || false,
                 deletedAt: data.message.deletedAt,
                 deletedBy: data.message.deletedBy,
-                attachments: data.message.attachments || []
+                attachments: data.message.attachments || [],
+                reactions: data.message.reactions || []
               }]);
               break;
             
@@ -146,10 +148,24 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId) =>
               setMessages(data.messages.map(msg => ({
                 id: msg.id,
                 username: msg.username,
+                profileImage: msg.profileImage,
                 text: msg.content,
                 timestamp: msg.createdAt,
-                userId: msg.userId
+                userId: msg.userId,
+                isPinned: msg.isPinned,
+                deletedAt: msg.deletedAt,
+                deletedBy: msg.deletedBy,
+                attachments: msg.attachments || [],
+                reactions: msg.reactions || []
               })));
+              break;
+            
+            case 'reaction-updated':
+              setMessages(prev => prev.map(msg =>
+                msg.id === data.messageId
+                  ? { ...msg, reactions: data.reactions }
+                  : msg
+              ));
               break;
             
             case 'error':
