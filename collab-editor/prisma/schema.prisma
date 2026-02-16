@@ -135,11 +135,27 @@ model Message {
   deletedBy    String? // User ID who deleted the message
   createdAt    DateTime   @default(now())
   attachments  ChatFile[]
+  reactions    Reaction[]
 
   @@index([roomId, createdAt])
   @@index([roomId, isPinned])
   @@index([userId])
   @@map("messages")
+}
+
+// Reaction model - emoji reactions on messages (like Slack/Discord)
+model Reaction {
+  id        String   @id @default(uuid())
+  messageId String
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  userId    String // User ID from user-service
+  emoji     String // Unicode emoji character: "👍", "❤️", etc.
+  createdAt DateTime @default(now())
+
+  @@unique([messageId, userId, emoji]) // One reaction per emoji per user per message
+  @@index([messageId])
+  @@index([userId])
+  @@map("reactions")
 }
 
 // ChatFile model - stores uploaded files/images in chat

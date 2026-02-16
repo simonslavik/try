@@ -11,6 +11,7 @@ import {
   activeDMClients, 
   broadcastToBookClub 
 } from './types.js';
+import { getReactionsForMessages } from './reactionHandler.js';
 
 export const handleJoin = (
   ws: WebSocket,
@@ -202,11 +203,15 @@ export const handleJoin = (
       }
 
       // Enrich messages with profile images from user details
+      const messageIds = recentMessages.map(msg => msg.id);
+      const reactionsMap = await getReactionsForMessages(messageIds);
+
       const enrichedMessages = recentMessages.map(msg => {
         const userDetails = userDetailsMap.get(msg.userId);
         return {
           ...msg,
-          profileImage: msg.profileImage || userDetails?.profileImage || null
+          profileImage: msg.profileImage || userDetails?.profileImage || null,
+          reactions: reactionsMap.get(msg.id) || []
         };
       });
 
@@ -290,6 +295,7 @@ export const handleSwitchRoom = (message: any, currentClient: Client | null) => 
           content: true,
           userId: true,
           username: true,
+          profileImage: true,
           isPinned: true,
           deletedAt: true,
           deletedBy: true,
@@ -298,11 +304,19 @@ export const handleSwitchRoom = (message: any, currentClient: Client | null) => 
         }
       });
 
+      // Attach reactions to messages
+      const messageIds = messages.map(msg => msg.id);
+      const reactionsMap = await getReactionsForMessages(messageIds);
+      const messagesWithReactions = messages.map(msg => ({
+        ...msg,
+        reactions: reactionsMap.get(msg.id) || []
+      }));
+
       // Send room data to user
       currentClient.ws.send(JSON.stringify({
         type: 'room-switched',
         roomId,
-        messages
+        messages: messagesWithReactions
       }));
 
       console.log(`🔄 ${currentClient.username} switched to room ${roomId}`);
@@ -344,7 +358,7 @@ export const handleChatMessage = (message: any, currentClient: Client | null) =>
     // Broadcast chat message to all users in the SAME ROOM (including sender)
     const chatData = {
       type: 'chat-message',
-      message: savedMessage
+      message: { ...savedMessage, reactions: [] }
     };
 
     activeClub.clients.forEach((client) => {

@@ -11,6 +11,7 @@ import {
   handlePinMessage,
   handleDisconnect
 } from './handlers.js';
+import { handleAddReaction, handleRemoveReaction } from './reactionHandler.js';
 
 const MAX_MESSAGE_LENGTH = 4000;
 const RATE_LIMIT_WINDOW_MS = 5000;
@@ -98,6 +99,14 @@ export const setupWebSocket = (wss: WebSocketServer) => {
           
           case 'pin-message':
             handlePinMessage(message, currentClient);
+            break;
+          
+          case 'add-reaction':
+            if (currentClient) handleAddReaction(currentClient, message);
+            break;
+          
+          case 'remove-reaction':
+            if (currentClient) handleRemoveReaction(currentClient, message);
             break;
           
           default:
