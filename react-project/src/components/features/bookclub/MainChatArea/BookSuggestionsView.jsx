@@ -96,7 +96,7 @@ const BookSuggestionsView = ({ bookClubId, auth }) => {
               <div
                 key={suggestion.id}
                 onClick={() => setSelectedSuggestion(suggestion)}
-                className="bg-gray-800 rounded-lg p-5 border border-gray-700 hover:border-purple-500 transition-all cursor-pointer"
+                className="bg-gray-800 rounded-lg p-5 border border-gray-700 hover:border-purple-500 transition-all cursor-pointer overflow-hidden"
               >
                 {/* Book Cover and Info */}
                 <div className="flex gap-4 mb-4">
@@ -163,9 +163,10 @@ const BookSuggestionsView = ({ bookClubId, auth }) => {
 
                 {/* Book Description (if available) */}
                 {suggestion.book?.description && (
-                  <div className="mt-4 pt-4 border-t border-gray-700">
-                    <p className="text-gray-400 text-xs line-clamp-3">
-                      {suggestion.book.description}
+                  <div className="mt-4 pt-4 border-t border-gray-700 max-h-24 overflow-hidden">
+                    <p className="text-gray-400 text-xs break-words">
+                      {suggestion.book.description.slice(0, 150)}
+                      {suggestion.book.description.length > 150 && '…'}
                     </p>
                   </div>
                 )}
