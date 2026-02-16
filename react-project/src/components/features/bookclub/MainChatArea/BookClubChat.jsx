@@ -6,6 +6,8 @@ import MessageAttachment from '../../../common/MessageAttachment';
 import { messageModerationAPI } from '@api/messageModeration.api';
 import { getProfileImageUrl } from '@config/constants';
 import logger from '@utils/logger';
+import ReactionPicker from '../chat/ReactionPicker';
+import ReactionBar from '../chat/ReactionBar';
 
 // Function to convert URLs in text to clickable links
 const linkifyText = (text) => {
@@ -140,7 +142,7 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
         setMessages(prevMessages => 
           prevMessages.map(msg => 
             msg.id === messageId 
-              ? { ...msg, text: '[Message deleted]', deletedAt: new Date().toISOString(), attachments: [], isPinned: false }
+              ? { ...msg, text: '[Message deleted]', deletedAt: new Date().toISOString(), attachments: [], isPinned: false, reactions: [] }
               : msg
           )
         );
@@ -185,6 +187,24 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
       setMessageMenuId(messageMenuId === messageId ? null : messageId);
     };
 
+    const handleToggleReaction = (messageId, emoji, hasReacted) => {
+      if (!ws?.current || ws.current.readyState !== WebSocket.OPEN) return;
+      ws.current.send(JSON.stringify({
+        type: hasReacted ? 'remove-reaction' : 'add-reaction',
+        messageId,
+        emoji,
+      }));
+    };
+
+    // Helper to find the current user's reaction emoji on a message
+    const getUserReactionEmoji = (reactions) => {
+      if (!reactions || !auth?.user?.id) return null;
+      for (const r of reactions) {
+        if (r.userIds.includes(auth.user.id)) return r.emoji;
+      }
+      return null;
+    };
+
     return (
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {messages.length === 0 ? (
@@ -221,13 +241,22 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
                                   <p className="text-white break-words font-medium">{msg.text ? linkifyText(msg.text) : ''}</p>
                                 </div>
                               )}
-                              {!msg.deletedAt && (canModerate || msg.userId === auth?.user?.id) && (
-                                <button
-                                  onClick={(e) => toggleMessageMenu(msg.id, e)}
-                                  className="absolute -left-8 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-gray-700/80 hover:bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                  <FiMoreVertical className="w-4 h-4 text-gray-300" />
-                                </button>
+                              {!msg.deletedAt && (
+                                <div className="absolute -left-16 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+                                  <ReactionPicker
+                                    onSelectEmoji={(emoji, isAlreadySelected) => handleToggleReaction(msg.id, emoji, isAlreadySelected)}
+                                    position="top"
+                                    currentUserEmoji={getUserReactionEmoji(msg.reactions)}
+                                  />
+                                  {(canModerate || msg.userId === auth?.user?.id) && (
+                                    <button
+                                      onClick={(e) => toggleMessageMenu(msg.id, e)}
+                                      className="p-1.5 rounded-lg bg-gray-700/80 hover:bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                      <FiMoreVertical className="w-4 h-4 text-gray-300" />
+                                    </button>
+                                  )}
+                                </div>
                               )}
                               {messageMenuId === msg.id && (
                                 <div ref={menuRef} className="absolute left-[-85px] top-[80%] mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 min-w-[160px]">
@@ -257,6 +286,13 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
                                   ))}
                                 </div>
                               ) : null}
+                              <div className="flex justify-end">
+                                <ReactionBar
+                                  reactions={msg.reactions}
+                                  currentUserId={auth?.user?.id}
+                                  onToggleReaction={(emoji, hasReacted) => handleToggleReaction(msg.id, emoji, hasReacted)}
+                                />
+                              </div>
                               {isLastInGroup && (
                                 <span className="text-xs text-gray-500 block text-right mt-1">
                                   {formatTimestamp(msg.timestamp)}
@@ -295,6 +331,11 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
                                   </div>
                                 ) : null}
                               </div>
+                              <ReactionBar
+                                reactions={msg.reactions}
+                                currentUserId={auth?.user?.id}
+                                onToggleReaction={(emoji, hasReacted) => handleToggleReaction(msg.id, emoji, hasReacted)}
+                              />
                               {isLastInGroup && showFullDateId === msg.id && (
                                 <span className="text-xs text-gray-500 block mt-1">
                                   {new Date(msg.timestamp).toLocaleString()}
@@ -305,10 +346,19 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
                                   {formatTimestamp(msg.timestamp)}
                                 </span>
                               )}
-                              {(canModerate || msg.userId === auth?.user?.id) && !msg.deletedAt && (
-                                <button onClick={(e) => toggleMessageMenu(msg.id, e)} className="absolute -right-8 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-gray-700/80 hover:bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <FiMoreVertical className="w-4 h-4 text-gray-300" />
-                                </button>
+                              {!msg.deletedAt && (
+                                <div className="absolute -right-16 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+                                  <ReactionPicker
+                                    onSelectEmoji={(emoji, isAlreadySelected) => handleToggleReaction(msg.id, emoji, isAlreadySelected)}
+                                    position="top"
+                                    currentUserEmoji={getUserReactionEmoji(msg.reactions)}
+                                  />
+                                  {(canModerate || msg.userId === auth?.user?.id) && (
+                                    <button onClick={(e) => toggleMessageMenu(msg.id, e)} className="p-1.5 rounded-lg bg-gray-700/80 hover:bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                                      <FiMoreVertical className="w-4 h-4 text-gray-300" />
+                                    </button>
+                                  )}
+                                </div>
                               )}
                               {messageMenuId === msg.id && (canModerate || msg.userId === auth?.user?.id) && (
                                 <div ref={menuRef} className="absolute right-0 top-1/2 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 min-w-[160px]">

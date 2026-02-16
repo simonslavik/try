@@ -1,6 +1,7 @@
 import React from 'react';
 import FileUpload from '../../common/FileUpload';
 import logger from '@utils/logger';
+import EmojiPickerButton from './chat/EmojiPickerButton';
 
 const MessageInput = ({ 
   newMessage,
@@ -13,17 +14,22 @@ const MessageInput = ({
   onSubmit,
   auth
 }) => {
+  const handleEmojiInsert = (emoji) => {
+    setNewMessage((prev) => prev + emoji);
+  };
+
   return (
     <form onSubmit={onSubmit} className="bg-gray-800 border-t border-gray-700 relative">
       {/* File Upload Preview */}
       
-      <div className="flex gap-2 p-4">
+      <div className="flex gap-2 p-4 items-center">
         <FileUpload 
         ref={fileUploadRef}
         onFilesSelected={onFilesSelected} 
         auth={auth}
         disabled={!currentRoom}
         />
+        <EmojiPickerButton onEmojiSelect={handleEmojiInsert} />
         <input
           type="text"
           value={newMessage}
