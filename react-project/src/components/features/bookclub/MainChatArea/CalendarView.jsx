@@ -208,12 +208,7 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
           </button>
         </div>
         <div className="flex gap-2">
-          <button
-            onClick={handleToday}
-            className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors text-sm"
-          >
-            Today
-          </button>
+          
           {auth?.user && (
             <button
               onClick={() => onAddEvent && onAddEvent()}

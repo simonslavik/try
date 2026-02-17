@@ -35,6 +35,12 @@ export class BookClubBooksRepository {
               createdAt: true,
             },
           },
+          ratings: {
+            select: {
+              userId: true,
+              rating: true,
+            },
+          },
         },
         orderBy: { createdAt: 'desc' },
         ...(skip !== undefined && { skip }),

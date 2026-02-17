@@ -141,6 +141,20 @@ export const acceptSuggestionSchema = joi.object({
 });
 
 // ========================
+// Book Club Book Rating Schema
+// ========================
+
+export const rateBookClubBookSchema = joi.object({
+  rating: joi.number().integer().min(1).max(5).required().messages({
+    'any.required': 'Rating is required',
+    'number.base': 'Rating must be a number',
+    'number.integer': 'Rating must be a whole number',
+    'number.min': 'Rating must be at least 1',
+    'number.max': 'Rating cannot exceed 5',
+  }),
+});
+
+// ========================
 // Book Search Schemas
 // ========================
 

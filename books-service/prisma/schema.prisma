@@ -67,6 +67,7 @@ model BookClubBook {
 
   readingProgress ReadingProgress[]
   reviews         BookClubBookReview[]
+  ratings         BookClubBookRating[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -75,6 +76,22 @@ model BookClubBook {
   @@index([bookClubId])
   @@index([status])
   @@index([bookClubId, status])
+}
+
+model BookClubBookRating {
+  id             String @id @default(uuid())
+  bookClubBookId String
+  userId         String
+  rating         Int // 1-5 stars
+
+  bookClubBook BookClubBook @relation(fields: [bookClubBookId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([bookClubBookId, userId])
+  @@index([bookClubBookId])
+  @@index([userId])
 }
 
 model UserBook {

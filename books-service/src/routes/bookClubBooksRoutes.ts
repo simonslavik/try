@@ -8,8 +8,11 @@ import {
   addBookForBookClubSchema,
   updateBookClubBookSchema,
   batchCurrentBooksSchema,
+  bookClubBookIdParamSchema,
+  rateBookClubBookSchema,
 } from '../utils/validation';
 import * as bookClubBooksController from '../controllers/bookClubBooksController';
+import * as bookClubBookRatingController from '../controllers/bookClubBookRatingController';
 
 const router = Router();
 
@@ -50,6 +53,32 @@ router.delete(
   requireBookClubRole('MODERATOR'),
   validate({ params: bookClubIdParamSchema }),
   bookClubBooksController.deleteBookClubBook
+);
+
+// ====== Book Rating Routes (any authenticated member) ======
+
+// Rate a bookclub book
+router.post(
+  '/:bookClubId/books/:bookClubBookId/rate',
+  authMiddleware,
+  validate({ params: bookClubBookIdParamSchema, body: rateBookClubBookSchema }),
+  bookClubBookRatingController.rateBookClubBook
+);
+
+// Remove rating from a bookclub book
+router.delete(
+  '/:bookClubId/books/:bookClubBookId/rate',
+  authMiddleware,
+  validate({ params: bookClubBookIdParamSchema }),
+  bookClubBookRatingController.removeBookClubBookRating
+);
+
+// Get rating info for a bookclub book
+router.get(
+  '/:bookClubId/books/:bookClubBookId/rating',
+  authMiddleware,
+  validate({ params: bookClubBookIdParamSchema }),
+  bookClubBookRatingController.getBookClubBookRating
 );
 
 export default router;

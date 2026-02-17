@@ -263,6 +263,47 @@ const BookClub = () => {
     }
   };
 
+  // Rate a bookclub book
+  const handleRateBook = async (bookClubBookId, rating) => {
+    if (!auth?.token) return;
+    
+    try {
+      const response = await apiClient.post(
+        `/v1/bookclub/${bookClubId}/books/${bookClubBookId}/rate`,
+        { rating }
+      );
+      
+      if (response.data.success) {
+        // Refresh books to update rating display
+        fetchBookclubBooks();
+      }
+    } catch (err) {
+      logger.error('Error rating book:', err);
+      alert('Failed to rate book');
+      throw err;
+    }
+  };
+
+  // Remove rating from a bookclub book
+  const handleRemoveRating = async (bookClubBookId) => {
+    if (!auth?.token) return;
+    
+    try {
+      const response = await apiClient.delete(
+        `/v1/bookclub/${bookClubId}/books/${bookClubBookId}/rate`
+      );
+      
+      if (response.data.success) {
+        // Refresh books to update rating display
+        fetchBookclubBooks();
+      }
+    } catch (err) {
+      logger.error('Error removing rating:', err);
+      alert('Failed to remove rating');
+      throw err;
+    }
+  };
+
   // Fetch bookclub details
   useEffect(() => {
     const fetchBookClub = async () => {
@@ -971,7 +1012,16 @@ const BookClub = () => {
                     <p>Loading books...</p>
                   </div>
                 ) : (
-                  <BookClubBookView setShowAddBookModal={setShowAddBookModal} bookclubBooks={bookclubBooks} setCurrentBookData={setCurrentBookData} setCurrentBookDetailsOpen={setCurrentBookDetailsOpen} handleStatusChange={handleStatusChange} />
+                  <BookClubBookView 
+                    setShowAddBookModal={setShowAddBookModal} 
+                    bookclubBooks={bookclubBooks} 
+                    setCurrentBookData={setCurrentBookData} 
+                    setCurrentBookDetailsOpen={setCurrentBookDetailsOpen} 
+                    handleStatusChange={handleStatusChange}
+                    onRateBook={handleRateBook}
+                    onRemoveRating={handleRemoveRating}
+                    currentUserId={auth?.user?.id}
+                  />
                 )}
               </div>
             ) : (
