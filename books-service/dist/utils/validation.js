@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.paginationSchema = exports.googleBooksIdParamSchema = exports.suggestionIdParamSchema = exports.userBookIdParamSchema = exports.bookClubBookIdParamSchema = exports.bookIdParamSchema = exports.bookClubIdParamSchema = exports.searchQuerySchema = exports.acceptSuggestionSchema = exports.voteSuggestionSchema = exports.createSuggestionSchema = exports.bookClubBookReviewSchema = exports.postsBookProgressSchema = exports.batchCurrentBooksSchema = exports.updateBookClubBookSchema = exports.addBookForBookClubSchema = exports.updateBookSchema = exports.addBookSchema = void 0;
+exports.paginationSchema = exports.googleBooksIdParamSchema = exports.suggestionIdParamSchema = exports.userBookIdParamSchema = exports.bookClubBookIdParamSchema = exports.bookIdParamSchema = exports.bookClubIdParamSchema = exports.searchQuerySchema = exports.rateBookClubBookSchema = exports.acceptSuggestionSchema = exports.voteSuggestionSchema = exports.createSuggestionSchema = exports.bookClubBookReviewSchema = exports.postsBookProgressSchema = exports.batchCurrentBooksSchema = exports.updateBookClubBookSchema = exports.addBookForBookClubSchema = exports.updateBookSchema = exports.addBookSchema = void 0;
 const joi_1 = __importDefault(require("joi"));
 // ========================
 // User Books Schemas
@@ -129,6 +129,18 @@ exports.acceptSuggestionSchema = joi_1.default.object({
         'date.base': 'End date must be a valid date',
         'date.greater': 'End date must be after start date',
         'any.required': 'End date is required',
+    }),
+});
+// ========================
+// Book Club Book Rating Schema
+// ========================
+exports.rateBookClubBookSchema = joi_1.default.object({
+    rating: joi_1.default.number().integer().min(1).max(5).required().messages({
+        'any.required': 'Rating is required',
+        'number.base': 'Rating must be a number',
+        'number.integer': 'Rating must be a whole number',
+        'number.min': 'Rating must be at least 1',
+        'number.max': 'Rating cannot exceed 5',
     }),
 });
 // ========================
