@@ -12,6 +12,7 @@ import {
   broadcastToBookClub 
 } from './types.js';
 import { getReactionsForMessages } from './reactionHandler.js';
+import { extractMentions, isEveryoneMentioned } from '../utils/mentionParser.js';
 
 export const handleJoin = (
   ws: WebSocket,
@@ -355,10 +356,16 @@ export const handleChatMessage = (message: any, currentClient: Client | null) =>
     }
   })
   .then((savedMessage) => {
+    // Extract mentions from message content
+    const mentionedUserIds = extractMentions(savedMessage.content || '');
+    const mentionsEveryone = isEveryoneMentioned(savedMessage.content || '');
+
     // Broadcast chat message to all users in the SAME ROOM (including sender)
     const chatData = {
       type: 'chat-message',
-      message: { ...savedMessage, reactions: [] }
+      message: { ...savedMessage, reactions: [] },
+      mentions: mentionedUserIds,
+      mentionsEveryone
     };
 
     activeClub.clients.forEach((client) => {
