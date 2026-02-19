@@ -390,8 +390,12 @@ const BookClub = () => {
   const handleSendMessage = async (e) => {
     e.preventDefault();
     
+    // Use raw message with <@userId> tokens if available (from mention system)
+    const rawMessage = e._rawMessage || newMessage;
+    
     logger.debug('=== SEND MESSAGE DEBUG ===');
-    logger.debug('Message text:', newMessage);
+    logger.debug('Display message:', newMessage);
+    logger.debug('Raw message (with mentions):', rawMessage);
     logger.debug('Selected files count:', selectedFiles.length);
     logger.debug('Selected files:', selectedFiles);
     logger.debug('FileUploadRef exists:', !!fileUploadRef.current);
@@ -400,7 +404,7 @@ const BookClub = () => {
     logger.debug('ws.current readyState:', ws.current?.readyState);
     logger.debug('WebSocket.OPEN value:', WebSocket.OPEN);
     
-    const hasMessage = newMessage.trim().length > 0;
+    const hasMessage = rawMessage.trim().length > 0;
     const hasFiles = selectedFiles.length > 0;
     const hasContent = hasMessage || hasFiles;
     const wsReady = ws.current && ws.current.readyState === WebSocket.OPEN;
@@ -431,10 +435,10 @@ const BookClub = () => {
       }
 
       // If there's a text message and files, send text message first
-      if (newMessage.trim() && attachments.length > 0) {
+      if (rawMessage.trim() && attachments.length > 0) {
         const textMessageData = {
           type: 'chat-message',
-          message: newMessage.trim(),
+          message: rawMessage.trim(),
           attachments: []
         };
         logger.debug('Sending text message:', textMessageData);
@@ -446,17 +450,17 @@ const BookClub = () => {
         for (const attachment of attachments) {
           const fileMessageData = {
             type: 'chat-message',
-            message: newMessage.trim() && attachments.length === 1 ? newMessage.trim() : null,
+            message: rawMessage.trim() && attachments.length === 1 ? rawMessage.trim() : null,
             attachments: [attachment]
           };
           logger.debug('Sending file message:', fileMessageData);
           ws.current.send(JSON.stringify(fileMessageData));
         }
-      } else if (newMessage.trim()) {
+      } else if (rawMessage.trim()) {
         // If only text, no files
         const messageData = {
           type: 'chat-message',
-          message: newMessage.trim(),
+          message: rawMessage.trim(),
           attachments: []
         };
         logger.debug('Sending text-only message:', messageData);
@@ -1032,6 +1036,7 @@ const BookClub = () => {
                 auth={auth} 
                 userRole={userRole}
                 ws={ws}
+                members={bookClubMembers}
               />
             )}
 
@@ -1047,6 +1052,7 @@ const BookClub = () => {
                 onFilesSelected={handleFilesSelected}
                 onSubmit={handleSendMessage}
                 auth={auth}
+                members={bookClubMembers}
               />
             ) : !showBooksHistory && !showCalendar && !showSuggestions && !showSettings ? (
               <div className="bg-gray-800 border-t border-gray-700 p-4 text-center">

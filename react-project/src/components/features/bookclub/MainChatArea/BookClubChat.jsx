@@ -8,6 +8,7 @@ import { getProfileImageUrl } from '@config/constants';
 import logger from '@utils/logger';
 import ReactionPicker from '../chat/ReactionPicker';
 import ReactionBar from '../chat/ReactionBar';
+import MentionRenderer from '../chat/MentionRenderer';
 
 // Function to convert URLs in text to clickable links
 const linkifyText = (text) => {
@@ -35,6 +36,58 @@ const linkifyText = (text) => {
 };
 
 // Function to format timestamp smartly
+
+// Combined renderer: mentions + links
+const MentionRendererWithLinks = ({ content, members, currentUserId }) => {
+  if (!content || typeof content !== 'string') return null;
+
+  const mentionRegex = /(<@[a-zA-Z0-9_-]+>|<@everyone>)/g;
+  const parts = content.split(mentionRegex);
+
+  if (parts.length === 1) return <>{linkifyText(content)}</>;
+
+  const memberMap = {};
+  for (const m of members) {
+    if (m.id) memberMap[m.id] = m.username || m.name || 'Unknown';
+  }
+
+  return (
+    <>
+      {parts.map((part, index) => {
+        if (part === '<@everyone>') {
+          return (
+            <span
+              key={index}
+              className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-yellow-500/30 text-yellow-200 ring-1 ring-yellow-500/50"
+            >
+              @everyone
+            </span>
+          );
+        }
+        const match = part.match(/^<@([a-zA-Z0-9_-]+)>$/);
+        if (match) {
+          const uid = match[1];
+          const name = memberMap[uid] || 'Unknown User';
+          const isSelf = uid === currentUserId;
+          return (
+            <span
+              key={index}
+              className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold ${
+                isSelf
+                  ? 'bg-yellow-500/30 text-yellow-200 ring-1 ring-yellow-500/50'
+                  : 'bg-indigo-500/30 text-indigo-200 ring-1 ring-indigo-500/50'
+              }`}
+            >
+              @{name}
+            </span>
+          );
+        }
+        return <React.Fragment key={index}>{linkifyText(part)}</React.Fragment>;
+      })}
+    </>
+  );
+};
+
 const formatTimestamp = (timestamp) => {
   if (!timestamp) return '';
   const messageDate = new Date(timestamp);
@@ -53,7 +106,7 @@ const formatTimestamp = (timestamp) => {
   }
 };
 
-const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }) => {
+const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, members = [] }) => {
     const messagesEndRef = useRef(null);
     const [messageMenuId, setMessageMenuId] = useState(null);
     const [showFullDateId, setShowFullDateId] = useState(null);
@@ -205,6 +258,25 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
       return null;
     };
 
+    // Render message text with mentions and linkified URLs
+    const renderMessageContent = (text) => {
+      if (!text) return '';
+      // Check if message has any mention tokens
+      const hasMentions = /<@[a-zA-Z0-9_-]+>/.test(text) || text.includes('<@everyone>');
+      if (hasMentions) {
+        // MentionRenderer handles splitting by mention tokens
+        // For plain text segments, we still apply linkification
+        return (
+          <MentionRendererWithLinks
+            content={text}
+            members={members}
+            currentUserId={auth?.user?.id}
+          />
+        );
+      }
+      return linkifyText(text);
+    };
+
     return (
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {messages.length === 0 ? (
@@ -238,7 +310,7 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
                               )}
                               {msg.text && (
                                 <div className={`bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl px-4 py-3 shadow-lg mb-1 ${msg.deletedAt ? 'opacity-60 italic' : ''}`}>
-                                  <p className="text-white break-words font-medium">{msg.text ? linkifyText(msg.text) : ''}</p>
+                                  <p className="text-white break-words font-medium">{renderMessageContent(msg.text)}</p>
                                 </div>
                               )}
                               {!msg.deletedAt && (
@@ -322,7 +394,7 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws }
                                 onClick={() => setShowFullDateId(showFullDateId === msg.id ? null : msg.id)}
                                 className="bg-gray-800 rounded-2xl px-4 py-3 shadow-md cursor-pointer hover:bg-gray-750 transition-colors"
                               >
-                                {msg.text && <p className={`text-gray-200 break-words leading-relaxed ${msg.deletedAt ? 'italic text-gray-500' : ''}`}>{msg.text ? linkifyText(msg.text) : ''}</p>}
+                                {msg.text && <p className={`text-gray-200 break-words leading-relaxed ${msg.deletedAt ? 'italic text-gray-500' : ''}`}>{renderMessageContent(msg.text)}</p>}
                                 {msg.attachments && msg.attachments.length > 0 && !msg.deletedAt ? (
                                   <div className="flex flex-col gap-2 mt-2">
                                     {msg.attachments.map((attachment) => (
