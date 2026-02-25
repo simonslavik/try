@@ -1,0 +1,33 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Books Service
+  - job_name: 'books-service'
+    static_configs:
+      - targets: ['books-service:3002']
+    metrics_path: '/metrics'
+  
+  # User Service
+  - job_name: 'user-service'
+    static_configs:
+      - targets: ['user-service:3001']
+    metrics_path: '/metrics'
+  
+  # Gateway
+  - job_name: 'gateway'
+    static_configs:
+      - targets: ['gateway:3000']
+    metrics_path: '/metrics'
+  
+  # Collab Editor
+  - job_name: 'collab-editor'
+    static_configs:
+      - targets: ['collab-editor:4000']
+    metrics_path: '/metrics'
+  
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']

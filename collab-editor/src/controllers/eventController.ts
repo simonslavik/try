@@ -1,33 +1,20 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middleware/authMiddleware.js';
-
-const prisma = new PrismaClient();
+import { EventService } from '../services/event.service.js';
+import logger from '../utils/logger.js';
 
 // Get all events for a bookclub
 export const getEvents = async (req: Request, res: Response) => {
   try {
     const { bookClubId } = req.params;
     
-    // Check if bookclub exists
-    const bookClub = await prisma.bookClub.findUnique({
-      where: { id: bookClubId }
-    });
-    
-    if (!bookClub) {
-      return res.status(404).json({ error: 'Book club not found' });
-    }
-    
-    // Get all events for this bookclub
-    const events = await prisma.bookClubEvent.findMany({
-      where: { bookClubId },
-      orderBy: { eventDate: 'asc' }
-    });
+    const events = await EventService.getEvents(bookClubId);
     
     res.json({ events });
-  } catch (error) {
-    console.error('Error fetching events:', error);
-    res.status(500).json({ error: 'Failed to fetch events' });
+  } catch (error: any) {
+    logger.error('ERROR_FETCH_EVENTS', { error: error.message });
+    const statusCode = error.message === 'Book club not found' ? 404 : 500;
+    res.status(statusCode).json({ error: error.message || 'Failed to fetch events' });
   }
 };
 
@@ -38,39 +25,16 @@ export const createEvent = async (req: AuthRequest, res: Response) => {
     const { title, description, eventDate, eventType } = req.body;
     const userId = req.user!.userId;
     
-    if (!title || !eventDate) {
-      return res.status(400).json({ error: 'Title and event date are required' });
-    }
+    const event = await EventService.create(bookClubId, userId, { title, description, eventDate, eventType });
     
-    // Check if user is a member of the bookclub
-    const bookClub = await prisma.bookClub.findUnique({
-      where: { id: bookClubId }
-    });
-    
-    if (!bookClub) {
-      return res.status(404).json({ error: 'Book club not found' });
-    }
-    
-    if (!bookClub.members.includes(userId)) {
-      return res.status(403).json({ error: 'You must be a member to create events' });
-    }
-    
-    const event = await prisma.bookClubEvent.create({
-      data: {
-        title: title.trim(),
-        description: description?.trim() || null,
-        eventDate: new Date(eventDate),
-        eventType: eventType || 'meeting',
-        bookClubId,
-        createdBy: userId
-      }
-    });
-    
-    console.log(`📅 Event created in book club ${bookClubId}: ${event.title}`);
     res.json({ event, message: 'Event created successfully' });
-  } catch (error) {
-    console.error('Error creating event:', error);
-    res.status(500).json({ error: 'Failed to create event' });
+  } catch (error: any) {
+    logger.error('ERROR_CREATE_EVENT', { error: error.message });
+    let statusCode = 500;
+    if (error.message === 'Title and event date are required') statusCode = 400;
+    if (error.message === 'Book club not found') statusCode = 404;
+    if (error.message === 'You must be a member to create events') statusCode = 403;
+    res.status(statusCode).json({ error: error.message || 'Failed to create event' });
   }
 };
 
@@ -81,33 +45,15 @@ export const updateEvent = async (req: AuthRequest, res: Response) => {
     const { title, description, eventDate, eventType } = req.body;
     const userId = req.user!.userId;
     
-    const event = await prisma.bookClubEvent.findUnique({
-      where: { id: eventId }
-    });
+    const updatedEvent = await EventService.update(eventId, userId, { title, description, eventDate, eventType });
     
-    if (!event) {
-      return res.status(404).json({ error: 'Event not found' });
-    }
-    
-    if (event.createdBy !== userId) {
-      return res.status(403).json({ error: 'Only the event creator can update it' });
-    }
-    
-    const updatedEvent = await prisma.bookClubEvent.update({
-      where: { id: eventId },
-      data: {
-        ...(title && { title: title.trim() }),
-        ...(description !== undefined && { description: description?.trim() || null }),
-        ...(eventDate && { eventDate: new Date(eventDate) }),
-        ...(eventType && { eventType })
-      }
-    });
-    
-    console.log(`📝 Event updated: ${updatedEvent.title}`);
     res.json({ event: updatedEvent, message: 'Event updated successfully' });
-  } catch (error) {
-    console.error('Error updating event:', error);
-    res.status(500).json({ error: 'Failed to update event' });
+  } catch (error: any) {
+    logger.error('ERROR_UPDATE_EVENT', { error: error.message });
+    let statusCode = 500;
+    if (error.message === 'Event not found') statusCode = 404;
+    if (error.message === 'Only the event creator can update it') statusCode = 403;
+    res.status(statusCode).json({ error: error.message || 'Failed to update event' });
   }
 };
 
@@ -117,26 +63,14 @@ export const deleteEvent = async (req: AuthRequest, res: Response) => {
     const { eventId } = req.params;
     const userId = req.user!.userId;
     
-    const event = await prisma.bookClubEvent.findUnique({
-      where: { id: eventId }
-    });
+    await EventService.delete(eventId, userId);
     
-    if (!event) {
-      return res.status(404).json({ error: 'Event not found' });
-    }
-    
-    if (event.createdBy !== userId) {
-      return res.status(403).json({ error: 'Only the event creator can delete it' });
-    }
-    
-    await prisma.bookClubEvent.delete({
-      where: { id: eventId }
-    });
-    
-    console.log(`🗑️  Event deleted: ${event.title}`);
     res.json({ message: 'Event deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting event:', error);
-    res.status(500).json({ error: 'Failed to delete event' });
+  } catch (error: any) {
+    logger.error('ERROR_DELETE_EVENT', { error: error.message });
+    let statusCode = 500;
+    if (error.message === 'Event not found') statusCode = 404;
+    if (error.message === 'Only the event creator can delete it') statusCode = 403;
+    res.status(statusCode).json({ error: error.message || 'Failed to delete event' });
   }
 };

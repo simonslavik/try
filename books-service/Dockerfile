@@ -1,25 +1,23 @@
+# Development Dockerfile for books-service
 FROM node:20-alpine
 
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
-COPY tsconfig.json ./
+COPY prisma ./prisma/
 
 # Install dependencies
-RUN npm install
+RUN npm ci
 
-# Copy prisma schema
-COPY prisma ./prisma/
+# Copy source code
+COPY . .
 
 # Generate Prisma Client
 RUN npx prisma generate
 
-# Copy source code
-COPY src ./src/
-
 # Expose port
 EXPOSE 3002
 
-# Run migrations and start server
+# Run migrations and start dev server
 CMD npx prisma migrate deploy && npm run dev

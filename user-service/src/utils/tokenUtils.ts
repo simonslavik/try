@@ -12,6 +12,7 @@ interface User {
 interface TokenPayload {
     userId: string;
     email: string;
+    name: string;
 }
 
 interface Tokens {
@@ -34,10 +35,13 @@ export const generateTokens = async (user: User): Promise<Tokens> => {
     const accessToken = jwt.sign(
         {
             userId: user.id,
-            email: user.email
+            email: user.email,
+            name: user.name
         } as TokenPayload,
         process.env.JWT_SECRET!,
-        { expiresIn: process.env.JWT_EXPIRATION || DEFAULT_JWT_EXPIRATION }
+        { 
+            expiresIn: process.env.JWT_EXPIRATION || DEFAULT_JWT_EXPIRATION 
+        } as jwt.SignOptions
     );
 
     // Generate random refresh token (not JWT - just random string)
@@ -147,4 +151,24 @@ export const cleanupExpiredTokens = async (): Promise<number> => {
         logError(error, 'Error cleaning up expired tokens');
         return 0;
     }
+};
+
+/**
+ * Generate access token (JWT) for a user
+ */
+export const generateAccessToken = (user: User): string => {
+    return jwt.sign(
+        { userId: user.id, email: user.email, name: user.name } as TokenPayload,
+        process.env.JWT_SECRET!,
+        { 
+            expiresIn: process.env.JWT_EXPIRATION || DEFAULT_JWT_EXPIRATION 
+        } as jwt.SignOptions
+    );
+};
+
+/**
+ * Generate refresh token (random string) for a user
+ */
+export const generateRefreshToken = (userId: string): string => {
+    return crypto.randomBytes(REFRESH_TOKEN_BYTES).toString('hex');
 };
