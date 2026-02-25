@@ -1,15 +1,18 @@
 import { WebSocket } from 'ws';
 import { v4 as uuidv4 } from 'uuid';
-import { PrismaClient } from '@prisma/client';
+import { MembershipStatus, BookClubRole } from '@prisma/client';
 import { verifyWebSocketToken } from '../utils/websocketAuth.js';
+import { hasMinRole } from '../utils/roles.js';
+import prisma from '../config/database.js';
+import logger from '../utils/logger.js';
 import { 
   Client, 
   activeBookClubs, 
   activeDMClients, 
   broadcastToBookClub 
 } from './types.js';
-
-const prisma = new PrismaClient();
+import { getReactionsForMessages } from './reactionHandler.js';
+import { extractMentions, isEveryoneMentioned } from '../utils/mentionParser.js';
 
 export const handleJoin = (
   ws: WebSocket,
@@ -60,6 +63,47 @@ export const handleJoin = (
         return;
       }
 
+      // ===== MEMBERSHIP VERIFICATION =====
+      // Check if user is an active member of this bookclub
+      const membership = await prisma.bookClubMember.findUnique({
+        where: {
+          bookClubId_userId: {
+            bookClubId: bookClubId,
+            userId: userId
+          }
+        }
+      });
+
+      if (!membership || membership.status !== MembershipStatus.ACTIVE) {
+        console.error('❌ Access denied: User is not an active member');
+        ws.send(JSON.stringify({
+          type: 'access-denied',
+          message: 'You must be a member to access this book club',
+          shouldReconnect: false
+        }));
+        ws.close();
+        return;
+      }
+
+      if (membership.status === MembershipStatus.BANNED) {
+        console.error('❌ Access denied: User is banned');
+        ws.send(JSON.stringify({
+          type: 'access-denied',
+          message: 'You have been banned from this book club',
+          shouldReconnect: false
+        }));
+        ws.close();
+        return;
+      }
+
+      console.log('✅ Membership verified:', { userId, bookClubId, role: membership.role });
+
+      // Profile image will be resolved from the batch user fetch below
+      let userProfileImage = message.profileImage || null;
+
+      // Track if this is a new member (for WebSocket purposes, this is always false since they must already be a member)
+      const wasNewMember = false;
+
       // If no roomId provided, use first room (general)
       const targetRoomId = roomId || bookClub.rooms[0]?.id;
       
@@ -78,6 +122,7 @@ export const handleJoin = (
         id: clientId,
         userId: userId,
         username: username || 'Anonymous',
+        profileImage: userProfileImage,
         ws,
         bookClubId,
         roomId: targetRoomId
@@ -91,44 +136,53 @@ export const handleJoin = (
       const activeClub = activeBookClubs.get(bookClubId)!;
       activeClub.clients.set(clientId, currentClient);
 
-      // Add user to members if not already
-      let wasNewMember = false;
-      if (!bookClub.members.includes(userId)) {
-        await prisma.bookClub.update({
-          where: { id: bookClubId },
-          data: { 
-            members: { push: userId },
-            lastActiveAt: new Date()
-          }
-        });
-        wasNewMember = true;
-      } else {
-        await prisma.bookClub.update({
-          where: { id: bookClubId },
-          data: { lastActiveAt: new Date() }
-        });
-      }
+      // Update last active timestamp
+      await prisma.bookClub.update({
+        where: { id: bookClubId },
+        data: { lastActiveAt: new Date() }
+      });
 
       // Get recent messages for the current room
+      console.log('📨 Fetching messages with deletedAt field...');
       const recentMessages = await prisma.message.findMany({
         where: { roomId: targetRoomId },
         orderBy: { createdAt: 'asc' },
         take: 100,
-        include: {
+        select: {
+          id: true,
+          content: true,
+          userId: true,
+          username: true,
+          profileImage: true,
+          isPinned: true,
+          deletedAt: true,
+          deletedBy: true,
+          editedAt: true,
+          createdAt: true,
           attachments: true
         }
       });
+      console.log('📨 Sample message:', recentMessages[0]);
 
-      // Fetch all member details from user service
+      // Fetch all active member details from user service
       const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:3001/api';
+      const activeMembers = await prisma.bookClubMember.findMany({
+        where: {
+          bookClubId: bookClubId,
+          status: MembershipStatus.ACTIVE
+        },
+        select: { userId: true },
+        take: 200
+      });
+
       let memberDetails = [];
-      const allMembers = wasNewMember ? [...bookClub.members, userId] : bookClub.members;
+      const memberIds = activeMembers.map(m => m.userId);
       
       try {
         const response = await fetch(`${userServiceUrl}/users/batch`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userIds: allMembers })
+          body: JSON.stringify({ userIds: memberIds })
         });
         
         if (response.ok) {
@@ -141,13 +195,35 @@ export const handleJoin = (
         console.error('Error fetching member details:', error);
       }
 
+      // Create a map of userId to user details for quick lookup
+      const userDetailsMap = new Map(memberDetails.map((user: any) => [user.id, user]));
+
+      // Resolve current user's profile image from batch results (avoids separate HTTP call)
+      const currentUserDetails = userDetailsMap.get(userId);
+      if (currentUserDetails?.profileImage) {
+        userProfileImage = currentUserDetails.profileImage;
+      }
+
+      // Enrich messages with profile images from user details
+      const messageIds = recentMessages.map(msg => msg.id);
+      const reactionsMap = await getReactionsForMessages(messageIds);
+
+      const enrichedMessages = recentMessages.map(msg => {
+        const userDetails = userDetailsMap.get(msg.userId);
+        return {
+          ...msg,
+          profileImage: msg.profileImage || userDetails?.profileImage || null,
+          reactions: reactionsMap.get(msg.id) || []
+        };
+      });
+
       // Send initial data to new user
-      ws.send(JSON.stringify({
+      const initPayload = {
         type: 'init',
         clientId,
         bookClub,
         currentRoomId: targetRoomId,
-        messages: recentMessages,
+        messages: enrichedMessages,
         members: memberDetails,
         users: Array.from(activeClub.clients.values()).map(c => ({
           id: c.id,
@@ -155,7 +231,9 @@ export const handleJoin = (
           username: c.username,
           roomId: c.roomId
         }))
-      }));
+      };
+      console.log('📤 Sending init with message sample:', initPayload.messages[0]);
+      ws.send(JSON.stringify(initPayload));
 
       // Notify others that someone joined (including updated members if new)
       if (wasNewMember) {
@@ -214,16 +292,34 @@ export const handleSwitchRoom = (message: any, currentClient: Client | null) => 
         where: { roomId },
         orderBy: { createdAt: 'asc' },
         take: 100,
-        include: {
+        select: {
+          id: true,
+          content: true,
+          userId: true,
+          username: true,
+          profileImage: true,
+          isPinned: true,
+          deletedAt: true,
+          deletedBy: true,
+          editedAt: true,
+          createdAt: true,
           attachments: true
         }
       });
+
+      // Attach reactions to messages
+      const messageIds = messages.map(msg => msg.id);
+      const reactionsMap = await getReactionsForMessages(messageIds);
+      const messagesWithReactions = messages.map(msg => ({
+        ...msg,
+        reactions: reactionsMap.get(msg.id) || []
+      }));
 
       // Send room data to user
       currentClient.ws.send(JSON.stringify({
         type: 'room-switched',
         roomId,
-        messages
+        messages: messagesWithReactions
       }));
 
       console.log(`🔄 ${currentClient.username} switched to room ${roomId}`);
@@ -251,6 +347,7 @@ export const handleChatMessage = (message: any, currentClient: Client | null) =>
       roomId: currentClient.roomId,
       userId: currentClient.userId,
       username: currentClient.username,
+      profileImage: currentClient.profileImage,
       content: message.message || null,
       attachments: message.attachments && message.attachments.length > 0 ? {
         connect: message.attachments.map((att: any) => ({ id: att.id }))
@@ -261,10 +358,16 @@ export const handleChatMessage = (message: any, currentClient: Client | null) =>
     }
   })
   .then((savedMessage) => {
+    // Extract mentions from message content
+    const mentionedUserIds = extractMentions(savedMessage.content || '');
+    const mentionsEveryone = isEveryoneMentioned(savedMessage.content || '');
+
     // Broadcast chat message to all users in the SAME ROOM (including sender)
     const chatData = {
       type: 'chat-message',
-      message: savedMessage
+      message: { ...savedMessage, reactions: [] },
+      mentions: mentionedUserIds,
+      mentionsEveryone
     };
 
     activeClub.clients.forEach((client) => {
@@ -404,6 +507,40 @@ export const handleDMMessage = async (message: any, currentClient: Client | null
   }
 };
 
+export const handleDeleteDMMessage = async (message: any, currentClient: Client | null) => {
+  if (!currentClient || !currentClient.isDMConnection) return;
+
+  const { messageId } = message;
+  
+  try {
+    // Note: The actual deletion is handled by the HTTP DELETE endpoint
+    // This handler just broadcasts the deletion to the conversation partner
+    
+    const { receiverId } = message;
+
+    // Only notify the specific conversation partner (not all DM clients)
+    if (receiverId) {
+      const receiverClient = activeDMClients.get(receiverId);
+      if (receiverClient && receiverClient.ws.readyState === WebSocket.OPEN) {
+        receiverClient.ws.send(JSON.stringify({
+          type: 'dm-deleted',
+          messageId
+        }));
+      }
+    }
+
+    console.log(`🗑️ DM deletion broadcasted by ${currentClient.username}: ${messageId}`);
+  } catch (error) {
+    console.error('Error broadcasting DM deletion:', error);
+    if (currentClient && currentClient.ws.readyState === WebSocket.OPEN) {
+      currentClient.ws.send(JSON.stringify({
+        type: 'error',
+        message: error instanceof Error ? error.message : 'Failed to broadcast deletion'
+      }));
+    }
+  }
+};
+
 export const handleDisconnect = (client: Client) => {
   // Handle DM disconnection
   if (client.isDMConnection) {
@@ -433,5 +570,238 @@ export const handleDisconnect = (client: Client) => {
   if (activeClub.clients.size === 0) {
     activeBookClubs.delete(client.bookClubId);
     console.log(`🧹 Active book club ${client.bookClubId} cleaned up (no connected users)`);
+  }
+};
+
+export const handleDeleteMessage = async (message: any, currentClient: Client | null) => {
+  if (!currentClient || !currentClient.bookClubId) return;
+
+  const { messageId } = message;
+  const activeClub = activeBookClubs.get(currentClient.bookClubId);
+  if (!activeClub) return;
+
+  try {
+    // Parallelize message fetch and membership check (was sequential)
+    const isOwnMessage = (msg: any) => msg.userId === currentClient.userId;
+
+    const [messageToDelete, membership] = await Promise.all([
+      prisma.message.findUnique({
+        where: { id: messageId },
+        include: { room: true }
+      }),
+      // Only fetch membership if we might need it for role check
+      prisma.bookClubMember.findUnique({
+        where: {
+          bookClubId_userId: {
+            bookClubId: currentClient.bookClubId,
+            userId: currentClient.userId
+          }
+        }
+      })
+    ]);
+
+    if (!messageToDelete) {
+      currentClient.ws.send(JSON.stringify({
+        type: 'error',
+        message: 'Message not found'
+      }));
+      return;
+    }
+
+    // Check if user has MODERATOR+ permission or owns the message
+    let hasPermission = isOwnMessage(messageToDelete);
+
+    if (!hasPermission) {
+      hasPermission = membership ? hasMinRole(membership.role, BookClubRole.MODERATOR) : false;
+    }
+
+    if (!hasPermission) {
+      currentClient.ws.send(JSON.stringify({
+        type: 'error',
+        message: 'You need MODERATOR role or higher to delete other users\' messages'
+      }));
+      return;
+    }
+
+    // Soft delete the message and unpin if pinned
+    const deletedMessage = await prisma.message.update({
+      where: { id: messageId },
+      data: {
+        deletedAt: new Date(),
+        deletedBy: currentClient.userId,
+        content: '[Message deleted]',
+        isPinned: false
+      }
+    });
+
+    // Broadcast deletion to users in the same room only
+    activeClub.clients.forEach((client) => {
+      if (client.roomId === currentClient.roomId && client.ws.readyState === WebSocket.OPEN) {
+        client.ws.send(JSON.stringify({
+          type: 'message-deleted',
+          messageId,
+          deletedBy: currentClient.userId
+        }));
+      }
+    });
+
+    console.log(`🗑️ Message ${messageId} deleted by ${currentClient.username}`);
+  } catch (error) {
+    console.error('Error deleting message:', error);
+    currentClient.ws.send(JSON.stringify({
+      type: 'error',
+      message: 'Failed to delete message'
+    }));
+  }
+};
+
+export const handlePinMessage = async (message: any, currentClient: Client | null) => {
+  if (!currentClient || !currentClient.bookClubId) return;
+
+  const { messageId, isPinned } = message;
+  const activeClub = activeBookClubs.get(currentClient.bookClubId);
+  if (!activeClub) return;
+
+  try {
+    // Fetch membership and verify message exists in parallel
+    const [membership, messageExists] = await Promise.all([
+      prisma.bookClubMember.findUnique({
+        where: {
+          bookClubId_userId: {
+            bookClubId: currentClient.bookClubId,
+            userId: currentClient.userId
+          }
+        }
+      }),
+      prisma.message.findUnique({ where: { id: messageId }, select: { id: true } })
+    ]);
+
+    const hasPermission = membership ? hasMinRole(membership.role, BookClubRole.MODERATOR) : false;
+
+    if (!hasPermission) {
+      currentClient.ws.send(JSON.stringify({
+        type: 'error',
+        message: 'You need MODERATOR role or higher to pin messages'
+      }));
+      return;
+    }
+
+    if (!messageExists) {
+      currentClient.ws.send(JSON.stringify({
+        type: 'error',
+        message: 'Message not found'
+      }));
+      return;
+    }
+
+    // Update message pin status
+    const pinnedMessage = await prisma.message.update({
+      where: { id: messageId },
+      data: { isPinned }
+    });
+
+    // Broadcast pin status to users in the same room only
+    activeClub.clients.forEach((client) => {
+      if (client.roomId === currentClient.roomId && client.ws.readyState === WebSocket.OPEN) {
+        client.ws.send(JSON.stringify({
+          type: 'message-pinned',
+          messageId,
+          isPinned,
+          pinnedBy: currentClient.userId
+        }));
+      }
+    });
+
+    console.log(`📌 Message ${messageId} ${isPinned ? 'pinned' : 'unpinned'} by ${currentClient.username}`);
+  } catch (error) {
+    console.error('Error pinning message:', error);
+    currentClient.ws.send(JSON.stringify({
+      type: 'error',
+      message: 'Failed to pin message'
+    }));
+  }
+};
+
+export const handleEditMessage = async (message: any, currentClient: Client | null) => {
+  if (!currentClient || !currentClient.bookClubId) return;
+
+  const { messageId, content } = message;
+  const activeClub = activeBookClubs.get(currentClient.bookClubId);
+  if (!activeClub) return;
+
+  if (!content || typeof content !== 'string' || content.trim().length === 0) {
+    currentClient.ws.send(JSON.stringify({
+      type: 'error',
+      message: 'Message content is required'
+    }));
+    return;
+  }
+
+  if (content.length > 4000) {
+    currentClient.ws.send(JSON.stringify({
+      type: 'error',
+      message: 'Message content must be at most 4000 characters'
+    }));
+    return;
+  }
+
+  try {
+    const messageToEdit = await prisma.message.findUnique({
+      where: { id: messageId }
+    });
+
+    if (!messageToEdit) {
+      currentClient.ws.send(JSON.stringify({
+        type: 'error',
+        message: 'Message not found'
+      }));
+      return;
+    }
+
+    // Only the message author can edit
+    if (messageToEdit.userId !== currentClient.userId) {
+      currentClient.ws.send(JSON.stringify({
+        type: 'error',
+        message: 'You can only edit your own messages'
+      }));
+      return;
+    }
+
+    if (messageToEdit.deletedAt) {
+      currentClient.ws.send(JSON.stringify({
+        type: 'error',
+        message: 'Cannot edit a deleted message'
+      }));
+      return;
+    }
+
+    const updatedMessage = await prisma.message.update({
+      where: { id: messageId },
+      data: {
+        content: content.trim(),
+        editedAt: new Date()
+      }
+    });
+
+    // Broadcast edit to users in the same room
+    activeClub.clients.forEach((client) => {
+      if (client.roomId === currentClient.roomId && client.ws.readyState === WebSocket.OPEN) {
+        client.ws.send(JSON.stringify({
+          type: 'message-edited',
+          messageId,
+          content: updatedMessage.content,
+          editedAt: updatedMessage.editedAt,
+          editedBy: currentClient.userId
+        }));
+      }
+    });
+
+    console.log(`✏️ Message ${messageId} edited by ${currentClient.username}`);
+  } catch (error) {
+    console.error('Error editing message:', error);
+    currentClient.ws.send(JSON.stringify({
+      type: 'error',
+      message: 'Failed to edit message'
+    }));
   }
 };

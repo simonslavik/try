@@ -1,13 +1,17 @@
 import { Route, Routes } from "react-router-dom";
-import Home from "./pages/home";
-import BookClub from "./pages/bookclub/:id";
-import ProtectedRoute from "./components/ProtectedRoute";
-import NewBookClubPage from "./pages/createbookclub";
-import ChangeProfilePage from "./pages/changeProfile";
-import ProfilePage from "./pages/profilePage/:id";
-import BookClubPage from "./pages/bookclubPage/:id";
-import DiscoverBookClubs from "./pages/discover";
-import InviteJoinPage from "./pages/invite/:code";
+import Home from "@pages/Home";
+import BookClub from "@pages/BookClub/:id";
+import ProtectedRoute from "@components/common/ProtectedRoute";
+import NewBookClubPage from "@pages/CreateBookClub";
+import ChangeProfilePage from "@pages/ChangeProfile";
+import ProfilePage from "@pages/Profile/:id";
+import BookClubPage from "@pages/BookClubDetails/:id";
+import DiscoverBookClubs from "@pages/Discover";
+import InviteJoinPage from "@pages/Invite/:code";
+import ResetPasswordPage from "@pages/ResetPassword";
+import VerifyEmailPage from "@pages/VerifyEmail";
+import BookclubSettings from "@pages/BookclubSettings";
+import DMChatPage from "@pages/DMChat";
 
 
 function App() {
@@ -19,11 +23,7 @@ function App() {
           <BookClub />
         </ProtectedRoute>
       } />
-      <Route path="/bookclubpage/:id" element={
-        <ProtectedRoute>
-          <BookClubPage />
-        </ProtectedRoute>
-      } />
+      <Route path="/bookclubpage/:id" element={<BookClubPage />} />
       <Route path="/create-bookclub" element={
         <ProtectedRoute>
           <NewBookClubPage />
@@ -37,6 +37,18 @@ function App() {
       }/>
       <Route path="/discover" element={<DiscoverBookClubs />}/>
       <Route path="/invite/:code" element={<InviteJoinPage />}/>
+      <Route path="/bookclub-settings/:id" element={
+        <ProtectedRoute>
+          <BookclubSettings />
+        </ProtectedRoute>
+      }/>
+      <Route path="/dm/:userId?" element={
+        <ProtectedRoute>
+          <DMChatPage />
+        </ProtectedRoute>
+      }/>
+      <Route path="/reset-password" element={<ResetPasswordPage />}/>
+      <Route path="/verify-email" element={<VerifyEmailPage />}/>
       
     </Routes>
   );

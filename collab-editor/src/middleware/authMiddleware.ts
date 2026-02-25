@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
 
 // Extend Express Request to include user property
 declare global {
@@ -8,6 +7,7 @@ declare global {
             user?: {
                 userId: string;
                 email: string;
+                name?: string;
             };
         }
     }
@@ -18,106 +18,54 @@ export interface AuthRequest extends Request {
     user?: {
         userId: string;
         email: string;
+        name?: string;
     };
 }
 
-interface TokenPayload {
-    userId: string;
-    email: string;
-    iat: number;
-    exp: number;
-}
-
 /**
- * Middleware to verify JWT access token
- * Extracts token from Authorization header and verifies it
- * Attaches user info to req.user if valid
+ * Authentication middleware — trusts x-user-id header set by the API gateway.
+ * The gateway has already verified the JWT and forwards user info as headers.
+ * 
+ * IMPORTANT: This service must NEVER be exposed publicly.
+ * Only the gateway (and WebSocket on port 4000) should be accessible from outside.
+ * WebSocket auth still uses JWT directly (see websocketAuth.ts).
  */
-export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        // Get token from Authorization header
-        const authHeader = req.headers.authorization;
+export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.headers['x-user-id'] as string;
+    const userEmail = req.headers['x-user-email'] as string;
+    const userName = req.headers['x-user-name'] as string;
 
-        if (!authHeader) {
-            return res.status(401).json({ 
-                message: 'No authorization token provided' 
-            });
-        }
-
-        // Expected format: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-        const parts = authHeader.split(' ');
-
-        if (parts.length !== 2 || parts[0] !== 'Bearer') {
-            return res.status(401).json({ 
-                message: 'Invalid authorization format. Expected: Bearer <token>' 
-            });
-        }
-
-        const token = parts[1];
-
-        // Verify token
-        const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
-        
-        const decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
-
-        // Attach user info to request
-        req.user = {
-            userId: decoded.userId,
-            email: decoded.email
-        };
-
-        next();
-    } catch (error: any) {
-        if (error.name === 'JsonWebTokenError') {
-            return res.status(401).json({ 
-                message: 'Invalid token' 
-            });
-        }
-        
-        if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({ 
-                message: 'Token expired' 
-            });
-        }
-
-        console.error('Auth middleware error:', error);
-        return res.status(500).json({ 
-            message: 'Internal server error during authentication' 
+    if (!userId) {
+        return res.status(401).json({ 
+            message: 'Authentication required' 
         });
     }
+
+    req.user = {
+        userId,
+        email: userEmail || '',
+        name: userName || undefined
+    };
+
+    next();
 };
 
 /**
- * Optional auth middleware - doesn't fail if no token provided
- * Just attaches user info if token is valid
+ * Optional auth middleware — attaches user info if gateway forwarded it, continues regardless.
+ * Used for endpoints that work with or without authentication.
  */
-export const optionalAuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const authHeader = req.headers.authorization;
+export const optionalAuthMiddleware = (req: Request, _res: Response, next: NextFunction) => {
+    const userId = req.headers['x-user-id'] as string;
+    const userEmail = req.headers['x-user-email'] as string;
+    const userName = req.headers['x-user-name'] as string;
 
-        if (!authHeader) {
-            return next();
-        }
-
-        const parts = authHeader.split(' ');
-
-        if (parts.length !== 2 || parts[0] !== 'Bearer') {
-            return next();
-        }
-
-        const token = parts[1];
-        const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
-        
-        const decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
-
+    if (userId) {
         req.user = {
-            userId: decoded.userId,
-            email: decoded.email
+            userId,
+            email: userEmail || '',
+            name: userName || undefined
         };
-
-        next();
-    } catch (error) {
-        // If token is invalid, just continue without user
-        next();
     }
+
+    next();
 };

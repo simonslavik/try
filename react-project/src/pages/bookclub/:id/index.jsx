@@ -1,13 +1,12 @@
-import { useEffect, useState, useContext, useRef } from 'react';
+import { useEffect, useState, useContext, useRef, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import AuthContext from '../../../context';
-import MyBookClubsSidebar from '../../../components/BookClub/MyBookClubsSidebar';
-import SideBarRooms from '../../../components/BookClub/SideBar/SideBarRooms';
-import DMSidebar from '../../../components/BookClub/SideBar/DMSidebar';
-import DMChat from '../../../components/BookClub/MainChatArea/DMChat';
-import AddCurrentBookModal from '../../../components/BookClub/Modals/AddCurrentBookModal';
-import CurrentBookDetailsModal from '../../../components/BookClub/Modals/CurrentBookDetailsModal';
-import AddBookToBookclubModal from '../../../components/BookClub/Modals/AddBookToBookclubModal';
+import AuthContext from '@context/index';
+import MyBookClubsSidebar from '@components/features/bookclub/MyBookClubsSidebar';
+import SideBarRooms from '@components/features/bookclub/SideBar/SideBarRooms';
+import AddCurrentBookModal from '@components/features/bookclub/Modals/AddCurrentBookModal';
+import CurrentBookDetailsModal from '@components/features/bookclub/Modals/CurrentBookDetailsModal';
+import AddBookToBookclubModal from '@components/features/bookclub/Modals/AddBookToBookclubModal';
+import { COLLAB_EDITOR_URL } from '@config/constants';
 
 // Function to convert URLs in text to clickable links
 const linkifyText = (text) => {
@@ -32,16 +31,24 @@ const linkifyText = (text) => {
     return part;
   });
 };
-import CalendarView from '../../../components/BookClub/MainChatArea/CalendarView';
-import AddEventModal from '../../../components/BookClub/Modals/AddEventModal';
-import BookSuggestionsView from '../../../components/BookClub/MainChatArea/BookSuggestionsView';
-import BookClubBookView from '../../../components/BookClub/MainChatArea/BookClubBookView';
-import BookClubChat from '../../../components/BookClub/MainChatArea/BookClubChat';
-import ConnectedUsersSidebar from '../../../components/BookClub/ConnectedUsersSidebar';
-import MessageInput from '../../../components/BookClub/MessageInput';
-import BookclubHeader from '../../../components/BookClub/MainChatArea/BookclubHeader';
-import InviteModal from '../../../components/Modals/InviteModal';
-import { useBookclubWebSocket } from '../../../hooks/useBookclubWebSocket';
+import CalendarView from '@components/features/bookclub/MainChatArea/CalendarView';
+import AddEventModal from '@components/features/bookclub/Modals/AddEventModal';
+import BookSuggestionsView from '@components/features/bookclub/MainChatArea/BookSuggestionsView';
+import BookClubBookView from '@components/features/bookclub/MainChatArea/BookClubBookView';
+import BookClubChat from '@components/features/bookclub/MainChatArea/BookClubChat';
+import ConnectedUsersSidebar from '@components/features/bookclub/ConnectedUsersSidebar';
+import MessageInput from '@components/features/bookclub/MessageInput';
+import BookclubHeader from '@components/features/bookclub/MainChatArea/BookclubHeader';
+import InviteModal from '@components/common/modals/InviteModal';
+import AdminApprovalPanel from '@components/features/bookclub/AdminApprovalPanel';
+import InviteLinkManager from '@components/features/bookclub/InviteLinkManager';
+import MemberManagement from '@components/features/bookclub/MemberManagement';
+import { useBookclubWebSocket } from '@hooks/useBookclubWebSocket';
+import { messageModerationAPI } from '@api/messageModeration.api';
+import { bookclubAPI } from '@api/bookclub.api';
+import { FiX, FiSettings as FiSettingsIcon, FiLock, FiUnlock, FiEyeOff, FiImage, FiTrash2 } from 'react-icons/fi';
+import apiClient from '@api/axios';
+import logger from '@utils/logger';
 
 
 const BookClub = () => {
@@ -49,9 +56,6 @@ const BookClub = () => {
   const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
-  
-  // Mode state - check if navigation state specifies DM mode
-  const [viewMode, setViewMode] = useState(location.state?.viewMode || 'bookclub'); // 'bookclub' or 'dm'
   
   // Bookclub states
   const [bookClub, setBookClub] = useState(null);
@@ -73,6 +77,18 @@ const BookClub = () => {
   const [showBooksHistory, setShowBooksHistory] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [previousView, setPreviousView] = useState(null); // Store previous view before opening settings
+  
+  // Settings form states
+  const [settingsForm, setSettingsForm] = useState({
+    name: '',
+    description: '',
+    category: '',
+    visibility: 'PUBLIC',
+    requiresApproval: false
+  });
+  const [savingSettings, setSavingSettings] = useState(false);
   
   // Books states
   const [bookclubBooks, setBookclubBooks] = useState({ current: [], upcoming: [], completed: [] });
@@ -91,14 +107,15 @@ const BookClub = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState(false);
   
-  // DM states
-  const [conversations, setConversations] = useState([]);
-  const [currentDMUser, setCurrentDMUser] = useState(null);
-  const [dmMessages, setDmMessages] = useState([]);
-  const [sendingMessage, setSendingMessage] = useState(false);
+  // User's role in the current bookclub
+  const [userRole, setUserRole] = useState(null);
+  
+  // Friends list for connected users sidebar
   const [friends, setFriends] = useState([]);
   
-  const dmWs = useRef(null);
+  // Force re-render counter for role updates
+  const [roleUpdateCounter, setRoleUpdateCounter] = useState(0);
+  
   const fileInputRef = useRef(null);
   const fileUploadRef = useRef(null);
 
@@ -113,13 +130,83 @@ const BookClub = () => {
     setBookClubMembers
   } = useBookclubWebSocket(bookClub, currentRoom, auth, bookClubId);
 
+  // Extract user's role from bookClubMembers
+  useEffect(() => {
+    if (!auth?.user?.id) return;
+    
+    logger.debug('UserRole Debug:', {
+      bookClubMembers,
+      authUserId: auth.user.id,
+      bookClubData: bookClub,
+      creatorId: bookClub?.creatorId
+    });
+    
+    // First check if user is the creator
+    if (bookClub?.creatorId === auth.user.id) {
+      logger.debug('✅ User is creator, setting OWNER role');
+      setUserRole('OWNER');
+      return;
+    }
+    
+    // Otherwise check membership in bookClubMembers
+    if (bookClubMembers && bookClubMembers.length > 0) {
+      logger.debug('BookClub Members details:', bookClubMembers.map(m => ({
+        userId: m.userId,
+        role: m.role,
+        matches: m.userId === auth.user.id
+      })));
+      
+      const membership = bookClubMembers.find(m => m.userId === auth.user.id);
+      logger.debug('Membership found:', membership);
+      if (membership) {
+        setUserRole(membership.role);
+      } else {
+        setUserRole(null);
+      }
+    }
+  }, [bookClubMembers, auth?.user?.id, bookClub]);
+
   // Reset books history and calendar view when bookClubId changes
   useEffect(() => {
     setShowBooksHistory(false);
     setShowCalendar(false);
     setShowSuggestions(false);
+    setShowSettings(false);
     setBookclubBooks({ current: [], upcoming: [], completed: [] });
   }, [bookClubId]);
+
+  // Populate settings form when bookClub loads
+  useEffect(() => {
+    if (bookClub) {
+      setSettingsForm({
+        name: bookClub.name || '',
+        description: bookClub.description || '',
+        category: bookClub.category || '',
+        visibility: bookClub.visibility || 'PUBLIC',
+        requiresApproval: bookClub.requiresApproval || false
+      });
+    }
+  }, [bookClub]);
+
+  // Handle settings form submission
+  const handleSaveSettings = async (e) => {
+    e.preventDefault();
+    setSavingSettings(true);
+    try {
+      await bookclubAPI.updateBookclubSettings(bookClubId, {
+        ...settingsForm,
+        requiresApproval: settingsForm.visibility === 'PRIVATE' ? settingsForm.requiresApproval : false
+      });
+      alert('Settings updated successfully!');
+      // Refresh bookclub data
+      const response = await bookclubAPI.getBookclubPreview(bookClubId);
+      setBookClub(response.data);
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to update settings');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
 
   // Fetch bookclub books history
   const fetchBookclubBooks = async () => {
@@ -127,15 +214,8 @@ const BookClub = () => {
     
     setLoadingBooks(true);
     try {
-      const response = await fetch(
-        `http://localhost:3000/v1/bookclub/${bookClubId}/books`,
-        {
-          headers: {
-            'Authorization': `Bearer ${auth.token}`
-          }
-        }
-      );
-      const data = await response.json();
+      const response = await apiClient.get(`/v1/bookclub/${bookClubId}/books`);
+      const data = response.data;
       
       if (data.success) {
         // Organize books by status
@@ -147,7 +227,7 @@ const BookClub = () => {
         setBookclubBooks(organized);
       }
     } catch (err) {
-      console.error('Error fetching bookclub books:', err);
+      logger.error('Error fetching bookclub books:', err);
     } finally {
       setLoadingBooks(false);
     }
@@ -157,6 +237,7 @@ const BookClub = () => {
     setShowBooksHistory(true);
     setShowCalendar(false);
     setShowSuggestions(false);
+    setShowSettings(false);
     fetchBookclubBooks();
   };
 
@@ -164,19 +245,12 @@ const BookClub = () => {
     if (!auth?.token) return;
     
     try {
-      const response = await fetch(
-        `http://localhost:3000/v1/bookclub/${bookClubId}/books/${bookId}`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${auth.token}`
-          },
-          body: JSON.stringify({ status: newStatus })
-        }
+      const response = await apiClient.patch(
+        `/v1/bookclub/${bookClubId}/books/${bookId}`,
+        { status: newStatus }
       );
       
-      const data = await response.json();
+      const data = response.data;
       if (data.success) {
         // Refresh the books list
         fetchBookclubBooks();
@@ -184,8 +258,49 @@ const BookClub = () => {
         alert(data.error || 'Failed to update book status');
       }
     } catch (err) {
-      console.error('Error updating book status:', err);
+      logger.error('Error updating book status:', err);
       alert('Failed to update book status');
+    }
+  };
+
+  // Rate a bookclub book
+  const handleRateBook = async (bookClubBookId, rating) => {
+    if (!auth?.token) return;
+    
+    try {
+      const response = await apiClient.post(
+        `/v1/bookclub/${bookClubId}/books/${bookClubBookId}/rate`,
+        { rating }
+      );
+      
+      if (response.data.success) {
+        // Refresh books to update rating display
+        fetchBookclubBooks();
+      }
+    } catch (err) {
+      logger.error('Error rating book:', err);
+      alert('Failed to rate book');
+      throw err;
+    }
+  };
+
+  // Remove rating from a bookclub book
+  const handleRemoveRating = async (bookClubBookId) => {
+    if (!auth?.token) return;
+    
+    try {
+      const response = await apiClient.delete(
+        `/v1/bookclub/${bookClubId}/books/${bookClubBookId}/rate`
+      );
+      
+      if (response.data.success) {
+        // Refresh books to update rating display
+        fetchBookclubBooks();
+      }
+    } catch (err) {
+      logger.error('Error removing rating:', err);
+      alert('Failed to remove rating');
+      throw err;
     }
   };
 
@@ -193,27 +308,21 @@ const BookClub = () => {
   useEffect(() => {
     const fetchBookClub = async () => {
       try {
-        const headers = auth?.token 
-          ? { Authorization: `Bearer ${auth.token}` }
-          : {};
+        const response = await apiClient.get(`/v1/bookclubs/${bookClubId}`);
+        const responseData = response.data;
         
-        const response = await fetch(`http://localhost:3000/v1/editor/bookclubs/${bookClubId}`, { headers });
-        const data = await response.json();
+        // Handle new response format { success: true, data: {...} }
+        const data = responseData.success ? responseData.data : responseData;
+        setBookClub(data);
+        setRooms(data.rooms || []);
         
-        if (response.ok) {
-          setBookClub(data);
-          setRooms(data.rooms || []);
-          
-          // Select first room by default
-          if (data.rooms && data.rooms.length > 0) {
-            setCurrentRoom(data.rooms[0]);
-          }
-        } else {
-          setError(data.error || 'Failed to load book club');
+        // Select first room by default
+        if (data.rooms && data.rooms.length > 0) {
+          setCurrentRoom(data.rooms[0]);
         }
       } catch (err) {
-        console.error('Error fetching book club:', err);
-        setError('Failed to connect to server');
+        logger.error('Error fetching book club:', err);
+        setError(err.response?.data?.message || err.response?.data?.error || 'Failed to connect to server');
       } finally {
         setLoading(false);
       }
@@ -224,260 +333,90 @@ const BookClub = () => {
     }
   }, [bookClubId, auth]);
 
+  // Fetch bookclub books when bookClubId changes
+  useEffect(() => {
+    if (bookClubId && auth?.token) {
+      fetchBookclubBooks();
+    }
+  }, [bookClubId, auth?.token]);
+
   // Fetch my bookclubs only once on mount (not on bookClubId change to prevent reordering)
   useEffect(() => {
     if (auth?.user) {
-        const headers = auth?.token 
-          ? { Authorization: `Bearer ${auth.token}` }
-          : {};
-        
-        fetch('http://localhost:3000/v1/editor/bookclubs?mine=true', { headers })
-            .then(response => response.json())
-            .then(data => {
-                console.log('My Bookclubs response:', data);
-                setMyBookClubs(data.bookClubs || []);
+        apiClient.get('/v1/bookclubs/discover')
+            .then(response => {
+                const data = response.data;
+                logger.debug('My Bookclubs response:', data);
+                // Handle new API response format { success: true, data: [...] }
+                const clubs = data.success ? data.data : (data.bookClubs || []);
+                // Filter for clubs where user is a member (including INVITE_ONLY clubs)
+                const myClubs = clubs.filter(club => 
+                  club.creatorId === auth.user.id || club.isMember === true
+                );
+                // Sort bookclubs alphabetically by name for consistent order
+                myClubs.sort((a, b) => a.name.localeCompare(b.name));
+                setMyBookClubs(myClubs);
             })
-            .catch(error => console.error('Error fetching my book clubs:', error));
+            .catch(error => logger.error('Error fetching my book clubs:', error));
     }
   }, [auth]);
 
-  // DM WebSocket connection
+  // Fetch friends list for connected users sidebar
   useEffect(() => {
-    if (!auth?.user?.id || !auth?.user?.name) return;
-
-    const ws = new WebSocket('ws://localhost:4000');
-    dmWs.current = ws;
-
-    ws.onopen = () => {
-      console.log('📨 DM WebSocket connected');
-      ws.send(JSON.stringify({
-        type: 'join-dm',
-        userId: auth.user.id,
-        username: auth.user.name
-      }));
-    };
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+    const fetchFriends = async () => {
+      if (!auth?.token) return;
       
-      switch (data.type) {
-        case 'dm-joined':
-          console.log('✅ Joined DM connection');
-          break;
-          
-        case 'dm-sent':
-          // Message we sent was confirmed - add it if not already in list
-          setDmMessages(prev => {
-            if (prev.find(m => m.id === data.message.id)) return prev;
-            return [...prev, data.message];
-          });
-          setSendingMessage(false);
-          break;
-          
-        case 'dm-received':
-          // New message received from someone else
-          const newMsg = data.message;
-          
-          // Update messages if this is the active conversation
-          if (currentDMUser && (newMsg.senderId === currentDMUser.id || newMsg.receiverId === currentDMUser.id)) {
-            setDmMessages(prev => {
-              if (prev.find(m => m.id === newMsg.id)) return prev;
-              return [...prev, newMsg];
-            });
-          }
-          
-          // Update conversations list
-          fetchConversations();
-          break;
-          
-        case 'error':
-          console.error('WebSocket error:', data.message);
-          setSendingMessage(false);
-          alert(data.message || 'Failed to send message');
-          break;
-      }
-    };
-
-    ws.onerror = (error) => {
-      console.error('DM WebSocket error:', error);
-    };
-
-    ws.onclose = () => {
-      console.log('📪 DM WebSocket disconnected');
-    };
-
-    return () => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.close();
-      }
-    };
-  }, [auth?.user?.id, auth?.user?.name, currentDMUser]);
-
-  // Fetch conversations when switching to DM mode
-  const fetchConversations = async () => {
-    if (!auth?.token) return;
-    
-    try {
-      const response = await fetch('http://localhost:3000/v1/messages/conversations', {
-        headers: { Authorization: `Bearer ${auth.token}` }
-      });
-      const data = await response.json();
-      
-      if (response.ok) {
-        // Backend returns { success: true, data: [...conversations] }
-        setConversations(data.data || []);
-      } else {
-        console.error('Failed to fetch conversations:', data.message);
-      }
-    } catch (err) {
-      console.error('Error fetching conversations:', err);
-    }
-  };
-
-  // Fetch friends list
-  const fetchFriends = async () => {
-    if (!auth?.token) return;
-    
-    try {
-      const response = await fetch('http://localhost:3000/v1/friends/list', {
-        headers: { Authorization: `Bearer ${auth.token}` }
-      });
-      const data = await response.json();
-      
-      if (response.ok) {
-        setFriends(data.data || []);
-      } else {
-        console.error('Failed to fetch friends:', data.message);
-      }
-    } catch (err) {
-      console.error('Error fetching friends:', err);
-    }
-  };
-
-  useEffect(() => {
-    if (viewMode === 'dm') {
-      fetchConversations();
-      fetchFriends();
-    }
-  }, [viewMode, auth]);
-
-  // Check for DM intent from sessionStorage
-  useEffect(() => {
-    const dmIntent = sessionStorage.getItem('openDM');
-    if (dmIntent && auth?.user) {
       try {
-        const { userId } = JSON.parse(dmIntent);
-        // Clear the intent
-        sessionStorage.removeItem('openDM');
-        // Open DM with the user
-        handleStartDM(userId);
+        const response = await apiClient.get('/v1/friends/list');
+        const data = response.data;
+        
+        setFriends(data.data || []);
       } catch (err) {
-        console.error('Error parsing DM intent:', err);
-        sessionStorage.removeItem('openDM');
+        logger.error('Error fetching friends:', err);
       }
-    }
-  }, [bookClubId, auth]);
+    };
 
-  // Fetch messages for selected DM conversation
-  const fetchDMMessages = async (userId) => {
-    if (!auth?.token) return;
-    
-    try {
-      const response = await fetch(`http://localhost:3000/v1/messages/${userId}`, {
-        headers: { Authorization: `Bearer ${auth.token}` }
-      });
-      const data = await response.json();
-      
-      if (response.ok) {
-        setDmMessages(data.data.messages || []);
-        setCurrentDMUser(data.data.otherUser);
-      } else {
-        console.error('Failed to fetch messages:', data.message);
-        // If fetch fails, try to find user in conversations or bookClubMembers
-        const userFromConv = conversations.find(c => c.friend?.id === userId)?.friend;
-        const userFromMembers = bookClubMembers.find(m => m.id === userId);
-        if (userFromConv) {
-          setCurrentDMUser(userFromConv);
-          setDmMessages([]);
-        } else if (userFromMembers) {
-          setCurrentDMUser({
-            id: userFromMembers.id,
-            name: userFromMembers.username,
-            email: userFromMembers.email || '',
-            profileImage: userFromMembers.profileImage
-          });
-          setDmMessages([]);
-        }
-      }
-    } catch (err) {
-      console.error('Error fetching DM messages:', err);
-      // Fallback: try to set user from conversations or members
-      const userFromConv = conversations.find(c => c.friend?.id === userId)?.friend;
-      const userFromMembers = bookClubMembers.find(m => m.id === userId);
-      if (userFromConv) {
-        setCurrentDMUser(userFromConv);
-        setDmMessages([]);
-      } else if (userFromMembers) {
-        setCurrentDMUser({
-          id: userFromMembers.id,
-          name: userFromMembers.username,
-          email: userFromMembers.email || '',
-          profileImage: userFromMembers.profileImage
-        });
-        setDmMessages([]);
-      }
-    }
-  };
+    fetchFriends();
+  }, [auth?.token]);
 
-  const handleSelectDMConversation = async (userId) => {
-    await fetchDMMessages(userId);
-  };
 
-  const handleSendDM = (content, attachments = []) => {
-    if ((!content || !content.trim()) && attachments.length === 0) {
-      return;
-    }
-    
-    if (sendingMessage || !dmWs.current || dmWs.current.readyState !== WebSocket.OPEN || !currentDMUser) {
-      return;
-    }
 
-    setSendingMessage(true);
-    
-    dmWs.current.send(JSON.stringify({
-      type: 'dm-message',
-      receiverId: currentDMUser.id,
-      content: content?.trim() || '',
-      attachments: attachments
-    }));
-  };
+
+
+
+
+
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
     
-    console.log('=== SEND MESSAGE DEBUG ===');
-    console.log('Message text:', newMessage);
-    console.log('Selected files count:', selectedFiles.length);
-    console.log('Selected files:', selectedFiles);
-    console.log('FileUploadRef exists:', !!fileUploadRef.current);
-    console.log('ws ref exists:', !!ws);
-    console.log('ws.current exists:', !!ws.current);
-    console.log('ws.current readyState:', ws.current?.readyState);
-    console.log('WebSocket.OPEN value:', WebSocket.OPEN);
+    // Use raw message with <@userId> tokens if available (from mention system)
+    const rawMessage = e._rawMessage || newMessage;
     
-    const hasMessage = newMessage.trim().length > 0;
+    logger.debug('=== SEND MESSAGE DEBUG ===');
+    logger.debug('Display message:', newMessage);
+    logger.debug('Raw message (with mentions):', rawMessage);
+    logger.debug('Selected files count:', selectedFiles.length);
+    logger.debug('Selected files:', selectedFiles);
+    logger.debug('FileUploadRef exists:', !!fileUploadRef.current);
+    logger.debug('ws ref exists:', !!ws);
+    logger.debug('ws.current exists:', !!ws.current);
+    logger.debug('ws.current readyState:', ws.current?.readyState);
+    logger.debug('WebSocket.OPEN value:', WebSocket.OPEN);
+    
+    const hasMessage = rawMessage.trim().length > 0;
     const hasFiles = selectedFiles.length > 0;
     const hasContent = hasMessage || hasFiles;
     const wsReady = ws.current && ws.current.readyState === WebSocket.OPEN;
     
-    console.log('Has message:', hasMessage);
-    console.log('Has files:', hasFiles);
-    console.log('Has content:', hasContent);
-    console.log('WS ready:', wsReady);
+    logger.debug('Has message:', hasMessage);
+    logger.debug('Has files:', hasFiles);
+    logger.debug('Has content:', hasContent);
+    logger.debug('WS ready:', wsReady);
     
     if (!hasContent || !wsReady) {
-      console.log('Validation failed - returning early');
-      console.log('Reason: hasContent=', hasContent, 'wsReady=', wsReady);
+      logger.debug('Validation failed - returning early');
+      logger.debug('Reason: hasContent=', hasContent, 'wsReady=', wsReady);
       return;
     }
 
@@ -488,27 +427,50 @@ const BookClub = () => {
       
       // Upload files if any are selected
       if (selectedFiles.length > 0 && fileUploadRef.current) {
-        console.log('Starting file upload...');
+        logger.debug('Starting file upload...');
         attachments = await fileUploadRef.current.uploadFiles();
-        console.log('Uploaded attachments:', attachments);
+        logger.debug('Uploaded attachments:', attachments);
       } else {
-        console.log('No files to upload or ref missing');
+        logger.debug('No files to upload or ref missing');
       }
 
-      // Send message via WebSocket
-      console.log('Sending WebSocket message with attachments:', attachments);
-      const messageData = {
-        type: 'chat-message',
-        message: newMessage.trim() || null,
-        attachments: attachments
-      };
-      console.log('Full message data:', messageData);
-      ws.current.send(JSON.stringify(messageData));
+      // If there's a text message and files, send text message first
+      if (rawMessage.trim() && attachments.length > 0) {
+        const textMessageData = {
+          type: 'chat-message',
+          message: rawMessage.trim(),
+          attachments: []
+        };
+        logger.debug('Sending text message:', textMessageData);
+        ws.current.send(JSON.stringify(textMessageData));
+      }
+
+      // Send each file as a separate message
+      if (attachments.length > 0) {
+        for (const attachment of attachments) {
+          const fileMessageData = {
+            type: 'chat-message',
+            message: rawMessage.trim() && attachments.length === 1 ? rawMessage.trim() : null,
+            attachments: [attachment]
+          };
+          logger.debug('Sending file message:', fileMessageData);
+          ws.current.send(JSON.stringify(fileMessageData));
+        }
+      } else if (rawMessage.trim()) {
+        // If only text, no files
+        const messageData = {
+          type: 'chat-message',
+          message: rawMessage.trim(),
+          attachments: []
+        };
+        logger.debug('Sending text-only message:', messageData);
+        ws.current.send(JSON.stringify(messageData));
+      }
 
       setNewMessage('');
       setSelectedFiles([]); // Clear selected files after sending
     } catch (error) {
-      console.error('Error sending message:', error);
+      logger.error('Error sending message:', error);
       alert('Failed to send message');
     } finally {
       setUploadingFiles(false);
@@ -524,25 +486,15 @@ const BookClub = () => {
     if (!roomName || !roomName.trim()) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/v1/editor/bookclubs/${bookClubId}/rooms`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth.token}`
-        },
-        body: JSON.stringify({ name: roomName.trim() })
-      });
-
-      const data = await response.json();
+      const response = await apiClient.post(`/v1/bookclubs/${bookClubId}/rooms`, { name: roomName.trim() });
+      const data = response.data;
       
-      if (response.ok) {
-        setRooms(prev => [...prev, data.room]);
-      } else {
-        alert(data.error || 'Failed to create room');
-      }
+      setRooms(prev => [...prev, data.room]);
+      // Redirect to the newly created room
+      switchRoom(data.room);
     } catch (err) {
-      console.error('Error creating room:', err);
-      alert('Failed to create room');
+      logger.error('Error creating room:', err);
+      alert(err.response?.data?.error || 'Failed to create room');
     }
   };
 
@@ -553,6 +505,7 @@ const BookClub = () => {
       setShowBooksHistory(false);
       setShowCalendar(false);
       setShowSuggestions(false);
+      setShowSettings(false);
       
       // Send switch-room message to server
       if (ws.current && ws.current.readyState === WebSocket.OPEN) {
@@ -573,24 +526,15 @@ const BookClub = () => {
 
     setUploadingImage(true);
     try {
-      const response = await fetch(`http://localhost:3000/v1/editor/bookclubs/${bookClubId}/image`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${auth.token}`
-        },
-        body: formData
+      const response = await apiClient.post(`/v1/bookclubs/${bookClubId}/image`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
-
-      const data = await response.json();
+      const data = response.data;
       
-      if (response.ok) {
-        setBookClub(prev => ({ ...prev, imageUrl: data.imageUrl }));
-      } else {
-        alert(data.error || 'Failed to upload image');
-      }
+      setBookClub(prev => ({ ...prev, imageUrl: data.imageUrl }));
     } catch (err) {
-      console.error('Error uploading image:', err);
-      alert('Failed to upload image');
+      logger.error('Error uploading image:', err);
+      alert(err.response?.data?.error || 'Failed to upload image');
     } finally {
       setUploadingImage(false);
       if (fileInputRef.current) {
@@ -603,23 +547,11 @@ const BookClub = () => {
     if (!confirm('Are you sure you want to delete the bookclub image?')) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/v1/editor/bookclubs/${bookClubId}/image`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${auth.token}`
-        }
-      });
-
-      const data = await response.json();
-      
-      if (response.ok) {
-        setBookClub(prev => ({ ...prev, imageUrl: null }));
-      } else {
-        alert(data.error || 'Failed to delete image');
-      }
+      await apiClient.delete(`/v1/bookclubs/${bookClubId}/image`);
+      setBookClub(prev => ({ ...prev, imageUrl: null }));
     } catch (err) {
-      console.error('Error deleting image:', err);
-      alert('Failed to delete image');
+      logger.error('Error deleting image:', err);
+      alert(err.response?.data?.error || 'Failed to delete image');
     }
   };
 
@@ -627,55 +559,16 @@ const BookClub = () => {
     if (!auth?.token) return;
     
     try {
-      const response = await fetch('http://localhost:3000/v1/friends/request', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth.token}`
-        },
-        body: JSON.stringify({ recipientId: userId })
-      });
+      const response = await apiClient.post('/v1/friends/request', { recipientId: userId });
+      const data = response.data;
+      logger.debug('Friend request response:', data);
       
-      const data = await response.json();
-      console.log('Friend request response:', data, 'Status:', response.status);
-      
-      if (response.ok) {
-        alert('Friend request sent!');
-        // Refetch friends to update UI
-        await fetchFriends();
-        setSelectedUserId(null);
-      } else {
-        console.error('Friend request failed:', data);
-        alert(data.error || data.message || 'Failed to send friend request');
-      }
+      alert('Friend request sent!');
+      setSelectedUserId(null);
     } catch (err) {
-      console.error('Error sending friend request:', err);
-      alert('Failed to send friend request: ' + err.message);
+      logger.error('Error sending friend request:', err);
+      alert(err.response?.data?.error || err.response?.data?.message || 'Failed to send friend request');
     }
-  };
-
-  const handleStartDM = async (userId) => {
-    setViewMode('dm');
-    await fetchDMMessages(userId);
-    
-    // If user is not in conversations yet, add them temporarily
-    if (!conversations.some(conv => conv.friend?.id === userId)) {
-      const userInfo = bookClubMembers.find(member => member.id === userId);
-      if (userInfo) {
-        setConversations(prev => [{
-          friend: {
-            id: userInfo.id,
-            name: userInfo.username,
-            email: userInfo.email || '',
-            profileImage: userInfo.profileImage
-          },
-          lastMessage: null,
-          unreadCount: 0
-        }, ...prev]);
-      }
-    }
-    
-    setSelectedUserId(null);
   };
 
   // Calendar event handlers
@@ -694,24 +587,12 @@ const BookClub = () => {
     if (!auth?.token) return;
     
     try {
-      const response = await fetch(`http://localhost:3000/v1/editor/events/${eventId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${auth.token}`
-        }
-      });
-      
-      if (response.ok) {
-        // Event deleted successfully - calendar will refetch
-        return true;
-      } else {
-        const data = await response.json();
-        alert(data.error || 'Failed to delete event');
-        return false;
-      }
+      await apiClient.delete(`/v1/editor/events/${eventId}`);
+      // Event deleted successfully - calendar will refetch
+      return true;
     } catch (err) {
-      console.error('Error deleting event:', err);
-      alert('Failed to delete event');
+      logger.error('Error deleting event:', err);
+      alert(err.response?.data?.error || 'Failed to delete event');
       return false;
     }
   };
@@ -729,6 +610,49 @@ const BookClub = () => {
   const handleCalendarRefreshCallback = (refreshFn) => {
     setCalendarRefresh(() => refreshFn);
   };
+
+
+  // Memoize mapped members with roles to trigger re-render when roles update
+  const mappedBookClubMembers = useMemo(() => {
+    logger.debug('🔄 Recalculating mappedBookClubMembers', {
+      bookClubMembersCount: bookClubMembers.length,
+      bookClubDotMembersCount: bookClub?.members?.length,
+      roleUpdateCounter,
+      bookClubMembers: bookClubMembers,
+      bookClubDotMembers: bookClub?.members
+    });
+    
+    // Filter out members who are not in bookClub.members (removed members)
+    const activeMembers = bookClubMembers.filter(member => {
+      // If we don't have bookClub.members yet, show all
+      if (!bookClub?.members) return true;
+      // Only show members who exist in the API response (ACTIVE status)
+      return bookClub.members.some(m => m.userId === member.id);
+    });
+    
+    return activeMembers.map(member => {
+      // bookClubMembers from WebSocket has: id, username, email, profileImage
+      // bookClub.members from API has: id, userId, role, bookClubId
+      // Match by: bookClub.members.userId === bookClubMembers.id
+      const memberWithRole = bookClub?.members?.find(m => m.userId === member.id);
+      const mappedMember = {
+        ...member,
+        id: member.id,
+        role: memberWithRole?.role || (member.id === bookClub?.creatorId ? 'OWNER' : 'MEMBER')
+      };
+      
+      logger.debug('👤 Mapping member:', {
+        memberName: member.username,
+        memberId: member.id,
+        lookingForUserId: member.id,
+        foundMemberWithRole: memberWithRole,
+        finalRole: mappedMember.role,
+        bookClubCreatorId: bookClub?.creatorId
+      });
+      
+      return mappedMember;
+    });
+  }, [bookClubMembers, bookClub?.members, bookClub?.creatorId, roleUpdateCounter]);
 
 
   
@@ -767,93 +691,307 @@ const BookClub = () => {
           <MyBookClubsSidebar 
             bookClubs={myBookClubs} 
             currentBookClubId={bookClubId}
-            viewMode={viewMode}
             onSelectBookClub={(id) => {
-              setViewMode('bookclub');
               navigate(`/bookclub/${id}`);
             }}
-            onOpenDM={() => setViewMode('dm')}
+            onOpenDM={() => navigate('/dm')}
             auth={auth}
           />
           
-          {/* Conditional Sidebar - Bookclub Rooms or DM Conversations */}
-          {viewMode === 'dm' ? (
-            <DMSidebar
-              conversations={conversations}
-              friends={friends}
-              currentConversation={currentDMUser?.id}
-              onSelectConversation={handleSelectDMConversation}
-              onStartConversation={handleSelectDMConversation}
-              onBackToBookclub={() => setViewMode('bookclub')}
-              auth={auth}
-            />
-          ) : (
-            <SideBarRooms
-              bookClub={bookClub}
-              rooms={rooms}
-              currentRoom={currentRoom}
-              switchRoom={switchRoom}
-              handleCreateRoom={handleCreateRoom}
-              auth={auth}
-              uploadingImage={uploadingImage}
-              fileInputRef={fileInputRef}
-              handleImageUpload={handleImageUpload}
-              handleDeleteImage={handleDeleteImage}
-              onNameUpdate={(newName) => setBookClub(prev => ({ ...prev, name: newName }))}
-              onOpenDM={() => setViewMode('dm')}
-              setAddCurrentBookState={setAddCurrentBookState}
-              addCurrentBookState={addCurrentBookState}
-              onCurrentBookClick={(bookData) => {
-                setCurrentBookData(bookData);
-                setCurrentBookDetailsOpen(true);
-              }}
-              onShowBooksHistory={handleShowBooksHistory}
-              setShowBooksHistory={setShowBooksHistory}
-              showBooksHistory={showBooksHistory}
-              onShowCalendar={() => {
-                setShowCalendar(true);
-                setShowBooksHistory(false);
-                setShowSuggestions(false);
-                setCurrentRoom(null);
-              }}
-              showCalendar={showCalendar}
-              onShowSuggestions={() => {
-                setShowSuggestions(true);
-                setShowBooksHistory(false);
-                setShowCalendar(false);
-                setCurrentRoom(null);
-              }}
-              showSuggestions={showSuggestions}
-            />
-          )}
+          {/* Bookclub Rooms Sidebar */}
+          <SideBarRooms
+            bookClub={bookClub}
+            rooms={rooms}
+            currentRoom={currentRoom}
+            switchRoom={switchRoom}
+            handleCreateRoom={handleCreateRoom}
+            auth={auth}
+            uploadingImage={uploadingImage}
+            fileInputRef={fileInputRef}
+            handleImageUpload={handleImageUpload}
+            handleDeleteImage={handleDeleteImage}
+            onNameUpdate={(newName) => setBookClub(prev => ({ ...prev, name: newName }))}
+            onOpenDM={() => navigate('/dm')}
+            setAddCurrentBookState={setAddCurrentBookState}
+            addCurrentBookState={addCurrentBookState}
+            onCurrentBookClick={(bookData) => {
+              setCurrentBookData(bookData);
+              setCurrentBookDetailsOpen(true);
+            }}
+            onShowBooksHistory={handleShowBooksHistory}
+            setShowBooksHistory={setShowBooksHistory}
+            showBooksHistory={showBooksHistory}
+            onShowCalendar={() => {
+              setShowCalendar(true);
+              setShowBooksHistory(false);
+              setShowSuggestions(false);
+              setShowSettings(false);
+              setCurrentRoom(null);
+            }}
+            showCalendar={showCalendar}
+            onShowSuggestions={() => {
+              setShowSuggestions(true);
+              setShowBooksHistory(false);
+              setShowCalendar(false);
+              setShowSettings(false);
+              setCurrentRoom(null);
+            }}
+            showSuggestions={showSuggestions}
+          />
         </div>
         
         <div className="flex flex-1">
-        {/* Main Chat Area - Conditional rendering based on mode */}
-        {viewMode === 'dm' ? (
-          <DMChat
-            otherUser={currentDMUser}
-            messages={dmMessages}
-            onSendMessage={handleSendDM}
+        {/* Main Chat Area */}
+        <div className="flex flex-col flex-1">
+          {/* Room Header */}
+          <BookclubHeader 
+            showBooksHistory={showBooksHistory}
+            showCalendar={showCalendar}
+            showSuggestions={showSuggestions}
+            showSettings={showSettings}
+            currentRoom={currentRoom}
             auth={auth}
+            onInviteClick={() => {
+              logger.debug('Invite button clicked!');
+              setShowInviteModal(true);
+            }}
+            onSettingsClick={() => {
+              // Store current view state before opening settings
+              setPreviousView({
+                showBooksHistory,
+                showCalendar,
+                showSuggestions
+              });
+              setShowBooksHistory(false);
+              setShowCalendar(false);
+              setShowSuggestions(false);
+              setShowSettings(true);
+            }}
+            userRole={userRole}
           />
-        ) : (
-          <div className="flex flex-col flex-1">
-            {/* Room Header */}
-            <BookclubHeader 
-              showBooksHistory={showBooksHistory}
-              showCalendar={showCalendar}
-              showSuggestions={showSuggestions}
-              currentRoom={currentRoom}
-              auth={auth}
-              onInviteClick={() => {
-                console.log('Invite button clicked!');
-                setShowInviteModal(true);
-              }}
-            />
 
-            {/* Content Area - Calendar, Books History, Suggestions, or Messages */}
-            {showCalendar ? (
+          {/* Content Area - Settings, Calendar, Books History, Suggestions, or Messages */}
+          {showSettings ? (
+            <div className="flex-1 overflow-y-auto bg-gray-900 p-6">
+              {/* Settings Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <FiSettingsIcon className="w-6 h-6 text-purple-400" />
+                    <h2 className="text-2xl font-bold text-white">Bookclub Settings</h2>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowSettings(false);
+                      // Restore previous view if any
+                      if (previousView) {
+                        setShowBooksHistory(previousView.showBooksHistory);
+                        setShowCalendar(previousView.showCalendar);
+                        setShowSuggestions(previousView.showSuggestions);
+                        setPreviousView(null);
+                      }
+                    }}
+                    className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                  >
+                    <FiX className="w-6 h-6 text-gray-400 hover:text-white" />
+                  </button>
+                </div>
+
+                {/* Settings Form */}
+                <div className="bg-gray-800 rounded-xl p-6 mb-6">
+                  <h3 className="text-xl font-bold text-white mb-6">General Settings</h3>
+                  <form onSubmit={handleSaveSettings} className="space-y-6">
+                    {/* Bookclub Image */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-300 mb-2">Bookclub Image</label>
+                      <div className="relative group w-52 h-52">
+                        <img 
+                          src={bookClub?.imageUrl ? `${COLLAB_EDITOR_URL}${bookClub.imageUrl}` : '/images/default.webp'}
+                          alt={bookClub?.name}
+                          className="w-full h-full object-cover rounded-lg"
+                          onError={(e) => { e.target.src = '/images/default.webp'; }}
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 rounded-lg">
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploadingImage}
+                            className="px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium flex items-center gap-1.5"
+                          >
+                            <FiImage size={14} />
+                            {uploadingImage ? 'Uploading...' : 'Change'}
+                          </button>
+                          {bookClub?.imageUrl && (
+                            <button
+                              type="button"
+                              onClick={handleDeleteImage}
+                              className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium flex items-center gap-1.5"
+                            >
+                              <FiTrash2 size={14} />
+                              Delete
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                    </div>
+
+                    {/* Name */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-300 mb-2">Bookclub Name</label>
+                      <input
+                        type="text"
+                        value={settingsForm.name}
+                        onChange={(e) => setSettingsForm({...settingsForm, name: e.target.value})}
+                        className="w-full px-4 py-3 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                        required
+                      />
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-300 mb-2">Description</label>
+                      <textarea
+                        value={settingsForm.description}
+                        onChange={(e) => setSettingsForm({...settingsForm, description: e.target.value})}
+                        rows={4}
+                        className="w-full px-4 py-3 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-purple-500 outline-none resize-none"
+                      />
+                    </div>
+
+                    {/* Category */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-300 mb-2">Category</label>
+                      <select
+                        value={settingsForm.category}
+                        onChange={(e) => setSettingsForm({...settingsForm, category: e.target.value})}
+                        className="w-full px-4 py-3 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                      >
+                        <option value="">Select a category</option>
+                        <option value="Fiction">Fiction</option>
+                        <option value="Non-Fiction">Non-Fiction</option>
+                        <option value="Mystery">Mystery</option>
+                        <option value="Romance">Romance</option>
+                        <option value="Science Fiction">Science Fiction</option>
+                        <option value="Fantasy">Fantasy</option>
+                        <option value="Thriller">Thriller</option>
+                        <option value="Biography">Biography</option>
+                        <option value="Self-Help">Self-Help</option>
+                        <option value="History">History</option>
+                        <option value="Poetry">Poetry</option>
+                        <option value="Young Adult">Young Adult</option>
+                        <option value="Classic Literature">Classic Literature</option>
+                        <option value="Horror">Horror</option>
+                        <option value="Philosophy">Philosophy</option>
+                      </select>
+                    </div>
+
+                    {/* Visibility */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-300 mb-3">Visibility</label>
+                      <div className="space-y-3">
+                        <label className="flex items-center gap-3 p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-650">
+                          <input
+                            type="radio"
+                            value="PUBLIC"
+                            checked={settingsForm.visibility === 'PUBLIC'}
+                            onChange={(e) => setSettingsForm({...settingsForm, visibility: e.target.value})}
+                            className="w-4 h-4"
+                          />
+                          <FiUnlock className="text-green-400" />
+                          <div>
+                            <span className="font-semibold text-white">Public</span>
+                            <p className="text-sm text-gray-400">Anyone can see and join instantly</p>
+                          </div>
+                        </label>
+                        <label className="flex items-center gap-3 p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-650">
+                          <input
+                            type="radio"
+                            value="PRIVATE"
+                            checked={settingsForm.visibility === 'PRIVATE'}
+                            onChange={(e) => setSettingsForm({...settingsForm, visibility: e.target.value})}
+                            className="w-4 h-4"
+                          />
+                          <FiLock className="text-yellow-400" />
+                          <div>
+                            <span className="font-semibold text-white">Private</span>
+                            <p className="text-sm text-gray-400">Anyone can see, join requires approval</p>
+                          </div>
+                        </label>
+                        <label className="flex items-center gap-3 p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-650">
+                          <input
+                            type="radio"
+                            value="INVITE_ONLY"
+                            checked={settingsForm.visibility === 'INVITE_ONLY'}
+                            onChange={(e) => setSettingsForm({...settingsForm, visibility: e.target.value})}
+                            className="w-4 h-4"
+                          />
+                          <FiEyeOff className="text-purple-400" />
+                          <div>
+                            <span className="font-semibold text-white">Invite Only</span>
+                            <p className="text-sm text-gray-400">Only visible to members, join via invite</p>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Approval Checkbox */}
+                    {settingsForm.visibility === 'PRIVATE' && (
+                      <div className="bg-gray-700 p-4 rounded-lg">
+                        <label className="flex items-center gap-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={settingsForm.requiresApproval}
+                            onChange={(e) => setSettingsForm({...settingsForm, requiresApproval: e.target.checked})}
+                            className="w-5 h-5"
+                          />
+                          <span className="font-semibold text-white">Require admin approval for join requests</span>
+                        </label>
+                      </div>
+                    )}
+
+                    {/* Submit Button */}
+                    <button
+                      type="submit"
+                      disabled={savingSettings}
+                      className={`w-full px-6 py-3 rounded-xl font-semibold transition-colors ${
+                        savingSettings
+                          ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                          : 'bg-purple-600 text-white hover:bg-purple-700'
+                      }`}
+                    >
+                      {savingSettings ? 'Saving...' : 'Save Settings'}
+                    </button>
+                  </form>
+                </div>
+
+                {/* Admin Panels */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                  <AdminApprovalPanel bookclubId={bookClubId} userRole={userRole} />
+                </div>
+
+                {/* Member Management */}
+                <MemberManagement
+                  bookclub={{
+                    ...bookClub,
+                    members: mappedBookClubMembers
+                  }}
+                  currentUserId={auth?.user?.id}
+                  currentUserRole={userRole}
+                  onMemberUpdate={async () => {
+                    const response = await bookclubAPI.getBookclubPreview(bookClubId);
+                    setBookClub(response.data);
+                    // Increment counter to force re-render
+                    setRoleUpdateCounter(prev => prev + 1);
+                  }}
+                />
+              </div>
+            ) : showCalendar ? (
               <div className="flex-1 overflow-hidden">
                 <CalendarView
                   bookClubId={bookClubId}
@@ -878,15 +1016,32 @@ const BookClub = () => {
                     <p>Loading books...</p>
                   </div>
                 ) : (
-                  <BookClubBookView setShowAddBookModal={setShowAddBookModal} bookclubBooks={bookclubBooks} setCurrentBookData={setCurrentBookData} setCurrentBookDetailsOpen={setCurrentBookDetailsOpen} handleStatusChange={handleStatusChange} />
+                  <BookClubBookView 
+                    setShowAddBookModal={setShowAddBookModal} 
+                    bookclubBooks={bookclubBooks} 
+                    setCurrentBookData={setCurrentBookData} 
+                    setCurrentBookDetailsOpen={setCurrentBookDetailsOpen} 
+                    handleStatusChange={handleStatusChange}
+                    onRateBook={handleRateBook}
+                    onRemoveRating={handleRemoveRating}
+                    currentUserId={auth?.user?.id}
+                  />
                 )}
               </div>
             ) : (
-              <BookClubChat messages={messages} currentRoom={currentRoom} auth={auth} />
+              <BookClubChat 
+                messages={messages} 
+                setMessages={setMessages}
+                currentRoom={currentRoom} 
+                auth={auth} 
+                userRole={userRole}
+                ws={ws}
+                members={bookClubMembers}
+              />
             )}
 
             {/* Message Input - Only show when not viewing special views */}
-            {!showBooksHistory && !showCalendar && !showSuggestions && auth?.user ? (
+            {!showBooksHistory && !showCalendar && !showSuggestions && !showSettings && auth?.user ? (
               <MessageInput
                 newMessage={newMessage}
                 setNewMessage={setNewMessage}
@@ -897,8 +1052,9 @@ const BookClub = () => {
                 onFilesSelected={handleFilesSelected}
                 onSubmit={handleSendMessage}
                 auth={auth}
+                members={bookClubMembers}
               />
-            ) : !showBooksHistory && !showCalendar && !showSuggestions ? (
+            ) : !showBooksHistory && !showCalendar && !showSuggestions && !showSettings ? (
               <div className="bg-gray-800 border-t border-gray-700 p-4 text-center">
                 <p className="text-gray-400">
                   Please <button onClick={() => navigate('/login', { state: { from: `/bookclub/${bookClubId}` } })} className="text-purple-400 hover:underline">log in</button> to chat
@@ -908,17 +1064,14 @@ const BookClub = () => {
 
           </div>
           )}
-          {/* Connected Users - only show in bookclub mode */}
-          {viewMode === 'bookclub' && (
-            <ConnectedUsersSidebar
-              bookClubMembers={bookClubMembers}
+          {/* Connected Users Sidebar */}
+          <ConnectedUsersSidebar
+              bookClubMembers={mappedBookClubMembers}
               connectedUsers={connectedUsers}
               friends={friends}
               auth={auth}
               onSendFriendRequest={handleSendFriendRequest}
-              onStartDM={handleStartDM}
             />
-          )}
         </div>
 
 
@@ -930,7 +1083,7 @@ const BookClub = () => {
             bookClubId={bookClubId}
             onClose={() => setAddCurrentBookState(false)}
             onBookAdded={(book) => {
-              console.log('Book added:', book);
+              logger.debug('Book added:', book);
               setAddCurrentBookState(false);
               // Trigger refresh in SideBarRooms by updating a timestamp or similar
             }}
@@ -962,7 +1115,7 @@ const BookClub = () => {
             bookClubId={bookClubId}
             onClose={() => setShowAddBookModal(false)}
             onBookAdded={(book) => {
-              console.log('Book added:', book);
+              logger.debug('Book added:', book);
               setShowAddBookModal(false);
               // Refresh the books list
               fetchBookclubBooks();
@@ -988,11 +1141,12 @@ const BookClub = () => {
         )}
 
         {/* Invite Modal */}
-        {console.log('showInviteModal:', showInviteModal)}
         {showInviteModal && (
           <InviteModal
             bookClubId={bookClubId}
             bookClubName={bookClub?.name}
+            bookClubMembers={mappedBookClubMembers}
+            currentUserRole={userRole}
             onClose={() => setShowInviteModal(false)}
           />
         )}
