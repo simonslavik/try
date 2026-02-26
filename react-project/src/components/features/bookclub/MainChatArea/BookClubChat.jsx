@@ -1,6 +1,6 @@
 
 import React, { useRef, useEffect, useState } from 'react';
-import { FiHash, FiTrash2, FiMoreVertical, FiEdit2, FiCheck, FiX } from 'react-icons/fi';
+import { FiHash, FiTrash2, FiMoreVertical, FiEdit2, FiCheck, FiX, FiCopy, FiCornerUpLeft } from 'react-icons/fi';
 import { BsPinAngle } from 'react-icons/bs';
 import MessageAttachment from '../../../common/MessageAttachment';
 import { messageModerationAPI } from '@api/messageModeration.api';
@@ -106,12 +106,13 @@ const formatTimestamp = (timestamp) => {
   }
 };
 
-const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, members = [] }) => {
+const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, members = [], onReply }) => {
     const messagesEndRef = useRef(null);
     const [messageMenuId, setMessageMenuId] = useState(null);
     const [showFullDateId, setShowFullDateId] = useState(null);
     const [editingMessageId, setEditingMessageId] = useState(null);
     const [editingText, setEditingText] = useState('');
+    const [copiedMessageId, setCopiedMessageId] = useState(null);
     const editInputRef = useRef(null);
     const menuRef = useRef(null);
 
@@ -243,6 +244,39 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
       setMessageMenuId(messageMenuId === messageId ? null : messageId);
     };
 
+    const handleCopyMessage = async (messageId, text) => {
+      setMessageMenuId(null);
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        setCopiedMessageId(messageId);
+        setTimeout(() => setCopiedMessageId(null), 2000);
+      } catch (error) {
+        logger.error('Error copying message:', error);
+      }
+    };
+
+    const handleReply = (msg) => {
+      setMessageMenuId(null);
+      if (onReply) {
+        onReply({
+          id: msg.id,
+          text: msg.text,
+          username: msg.username,
+          userId: msg.userId
+        });
+      }
+    };
+
+    const scrollToMessage = (messageId) => {
+      const el = document.getElementById(`msg-${messageId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('ring-2', 'ring-purple-500', 'ring-opacity-75');
+        setTimeout(() => el.classList.remove('ring-2', 'ring-purple-500', 'ring-opacity-75'), 2000);
+      }
+    };
+
     const startEditingMessage = (msg) => {
       setMessageMenuId(null);
       setEditingMessageId(msg.id);
@@ -349,7 +383,7 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
                   const { groupWithPrevious, isLastInGroup } = shouldGroupMessages(msg, previousMsg, nextMsg);
                   
                   return (
-                  <div key={msg.id || idx} className={`flex flex-col ${groupWithPrevious ? 'mt-1' : 'mt-3'}`}>
+                  <div key={msg.id || idx} id={`msg-${msg.id}`} className={`flex flex-col ${groupWithPrevious ? 'mt-1' : 'mt-3'} transition-all duration-300 rounded-lg`}>
                     {msg.type === 'system' ? (
                       <div className="text-center">
                         <span className="text-xs text-gray-500 italic">{msg.text}</span>
@@ -363,6 +397,17 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
                                 <div className="flex items-center justify-end gap-1 text-xs text-yellow-400 mb-1">
                                   <BsPinAngle className="w-3 h-3" />
                                   <span>Pinned</span>
+                                </div>
+                              )}
+                              {msg.replyTo && (
+                                <div
+                                  onClick={() => scrollToMessage(msg.replyTo.id)}
+                                  className="flex items-center justify-end gap-1 mb-1 cursor-pointer group/reply"
+                                >
+                                  <div className="bg-purple-900/40 border-l-2 border-purple-400 rounded-r-lg px-3 py-1.5 max-w-[280px] hover:bg-purple-900/60 transition-colors">
+                                    <span className="text-xs text-purple-300 font-medium block">{msg.replyTo.username}</span>
+                                    <span className="text-xs text-gray-400 truncate block">{msg.replyTo.content || '[attachment]'}</span>
+                                  </div>
                                 </div>
                               )}
                               {editingMessageId === msg.id ? (
@@ -385,11 +430,16 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
                                   </div>
                                 </div>
                               ) : msg.text && (
-                                <div className={`bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl px-4 py-3 shadow-lg mb-1 ${msg.deletedAt ? 'opacity-60 italic' : ''}`}>
+                                <div className={`relative bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl px-4 py-3 shadow-lg mb-1 ${msg.deletedAt ? 'opacity-60 italic' : ''}`}>
                                   <p className="text-white break-words font-medium">
                                     {renderMessageContent(msg.text)}
                                     {msg.editedAt && <span className="text-xs text-purple-200 italic ml-1">(edited)</span>}
                                   </p>
+                                  {copiedMessageId === msg.id && (
+                                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-green-600 text-white text-xs px-2 py-1 rounded-md shadow-lg whitespace-nowrap">
+                                      Copied!
+                                    </div>
+                                  )}
                                 </div>
                               )}
                               {!msg.deletedAt && (
@@ -421,6 +471,18 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
                                     <button onClick={() => startEditingMessage(msg)} className="w-full px-4 py-2 text-left text-sm text-gray-200 hover:bg-gray-700 flex items-center gap-2">
                                       <FiEdit2 className="w-4 h-4" />
                                       Edit message
+                                    </button>
+                                  )}
+                                  {msg.text && !msg.deletedAt && (
+                                    <button onClick={() => handleCopyMessage(msg.id, msg.text)} className="w-full px-4 py-2 text-left text-sm text-gray-200 hover:bg-gray-700 flex items-center gap-2">
+                                      <FiCopy className="w-4 h-4" />
+                                      Copy text
+                                    </button>
+                                  )}
+                                  {!msg.deletedAt && (
+                                    <button onClick={() => handleReply(msg)} className="w-full px-4 py-2 text-left text-sm text-gray-200 hover:bg-gray-700 flex items-center gap-2">
+                                      <FiCornerUpLeft className="w-4 h-4" />
+                                      Reply
                                     </button>
                                   )}
                                   {(canModerate || msg.userId === auth?.user?.id) && (
@@ -475,9 +537,20 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
                                   </span>
                                 )}
                               </div>
+                              {msg.replyTo && (
+                                <div
+                                  onClick={() => scrollToMessage(msg.replyTo.id)}
+                                  className="mb-1 cursor-pointer"
+                                >
+                                  <div className="bg-gray-700/50 border-l-2 border-purple-400 rounded-r-lg px-3 py-1.5 max-w-[280px] hover:bg-gray-700/70 transition-colors">
+                                    <span className="text-xs text-purple-300 font-medium block">{msg.replyTo.username}</span>
+                                    <span className="text-xs text-gray-400 truncate block">{msg.replyTo.content || '[attachment]'}</span>
+                                  </div>
+                                </div>
+                              )}
                               <div 
                                 onClick={() => setShowFullDateId(showFullDateId === msg.id ? null : msg.id)}
-                                className="bg-gray-800 rounded-2xl px-4 py-3 shadow-md cursor-pointer hover:bg-gray-750 transition-colors"
+                                className="relative bg-gray-800 rounded-2xl px-4 py-3 shadow-md cursor-pointer hover:bg-gray-750 transition-colors"
                               >
                                 {msg.text && <p className={`text-gray-200 break-words leading-relaxed ${msg.deletedAt ? 'italic text-gray-500' : ''}`}>
                                   {renderMessageContent(msg.text)}
@@ -490,6 +563,11 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
                                     ))}
                                   </div>
                                 ) : null}
+                                {copiedMessageId === msg.id && (
+                                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-green-600 text-white text-xs px-2 py-1 rounded-md shadow-lg whitespace-nowrap">
+                                    Copied!
+                                  </div>
+                                )}
                               </div>
                               <ReactionBar
                                 reactions={msg.reactions}
@@ -513,23 +591,37 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
                                     position="top"
                                     currentUserEmoji={getUserReactionEmoji(msg.reactions)}
                                   />
-                                  {canModerate && (
-                                    <button onClick={(e) => toggleMessageMenu(msg.id, e)} className="p-1.5 rounded-lg bg-gray-700/80 hover:bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                                      <FiMoreVertical className="w-4 h-4 text-gray-300" />
-                                    </button>
-                                  )}
+                                  <button onClick={(e) => toggleMessageMenu(msg.id, e)} className="p-1.5 rounded-lg bg-gray-700/80 hover:bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <FiMoreVertical className="w-4 h-4 text-gray-300" />
+                                  </button>
                                 </div>
                               )}
-                              {messageMenuId === msg.id && canModerate && (
+                              {messageMenuId === msg.id && (
                                 <div ref={menuRef} className="absolute right-0 top-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 min-w-[160px]">
-                                  <button onClick={() => handlePinMessage(msg.id, msg.isPinned)} className="w-full px-4 py-2 text-left text-sm text-gray-200 hover:bg-gray-700 flex items-center gap-2 rounded-t-lg">
-                                    <BsPinAngle className="w-4 h-4" />
-                                    {msg.isPinned ? 'Unpin message' : 'Pin message'}
-                                  </button>
-                                  <button onClick={() => handleDeleteMessage(msg.id)} className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-700 flex items-center gap-2 rounded-b-lg">
-                                    <FiTrash2 className="w-4 h-4" />
-                                    Delete message
-                                  </button>
+                                  {msg.text && !msg.deletedAt && (
+                                    <button onClick={() => handleCopyMessage(msg.id, msg.text)} className="w-full px-4 py-2 text-left text-sm text-gray-200 hover:bg-gray-700 flex items-center gap-2 rounded-t-lg">
+                                      <FiCopy className="w-4 h-4" />
+                                      Copy text
+                                    </button>
+                                  )}
+                                  {!msg.deletedAt && (
+                                    <button onClick={() => handleReply(msg)} className="w-full px-4 py-2 text-left text-sm text-gray-200 hover:bg-gray-700 flex items-center gap-2">
+                                      <FiCornerUpLeft className="w-4 h-4" />
+                                      Reply
+                                    </button>
+                                  )}
+                                  {canModerate && (
+                                    <button onClick={() => handlePinMessage(msg.id, msg.isPinned)} className="w-full px-4 py-2 text-left text-sm text-gray-200 hover:bg-gray-700 flex items-center gap-2">
+                                      <BsPinAngle className="w-4 h-4" />
+                                      {msg.isPinned ? 'Unpin message' : 'Pin message'}
+                                    </button>
+                                  )}
+                                  {canModerate && (
+                                    <button onClick={() => handleDeleteMessage(msg.id)} className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-700 flex items-center gap-2 rounded-b-lg">
+                                      <FiTrash2 className="w-4 h-4" />
+                                      Delete message
+                                    </button>
+                                  )}
                                 </div>
                               )}
                             </div>

@@ -94,6 +94,8 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId) =>
                 deletedAt: msg.deletedAt,
                 deletedBy: msg.deletedBy,
                 editedAt: msg.editedAt,
+                replyToId: msg.replyToId,
+                replyTo: msg.replyTo || null,
                 attachments: msg.attachments || [],
                 reactions: msg.reactions || []
               })));
@@ -115,6 +117,8 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId) =>
                 deletedAt: data.message.deletedAt,
                 deletedBy: data.message.deletedBy,
                 editedAt: data.message.editedAt,
+                replyToId: data.message.replyToId,
+                replyTo: data.message.replyTo || null,
                 attachments: data.message.attachments || [],
                 reactions: data.message.reactions || []
               }]);
@@ -158,6 +162,8 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId) =>
                 deletedAt: msg.deletedAt,
                 deletedBy: msg.deletedBy,
                 editedAt: msg.editedAt,
+                replyToId: msg.replyToId,
+                replyTo: msg.replyTo || null,
                 attachments: msg.attachments || [],
                 reactions: msg.reactions || []
               })));
