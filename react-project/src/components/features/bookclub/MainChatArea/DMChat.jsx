@@ -261,11 +261,11 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
             <div 
               key={msg.id || idx}
               id={`dm-msg-${msg.id}`}
-              className={`flex gap-3 group ${
+              className={`flex gap-1 group ${
                 isOwn ? 'justify-end' : 'justify-start'
-              } ${groupWithPrevious ? 'mt-1' : 'mt-3'} transition-all duration-300 rounded-lg`}
+              } ${groupWithPrevious ? 'mt-1' : 'mt-1'} transition-all duration-300 rounded-lg`}
             >
-              <div className="flex flex-col gap-2 max-w-xs lg:max-w-md">
+              <div className="flex flex-col max-w-xs lg:max-w-md">
                 {/* Reply quote block */}
                 {msg.replyTo && (
                   <div
@@ -287,7 +287,7 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
                     <div className={`relative px-4 py-2 rounded-2xl break-words ${msg.deletedAt ? 'opacity-60' : ''} ${
                         isOwn ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-200'
                     }`}>
-                      <p className={msg.deletedAt ? 'italic text-gray-300' : ''}>{linkifyText(msg.content)}</p>
+                      <p className={`text-sm ${msg.deletedAt ? 'italic text-gray-300' : ''}`}>{linkifyText(msg.content)}</p>
                       {isLastInGroup && (
                         <p className="text-xs opacity-70 mt-1">
                           {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -301,7 +301,7 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
                     </div>
                   )}
                   {msg.attachments?.length > 0 && !msg.deletedAt && (
-                    <div className="flex flex-col gap-2 mt-1">
+                    <div className="flex flex-col gap-1 mt-1">
                       {msg.attachments.map((attachment, attIdx) => (
                         <MessageAttachment key={attIdx} attachment={attachment} isSender={isOwn} />
                       ))}

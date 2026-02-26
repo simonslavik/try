@@ -78,16 +78,18 @@ export const MentionRendererWithLinks = ({ content, members, currentUserId }) =>
           const name = memberMap[uid] || 'Unknown User';
           const isSelf = uid === currentUserId;
           return (
-            <span
+            <a
               key={index}
-              className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold ${
+              href={`/profile/${uid}`}
+              onClick={(e) => { e.stopPropagation(); }}
+              className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold cursor-pointer hover:brightness-125 transition-all no-underline ${
                 isSelf
                   ? 'bg-yellow-500/30 text-yellow-200 ring-1 ring-yellow-500/50'
                   : 'bg-indigo-500/30 text-indigo-200 ring-1 ring-indigo-500/50'
               }`}
             >
               @{name}
-            </span>
+            </a>
           );
         }
         return <React.Fragment key={index}>{linkifyText(part)}</React.Fragment>;

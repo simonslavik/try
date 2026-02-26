@@ -33,10 +33,10 @@ const ReactionPicker = ({ onSelectEmoji, position = 'top', currentUserEmoji = nu
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className="p-1.5 rounded-lg bg-gray-700/80 hover:bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="p-1 rounded-lg bg-gray-700/80 hover:bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity"
         title="Add reaction"
       >
-        <BsEmojiSmile className="w-4 h-4 text-gray-300" />
+        <BsEmojiSmile className="w-3.5 h-3.5 text-gray-300" />
       </button>
 
       {isOpen && (

@@ -25,7 +25,7 @@ const OwnMessage = ({
   const isEditing = editingMessageId === msg.id;
 
   return (
-    <div className="flex gap-3 justify-end group">
+    <div className="flex gap-1 justify-end group">
       <div className="text-right max-w-md self-end">
         {/* Pinned badge */}
         {msg.isPinned && (
@@ -41,7 +41,7 @@ const OwnMessage = ({
         <div className="relative">
         {/* Message body */}
         {isEditing ? (
-          <div className="bg-gray-800 rounded-2xl px-4 py-3 shadow-lg mb-1 border border-purple-500">
+          <div className="bg-gray-800 rounded-2xl px-2 py-3 shadow-lg mb-1 border border-purple-500">
             <textarea
               ref={editInputRef}
               value={editingText}
@@ -60,8 +60,8 @@ const OwnMessage = ({
             </div>
           </div>
         ) : msg.text && (
-          <div className={`relative bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl px-4 py-3 shadow-lg mb-1 ${msg.deletedAt ? 'opacity-60 italic' : ''}`}>
-            <p className="text-white break-words font-medium">
+          <div className={`relative bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl px-2 py-3 shadow-lg mb-1 ${msg.deletedAt ? 'opacity-60 italic' : ''}`}>
+            <p className="text-sm text-white break-words font-medium">
               {renderMessageContent(msg.text, members, auth?.user?.id)}
               {msg.editedAt && <span className="text-xs text-purple-200 italic ml-1">(edited)</span>}
             </p>
@@ -113,7 +113,7 @@ const OwnMessage = ({
 
         {/* Timestamp */}
         {isLastInGroup && (
-          <span className="text-xs text-gray-500 block text-right mt-1">
+          <span className="text-xs text-gray-500 block text-right">
             {formatTimestamp(msg.timestamp)}
           </span>
         )}
