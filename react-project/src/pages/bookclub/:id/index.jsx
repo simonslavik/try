@@ -53,7 +53,7 @@ import logger from '@utils/logger';
 
 const BookClub = () => {
   const { id: bookClubId } = useParams();
-  const { auth } = useContext(AuthContext);
+  const { auth, setAuth, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -704,6 +704,9 @@ const BookClub = () => {
             }}
             onOpenDM={() => navigate('/dm')}
             auth={auth}
+            setAuth={setAuth}
+            wsRef={ws}
+            onLogout={logout}
           />
           
           {/* Bookclub Rooms Sidebar */}
@@ -1047,6 +1050,9 @@ const BookClub = () => {
                 ws={ws}
                 members={bookClubMembers}
                 onReply={setReplyingTo}
+                friends={friends}
+                onSendFriendRequest={handleSendFriendRequest}
+                connectedUsers={connectedUsers}
               />
             )}
 

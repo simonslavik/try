@@ -1,30 +1,26 @@
-import React from 'react';
-import { FiHome, FiMail, FiSend } from 'react-icons/fi';
+import React, { useState, useCallback } from 'react';
+import { FiHome, FiSend } from 'react-icons/fi';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { COLLAB_EDITOR_URL, getProfileImageUrl } from '@config/constants';
-import logger from '@utils/logger';
+import StatusPopup from './StatusPopup';
+import { getStatusColor } from './statusUtils';
 
-// Helper function to get user initials
-const getUserInitials = (name) => {
-  if (!name) return 'GU';
-  
-  const parts = name.trim().split(/\s+/); // Split by whitespace
-  
-  if (parts.length >= 2) {
-    // Multiple words: take first letter of first and last word
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  } else {
-    // Single word: take first two letters
-    return name.substring(0, 2).toUpperCase();
-  }
-};
-
-const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, onOpenDM, auth }) => {
+const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, onOpenDM, auth, setAuth, wsRef, onLogout }) => {
     const navigate = useNavigate();
     const location = useLocation();
+    const [showStatusPopup, setShowStatusPopup] = useState(false);
     
     // Check if we're on the DM page
     const isOnDMPage = location.pathname.startsWith('/dm');
+
+    const handleStatusChange = useCallback((status) => {
+      if (auth?.user) {
+        setAuth({
+          ...auth,
+          user: { ...auth.user, status },
+        });
+      }
+    }, [auth, setAuth]);
 
     return (
         <div className="w-20 bg-gray-900 border-r border-gray-700 flex flex-col items-center py-4 gap-3 overflow-y-auto">
@@ -90,7 +86,7 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, on
           >
             +
           </button>
-          <button className='cursor-pointer absolute bottom-4' onClick={() => navigate(`/profile/${auth.user.id}`)}>
+          <button className='cursor-pointer absolute bottom-4' onClick={() => setShowStatusPopup(prev => !prev)}>
             <div className="relative">
               <img
                 src={getProfileImageUrl(auth.user.profileImage) || '/images/default.webp'} 
@@ -98,9 +94,18 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, on
                 className="w-10 h-10 rounded-full object-cover hover:bg-gray-50 cursor-pointer"
                 onError={(e) => { e.target.src = '/images/default.webp'; }}
               />
-              <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-900 bg-green-500"></div>
+              <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-900 ${getStatusColor(auth.user.status || 'ONLINE')}`}></div>
             </div>
           </button>
+          {showStatusPopup && (
+            <StatusPopup
+              user={auth.user}
+              onClose={() => setShowStatusPopup(false)}
+              onStatusChange={handleStatusChange}
+              wsRef={wsRef}
+              onLogout={onLogout}
+            />
+          )}
           
         </div>
     );

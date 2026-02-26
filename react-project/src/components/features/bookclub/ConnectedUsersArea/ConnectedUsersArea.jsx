@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import { FiUsers } from 'react-icons/fi';
 import { getProfileImageUrl } from '@config/constants';
+import { getStatusColor } from '../statusUtils';
+import UserHoverCard from '../UserHoverCard';
 import logger from '@utils/logger';
 
 
@@ -62,15 +64,21 @@ const ConnectedUsersArea = (
                       className="px-2 py-1 text-sm text-gray-300 flex items-center gap-2 hover:bg-gray-700 rounded cursor-pointer"
                     >
                       <div className="relative">
-                        <img 
-                          src={getProfileImageUrl(user.profileImage) || '/images/default.webp'} 
-                          alt={user.username} 
-                          className="w-8 h-8 rounded-full object-cover"
-                          onError={(e) => { e.target.src = '/images/default.webp'; }}
-                        />
-                        <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-800 ${
-                          isOnline ? 'bg-green-500' : 'bg-gray-500'
-                        }`}></div>
+                        <UserHoverCard
+                          user={user}
+                          currentUserId={auth?.user?.id}
+                          isFriend={isFriend}
+                          isOnline={isOnline}
+                          onSendFriendRequest={handleSendFriendRequest}
+                        >
+                          <img 
+                            src={getProfileImageUrl(user.profileImage) || '/images/default.webp'} 
+                            alt={user.username} 
+                            className="w-8 h-8 rounded-full object-cover"
+                            onError={(e) => { e.target.src = '/images/default.webp'; }}
+                          />
+                        </UserHoverCard>
+                        <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-800 ${getStatusColor(user.status || (isOnline ? 'ONLINE' : 'OFFLINE'))}`}></div>
                       </div>
                       <span className="truncate">{user.username}</span>
                       {isFriend && (

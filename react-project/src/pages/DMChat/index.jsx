@@ -29,7 +29,7 @@ const normalizeMessage = (msg) => ({
 });
 
 const DMChatPage = () => {
-  const { auth } = useContext(AuthContext);
+  const { auth, setAuth, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const { userId } = useParams();
   
@@ -292,6 +292,9 @@ const DMChatPage = () => {
           onSelectBookClub={(id) => navigate(`/bookclub/${id}`)}
           onOpenDM={() => {}} // Already in DM mode
           auth={auth}
+          setAuth={setAuth}
+          wsRef={dmWs}
+          onLogout={logout}
         />
         
         {/* DM Conversations Sidebar */}
