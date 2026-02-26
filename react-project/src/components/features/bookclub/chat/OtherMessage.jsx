@@ -26,13 +26,13 @@ const OtherMessage = ({
       <img
         src={getProfileImageUrl(msg.profileImage) || '/images/default.webp'}
         alt={msg.username}
-        className="w-10 h-10 rounded-[20%] object-cover flex-shrink-0 self-start"
+        className="w-7 h-7 rounded-[50%] object-cover flex-shrink-0 self-end"
         onError={(e) => { e.target.src = '/images/default.webp'; }}
       />
-      <div className="max-w-md relative">
+      <div className="max-w-md">
         {/* Username + Pinned badge */}
         <div className="flex items-baseline">
-          <span className="text-white">{msg.username}</span>
+          <span className="text-white text-sm font-light    ">{msg.username}</span>
           {msg.isPinned && (
             <span className="flex items-center gap-1 text-xs text-yellow-400">
               <BsPinAngle className="w-3 h-3" />
@@ -45,6 +45,7 @@ const OtherMessage = ({
         <ReplyPreview replyTo={msg.replyTo} onScrollTo={onScrollToMessage} />
 
         {/* Message bubble */}
+        <div className="relative">
         <div
           onClick={() => setShowFullDate((v) => !v)}
           className="relative bg-gray-800 rounded-2xl px-4 py-3 shadow-md cursor-pointer hover:bg-gray-750 transition-colors"
@@ -69,26 +70,6 @@ const OtherMessage = ({
           )}
         </div>
 
-        {/* Reactions */}
-        <ReactionBar
-          reactions={msg.reactions}
-          currentUserId={auth?.user?.id}
-          onToggleReaction={(emoji, hasReacted) => onToggleReaction(msg.id, emoji, hasReacted)}
-          members={members}
-        />
-
-        {/* Timestamp */}
-        {isLastInGroup && showFullDate && (
-          <span className="text-xs text-gray-500 block mt-1">
-            {new Date(msg.timestamp).toLocaleString()}
-          </span>
-        )}
-        {isLastInGroup && !showFullDate && (
-          <span className="text-xs text-gray-500 block mt-1">
-            {formatTimestamp(msg.timestamp)}
-          </span>
-        )}
-
         {/* Floating actions (reaction picker + menu) */}
         <MessageActions
           msg={msg}
@@ -105,6 +86,29 @@ const OtherMessage = ({
           onDelete={onDelete}
           position="right"
         />
+        </div>
+
+        {/* Reactions */}
+        <ReactionBar
+          reactions={msg.reactions}
+          currentUserId={auth?.user?.id}
+          onToggleReaction={(emoji, hasReacted) => onToggleReaction(msg.id, emoji, hasReacted)}
+          members={members}
+          isOwn={false}
+        />
+
+        {/* Timestamp */}
+        {isLastInGroup && showFullDate && (
+          <span className="text-xs text-gray-500 block mt-1">
+            {new Date(msg.timestamp).toLocaleString()}
+          </span>
+        )}
+        {isLastInGroup && !showFullDate && (
+          <span className="text-xs text-gray-500 block mt-1">
+            {formatTimestamp(msg.timestamp)}
+          </span>
+        )}
+
       </div>
     </div>
   );

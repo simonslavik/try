@@ -11,7 +11,7 @@ import { FiX } from 'react-icons/fi';
  *  - onToggleReaction: (emoji: string, hasReacted: boolean) => void
  *  - members: Array<{ id, username?, name? }> — optional member list for name resolution
  */
-const ReactionBar = ({ reactions, currentUserId, onToggleReaction, members = [] }) => {
+const ReactionBar = ({ reactions, currentUserId, onToggleReaction, members = [], isOwn = true }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [activeEmoji, setActiveEmoji] = useState(null);
 
@@ -38,7 +38,7 @@ const ReactionBar = ({ reactions, currentUserId, onToggleReaction, members = [] 
 
   return (
     <>
-      <div className="flex flex-wrap mt-[-10px] z-10">
+      <div className={`flex flex-wrap mt-[-10px] z-50 ${isOwn ? 'justify-end' : 'justify-start  relative '}`}>
         {reactions.map(({ emoji, count, userIds }) => {
           const hasReacted = userIds.includes(currentUserId);
 

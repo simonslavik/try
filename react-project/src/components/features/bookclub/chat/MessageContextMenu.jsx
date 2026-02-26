@@ -45,7 +45,7 @@ const MessageContextMenu = ({ msg, isOwn, canModerate, menuRef, onPin, onEdit, o
   return (
     <div
       ref={menuRef}
-      className="absolute z-[60] bottom-full mb-2 right-0 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-2 min-w-[180px]"
+      className={`absolute z-[60] bottom-full mb-2 ${isOwn ? 'right-0' : 'left-0'} bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-2 min-w-[180px]`}
       onClick={(e) => e.stopPropagation()}
     >
       {menuItems.map((item, idx) => (
