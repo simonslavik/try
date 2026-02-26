@@ -112,6 +112,9 @@ const BookClub = () => {
   
   // Friends list for connected users sidebar
   const [friends, setFriends] = useState([]);
+
+  // Reply state — the message being replied to
+  const [replyingTo, setReplyingTo] = useState(null);
   
   // Force re-render counter for role updates
   const [roleUpdateCounter, setRoleUpdateCounter] = useState(0);
@@ -439,7 +442,8 @@ const BookClub = () => {
         const textMessageData = {
           type: 'chat-message',
           message: rawMessage.trim(),
-          attachments: []
+          attachments: [],
+          replyToId: replyingTo?.id || null
         };
         logger.debug('Sending text message:', textMessageData);
         ws.current.send(JSON.stringify(textMessageData));
@@ -451,7 +455,8 @@ const BookClub = () => {
           const fileMessageData = {
             type: 'chat-message',
             message: rawMessage.trim() && attachments.length === 1 ? rawMessage.trim() : null,
-            attachments: [attachment]
+            attachments: [attachment],
+            replyToId: replyingTo?.id || null
           };
           logger.debug('Sending file message:', fileMessageData);
           ws.current.send(JSON.stringify(fileMessageData));
@@ -461,7 +466,8 @@ const BookClub = () => {
         const messageData = {
           type: 'chat-message',
           message: rawMessage.trim(),
-          attachments: []
+          attachments: [],
+          replyToId: replyingTo?.id || null
         };
         logger.debug('Sending text-only message:', messageData);
         ws.current.send(JSON.stringify(messageData));
@@ -469,6 +475,7 @@ const BookClub = () => {
 
       setNewMessage('');
       setSelectedFiles([]); // Clear selected files after sending
+      setReplyingTo(null); // Clear reply after sending
     } catch (error) {
       logger.error('Error sending message:', error);
       alert('Failed to send message');
@@ -1037,6 +1044,7 @@ const BookClub = () => {
                 userRole={userRole}
                 ws={ws}
                 members={bookClubMembers}
+                onReply={setReplyingTo}
               />
             )}
 
@@ -1053,6 +1061,8 @@ const BookClub = () => {
                 onSubmit={handleSendMessage}
                 auth={auth}
                 members={bookClubMembers}
+                replyingTo={replyingTo}
+                onCancelReply={() => setReplyingTo(null)}
               />
             ) : !showBooksHistory && !showCalendar && !showSuggestions && !showSettings ? (
               <div className="bg-gray-800 border-t border-gray-700 p-4 text-center">

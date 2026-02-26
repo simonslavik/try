@@ -134,6 +134,9 @@ model Message {
   deletedAt    DateTime?
   deletedBy    String? // User ID who deleted the message
   editedAt     DateTime? // When the message was last edited
+  replyToId    String? // ID of the message being replied to
+  replyTo      Message?   @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies      Message[]  @relation("MessageReplies")
   createdAt    DateTime   @default(now())
   attachments  ChatFile[]
   reactions    Reaction[]

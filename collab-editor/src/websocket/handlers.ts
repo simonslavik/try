@@ -158,6 +158,15 @@ export const handleJoin = (
           deletedAt: true,
           deletedBy: true,
           editedAt: true,
+          replyToId: true,
+          replyTo: {
+            select: {
+              id: true,
+              content: true,
+              username: true,
+              userId: true
+            }
+          },
           createdAt: true,
           attachments: true
         }
@@ -302,6 +311,15 @@ export const handleSwitchRoom = (message: any, currentClient: Client | null) => 
           deletedAt: true,
           deletedBy: true,
           editedAt: true,
+          replyToId: true,
+          replyTo: {
+            select: {
+              id: true,
+              content: true,
+              username: true,
+              userId: true
+            }
+          },
           createdAt: true,
           attachments: true
         }
@@ -349,12 +367,21 @@ export const handleChatMessage = (message: any, currentClient: Client | null) =>
       username: currentClient.username,
       profileImage: currentClient.profileImage,
       content: message.message || null,
+      replyToId: message.replyToId || null,
       attachments: message.attachments && message.attachments.length > 0 ? {
         connect: message.attachments.map((att: any) => ({ id: att.id }))
       } : undefined
     },
     include: {
-      attachments: true
+      attachments: true,
+      replyTo: {
+        select: {
+          id: true,
+          content: true,
+          username: true,
+          userId: true
+        }
+      }
     }
   })
   .then((savedMessage) => {

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { FiX, FiCornerUpLeft } from 'react-icons/fi';
 import FileUpload from '../../common/FileUpload';
 import logger from '@utils/logger';
 import EmojiPickerButton from './chat/EmojiPickerButton';
@@ -39,7 +40,9 @@ const MessageInput = ({
   onSubmit,
   auth,
   members = [],
-  onGetRawMessage
+  onGetRawMessage,
+  replyingTo,
+  onCancelReply
 }) => {
   // Mention tracking
   const [mentionMarkers, setMentionMarkers] = useState([]);
@@ -207,6 +210,23 @@ const MessageInput = ({
 
   return (
     <form onSubmit={handleSubmit} className="bg-gray-800 border-t border-gray-700 relative">
+      {/* Reply Preview Bar */}
+      {replyingTo && (
+        <div className="flex items-center gap-2 px-4 pt-3 pb-1">
+          <FiCornerUpLeft className="w-4 h-4 text-purple-400 flex-shrink-0" />
+          <div className="flex-1 bg-gray-700/50 border-l-2 border-purple-400 rounded-r-lg px-3 py-1.5 min-w-0">
+            <span className="text-xs text-purple-300 font-medium block">Replying to {replyingTo.username}</span>
+            <span className="text-xs text-gray-400 truncate block">{replyingTo.text || '[attachment]'}</span>
+          </div>
+          <button
+            type="button"
+            onClick={onCancelReply}
+            className="p-1 rounded hover:bg-gray-700 text-gray-400 hover:text-white transition-colors flex-shrink-0"
+          >
+            <FiX className="w-4 h-4" />
+          </button>
+        </div>
+      )}
       {/* File Upload Preview */}
       
       <div className="flex gap-2 p-4 items-center">
