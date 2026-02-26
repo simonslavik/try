@@ -7,7 +7,7 @@ const QUICK_EMOJIS = [
   '💪', '🤝', '📚', '⭐',
 ];
 
-const ReactionPicker = ({ onSelectEmoji, position = 'top', currentUserEmoji = null }) => {
+const ReactionPicker = ({ onSelectEmoji, position = 'top', currentUserEmoji = null, isOwn = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const pickerRef = useRef(null);
 
@@ -43,7 +43,7 @@ const ReactionPicker = ({ onSelectEmoji, position = 'top', currentUserEmoji = nu
         <div
           className={`absolute z-[60] ${
             position === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
-          } right-0 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-2 w-[240px]`}
+          } ${isOwn ? 'right-0' : 'left-0'} bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-2 w-[240px]`}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="grid grid-cols-5 gap-1">

@@ -26,7 +26,7 @@ const OwnMessage = ({
 
   return (
     <div className="flex gap-3 justify-end group">
-      <div className="text-right max-w-md self-end relative">
+      <div className="text-right max-w-md self-end">
         {/* Pinned badge */}
         {msg.isPinned && (
           <div className="flex items-center justify-end gap-1 text-xs text-yellow-400 mb-1">
@@ -38,6 +38,7 @@ const OwnMessage = ({
         {/* Reply quote */}
         <ReplyPreview replyTo={msg.replyTo} onScrollTo={onScrollToMessage} alignRight />
 
+        <div className="relative">
         {/* Message body */}
         {isEditing ? (
           <div className="bg-gray-800 rounded-2xl px-4 py-3 shadow-lg mb-1 border border-purple-500">
@@ -98,6 +99,7 @@ const OwnMessage = ({
           onDelete={onDelete}
           position="left"
         />
+        </div>
 
         {/* Reactions */}
         <div className="flex justify-end">
