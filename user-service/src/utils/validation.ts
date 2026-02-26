@@ -86,6 +86,9 @@ export const sendDirectMessageSchema = joi.object({
     }),
     attachments: joi.array().items(joi.object()).default([]).messages({
         'array.base': 'Attachments must be an array'
+    }),
+    replyToId: joi.string().uuid().allow(null).optional().messages({
+        'string.guid': 'Invalid reply message ID format'
     })
 }).custom((value, helpers) => {
     // At least content or attachments must be present
