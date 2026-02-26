@@ -49,14 +49,14 @@ const ReactionBar = ({ reactions, currentUserId, onToggleReaction, members = [],
                 e.stopPropagation();
                 openModal(emoji);
               }}
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs transition-all border ${
+              className={`inline-flex items-center gap-0.5 px-1.5 py-0 rounded-full text-[10px] transition-all border ${
                 hasReacted
                   ? 'bg-purple-600/30 border-purple-500 text-purple-200 hover:bg-purple-600/40'
                   : 'bg-gray-700/50 border-gray-600 text-gray-300 hover:bg-gray-700'
               }`}
               title={`${emoji} ${count}`}
             >
-              <span className="text-sm">{emoji}</span>
+              <span className="text-xs">{emoji}</span>
               <span className="font-medium">{count}</span>
             </button>
           );

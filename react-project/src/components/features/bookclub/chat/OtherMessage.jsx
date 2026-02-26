@@ -99,12 +99,12 @@ const OtherMessage = ({
 
         {/* Timestamp */}
         {isLastInGroup && showFullDate && (
-          <span className="text-xs text-gray-500 block mt-1">
+          <span className="text-xs text-gray-500 block ">
             {new Date(msg.timestamp).toLocaleString()}
           </span>
         )}
         {isLastInGroup && !showFullDate && (
-          <span className="text-xs text-gray-500 block mt-1">
+          <span className="text-xs text-gray-500 block">
             {formatTimestamp(msg.timestamp)}
           </span>
         )}

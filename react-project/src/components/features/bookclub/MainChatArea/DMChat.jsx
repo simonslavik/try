@@ -1,37 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { FiSend, FiMoreVertical, FiTrash2, FiCopy, FiCornerUpLeft, FiX } from 'react-icons/fi';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { FiSend, FiCornerUpLeft, FiX } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import FileUpload from '../../../common/FileUpload';
 import MessageAttachment from '../../../common/MessageAttachment';
-import ReactionPicker from '../chat/ReactionPicker';
+import MessageActions from '../chat/MessageActions';
 import ReactionBar from '../chat/ReactionBar';
+import { linkifyText } from '../chat/messageUtils';
 import apiClient from '@api/axios';
 import { getProfileImageUrl } from '@config/constants';
 import logger from '@utils/logger';
-
-// Function to convert URLs in text to clickable links
-const linkifyText = (text) => {
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-  const parts = text.split(urlRegex);
-  
-  return parts.map((part, index) => {
-    if (part.match(urlRegex)) {
-      return (
-        <a
-          key={index}
-          href={part}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline hover:text-blue-300"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {part}
-        </a>
-      );
-    }
-    return part;
-  });
-};
 
 const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, replyingTo, setReplyingTo }) => {
   const [newMessage, setNewMessage] = useState('');
@@ -43,7 +20,14 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
   const fileUploadRef = useRef(null);
   const menuRef = useRef(null);
   const inputRef = useRef(null);
+  const prevMessageCountRef = useRef(messages.length);
   const navigate = useNavigate();
+
+  const currentUserId = auth?.user?.id;
+  const dmMembers = [
+    { id: currentUserId, name: auth?.user?.name || 'You' },
+    ...(otherUser ? [{ id: otherUser.id, name: otherUser.name }] : [])
+  ];
 
   // Helper function to check if messages should be grouped
   const shouldGroupMessages = (currentMsg, previousMsg, nextMsg) => {
@@ -72,18 +56,17 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
     return { groupWithPrevious, isLastInGroup };
   };
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
+  // Scroll only on new messages or conversation change
   useEffect(() => {
-    scrollToBottom();
+    if (messages.length > prevMessageCountRef.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+    prevMessageCountRef.current = messages.length;
   }, [messages]);
 
-  // Scroll to bottom when conversation changes
   useEffect(() => {
     if (otherUser) {
-      scrollToBottom();
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [otherUser]);
 
@@ -99,43 +82,65 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleDeleteMessage = async (messageId) => {
+  // ── Helpers ─────────────────────────────────────────────
+  const sendWs = useCallback((payload) => {
+    if (dmWs?.current?.readyState === WebSocket.OPEN) {
+      dmWs.current.send(JSON.stringify(payload));
+    }
+  }, [dmWs]);
+
+  const getUserReactionEmoji = useCallback((reactions) => {
+    if (!reactions || !currentUserId) return null;
+    for (const r of reactions) {
+      if (r.userIds && r.userIds.includes(currentUserId)) return r.emoji;
+    }
+    return null;
+  }, [currentUserId]);
+
+  const scrollToMessage = useCallback((messageId) => {
+    const el = document.getElementById(`dm-msg-${messageId}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('ring-2', 'ring-purple-500', 'ring-opacity-75');
+      setTimeout(() => el.classList.remove('ring-2', 'ring-purple-500', 'ring-opacity-75'), 2000);
+    }
+  }, []);
+
+  // ── Actions ─────────────────────────────────────────────
+  const toggleMenu = useCallback((messageId, event) => {
+    event.stopPropagation();
+    setMessageMenuId((prev) => (prev === messageId ? null : messageId));
+  }, []);
+
+  const handleToggleReaction = useCallback((messageId, emoji, hasReacted) => {
+    sendWs({
+      type: hasReacted ? 'dm-remove-reaction' : 'dm-add-reaction',
+      messageId,
+      emoji,
+      receiverId: otherUser?.id,
+    });
+  }, [sendWs, otherUser?.id]);
+
+  const handleDeleteMessage = useCallback(async (messageId) => {
     setMessageMenuId(null);
     if (!confirm('Are you sure you want to delete this message?')) return;
-    
     try {
-      // Send WebSocket notification to the conversation partner only
-      if (dmWs?.current && dmWs.current.readyState === WebSocket.OPEN) {
-        dmWs.current.send(JSON.stringify({
-          type: 'delete-dm-message',
-          messageId,
-          receiverId: otherUser?.id
-        }));
-      }
-      
-      // Call DM delete API endpoint
-      const { data } = await apiClient.delete(`/v1/messages/${messageId}`);
-
-      // Update local state immediately
-      setMessages(prevMessages => 
-        prevMessages.map(msg => 
-          msg.id === messageId 
-            ? { ...msg, content: '[Message deleted]', deletedAt: new Date().toISOString(), attachments: [] }
-            : msg
+      sendWs({ type: 'delete-dm-message', messageId, receiverId: otherUser?.id });
+      await apiClient.delete(`/v1/messages/${messageId}`);
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === messageId
+            ? { ...m, content: '[Message deleted]', deletedAt: new Date().toISOString(), attachments: [] }
+            : m
         )
       );
     } catch (error) {
       logger.error('Error deleting message:', error);
       alert('Failed to delete message');
     }
-  };
+  }, [sendWs, otherUser?.id, setMessages]);
 
-  const toggleMessageMenu = (messageId, event) => {
-    event.stopPropagation();
-    setMessageMenuId(messageMenuId === messageId ? null : messageId);
-  };
-
-  const handleCopyMessage = async (messageId, text) => {
+  const handleCopy = useCallback(async (messageId, text) => {
     setMessageMenuId(null);
     if (!text) return;
     try {
@@ -145,48 +150,20 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
     } catch (error) {
       logger.error('Error copying message:', error);
     }
-  };
+  }, []);
 
-  const handleReply = (msg) => {
+  const handleReply = useCallback((msg) => {
     setMessageMenuId(null);
     if (setReplyingTo) {
       setReplyingTo({
         id: msg.id,
-        content: msg.content,
-        senderName: msg.senderId === auth?.user?.id ? 'You' : (otherUser?.name || 'Unknown'),
-        senderId: msg.senderId
+        content: msg.text || msg.content,
+        senderName: msg.senderId === currentUserId ? 'You' : (otherUser?.name || 'Unknown'),
+        senderId: msg.senderId,
       });
-      // Focus the input
       setTimeout(() => inputRef.current?.focus(), 50);
     }
-  };
-
-  const scrollToMessage = (messageId) => {
-    const el = document.getElementById(`dm-msg-${messageId}`);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      el.classList.add('ring-2', 'ring-purple-500', 'ring-opacity-75');
-      setTimeout(() => el.classList.remove('ring-2', 'ring-purple-500', 'ring-opacity-75'), 2000);
-    }
-  };
-
-  const handleToggleReaction = (messageId, emoji, hasReacted) => {
-    if (!dmWs?.current || dmWs.current.readyState !== WebSocket.OPEN) return;
-    dmWs.current.send(JSON.stringify({
-      type: hasReacted ? 'dm-remove-reaction' : 'dm-add-reaction',
-      messageId,
-      emoji,
-      receiverId: otherUser?.id,
-    }));
-  };
-
-  const getUserReactionEmoji = (reactions) => {
-    if (!reactions || !auth?.user?.id) return null;
-    for (const r of reactions) {
-      if (r.userIds && r.userIds.includes(auth.user.id)) return r.emoji;
-    }
-    return null;
-  };
+  }, [setReplyingTo, currentUserId, otherUser?.name]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -277,6 +254,9 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
             const { groupWithPrevious, isLastInGroup } = shouldGroupMessages(msg, previousMsg, nextMsg);
             const isOwn = msg.senderId === auth?.user?.id;
             
+            // Normalize msg for shared components (content → text)
+            const normalizedMsg = { ...msg, text: msg.content };
+
             return (
             <div 
               key={msg.id || idx}
@@ -285,7 +265,7 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
                 isOwn ? 'justify-end' : 'justify-start'
               } ${groupWithPrevious ? 'mt-1' : 'mt-3'} transition-all duration-300 rounded-lg`}
             >
-              <div className="flex flex-col gap-2 max-w-xs lg:max-w-md relative">
+              <div className="flex flex-col gap-2 max-w-xs lg:max-w-md">
                 {/* Reply quote block */}
                 {msg.replyTo && (
                   <div
@@ -294,18 +274,19 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
                   >
                     <div className={`${isOwn ? 'bg-purple-900/40 border-purple-400' : 'bg-gray-700/50 border-purple-400'} border-l-2 rounded-r-lg px-3 py-1.5 max-w-[280px] hover:bg-purple-900/60 transition-colors`}>
                       <span className="text-xs text-purple-300 font-medium block">
-                        {msg.replyTo.sender?.name || (msg.replyTo.senderId === auth?.user?.id ? 'You' : otherUser?.name || 'Unknown')}
+                        {msg.replyTo.sender?.name || (msg.replyTo.senderId === currentUserId ? 'You' : otherUser?.name || 'Unknown')}
                       </span>
                       <span className="text-xs text-gray-400 truncate block">{msg.replyTo.content || '[attachment]'}</span>
                     </div>
                   </div>
                 )}
-                {msg.content && (
-                  <div className={`relative px-4 py-2 rounded-2xl break-words ${msg.deletedAt ? 'opacity-60' : ''} ${
-                      isOwn
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-gray-700 text-gray-200'
-                  }`}>
+
+                {/* Message bubble + attachments + actions wrapper */}
+                <div className="relative">
+                  {msg.content && (
+                    <div className={`relative px-4 py-2 rounded-2xl break-words ${msg.deletedAt ? 'opacity-60' : ''} ${
+                        isOwn ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-200'
+                    }`}>
                       <p className={msg.deletedAt ? 'italic text-gray-300' : ''}>{linkifyText(msg.content)}</p>
                       {isLastInGroup && (
                         <p className="text-xs opacity-70 mt-1">
@@ -317,77 +298,43 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
                           Copied!
                         </div>
                       )}
-                  </div>
-                )}
-                {msg.attachments && msg.attachments.length > 0 && !msg.deletedAt && (
-                  <div className="flex flex-col gap-2">
-                    {msg.attachments.map((attachment, attIdx) => (
-                      <MessageAttachment 
-                        key={attIdx} 
-                        attachment={attachment}
-                        isSender={isOwn}
-                      />
-                    ))}
-                  </div>
-                )}
-                {/* Reaction bar */}
-                {!msg.deletedAt && (
-                  <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                    <ReactionBar
-                      reactions={msg.reactions}
-                      currentUserId={auth?.user?.id}
-                      onToggleReaction={(emoji, hasReacted) => handleToggleReaction(msg.id, emoji, hasReacted)}
-                      members={[
-                        { id: auth?.user?.id, name: auth?.user?.name || 'You' },
-                        ...(otherUser ? [{ id: otherUser.id, name: otherUser.name }] : [])
-                      ]}
-                    />
-                  </div>
-                )}
-                {/* Action buttons: reaction picker + menu */}
-                {!msg.deletedAt && (
-                  <div className={`absolute top-1/2 -translate-y-1/2 flex items-center gap-0.5 ${
-                    isOwn ? '-left-16' : '-right-16'
-                  }`}>
-                    <ReactionPicker
-                      onSelectEmoji={(emoji, isAlreadySelected) => handleToggleReaction(msg.id, emoji, isAlreadySelected)}
-                      position="top"
-                      currentUserEmoji={getUserReactionEmoji(msg.reactions)}
-                    />
-                    <button
-                      onClick={(e) => toggleMessageMenu(msg.id, e)}
-                      className="p-1.5 rounded-lg bg-gray-700/80 hover:bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <FiMoreVertical className="w-4 h-4 text-gray-300" />
-                    </button>
-                  </div>
-                )}
-                {/* Context menu */}
-                {messageMenuId === msg.id && !msg.deletedAt && (
-                  <div 
-                    ref={menuRef} 
-                    className={`absolute ${
-                      isOwn ? 'left-[-85px]' : 'right-0'
-                    } top-[80%] mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 min-w-[160px]`}
-                  >
-                    {msg.content && (
-                      <button onClick={() => handleCopyMessage(msg.id, msg.content)} className="w-full px-4 py-2 text-left text-sm text-gray-200 hover:bg-gray-700 flex items-center gap-2 rounded-t-lg">
-                        <FiCopy className="w-4 h-4" />
-                        Copy text
-                      </button>
-                    )}
-                    <button onClick={() => handleReply(msg)} className="w-full px-4 py-2 text-left text-sm text-gray-200 hover:bg-gray-700 flex items-center gap-2">
-                      <FiCornerUpLeft className="w-4 h-4" />
-                      Reply
-                    </button>
-                    {isOwn && (
-                      <button onClick={() => handleDeleteMessage(msg.id)} className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-700 flex items-center gap-2 rounded-b-lg">
-                        <FiTrash2 className="w-4 h-4" />
-                        Delete message
-                      </button>
-                    )}
-                  </div>
-                )}
+                    </div>
+                  )}
+                  {msg.attachments?.length > 0 && !msg.deletedAt && (
+                    <div className="flex flex-col gap-2 mt-1">
+                      {msg.attachments.map((attachment, attIdx) => (
+                        <MessageAttachment key={attIdx} attachment={attachment} isSender={isOwn} />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Floating actions (reaction picker + context menu) */}
+                  <MessageActions
+                    msg={normalizedMsg}
+                    isOwn={isOwn}
+                    canModerate={false}
+                    currentUserEmoji={getUserReactionEmoji(msg.reactions)}
+                    isMenuOpen={messageMenuId === msg.id}
+                    menuRef={menuRef}
+                    onToggleReaction={handleToggleReaction}
+                    onToggleMenu={toggleMenu}
+                    onCopy={handleCopy}
+                    onReply={handleReply}
+                    onDelete={handleDeleteMessage}
+                    position={isOwn ? 'left' : 'right'}
+                  />
+                </div>
+
+                {/* Reactions */}
+                <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                  <ReactionBar
+                    reactions={msg.reactions}
+                    currentUserId={currentUserId}
+                    onToggleReaction={(emoji, hasReacted) => handleToggleReaction(msg.id, emoji, hasReacted)}
+                    members={dmMembers}
+                    isOwn={isOwn}
+                  />
+                </div>
               </div>
             </div>
             );

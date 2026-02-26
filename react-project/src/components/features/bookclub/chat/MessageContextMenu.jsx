@@ -14,12 +14,12 @@ import { BsPinAngle } from 'react-icons/bs';
  */
 const MessageContextMenu = ({ msg, isOwn, canModerate, menuRef, onPin, onEdit, onCopy, onReply, onDelete }) => {
   const menuItems = [
-    canModerate && {
+    canModerate && onPin && {
       label: msg.isPinned ? 'Unpin message' : 'Pin message',
       icon: <BsPinAngle className="w-4 h-4" />,
       onClick: () => onPin(msg.id, msg.isPinned),
     },
-    isOwn && msg.text && !msg.deletedAt && {
+    isOwn && msg.text && !msg.deletedAt && onEdit && {
       label: 'Edit message',
       icon: <FiEdit2 className="w-4 h-4" />,
       onClick: () => onEdit(msg),
