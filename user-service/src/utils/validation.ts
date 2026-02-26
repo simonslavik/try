@@ -108,6 +108,14 @@ export const updateProfileSchema = joi.object({
     })
 });
 
+// Status validation
+export const updateStatusSchema = joi.object({
+    status: joi.string().valid('ONLINE', 'AWAY', 'BUSY', 'OFFLINE').required().messages({
+        'any.only': 'Status must be one of: ONLINE, AWAY, BUSY, OFFLINE',
+        'any.required': 'Status is required'
+    })
+});
+
 // Google auth validation
 export const googleAuthSchema = joi.object({
     credential: joi.string().required().messages({

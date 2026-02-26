@@ -26,6 +26,7 @@ model User {
   createdAt                DateTime       @default(now())
   updatedAt                DateTime       @updatedAt
   profileImage             String? // Optional profile image URL
+  status                   UserStatus @default(ONLINE)
   refreshTokens            RefreshToken[]
 
   // Friend relationships
@@ -76,6 +77,13 @@ enum FriendshipStatus {
   PENDING
   ACCEPTED
   BLOCKED
+}
+
+enum UserStatus {
+  ONLINE
+  AWAY
+  BUSY
+  OFFLINE
 }
 
 model DirectMessage {

@@ -6,7 +6,7 @@ import logger from '@utils/logger';
 const ProtectedRoute = ({ children }) => {
   const { auth } = useContext(AuthContext);
   const isAuthed = auth && auth.token;
-  if (!isAuthed) return <Navigate to="/auth" replace />;
+  if (!isAuthed) return <Navigate to="/" replace />;
   return children;
 };
 

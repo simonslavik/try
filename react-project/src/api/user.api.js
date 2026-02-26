@@ -27,6 +27,12 @@ export const userAPI = {
     return response.data;
   },
 
+  // Update user status
+  updateStatus: async (status) => {
+    const response = await apiClient.patch('/v1/profile/status', { status });
+    return response.data;
+  },
+
   // Get user's bookclubs
   getUserBookclubs: async (userId) => {
     const response = await apiClient.get(`/users/${userId}/bookclubs`);

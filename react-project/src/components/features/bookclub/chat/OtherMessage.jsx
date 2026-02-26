@@ -7,6 +7,7 @@ import ReplyPreview from './ReplyPreview';
 import MessageActions from './MessageActions';
 import { getProfileImageUrl } from '@config/constants';
 import { renderMessageContent, formatTimestamp } from './messageUtils';
+import UserHoverCard from '../UserHoverCard';
 
 /**
  * Renders a message sent by another user (left-aligned with avatar).
@@ -19,19 +20,39 @@ const OtherMessage = ({
   onToggleReaction, onToggleMenu,
   onPin, onCopy, onReply, onDelete,
   onScrollToMessage, getUserReactionEmoji,
+  friends = [], onSendFriendRequest, connectedUsers = [],
 }) => {
   const [showFullDate, setShowFullDate] = useState(false);
   const navigate = useNavigate();
 
+  const isFriend = friends.some(f => f.friend?.id === msg.userId);
+  const isOnline = connectedUsers.some(cu => cu.userId === msg.userId);
+
+  const hoverUser = {
+    id: msg.userId,
+    username: msg.username,
+    profileImage: msg.profileImage,
+    status: msg.status,
+  };
+
   return (
     <div className="flex gap-1 group">
-      <img
-        src={getProfileImageUrl(msg.profileImage) || '/images/default.webp'}
-        alt={msg.username}
-        className="w-7 h-7 rounded-[50%] object-cover flex-shrink-0 self-end cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all"
-        onClick={() => msg.userId && navigate(`/profile/${msg.userId}`)}
-        onError={(e) => { e.target.src = '/images/default.webp'; }}
-      />
+      <UserHoverCard
+        user={hoverUser}
+        currentUserId={auth?.user?.id}
+        isFriend={isFriend}
+        isOnline={isOnline}
+        onSendFriendRequest={onSendFriendRequest}
+        className="flex-shrink-0 self-end"
+      >
+        <img
+          src={getProfileImageUrl(msg.profileImage) || '/images/default.webp'}
+          alt={msg.username}
+          className="w-7 h-7 rounded-[50%] object-cover cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all"
+          onClick={() => msg.userId && navigate(`/profile/${msg.userId}`)}
+          onError={(e) => { e.target.src = '/images/default.webp'; }}
+        />
+      </UserHoverCard>
       <div className="max-w-md">
         {/* Username + Pinned badge */}
         <div className="flex items-baseline">

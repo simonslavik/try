@@ -67,6 +67,21 @@ export class UserService {
   }
 
   /**
+   * Update user status
+   */
+  static async updateStatus(userId: string, status: string) {
+    const updatedUser = await UserRepository.update(userId, { status });
+
+    logger.info({
+      type: 'STATUS_UPDATED',
+      userId,
+      status,
+    });
+
+    return updatedUser;
+  }
+
+  /**
    * Search users
    */
   static async searchUsers(query: string, limit = 10) {

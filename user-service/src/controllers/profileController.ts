@@ -74,6 +74,27 @@ export const updateMyProfile = async (req: Request, res: Response) => {
 };
 
 /**
+ * Update current user's status
+ * Requires authentication
+ */
+export const updateMyStatus = async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    const { status } = req.body;
+
+    if (!userId) {
+        throw new UnauthorizedError('User not authenticated');
+    }
+
+    const updatedUser = await UserService.updateStatus(userId, status);
+
+    return res.status(200).json({
+        success: true,
+        message: 'Status updated successfully',
+        data: updatedUser
+    });
+};
+
+/**
  * Get any user's profile by ID (admin only)
  */
 export const getUserById = async (req: Request, res: Response) => {
@@ -132,7 +153,8 @@ export const getUsersByIds = async (req: Request, res: Response) => {
             id: user.id,
             username: user.name,
             email: user.email,
-            profileImage: user.profileImage
+            profileImage: user.profileImage,
+            status: user.status
         }))
     });
 };

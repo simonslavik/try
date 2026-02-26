@@ -947,3 +947,37 @@ export const handleDMRemoveReaction = async (message: any, currentClient: Client
     }
   }
 };
+
+/**
+ * Handle user status update — broadcast to all bookclubs the user belongs to + DM clients
+ */
+export const handleStatusUpdate = (message: any, currentClient: Client | null) => {
+  if (!currentClient) return;
+
+  const { status } = message;
+  if (!['ONLINE', 'AWAY', 'BUSY', 'OFFLINE'].includes(status)) return;
+
+  const payload = JSON.stringify({
+    type: 'user-status-update',
+    userId: currentClient.userId,
+    status,
+  });
+
+  // Broadcast to all bookclub clients
+  activeBookClubs.forEach((club) => {
+    club.clients.forEach((client) => {
+      if (client.userId !== currentClient.userId && client.ws.readyState === WebSocket.OPEN) {
+        client.ws.send(payload);
+      }
+    });
+  });
+
+  // Broadcast to all DM clients
+  activeDMClients.forEach((client) => {
+    if (client.userId !== currentClient.userId && client.ws.readyState === WebSocket.OPEN) {
+      client.ws.send(payload);
+    }
+  });
+
+  console.log(`🔄 Status update: ${currentClient.username} → ${status}`);
+};

@@ -18,6 +18,7 @@ export const USER_PUBLIC_FIELDS = {
     email: true,
     profileImage: true,
     emailVerified: true,
+    status: true,
     createdAt: true
 } as const;
 
@@ -25,7 +26,8 @@ export const USER_BASIC_FIELDS = {
     id: true,
     name: true,
     email: true,
-    profileImage: true
+    profileImage: true,
+    status: true
 } as const;
 
 // Friendship statuses
