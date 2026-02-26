@@ -171,7 +171,7 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
 
   // ── Render ──────────────────────────────────────────────
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-3">
+    <div className="flex-1 overflow-y-auto p-1 space-y-1">
       {messages.length === 0 ? (
         <div className="text-center text-gray-500 mt-8">
           <FiHash className="mx-auto text-4xl mb-2 opacity-30" />
@@ -188,7 +188,7 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
             <div
               key={msg.id || idx}
               id={`msg-${msg.id}`}
-              className={`flex flex-col ${groupWithPrevious ? 'mt-1' : 'mt-3'} transition-all duration-300 rounded-lg`}
+              className={`flex flex-col ${groupWithPrevious ? 'mt-1' : 'mt-1'} transition-all duration-300 rounded-lg`}
             >
               {msg.type === 'system' ? (
                 <div className="text-center">

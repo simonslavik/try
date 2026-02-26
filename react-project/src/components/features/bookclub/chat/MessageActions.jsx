@@ -26,8 +26,8 @@ const MessageActions = ({
   if (msg.deletedAt) return null;
 
   const positionClass = position === 'left'
-    ? 'absolute -left-16 top-1/2 -translate-y-1/2'
-    : 'absolute top-1/2 -translate-y-1/2 -right-16';
+    ? 'absolute -left-12 top-1/2 -translate-y-1/2'
+    : 'absolute top-1/2 -translate-y-1/2 -right-12';
 
   return (
     <div className={`${positionClass} flex items-center gap-0.5`}>
@@ -40,9 +40,9 @@ const MessageActions = ({
       <div className="relative">
           <button
             onClick={(e) => onToggleMenu(msg.id, e)}
-            className="p-1.5 rounded-lg bg-gray-700/80 hover:bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="p-1 rounded-lg bg-gray-700/80 hover:bg-gray-600 opacity-0 group-hover:opacity-100 transition-opacity"
           >
-            <FiMoreVertical className="w-4 h-4 text-gray-300" />
+            <FiMoreVertical className="w-3.5 h-3.5 text-gray-300" />
           </button>
           {isMenuOpen && (
             <MessageContextMenu
