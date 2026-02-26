@@ -66,7 +66,7 @@ export const getDirectMessages = async (req: Request, res: Response) => {
 export const sendDirectMessage = async (req: Request, res: Response) => {
     try {
         const currentUserId = req.user?.userId || req.headers['x-user-id'] as string;
-        const { receiverId, content, attachments = [] } = req.body;
+        const { receiverId, content, attachments = [], replyToId } = req.body;
 
         if (!currentUserId) {
             throw new UnauthorizedError('User not authenticated');
@@ -76,7 +76,8 @@ export const sendDirectMessage = async (req: Request, res: Response) => {
             currentUserId,
             receiverId,
             content?.trim() || '',
-            attachments
+            attachments,
+            replyToId
         );
 
         logger.info({
@@ -162,6 +163,61 @@ export const deleteDirectMessage = async (req: Request, res: Response) => {
             userId: req.user?.userId,
             messageId: req.params.messageId
         });
+        throw error;
+    }
+};
+
+/**
+ * Add a reaction to a DM
+ */
+export const addDMReaction = async (req: Request, res: Response) => {
+    try {
+        const currentUserId = req.user?.userId || req.headers['x-user-id'] as string;
+        const { messageId } = req.params;
+        const { emoji } = req.body;
+
+        if (!currentUserId) {
+            throw new UnauthorizedError('User not authenticated');
+        }
+
+        if (!emoji) {
+            throw new BadRequestError('Emoji is required');
+        }
+
+        const result = await DirectMessageService.addReaction(currentUserId, messageId, emoji);
+
+        return res.status(200).json({
+            success: true,
+            data: result
+        });
+    } catch (error: any) {
+        if (error instanceof ForbiddenError || error instanceof BadRequestError) throw error;
+        logError(error, 'Add DM reaction error', { userId: req.user?.userId, messageId: req.params.messageId });
+        throw error;
+    }
+};
+
+/**
+ * Remove a reaction from a DM
+ */
+export const removeDMReaction = async (req: Request, res: Response) => {
+    try {
+        const currentUserId = req.user?.userId || req.headers['x-user-id'] as string;
+        const { messageId, emoji } = req.params;
+
+        if (!currentUserId) {
+            throw new UnauthorizedError('User not authenticated');
+        }
+
+        const result = await DirectMessageService.removeReaction(currentUserId, messageId, emoji);
+
+        return res.status(200).json({
+            success: true,
+            data: result
+        });
+    } catch (error: any) {
+        if (error instanceof ForbiddenError || error instanceof BadRequestError) throw error;
+        logError(error, 'Remove DM reaction error', { userId: req.user?.userId, messageId: req.params.messageId });
         throw error;
     }
 };

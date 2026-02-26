@@ -8,6 +8,26 @@ import { WS_URL } from '@config/constants';
 import apiClient from '@api/axios';
 import logger from '@utils/logger';
 
+// Normalize raw Prisma reactions [{userId, emoji, ...}] to grouped format [{emoji, count, userIds}]
+const normalizeReactions = (reactions) => {
+  if (!reactions || reactions.length === 0) return [];
+  // Already in grouped format (from WS reaction-updated events)
+  if (reactions[0]?.userIds) return reactions;
+  // Raw Prisma format — group by emoji
+  const grouped = {};
+  for (const r of reactions) {
+    if (!grouped[r.emoji]) grouped[r.emoji] = { emoji: r.emoji, count: 0, userIds: [] };
+    grouped[r.emoji].userIds.push(r.userId);
+    grouped[r.emoji].count++;
+  }
+  return Object.values(grouped);
+};
+
+const normalizeMessage = (msg) => ({
+  ...msg,
+  reactions: normalizeReactions(msg.reactions),
+});
+
 const DMChatPage = () => {
   const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -19,6 +39,7 @@ const DMChatPage = () => {
   const [sendingMessage, setSendingMessage] = useState(false);
   const [friends, setFriends] = useState([]);
   const [myBookClubs, setMyBookClubs] = useState([]);
+  const [replyingTo, setReplyingTo] = useState(null);
   
   const dmWs = useRef(null);
 
@@ -72,7 +93,7 @@ const DMChatPage = () => {
         case 'dm-sent':
           setDmMessages(prev => {
             if (prev.find(m => m.id === data.message.id)) return prev;
-            return [...prev, data.message];
+            return [...prev, normalizeMessage(data.message)];
           });
           setSendingMessage(false);
           break;
@@ -83,18 +104,29 @@ const DMChatPage = () => {
           if (currentDMUser && (newMsg.senderId === currentDMUser.id || newMsg.receiverId === currentDMUser.id)) {
             setDmMessages(prev => {
               if (prev.find(m => m.id === newMsg.id)) return prev;
-              return [...prev, newMsg];
+              return [...prev, normalizeMessage(newMsg)];
             });
           }
           
           fetchConversations();
           break;
-                  case 'dm-deleted':
+        case 'dm-deleted':
           // Handle message deletion from WebSocket
           setDmMessages(prev => 
             prev.map(msg => 
               msg.id === data.messageId 
-                ? { ...msg, content: '[Message deleted]', deletedAt: new Date().toISOString(), attachments: [] }
+                ? { ...msg, content: '[Message deleted]', deletedAt: new Date().toISOString(), attachments: [], reactions: [] }
+                : msg
+            )
+          );
+          break;
+
+        case 'dm-reaction-updated':
+          // Handle reaction update from WebSocket
+          setDmMessages(prev =>
+            prev.map(msg =>
+              msg.id === data.messageId
+                ? { ...msg, reactions: data.reactions || [] }
                 : msg
             )
           );
@@ -186,7 +218,7 @@ const DMChatPage = () => {
       const response = await apiClient.get(`/v1/messages/${userId}`);
       const data = response.data;
       
-      const messagesInOrder = [...(data.data.messages || [])].reverse();
+      const messagesInOrder = [...(data.data.messages || [])].reverse().map(normalizeMessage);
       setDmMessages(messagesInOrder);
       setCurrentDMUser(data.data.otherUser);
       
@@ -230,7 +262,7 @@ const DMChatPage = () => {
     await fetchDMMessages(userId);
   };
 
-  const handleSendDM = (content, attachments = []) => {
+  const handleSendDM = (content, attachments = [], replyToId = null) => {
     if ((!content || !content.trim()) && attachments.length === 0) {
       return;
     }
@@ -245,7 +277,8 @@ const DMChatPage = () => {
       type: 'dm-message',
       receiverId: currentDMUser.id,
       content: content?.trim() || '',
-      attachments: attachments
+      attachments: attachments,
+      replyToId: replyToId || undefined
     }));
   };
 
@@ -282,6 +315,8 @@ const DMChatPage = () => {
           auth={auth}
           setMessages={setDmMessages}
           dmWs={dmWs}
+          replyingTo={replyingTo}
+          setReplyingTo={setReplyingTo}
         />
       </div>
     </div>

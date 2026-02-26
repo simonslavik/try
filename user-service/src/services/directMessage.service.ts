@@ -9,13 +9,42 @@ import { NotFoundError, ForbiddenError } from '../utils/errors.js';
  */
 export class DirectMessageService {
   /**
+   * Group raw Prisma DMReaction records into { emoji, count, userIds } format
+   */
+  private static groupReactions(rawReactions: any[]): { emoji: string; count: number; userIds: string[] }[] {
+    if (!rawReactions || rawReactions.length === 0) return [];
+    const grouped = new Map<string, string[]>();
+    for (const r of rawReactions) {
+      if (!grouped.has(r.emoji)) grouped.set(r.emoji, []);
+      grouped.get(r.emoji)!.push(r.userId);
+    }
+    return Array.from(grouped.entries()).map(([emoji, userIds]) => ({
+      emoji,
+      count: userIds.length,
+      userIds,
+    }));
+  }
+
+  /**
+   * Normalize a message's reactions from raw Prisma records to grouped format
+   */
+  private static normalizeMessage(message: any): any {
+    if (!message) return message;
+    return {
+      ...message,
+      reactions: this.groupReactions(message.reactions || []),
+    };
+  }
+
+  /**
    * Send a direct message
    */
   static async sendMessage(
     senderId: string,
     receiverId: string,
     content: string,
-    attachments?: any[]
+    attachments?: any[],
+    replyToId?: string
   ) {
     // Allow DMs without friendship requirement (bookclub members can DM each other)
     // Create message
@@ -23,7 +52,8 @@ export class DirectMessageService {
       senderId,
       receiverId,
       content,
-      attachments
+      attachments,
+      replyToId
     );
 
     logger.info({
@@ -33,7 +63,7 @@ export class DirectMessageService {
       messageId: message.id,
     });
 
-    return message;
+    return this.normalizeMessage(message);
   }
 
   /**
@@ -54,12 +84,15 @@ export class DirectMessageService {
       offset
     );
 
+    // Normalize reactions in all messages
+    const normalizedMessages = messages.map((m: any) => this.normalizeMessage(m));
+
     // Extract partner info from already-fetched messages (they include sender/receiver)
     // Only fall back to a separate query if no messages exist
     let otherUser: { id: string; name: string; email: string; profileImage: string | null } | null = null;
 
-    if (messages.length > 0) {
-      const firstMessage = messages[0] as any;
+    if (normalizedMessages.length > 0) {
+      const firstMessage = normalizedMessages[0] as any;
       const partner = firstMessage.senderId === partnerId
         ? firstMessage.sender
         : firstMessage.receiver;
@@ -86,7 +119,7 @@ export class DirectMessageService {
       }
     }
 
-    return { messages, otherUser };
+    return { messages: normalizedMessages, otherUser };
   }
 
   /**
@@ -198,5 +231,38 @@ export class DirectMessageService {
     });
 
     return { message: 'Conversation deleted' };
+  }
+
+  // ── DM Reactions ──────────────────────────────────────────
+
+  static async addReaction(userId: string, messageId: string, emoji: string) {
+    const message = await DirectMessageRepository.findById(messageId);
+    if (!message) throw new NotFoundError('Message not found');
+
+    // Only sender or receiver can react
+    if (message.senderId !== userId && message.receiverId !== userId) {
+      throw new ForbiddenError('You are not part of this conversation');
+    }
+
+    await DirectMessageRepository.addReaction(messageId, userId, emoji);
+    const reactions = await DirectMessageRepository.getReactions(messageId);
+    return { messageId, reactions };
+  }
+
+  static async removeReaction(userId: string, messageId: string, emoji: string) {
+    const message = await DirectMessageRepository.findById(messageId);
+    if (!message) throw new NotFoundError('Message not found');
+
+    if (message.senderId !== userId && message.receiverId !== userId) {
+      throw new ForbiddenError('You are not part of this conversation');
+    }
+
+    await DirectMessageRepository.removeReaction(messageId, userId, emoji);
+    const reactions = await DirectMessageRepository.getReactions(messageId);
+    return { messageId, reactions };
+  }
+
+  static async getReactions(messageId: string) {
+    return await DirectMessageRepository.getReactions(messageId);
   }
 }

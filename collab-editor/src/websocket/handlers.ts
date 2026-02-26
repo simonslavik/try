@@ -478,7 +478,7 @@ export const handleJoinDM = (
 export const handleDMMessage = async (message: any, currentClient: Client | null) => {
   if (!currentClient || !currentClient.isDMConnection) return;
 
-  const { receiverId, content, attachments = [] } = message;
+  const { receiverId, content, attachments = [], replyToId } = message;
   
   try {
     // Save message to user-service database via API
@@ -489,7 +489,7 @@ export const handleDMMessage = async (message: any, currentClient: Client | null
         'Content-Type': 'application/json',
         'X-User-Id': currentClient.userId // Internal service-to-service header
       },
-      body: JSON.stringify({ receiverId, content, attachments })
+      body: JSON.stringify({ receiverId, content, attachments, replyToId })
     });
 
     if (!response.ok) {
@@ -830,5 +830,120 @@ export const handleEditMessage = async (message: any, currentClient: Client | nu
       type: 'error',
       message: 'Failed to edit message'
     }));
+  }
+};
+
+// ── DM Reaction handlers ──────────────────────────────────
+
+export const handleDMAddReaction = async (message: any, currentClient: Client | null) => {
+  if (!currentClient || !currentClient.isDMConnection) return;
+
+  const { messageId, emoji, receiverId } = message;
+
+  try {
+    const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:3001/api';
+    const response = await fetch(`${userServiceUrl}/messages/${messageId}/reactions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': currentClient.userId,
+      },
+      body: JSON.stringify({ emoji }),
+    });
+
+    if (!response.ok) {
+      const errorData: any = await response.json().catch(() => ({ message: 'Unknown error' }));
+      throw new Error(errorData.message || 'Failed to add reaction');
+    }
+
+    const data: any = await response.json();
+    const reactionData = data.data;
+
+    // Broadcast to sender
+    if (currentClient.ws.readyState === WebSocket.OPEN) {
+      currentClient.ws.send(JSON.stringify({
+        type: 'dm-reaction-updated',
+        messageId: reactionData.messageId,
+        reactions: reactionData.reactions,
+      }));
+    }
+
+    // Broadcast to receiver
+    if (receiverId) {
+      const receiverClient = activeDMClients.get(receiverId);
+      if (receiverClient && receiverClient.ws.readyState === WebSocket.OPEN) {
+        receiverClient.ws.send(JSON.stringify({
+          type: 'dm-reaction-updated',
+          messageId: reactionData.messageId,
+          reactions: reactionData.reactions,
+        }));
+      }
+    }
+
+    console.log(`😍 DM reaction added by ${currentClient.username}: ${emoji} on ${messageId}`);
+  } catch (error) {
+    console.error('Error adding DM reaction:', error);
+    if (currentClient.ws.readyState === WebSocket.OPEN) {
+      currentClient.ws.send(JSON.stringify({
+        type: 'error',
+        message: error instanceof Error ? error.message : 'Failed to add reaction',
+      }));
+    }
+  }
+};
+
+export const handleDMRemoveReaction = async (message: any, currentClient: Client | null) => {
+  if (!currentClient || !currentClient.isDMConnection) return;
+
+  const { messageId, emoji, receiverId } = message;
+
+  try {
+    const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:3001/api';
+    const response = await fetch(`${userServiceUrl}/messages/${messageId}/reactions/${encodeURIComponent(emoji)}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': currentClient.userId,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData: any = await response.json().catch(() => ({ message: 'Unknown error' }));
+      throw new Error(errorData.message || 'Failed to remove reaction');
+    }
+
+    const data: any = await response.json();
+    const reactionData = data.data;
+
+    // Broadcast to sender
+    if (currentClient.ws.readyState === WebSocket.OPEN) {
+      currentClient.ws.send(JSON.stringify({
+        type: 'dm-reaction-updated',
+        messageId: reactionData.messageId,
+        reactions: reactionData.reactions,
+      }));
+    }
+
+    // Broadcast to receiver
+    if (receiverId) {
+      const receiverClient = activeDMClients.get(receiverId);
+      if (receiverClient && receiverClient.ws.readyState === WebSocket.OPEN) {
+        receiverClient.ws.send(JSON.stringify({
+          type: 'dm-reaction-updated',
+          messageId: reactionData.messageId,
+          reactions: reactionData.reactions,
+        }));
+      }
+    }
+
+    console.log(`❌ DM reaction removed by ${currentClient.username}: ${emoji} on ${messageId}`);
+  } catch (error) {
+    console.error('Error removing DM reaction:', error);
+    if (currentClient.ws.readyState === WebSocket.OPEN) {
+      currentClient.ws.send(JSON.stringify({
+        type: 'error',
+        message: error instanceof Error ? error.message : 'Failed to remove reaction',
+      }));
+    }
   }
 };

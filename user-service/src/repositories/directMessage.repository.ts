@@ -8,17 +8,27 @@ export class DirectMessageRepository {
   /**
    * Create a direct message
    */
-  static async create(senderId: string, receiverId: string, content: string, attachments?: any[]) {
+  static async create(senderId: string, receiverId: string, content: string, attachments?: any[], replyToId?: string) {
     return await prisma.directMessage.create({
       data: {
         senderId,
         receiverId,
         content,
         attachments: attachments || [],
+        replyToId: replyToId || null,
       },
       include: {
         sender: { select: USER_BASIC_FIELDS },
         receiver: { select: USER_BASIC_FIELDS },
+        reactions: true,
+        replyTo: {
+          select: {
+            id: true,
+            content: true,
+            senderId: true,
+            sender: { select: { id: true, name: true } }
+          }
+        }
       },
     });
   }
@@ -32,6 +42,15 @@ export class DirectMessageRepository {
       include: {
         sender: { select: USER_BASIC_FIELDS },
         receiver: { select: USER_BASIC_FIELDS },
+        reactions: true,
+        replyTo: {
+          select: {
+            id: true,
+            content: true,
+            senderId: true,
+            sender: { select: { id: true, name: true } }
+          }
+        }
       },
     });
   }
@@ -50,6 +69,15 @@ export class DirectMessageRepository {
       include: {
         sender: { select: USER_BASIC_FIELDS },
         receiver: { select: USER_BASIC_FIELDS },
+        reactions: true,
+        replyTo: {
+          select: {
+            id: true,
+            content: true,
+            senderId: true,
+            sender: { select: { id: true, name: true } }
+          }
+        }
       },
       orderBy: { createdAt: 'desc' },
       take: limit,
@@ -208,5 +236,54 @@ export class DirectMessageRepository {
         ],
       },
     });
+  }
+
+  // ── DM Reactions ──────────────────────────────────────────────
+
+  /**
+   * Add or toggle a reaction on a DM
+   */
+  static async addReaction(messageId: string, userId: string, emoji: string) {
+    // Upsert: if same user+message+emoji exists, it's a no-op (unique constraint)
+    return await prisma.dMReaction.upsert({
+      where: {
+        messageId_userId_emoji: { messageId, userId, emoji }
+      },
+      update: {},
+      create: { messageId, userId, emoji },
+    });
+  }
+
+  /**
+   * Remove a reaction from a DM
+   */
+  static async removeReaction(messageId: string, userId: string, emoji: string) {
+    return await prisma.dMReaction.deleteMany({
+      where: { messageId, userId, emoji },
+    });
+  }
+
+  /**
+   * Get grouped reactions for a message
+   */
+  static async getReactions(messageId: string) {
+    const reactions = await prisma.dMReaction.findMany({
+      where: { messageId },
+      select: { emoji: true, userId: true },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    // Group by emoji
+    const grouped = new Map<string, string[]>();
+    for (const r of reactions) {
+      if (!grouped.has(r.emoji)) grouped.set(r.emoji, []);
+      grouped.get(r.emoji)!.push(r.userId);
+    }
+
+    return Array.from(grouped.entries()).map(([emoji, userIds]) => ({
+      emoji,
+      count: userIds.length,
+      userIds,
+    }));
   }
 }

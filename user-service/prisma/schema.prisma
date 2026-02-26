@@ -85,11 +85,17 @@ model DirectMessage {
   content     String   @db.Text
   attachments Json?    @default("[]")
   isRead      Boolean  @default(false)
+  deletedAt   DateTime?
+  editedAt    DateTime?
+  replyToId   String?
+  replyTo     DirectMessage?  @relation("DMReplies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies     DirectMessage[] @relation("DMReplies")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  sender   User @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender    User          @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver  User          @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  reactions DMReaction[]
 
   @@index([senderId])
   @@index([receiverId])
@@ -97,4 +103,18 @@ model DirectMessage {
   @@index([senderId, receiverId, createdAt])
   @@index([receiverId, isRead])
   @@map("direct_messages")
+}
+
+model DMReaction {
+  id        String         @id @default(uuid())
+  messageId String
+  message   DirectMessage  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  userId    String
+  emoji     String
+  createdAt DateTime       @default(now())
+
+  @@unique([messageId, userId, emoji])
+  @@index([messageId])
+  @@index([userId])
+  @@map("dm_reactions")
 }

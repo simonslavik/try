@@ -1,43 +1,134 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { FiX } from 'react-icons/fi';
 
 /**
  * ReactionBar — displays grouped reactions under a message.
- * Each reaction chip shows the emoji, count, and highlights if the current user reacted.
- * Clicking a chip toggles the reaction on/off.
+ * Clicking a chip opens a modal showing who reacted with each emoji.
  *
  * Props:
  *  - reactions: Array<{ emoji, count, userIds }> — grouped reactions from backend
  *  - currentUserId: string — the logged-in user's ID
  *  - onToggleReaction: (emoji: string, hasReacted: boolean) => void
+ *  - members: Array<{ id, username?, name? }> — optional member list for name resolution
  */
-const ReactionBar = ({ reactions, currentUserId, onToggleReaction }) => {
+const ReactionBar = ({ reactions, currentUserId, onToggleReaction, members = [] }) => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [activeEmoji, setActiveEmoji] = useState(null);
+
   if (!reactions || reactions.length === 0) return null;
 
-  return (
-    <div className="flex flex-wrap gap-1 mt-1">
-      {reactions.map(({ emoji, count, userIds }) => {
-        const hasReacted = userIds.includes(currentUserId);
+  // Build a lookup map: userId -> display name
+  const nameMap = {};
+  for (const m of members) {
+    if (m.id) nameMap[m.id] = m.username || m.name || 'Unknown';
+  }
+  const resolveName = (userId) => {
+    if (userId === currentUserId) return 'You';
+    return nameMap[userId] || 'Unknown User';
+  };
 
-        return (
-          <button
-            key={emoji}
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleReaction(emoji, hasReacted);
-            }}
-            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs transition-all border ${
-              hasReacted
-                ? 'bg-purple-600/30 border-purple-500 text-purple-200 hover:bg-purple-600/40'
-                : 'bg-gray-700/50 border-gray-600 text-gray-300 hover:bg-gray-700'
-            }`}
-            title={`${emoji} ${count}`}
+  const openModal = (emoji) => {
+    setActiveEmoji(emoji);
+    setModalOpen(true);
+  };
+
+  const selectedReactions = activeEmoji
+    ? reactions.filter((r) => r.emoji === activeEmoji)
+    : reactions;
+
+  return (
+    <>
+      <div className="flex flex-wrap mt-[-10px] z-10">
+        {reactions.map(({ emoji, count, userIds }) => {
+          const hasReacted = userIds.includes(currentUserId);
+
+          return (
+            <button
+              key={emoji}
+              onClick={(e) => {
+                e.stopPropagation();
+                openModal(emoji);
+              }}
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs transition-all border ${
+                hasReacted
+                  ? 'bg-purple-600/30 border-purple-500 text-purple-200 hover:bg-purple-600/40'
+                  : 'bg-gray-700/50 border-gray-600 text-gray-300 hover:bg-gray-700'
+              }`}
+              title={`${emoji} ${count}`}
+            >
+              <span className="text-sm">{emoji}</span>
+              <span className="font-medium">{count}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Reactions detail modal */}
+      {modalOpen && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60"
+          onClick={() => setModalOpen(false)}
+        >
+          <div
+            className="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl w-80 max-h-[400px] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
           >
-            <span className="text-sm">{emoji}</span>
-            <span className="font-medium">{count}</span>
-          </button>
-        );
-      })}
-    </div>
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+              <h3 className="text-sm font-semibold text-white">Reactions</h3>
+              <button
+                onClick={() => setModalOpen(false)}
+                className="p-1 rounded-lg hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
+              >
+                <FiX className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Emoji tabs */}
+            <div className="flex gap-1 px-4 py-2 border-b border-gray-700 overflow-x-auto">
+              <button
+                onClick={() => setActiveEmoji(null)}
+                className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                  !activeEmoji
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                All {reactions.reduce((s, r) => s + r.count, 0)}
+              </button>
+              {reactions.map(({ emoji, count }) => (
+                <button
+                  key={emoji}
+                  onClick={() => setActiveEmoji(emoji)}
+                  className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                    activeEmoji === emoji
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  {emoji} {count}
+                </button>
+              ))}
+            </div>
+
+            {/* User list */}
+            <div className="flex-1 overflow-y-auto px-4 py-2 space-y-1">
+              {selectedReactions.map(({ emoji, userIds }) =>
+                userIds.map((uid) => (
+                  <div
+                    key={`${emoji}-${uid}`}
+                    className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-gray-700/50"
+                  >
+                    <span className="text-sm text-gray-200">{resolveName(uid)}</span>
+                    <span className="text-base">{emoji}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
