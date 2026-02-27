@@ -31,6 +31,7 @@ model BookClub {
   // Relations
   rooms              Room[]
   events             BookClubEvent[]
+  meetings           Meeting[]
   invites            BookClubInvite[]
   members            BookClubMember[]
   membershipRequests MembershipRequest[]
@@ -222,6 +223,60 @@ model BookClubEvent {
   @@index([bookClubId, eventDate])
   @@index([createdBy])
   @@map("bookclub_events")
+}
+
+// ─── Meetings ──────────────────────────────────────────────────
+
+enum MeetingStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+  CANCELLED
+}
+
+enum RSVPStatus {
+  ATTENDING
+  MAYBE
+  NOT_ATTENDING
+}
+
+// Meeting model - scheduled calls/meetings with external links (Zoom/Meet/Teams)
+model Meeting {
+  id          String        @id @default(uuid())
+  bookClubId  String
+  bookClub    BookClub      @relation(fields: [bookClubId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  meetingUrl  String // External meeting link (Zoom, Google Meet, Teams, etc.)
+  platform    String        @default("custom") // "zoom" | "google_meet" | "teams" | "discord" | "custom"
+  hostId      String // User ID from user-service
+  scheduledAt DateTime
+  duration    Int? // Duration in minutes
+  status      MeetingStatus @default(SCHEDULED)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  rsvps Meeting_RSVP[]
+
+  @@index([bookClubId])
+  @@index([bookClubId, scheduledAt])
+  @@index([hostId])
+  @@map("meetings")
+}
+
+// Meeting RSVP model - tracks member attendance responses
+model Meeting_RSVP {
+  id        String     @id @default(uuid())
+  meetingId String
+  meeting   Meeting    @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  userId    String // User ID from user-service
+  status    RSVPStatus @default(ATTENDING)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@unique([meetingId, userId])
+  @@index([meetingId])
+  @@map("meeting_rsvps")
 }
 
 // BookClubInvite model - stores invite links for book clubs (like Discord invites)

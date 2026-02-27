@@ -99,3 +99,30 @@ export const updateClubSchema = z.object({
 export const uuidParamSchema = z.object({
   id: z.string().uuid('Invalid ID'),
 });
+
+/**
+ * Validation schemas for Meeting endpoints
+ */
+
+export const createMeetingSchema = z.object({
+  title: z.string().min(1, 'Meeting title is required').max(200, 'Title too long'),
+  description: z.string().max(1000, 'Description too long').optional().nullable(),
+  meetingUrl: z.string().url('Must be a valid URL').max(2000, 'URL too long'),
+  platform: z.enum(['zoom', 'google_meet', 'teams', 'discord', 'custom']).optional(),
+  scheduledAt: z.string().min(1, 'Scheduled date/time is required'),
+  duration: z.number().int().min(5).max(480).optional().nullable(),
+});
+
+export const updateMeetingSchema = z.object({
+  title: z.string().min(1).max(200).optional(),
+  description: z.string().max(1000).optional().nullable(),
+  meetingUrl: z.string().url().max(2000).optional(),
+  platform: z.enum(['zoom', 'google_meet', 'teams', 'discord', 'custom']).optional(),
+  scheduledAt: z.string().optional(),
+  duration: z.number().int().min(5).max(480).optional().nullable(),
+  status: z.enum(['SCHEDULED', 'LIVE', 'ENDED', 'CANCELLED']).optional(),
+});
+
+export const rsvpSchema = z.object({
+  status: z.enum(['ATTENDING', 'MAYBE', 'NOT_ATTENDING']),
+});

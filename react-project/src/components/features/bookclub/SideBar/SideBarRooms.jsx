@@ -1,7 +1,7 @@
 
 
 import React, { useState, useRef, useEffect } from 'react';
-import { FiHome, FiPlus, FiHash, FiMail, FiBook, FiCalendar, FiLock, FiVolume2, FiSettings, FiUsers, FiMoreVertical } from 'react-icons/fi';
+import { FiHome, FiPlus, FiHash, FiMail, FiBook, FiCalendar, FiLock, FiVolume2, FiSettings, FiUsers, FiMoreVertical, FiVideo } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import BookClubImage from './BookClubImage';
 import logger from '@utils/logger';
@@ -82,7 +82,9 @@ const SideBarRooms = ({
     onShowCalendar,
     showCalendar,
     onShowSuggestions,
-    showSuggestions
+    showSuggestions,
+    onShowMeetings,
+    showMeetings
 }) => {
     const navigate = useNavigate();
     const [contextMenu, setContextMenu] = useState(null);
@@ -157,7 +159,7 @@ const SideBarRooms = ({
             </div>
 
             {/* Calendar Button */}
-            <div className='border-b border-gray-700 p-4 flex-shrink-0'>
+            <div className='border-b border-gray-700 p-4 flex-shrink-0 space-y-2'>
               <button
                 onClick={() => onShowCalendar && onShowCalendar()}
                 className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded transition-colors text-sm ${
@@ -168,6 +170,17 @@ const SideBarRooms = ({
               >
                 <FiCalendar size={14} />
                 BookClub Calendar
+              </button>
+              <button
+                onClick={() => onShowMeetings && onShowMeetings()}
+                className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded transition-colors text-sm ${
+                  showMeetings 
+                    ? 'bg-purple-600 text-white' 
+                    : 'bg-gray-700 text-white hover:bg-gray-600'
+                }`}
+              >
+                <FiVideo size={14} />
+                Meetings
               </button>
             </div>
 
@@ -189,7 +202,7 @@ const SideBarRooms = ({
                 
                 {rooms.map(room => {
                   const Icon = getRoomIcon(room);
-                  const isActive = currentRoom?.id === room.id && !showBooksHistory && !showCalendar && !showSuggestions;
+                  const isActive = currentRoom?.id === room.id && !showBooksHistory && !showCalendar && !showSuggestions && !showMeetings;
                   const iconColor = getRoomIconColor(room, isActive);
                   return (
                     <div

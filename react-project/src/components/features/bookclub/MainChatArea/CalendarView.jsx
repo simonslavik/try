@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { FiChevronLeft, FiChevronRight, FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FiChevronLeft, FiChevronRight, FiPlus, FiEdit2, FiTrash2, FiVideo } from 'react-icons/fi';
 import apiClient from '@api/axios';
+import { bookclubAPI } from '@api/bookclub.api';
 import logger from '@utils/logger';
 
 const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent, onEventSaved }) => {
@@ -10,6 +11,8 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedBook, setSelectedBook] = useState(null);
   const [bookClubBooks, setBookClubBooks] = useState([]);
+  const [meetings, setMeetings] = useState([]);
+  const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const monthNames = [
@@ -22,6 +25,7 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
   useEffect(() => {
     fetchEvents();
     fetchBookClubBooks();
+    fetchMeetings();
   }, [bookClubId, refreshTrigger]);
 
   // Expose refresh function to parent via callback (only once on mount)
@@ -32,6 +36,18 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
       onEventSaved(refresh);
     }
   }, []);
+
+  // Listen for meeting refresh events (triggered when meetings are created/edited/deleted)
+  useEffect(() => {
+    const originalRefresh = window.__meetingsRefresh;
+    window.__meetingsRefresh = () => {
+      originalRefresh?.();
+      fetchMeetings();
+    };
+    return () => {
+      window.__meetingsRefresh = originalRefresh;
+    };
+  }, [bookClubId]);
 
   const fetchEvents = async () => {
     try {
@@ -52,6 +68,15 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
       logger.error('Error fetching book club books:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchMeetings = async () => {
+    try {
+      const data = await bookclubAPI.getMeetings(bookClubId, true);
+      setMeetings(data.meetings || []);
+    } catch (error) {
+      logger.error('Error fetching meetings:', error);
     }
   };
 
@@ -89,6 +114,40 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
         eventDate.getFullYear() === date.getFullYear()
       );
     });
+  };
+
+  const getMeetingsForDate = (date) => {
+    if (!date) return [];
+    return meetings.filter(meeting => {
+      const meetingDate = new Date(meeting.scheduledAt);
+      return (
+        meetingDate.getDate() === date.getDate() &&
+        meetingDate.getMonth() === date.getMonth() &&
+        meetingDate.getFullYear() === date.getFullYear()
+      );
+    });
+  };
+
+  const getMeetingPlatformColor = (platform) => {
+    const colors = {
+      zoom: 'bg-blue-500',
+      google_meet: 'bg-green-500',
+      teams: 'bg-indigo-500',
+      discord: 'bg-violet-500',
+      custom: 'bg-purple-500'
+    };
+    return colors[platform] || colors.custom;
+  };
+
+  const getMeetingPlatformLabel = (platform) => {
+    const labels = {
+      zoom: 'Zoom',
+      google_meet: 'Google Meet',
+      teams: 'Teams',
+      discord: 'Discord',
+      custom: 'Meeting'
+    };
+    return labels[platform] || 'Meeting';
   };
 
   const getBooksForDate = (date) => {
@@ -234,6 +293,7 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
         {days.map((date, index) => {
           const dayEvents = getEventsForDate(date);
           const dayBooks = getBooksForDate(date);
+          const dayMeetings = getMeetingsForDate(date);
           const today = isToday(date);
           
           return (
@@ -271,6 +331,19 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
                       </div>
                     ))}
                     
+                    {/* Meetings */}
+                    {dayMeetings.map(meeting => (
+                      <div
+                        key={`meeting-${meeting.id}`}
+                        className={`text-xs p-1 rounded ${getMeetingPlatformColor(meeting.platform)} text-white cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1`}
+                        onClick={(e) => { e.stopPropagation(); setSelectedMeeting(meeting); }}
+                        title={`${meeting.title} - ${new Date(meeting.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+                      >
+                        <FiVideo size={10} className="flex-shrink-0" />
+                        <span className="font-semibold truncate">{meeting.title}</span>
+                      </div>
+                    ))}
+
                     {/* Books */}
                     {dayBooks.map(book => (
                       <div
@@ -358,6 +431,83 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
                   <FiTrash2 size={16} /> Delete
                 </button>
               </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Meeting details modal */}
+      {selectedMeeting && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setSelectedMeeting(null)}>
+          <div className="bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4 border border-gray-700" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-white text-xl font-bold flex items-center gap-2">
+                <FiVideo className="text-purple-400" />
+                {selectedMeeting.title}
+              </h3>
+              <button onClick={() => setSelectedMeeting(null)} className="text-gray-400 hover:text-white">✕</button>
+            </div>
+
+            <div className="space-y-3 mb-4">
+              <div>
+                <span className="text-gray-400 text-sm">Platform:</span>
+                <div className={`inline-block ml-2 px-2 py-1 rounded text-xs ${getMeetingPlatformColor(selectedMeeting.platform)} text-white`}>
+                  {getMeetingPlatformLabel(selectedMeeting.platform)}
+                </div>
+              </div>
+
+              <div>
+                <span className="text-gray-400 text-sm">Date & Time:</span>
+                <div className="text-white">
+                  {new Date(selectedMeeting.scheduledAt).toLocaleDateString('en-US', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                  })} at {new Date(selectedMeeting.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+              </div>
+
+              <div>
+                <span className="text-gray-400 text-sm">Duration:</span>
+                <div className="text-white">{selectedMeeting.duration} minutes</div>
+              </div>
+
+              {selectedMeeting.description && (
+                <div>
+                  <span className="text-gray-400 text-sm">Description:</span>
+                  <div className="text-white mt-1">{selectedMeeting.description}</div>
+                </div>
+              )}
+
+              <div>
+                <span className="text-gray-400 text-sm">Status:</span>
+                <div className={`inline-block ml-2 px-2 py-1 rounded text-xs ${
+                  selectedMeeting.status === 'LIVE' ? 'bg-green-500' :
+                  selectedMeeting.status === 'CANCELLED' ? 'bg-red-500' :
+                  selectedMeeting.status === 'ENDED' ? 'bg-gray-500' : 'bg-purple-500'
+                } text-white`}>
+                  {selectedMeeting.status}
+                </div>
+              </div>
+
+              {selectedMeeting.rsvps && selectedMeeting.rsvps.length > 0 && (
+                <div>
+                  <span className="text-gray-400 text-sm">RSVPs:</span>
+                  <div className="text-white text-sm mt-1">
+                    {selectedMeeting.rsvps.filter(r => r.status === 'ATTENDING').length} going
+                    {selectedMeeting.rsvps.filter(r => r.status === 'MAYBE').length > 0 && `, ${selectedMeeting.rsvps.filter(r => r.status === 'MAYBE').length} maybe`}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {selectedMeeting.meetingUrl && selectedMeeting.status !== 'ENDED' && selectedMeeting.status !== 'CANCELLED' && (
+              <a
+                href={selectedMeeting.meetingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full text-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition-colors"
+              >
+                Join Meeting
+              </a>
             )}
           </div>
         </div>
