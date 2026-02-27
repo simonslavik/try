@@ -7,6 +7,8 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
   const [messages, setMessages] = useState([]);
   const [connectedUsers, setConnectedUsers] = useState([]);
   const [bookClubMembers, setBookClubMembers] = useState([]);
+  const [unreadRooms, setUnreadRooms] = useState(new Set());
+  const [lastReadAt, setLastReadAt] = useState(null);
   const reconnectTimeoutRef = useRef(null);
   const isIntentionalCloseRef = useRef(false);
   const currentRoomIdRef = useRef(null);
@@ -105,6 +107,15 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
               if (data.members) {
                 setBookClubMembers(data.members);
               }
+              // Populate unread rooms from server
+              if (data.unreadRoomIds && data.unreadRoomIds.length > 0) {
+                console.log('🔔 Init: unread rooms from server:', data.unreadRoomIds);
+                setUnreadRooms(new Set(data.unreadRoomIds));
+              } else {
+                setUnreadRooms(new Set());
+              }
+              // Set lastReadAt for the current room
+              setLastReadAt(data.lastReadAt || null);
               // Notify parent about init data (rooms with types, user role)
               if (onInitRef.current) {
                 onInitRef.current({
@@ -160,6 +171,14 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
               break;
             
             case 'room-switched':
+              // Clear unread for the room we just switched to
+              setUnreadRooms(prev => {
+                const next = new Set(prev);
+                next.delete(data.roomId || currentRoomIdRef.current);
+                return next;
+              });
+              // Set lastReadAt for the switched room
+              setLastReadAt(data.lastReadAt || null);
               setMessages(data.messages.map(msg => ({
                 id: msg.id,
                 username: msg.username,
@@ -197,6 +216,18 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
             case 'error':
               logger.error('WebSocket error:', data.message);
               alert(data.message);
+              break;
+
+            case 'room-activity':
+              // A message was posted in another room — mark it as unread
+              console.log('🔔 room-activity received:', data.roomId, 'current:', currentRoomIdRef.current);
+              if (data.roomId && data.roomId !== currentRoomIdRef.current) {
+                setUnreadRooms(prev => {
+                  const next = new Set(prev).add(data.roomId);
+                  console.log('🔔 unreadRooms updated:', [...next]);
+                  return next;
+                });
+              }
               break;
           }
         } catch (err) {
@@ -261,6 +292,9 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
     connectedUsers, 
     setConnectedUsers,
     bookClubMembers,
-    setBookClubMembers
+    setBookClubMembers,
+    unreadRooms,
+    setUnreadRooms,
+    lastReadAt
   };
 };

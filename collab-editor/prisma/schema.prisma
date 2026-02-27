@@ -126,8 +126,9 @@ model Room {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  messages Message[]
-  members  RoomMember[]
+  messages  Message[]
+  members   RoomMember[]
+  roomReads RoomRead[]
 
   @@unique([bookClubId, name])
   @@index([bookClubId])
@@ -146,6 +147,19 @@ model RoomMember {
   @@index([roomId])
   @@index([userId])
   @@map("room_members")
+}
+
+// RoomRead model - tracks when each user last read each room (for unread indicators)
+model RoomRead {
+  id         String   @id @default(uuid())
+  roomId     String
+  room       Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  userId     String
+  lastReadAt DateTime @default(now())
+
+  @@unique([roomId, userId])
+  @@index([userId])
+  @@map("room_reads")
 }
 
 // Message model - stores chat messages in rooms (like Discord messages)

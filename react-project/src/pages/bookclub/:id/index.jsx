@@ -158,7 +158,10 @@ const BookClub = () => {
     connectedUsers, 
     setConnectedUsers,
     bookClubMembers,
-    setBookClubMembers
+    setBookClubMembers,
+    unreadRooms,
+    setUnreadRooms,
+    lastReadAt
   } = useBookclubWebSocket(bookClub, currentRoom, auth, bookClubId, { onInit: handleWsInit });
 
   // Extract user's role from bookClubMembers
@@ -554,20 +557,23 @@ const BookClub = () => {
   const switchRoom = (room) => {
     if (room.id !== currentRoom?.id) {
       setMessages([]);
-      setCurrentRoom(room);
+      setCurrentRoom(room); // This triggers useBookclubWebSocket's useEffect which sends switch-room
       setShowBooksHistory(false);
       setShowCalendar(false);
       setShowSuggestions(false);
       setShowMeetings(false);
       setShowSettings(false);
       
-      // Send switch-room message to server
-      if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-        ws.current.send(JSON.stringify({
-          type: 'switch-room',
-          roomId: room.id
-        }));
-      }
+      // Clear unread indicator for this room
+      setUnreadRooms(prev => {
+        const next = new Set(prev);
+        next.delete(room.id);
+        return next;
+      });
+      
+      // NOTE: Do NOT send switch-room here — the WS hook already sends it
+      // when currentRoom changes. Sending it twice causes lastReadAt to be
+      // overwritten on the second call, breaking the NEW divider.
     }
   };
 
@@ -808,6 +814,7 @@ const BookClub = () => {
               setCurrentRoom(null);
             }}
             showMeetings={showMeetings}
+            unreadRooms={unreadRooms}
           />
         </div>
         
@@ -1132,6 +1139,7 @@ const BookClub = () => {
                 friends={friends}
                 onSendFriendRequest={handleSendFriendRequest}
                 connectedUsers={connectedUsers}
+                lastReadAt={lastReadAt}
               />
             )}
 
@@ -1168,7 +1176,7 @@ const BookClub = () => {
             ) : null}
 
           </div>
-          )}
+
           {/* Connected Users Sidebar */}
           <ConnectedUsersSidebar
               bookClubMembers={mappedBookClubMembers}

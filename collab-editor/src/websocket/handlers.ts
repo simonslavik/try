@@ -255,6 +255,50 @@ export const handleJoin = (
       });
 
       // Send initial data to new user
+      // Get the user's previous lastReadAt for the current room (before updating)
+      const currentRoomRead = await prisma.roomRead.findUnique({
+        where: { roomId_userId: { roomId: targetRoomId, userId } },
+        select: { lastReadAt: true }
+      });
+      const roomLastReadAt = currentRoomRead?.lastReadAt || null;
+
+      // Mark the current room as read
+      await prisma.roomRead.upsert({
+        where: { roomId_userId: { roomId: targetRoomId, userId } },
+        update: { lastReadAt: new Date() },
+        create: { roomId: targetRoomId, userId, lastReadAt: new Date() }
+      });
+
+      // Determine which rooms have unread messages
+      // Get all accessible room IDs
+      const accessibleRoomIds = accessibleRooms.map((r: any) => r.id);
+
+      // Get the user's last read timestamps for all rooms
+      const roomReads = await prisma.roomRead.findMany({
+        where: { userId, roomId: { in: accessibleRoomIds } },
+        select: { roomId: true, lastReadAt: true }
+      });
+      const readMap = new Map(roomReads.map(rr => [rr.roomId, rr.lastReadAt]));
+
+      // Get the latest message timestamp per room (only from OTHER users)
+      const latestMessages = await prisma.message.groupBy({
+        by: ['roomId'],
+        where: { roomId: { in: accessibleRoomIds }, userId: { not: userId } },
+        _max: { createdAt: true }
+      });
+
+      const unreadRoomIds: string[] = [];
+      for (const lm of latestMessages) {
+        const lastMsg = lm._max.createdAt;
+        if (!lastMsg) continue;
+        const lastRead = readMap.get(lm.roomId);
+        console.log(`📊 Room ${lm.roomId}: lastMsg=${lastMsg?.toISOString()}, lastRead=${lastRead?.toISOString() || 'never'}, isTarget=${lm.roomId === targetRoomId}`);
+        // Unread if: never read, or last message is newer than last read, and not the current room
+        if (lm.roomId !== targetRoomId && (!lastRead || lastMsg > lastRead)) {
+          unreadRoomIds.push(lm.roomId);
+        }
+      }
+
       const initPayload = {
         type: 'init',
         clientId,
@@ -275,6 +319,8 @@ export const handleJoin = (
         messages: enrichedMessages,
         members: memberDetails,
         userRole: membership.role,
+        unreadRoomIds,
+        lastReadAt: roomLastReadAt ? roomLastReadAt.toISOString() : null,
         users: Array.from(activeClub.clients.values()).map(c => ({
           id: c.id,
           userId: c.userId,
@@ -282,7 +328,7 @@ export const handleJoin = (
           roomId: c.roomId
         }))
       };
-      console.log('📤 Sending init with message sample:', initPayload.messages[0]);
+      console.log('📤 Sending init with', unreadRoomIds.length, 'unread rooms');
       ws.send(JSON.stringify(initPayload));
 
       // Notify others that someone joined (including updated members if new)
@@ -393,12 +439,27 @@ export const handleSwitchRoom = (message: any, currentClient: Client | null) => 
         reactions: reactionsMap.get(msg.id) || []
       }));
 
+      // Get the user's previous lastReadAt for the switched room (before updating)
+      const switchedRoomRead = await prisma.roomRead.findUnique({
+        where: { roomId_userId: { roomId, userId: currentClient.userId } },
+        select: { lastReadAt: true }
+      });
+      const switchedLastReadAt = switchedRoomRead?.lastReadAt || null;
+
+      // Mark the new room as read
+      await prisma.roomRead.upsert({
+        where: { roomId_userId: { roomId, userId: currentClient.userId } },
+        update: { lastReadAt: new Date() },
+        create: { roomId, userId: currentClient.userId, lastReadAt: new Date() }
+      });
+
       // Send room data to user
       currentClient.ws.send(JSON.stringify({
         type: 'room-switched',
         roomId,
         roomType: room.type,
-        messages: messagesWithReactions
+        messages: messagesWithReactions,
+        lastReadAt: switchedLastReadAt ? switchedLastReadAt.toISOString() : null
       }));
 
       console.log(`🔄 ${currentClient.username} switched to room ${roomId}`);
@@ -482,6 +543,21 @@ export const handleChatMessage = (message: any, currentClient: Client | null) =>
         client.ws.send(JSON.stringify(chatData));
       }
     });
+
+    // Notify users in OTHER rooms about new activity (for unread indicators)
+    const activityData = {
+      type: 'room-activity',
+      roomId: currentClient.roomId
+    };
+    let activityCount = 0;
+    activeClub.clients.forEach((client) => {
+      // Skip same room, same user (own messages), and closed sockets
+      if (client.roomId !== currentClient.roomId && client.userId !== currentClient.userId && client.ws.readyState === WebSocket.OPEN) {
+        client.ws.send(JSON.stringify(activityData));
+        activityCount++;
+      }
+    });
+    console.log(`🔔 room-activity sent to ${activityCount} clients in other rooms (total clients: ${activeClub.clients.size})`);
 
     const attachmentInfo = savedMessage.attachments?.length > 0 
       ? ` with ${savedMessage.attachments.length} attachment(s)` 
