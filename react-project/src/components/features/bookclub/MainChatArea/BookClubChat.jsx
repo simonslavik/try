@@ -6,7 +6,7 @@ import OwnMessage from '../chat/OwnMessage';
 import OtherMessage from '../chat/OtherMessage';
 import { shouldGroupMessages } from '../chat/messageUtils';
 
-const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, members = [], onReply, friends = [], onSendFriendRequest, connectedUsers = [] }) => {
+const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, members = [], onReply, friends = [], onSendFriendRequest, connectedUsers = [], lastReadAt }) => {
   const messagesEndRef = useRef(null);
   const editInputRef = useRef(null);
   const menuRef = useRef(null);
@@ -172,6 +172,37 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
     connectedUsers,
   };
 
+  // ── Compute the index where the NEW divider should appear ──
+  const newDividerIndex = React.useMemo(() => {
+    if (!lastReadAt || !currentUserId) {
+      console.log('📌 NEW divider: skipped (lastReadAt=%s, currentUserId=%s)', lastReadAt, currentUserId);
+      return -1;
+    }
+    const cutoff = new Date(lastReadAt);
+    console.log('📌 NEW divider: lastReadAt=%s, cutoff=%s, msgs=%d', lastReadAt, cutoff.toISOString(), messages.length);
+
+    // Check if there are ANY messages from other users after lastReadAt
+    const hasOtherUnread = messages.some(
+      msg => msg.type !== 'system' && msg.userId !== currentUserId && new Date(msg.timestamp) > cutoff
+    );
+    if (!hasOtherUnread) {
+      console.log('📌 NEW divider: no unread from other users');
+      return -1;
+    }
+
+    // Find the first message from another user that's newer than lastReadAt
+    for (let i = 0; i < messages.length; i++) {
+      const msg = messages[i];
+      if (msg.type === 'system') continue;
+      if (msg.userId === currentUserId) continue;
+      if (new Date(msg.timestamp) > cutoff) {
+        console.log('📌 NEW divider: showing at index %d (msg=%s, ts=%s)', i, msg.text?.substring(0, 30), msg.timestamp);
+        return i;
+      }
+    }
+    return -1;
+  }, [lastReadAt, messages, currentUserId]);
+
   // ── Render ──────────────────────────────────────────────
   return (
     <div className="flex-1 overflow-y-auto p-1 space-y-1">
@@ -186,13 +217,21 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
           const prev = idx > 0 ? messages[idx - 1] : null;
           const next = idx < messages.length - 1 ? messages[idx + 1] : null;
           const { groupWithPrevious, isLastInGroup } = shouldGroupMessages(msg, prev, next);
+          const showNewDivider = idx === newDividerIndex;
 
           return (
-            <div
-              key={msg.id || idx}
-              id={`msg-${msg.id}`}
-              className={`flex flex-col ${groupWithPrevious ? 'mt-1' : 'mt-1'} transition-all duration-300 rounded-lg`}
-            >
+            <React.Fragment key={msg.id || idx}>
+              {showNewDivider && (
+                <div className="flex items-center gap-2 py-1 px-4">
+                  <div className="flex-1 h-px bg-red-500" />
+                  <span className="text-xs font-semibold text-red-500 uppercase tracking-wide">New</span>
+                  <div className="flex-1 h-px bg-red-500" />
+                </div>
+              )}
+              <div
+                id={`msg-${msg.id}`}
+                className={`flex flex-col ${groupWithPrevious ? 'mt-1' : 'mt-1'} transition-all duration-300 rounded-lg`}
+              >
               {msg.type === 'system' ? (
                 <div className="text-center">
                   <span className="text-xs text-gray-500 italic">{msg.text}</span>
@@ -219,7 +258,8 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
                   {...actionProps}
                 />
               )}
-            </div>
+              </div>
+            </React.Fragment>
           );
         })
       )}

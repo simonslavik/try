@@ -1,7 +1,7 @@
 
 
 import React, { useState, useRef, useEffect } from 'react';
-import { FiHome, FiPlus, FiHash, FiMail, FiBook, FiCalendar, FiLock, FiVolume2, FiSettings, FiUsers, FiMoreVertical, FiVideo } from 'react-icons/fi';
+import { FiHome, FiPlus, FiHash, FiMail, FiBook, FiCalendar, FiLock, FiVolume2, FiSettings, FiUsers, FiMoreVertical, FiVideo, FiMessageSquare } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import BookClubImage from './BookClubImage';
 import logger from '@utils/logger';
@@ -84,7 +84,8 @@ const SideBarRooms = ({
     onShowSuggestions,
     showSuggestions,
     onShowMeetings,
-    showMeetings
+    showMeetings,
+    unreadRooms = new Set()
 }) => {
     const navigate = useNavigate();
     const [contextMenu, setContextMenu] = useState(null);
@@ -128,59 +129,54 @@ const SideBarRooms = ({
               </h2>
             </div>
 
-            {/* Book Suggestions Button */}
-            <div className='border-b border-gray-700 p-4 flex-shrink-0'>
+            {/* Navigation */}
+            <div className="p-2 border-b border-gray-700 flex-shrink-0">
+              <div className="flex items-center justify-between px-2 py-1 mb-1">
+                <h3 className="text-gray-400 text-xs font-semibold uppercase">Navigation</h3>
+              </div>
               <button
                 onClick={() => onShowSuggestions && onShowSuggestions()}
-                className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded transition-colors text-sm ${
+                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-colors text-sm ${
                   showSuggestions 
-                    ? 'bg-purple-600 text-white' 
-                    : 'bg-gray-700 text-white hover:bg-gray-600'
+                    ? 'bg-gray-700 text-white' 
+                    : 'text-gray-400 hover:bg-gray-700 hover:text-white'
                 }`}
               >
-                <span className="text-lg">📚</span>
-                Book Suggestions
+                <FiMessageSquare size={16} className="flex-shrink-0 text-green-400" />
+                <span className="truncate flex-1">Book Suggestions</span>
               </button>
-            </div>
-            
-            {/* Books History Button */}
-            <div className='border-b border-gray-700 p-4 flex-shrink-0'>
               <button
                 onClick={() => onShowBooksHistory && onShowBooksHistory()}
-                className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded transition-colors text-sm ${
+                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-colors text-sm ${
                   showBooksHistory 
-                    ? 'bg-purple-600 text-white' 
-                    : 'bg-gray-700 text-white hover:bg-gray-600'
+                    ? 'bg-gray-700 text-white' 
+                    : 'text-gray-400 hover:bg-gray-700 hover:text-white'
                 }`}
               >
-                <FiBook size={14} />
-                BookClub Books
+                <FiBook size={16} className="flex-shrink-0 text-orange-400" />
+                <span className="truncate flex-1">BookClub Books</span>
               </button>
-            </div>
-
-            {/* Calendar Button */}
-            <div className='border-b border-gray-700 p-4 flex-shrink-0 space-y-2'>
               <button
                 onClick={() => onShowCalendar && onShowCalendar()}
-                className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded transition-colors text-sm ${
+                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-colors text-sm ${
                   showCalendar 
-                    ? 'bg-purple-600 text-white' 
-                    : 'bg-gray-700 text-white hover:bg-gray-600'
+                    ? 'bg-gray-700 text-white' 
+                    : 'text-gray-400 hover:bg-gray-700 hover:text-white'
                 }`}
               >
-                <FiCalendar size={14} />
-                BookClub Calendar
+                <FiCalendar size={16} className="flex-shrink-0 text-cyan-400" />
+                <span className="truncate flex-1">BookClub Calendar</span>
               </button>
               <button
                 onClick={() => onShowMeetings && onShowMeetings()}
-                className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded transition-colors text-sm ${
+                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-colors text-sm ${
                   showMeetings 
-                    ? 'bg-purple-600 text-white' 
-                    : 'bg-gray-700 text-white hover:bg-gray-600'
+                    ? 'bg-gray-700 text-white' 
+                    : 'text-gray-400 hover:bg-gray-700 hover:text-white'
                 }`}
               >
-                <FiVideo size={14} />
-                Meetings
+                <FiVideo size={16} className="flex-shrink-0 text-pink-400" />
+                <span className="truncate flex-1">Meetings</span>
               </button>
             </div>
 
@@ -205,6 +201,7 @@ const SideBarRooms = ({
                   const isActive = currentRoom?.id === room.id && !showBooksHistory && !showCalendar && !showSuggestions && !showMeetings;
                   const iconColor = getRoomIconColor(room, isActive);
                   const isLocked = room.type === 'PRIVATE' && room.isMember === false;
+                  const hasUnread = !isActive && unreadRooms.has(room.id);
                   return (
                     <div
                       key={room.id}
@@ -220,11 +217,16 @@ const SideBarRooms = ({
                             ? 'text-gray-600 cursor-not-allowed opacity-60'
                             : isActive
                               ? 'bg-gray-700 text-white'
-                              : 'text-gray-400 hover:bg-gray-700 hover:text-white'
+                              : hasUnread
+                                ? 'text-white font-semibold'
+                                : 'text-gray-400 hover:bg-gray-700 hover:text-white'
                         }`}
                       >
                         <Icon size={16} className={`flex-shrink-0 ${isLocked ? 'text-gray-600' : iconColor}`} />
                         <span className="truncate flex-1">{room.name}</span>
+                        {hasUnread && (
+                          <span className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0" />
+                        )}
                         {room.type === 'PRIVATE' && room._count?.members > 0 && (
                           <span className="text-[10px] text-gray-500 flex items-center gap-0.5">
                             <FiUsers size={10} /> {room._count.members}
