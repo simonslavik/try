@@ -36,6 +36,8 @@ const linkifyText = (text) => {
 import CalendarView from '@components/features/bookclub/MainChatArea/CalendarView';
 import AddEventModal from '@components/features/bookclub/Modals/AddEventModal';
 import BookSuggestionsView from '@components/features/bookclub/MainChatArea/BookSuggestionsView';
+import MeetingsView from '@components/features/bookclub/MainChatArea/MeetingsView';
+import ScheduleMeetingModal from '@components/features/bookclub/Modals/ScheduleMeetingModal';
 import BookClubBookView from '@components/features/bookclub/MainChatArea/BookClubBookView';
 import BookClubChat from '@components/features/bookclub/MainChatArea/BookClubChat';
 import ConnectedUsersSidebar from '@components/features/bookclub/ConnectedUsersSidebar';
@@ -81,6 +83,7 @@ const BookClub = () => {
   const [showBooksHistory, setShowBooksHistory] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showMeetings, setShowMeetings] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [previousView, setPreviousView] = useState(null); // Store previous view before opening settings
   
@@ -103,6 +106,10 @@ const BookClub = () => {
   const [eventToEdit, setEventToEdit] = useState(null);
   const [selectedEventDate, setSelectedEventDate] = useState(null);
   const [calendarRefresh, setCalendarRefresh] = useState(null);
+  
+  // Meeting modal states
+  const [showScheduleMeetingModal, setShowScheduleMeetingModal] = useState(false);
+  const [meetingToEdit, setMeetingToEdit] = useState(null);
   
   // Invite modal state
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -195,6 +202,7 @@ const BookClub = () => {
     setShowBooksHistory(false);
     setShowCalendar(false);
     setShowSuggestions(false);
+    setShowMeetings(false);
     setShowSettings(false);
     setBookclubBooks({ current: [], upcoming: [], completed: [] });
   }, [bookClubId]);
@@ -261,6 +269,7 @@ const BookClub = () => {
     setShowBooksHistory(true);
     setShowCalendar(false);
     setShowSuggestions(false);
+    setShowMeetings(false);
     setShowSettings(false);
     fetchBookclubBooks();
   };
@@ -548,6 +557,7 @@ const BookClub = () => {
       setShowBooksHistory(false);
       setShowCalendar(false);
       setShowSuggestions(false);
+      setShowMeetings(false);
       setShowSettings(false);
       
       // Send switch-room message to server
@@ -774,6 +784,7 @@ const BookClub = () => {
               setShowCalendar(true);
               setShowBooksHistory(false);
               setShowSuggestions(false);
+              setShowMeetings(false);
               setShowSettings(false);
               setCurrentRoom(null);
             }}
@@ -782,10 +793,20 @@ const BookClub = () => {
               setShowSuggestions(true);
               setShowBooksHistory(false);
               setShowCalendar(false);
+              setShowMeetings(false);
               setShowSettings(false);
               setCurrentRoom(null);
             }}
             showSuggestions={showSuggestions}
+            onShowMeetings={() => {
+              setShowMeetings(true);
+              setShowBooksHistory(false);
+              setShowCalendar(false);
+              setShowSuggestions(false);
+              setShowSettings(false);
+              setCurrentRoom(null);
+            }}
+            showMeetings={showMeetings}
           />
         </div>
         
@@ -797,6 +818,7 @@ const BookClub = () => {
             showBooksHistory={showBooksHistory}
             showCalendar={showCalendar}
             showSuggestions={showSuggestions}
+            showMeetings={showMeetings}
             showSettings={showSettings}
             currentRoom={currentRoom}
             auth={auth}
@@ -809,11 +831,13 @@ const BookClub = () => {
               setPreviousView({
                 showBooksHistory,
                 showCalendar,
-                showSuggestions
+                showSuggestions,
+                showMeetings
               });
               setShowBooksHistory(false);
               setShowCalendar(false);
               setShowSuggestions(false);
+              setShowMeetings(false);
               setShowSettings(true);
             }}
             userRole={userRole}
@@ -836,6 +860,7 @@ const BookClub = () => {
                         setShowBooksHistory(previousView.showBooksHistory);
                         setShowCalendar(previousView.showCalendar);
                         setShowSuggestions(previousView.showSuggestions);
+                        setShowMeetings(previousView.showMeetings);
                         setPreviousView(null);
                       }
                     }}
@@ -1058,6 +1083,21 @@ const BookClub = () => {
                   auth={auth}
                 />
               </div>
+            ) : showMeetings ? (
+              <MeetingsView
+                bookClubId={bookClubId}
+                currentUserId={auth?.user?.id}
+                allMembers={bookClubMembers}
+                userRole={userRole}
+                onScheduleMeeting={() => {
+                  setMeetingToEdit(null);
+                  setShowScheduleMeetingModal(true);
+                }}
+                onEditMeeting={(meeting) => {
+                  setMeetingToEdit(meeting);
+                  setShowScheduleMeetingModal(true);
+                }}
+              />
             ) : showBooksHistory ? (
               <div className="flex-1 overflow-y-auto p-6">
                 {loadingBooks ? (
@@ -1095,7 +1135,7 @@ const BookClub = () => {
             )}
 
             {/* Message Input - Only show when not viewing special views */}
-            {!showBooksHistory && !showCalendar && !showSuggestions && !showSettings && auth?.user ? (
+            {!showBooksHistory && !showCalendar && !showSuggestions && !showMeetings && !showSettings && auth?.user ? (
               currentRoom?.type === 'ANNOUNCEMENT' && !['OWNER', 'ADMIN', 'MODERATOR'].includes(userRole) ? (
                 <div className="bg-gray-800 border-t border-gray-700 p-4 text-center">
                   <p className="text-gray-400 text-sm">
@@ -1118,7 +1158,7 @@ const BookClub = () => {
                   onCancelReply={() => setReplyingTo(null)}
                 />
               )
-            ) : !showBooksHistory && !showCalendar && !showSuggestions && !showSettings ? (
+            ) : !showBooksHistory && !showCalendar && !showSuggestions && !showMeetings && !showSettings ? (
               <div className="bg-gray-800 border-t border-gray-700 p-4 text-center">
                 <p className="text-gray-400">
                   Please <button onClick={() => navigate('/login', { state: { from: `/bookclub/${bookClubId}` } })} className="text-purple-400 hover:underline">log in</button> to chat
@@ -1235,6 +1275,18 @@ const BookClub = () => {
           userRole={userRole}
           onRoomUpdated={handleRoomUpdated}
           onRoomDeleted={handleRoomDeleted}
+        />
+
+        {/* Schedule Meeting Modal */}
+        <ScheduleMeetingModal
+          isOpen={showScheduleMeetingModal}
+          onClose={() => { setShowScheduleMeetingModal(false); setMeetingToEdit(null); }}
+          bookClubId={bookClubId}
+          meeting={meetingToEdit}
+          onMeetingSaved={() => {
+            // Refresh meetings list
+            if (window.__meetingsRefresh) window.__meetingsRefresh();
+          }}
         />
     </div>
   );

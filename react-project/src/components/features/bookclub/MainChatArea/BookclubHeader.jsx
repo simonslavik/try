@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiHash, FiSettings, FiCalendar, FiUserPlus } from 'react-icons/fi';
+import { FiHash, FiSettings, FiCalendar, FiUserPlus, FiVideo } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import logger from '@utils/logger';
 
@@ -7,6 +7,7 @@ const BookclubHeader = ({
   showBooksHistory, 
   showCalendar, 
   showSuggestions,
+  showMeetings,
   showSettings,
   currentRoom,
   auth,
@@ -27,6 +28,11 @@ const BookclubHeader = ({
           </>
         ) : showSuggestions ? (
           <h2 className="text-white font-semibold">Book Suggestions & Voting</h2>
+        ) : showMeetings ? (
+          <>
+            <FiVideo className="text-purple-400" />
+            <h2 className="text-white font-semibold">Meetings</h2>
+          </>
         ) : (
           <>
             <FiHash className="text-gray-400" />

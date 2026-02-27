@@ -217,4 +217,42 @@ export const bookclubAPI = {
     const response = await apiClient.delete(`/v1/bookclubs/${bookclubId}/rooms/${roomId}/members/${userId}`);
     return response.data;
   },
+
+  // ===== MEETING APIs =====
+
+  // Get meetings for a bookclub
+  getMeetings: async (bookclubId, includePast = false) => {
+    const response = await apiClient.get(`/v1/bookclubs/${bookclubId}/meetings${includePast ? '?includePast=true' : ''}`);
+    return response.data;
+  },
+
+  // Create a meeting
+  createMeeting: async (bookclubId, meetingData) => {
+    const response = await apiClient.post(`/v1/bookclubs/${bookclubId}/meetings`, meetingData);
+    return response.data;
+  },
+
+  // Update a meeting
+  updateMeeting: async (bookclubId, meetingId, updates) => {
+    const response = await apiClient.patch(`/v1/bookclubs/${bookclubId}/meetings/${meetingId}`, updates);
+    return response.data;
+  },
+
+  // Delete a meeting
+  deleteMeeting: async (bookclubId, meetingId) => {
+    const response = await apiClient.delete(`/v1/bookclubs/${bookclubId}/meetings/${meetingId}`);
+    return response.data;
+  },
+
+  // RSVP to a meeting
+  rsvpMeeting: async (bookclubId, meetingId, status) => {
+    const response = await apiClient.post(`/v1/bookclubs/${bookclubId}/meetings/${meetingId}/rsvp`, { status });
+    return response.data;
+  },
+
+  // Cancel RSVP
+  cancelRsvp: async (bookclubId, meetingId) => {
+    const response = await apiClient.delete(`/v1/bookclubs/${bookclubId}/meetings/${meetingId}/rsvp`);
+    return response.data;
+  },
 };
