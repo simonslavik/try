@@ -6,6 +6,8 @@ import SideBarRooms from '@components/features/bookclub/SideBar/SideBarRooms';
 import AddCurrentBookModal from '@components/features/bookclub/Modals/AddCurrentBookModal';
 import CurrentBookDetailsModal from '@components/features/bookclub/Modals/CurrentBookDetailsModal';
 import AddBookToBookclubModal from '@components/features/bookclub/Modals/AddBookToBookclubModal';
+import CreateRoomModal from '@components/features/bookclub/Modals/CreateRoomModal';
+import RoomSettingsModal from '@components/features/bookclub/Modals/RoomSettingsModal';
 import { COLLAB_EDITOR_URL } from '@config/constants';
 
 // Function to convert URLs in text to clickable links
@@ -72,6 +74,8 @@ const BookClub = () => {
   const [currentBookDetailsOpen, setCurrentBookDetailsOpen] = useState(false);
   const [currentBookData, setCurrentBookData] = useState(null);
   const [showAddBookModal, setShowAddBookModal] = useState(false);
+  const [showCreateRoomModal, setShowCreateRoomModal] = useState(false);
+  const [roomSettingsTarget, setRoomSettingsTarget] = useState(null);
   
   // View states
   const [showBooksHistory, setShowBooksHistory] = useState(false);
@@ -122,6 +126,23 @@ const BookClub = () => {
   const fileInputRef = useRef(null);
   const fileUploadRef = useRef(null);
 
+  // Handle WebSocket init data (rooms filtered by visibility, user role from server)
+  const handleWsInit = ({ rooms: wsRooms, userRole: wsUserRole }) => {
+    if (wsRooms && wsRooms.length > 0) {
+      setRooms(wsRooms);
+      // Update current room with type info if we already have one selected
+      if (currentRoom) {
+        const updated = wsRooms.find(r => r.id === currentRoom.id);
+        if (updated) {
+          setCurrentRoom(prev => ({ ...prev, ...updated }));
+        }
+      }
+    }
+    if (wsUserRole) {
+      setUserRole(wsUserRole);
+    }
+  };
+
   // Use custom WebSocket hook for bookclub chat
   const { 
     ws, 
@@ -131,7 +152,7 @@ const BookClub = () => {
     setConnectedUsers,
     bookClubMembers,
     setBookClubMembers
-  } = useBookclubWebSocket(bookClub, currentRoom, auth, bookClubId);
+  } = useBookclubWebSocket(bookClub, currentRoom, auth, bookClubId, { onInit: handleWsInit });
 
   // Extract user's role from bookClubMembers
   useEffect(() => {
@@ -488,20 +509,35 @@ const BookClub = () => {
     setSelectedFiles(files);
   };
 
-  const handleCreateRoom = async () => {
-    const roomName = prompt('Enter room name:');
-    if (!roomName || !roomName.trim()) return;
+  const handleCreateRoom = () => {
+    setShowCreateRoomModal(true);
+  };
 
-    try {
-      const response = await apiClient.post(`/v1/bookclubs/${bookClubId}/rooms`, { name: roomName.trim() });
-      const data = response.data;
-      
-      setRooms(prev => [...prev, data.room]);
-      // Redirect to the newly created room
-      switchRoom(data.room);
-    } catch (err) {
-      logger.error('Error creating room:', err);
-      alert(err.response?.data?.error || 'Failed to create room');
+  const handleCreateRoomSubmit = async (roomData) => {
+    const response = await apiClient.post(`/v1/bookclubs/${bookClubId}/rooms`, roomData);
+    const data = response.data;
+    setRooms(prev => [...prev, data.room]);
+    switchRoom(data.room);
+  };
+
+  const handleOpenRoomSettings = (room) => {
+    setRoomSettingsTarget(room);
+  };
+
+  const handleRoomUpdated = (updatedRoom) => {
+    setRooms(prev => prev.map(r => r.id === updatedRoom.id ? { ...r, ...updatedRoom } : r));
+    if (currentRoom?.id === updatedRoom.id) {
+      setCurrentRoom(prev => ({ ...prev, ...updatedRoom }));
+    }
+  };
+
+  const handleRoomDeleted = (deletedRoom) => {
+    setRooms(prev => prev.filter(r => r.id !== deletedRoom.id));
+    if (currentRoom?.id === deletedRoom.id) {
+      const remaining = rooms.filter(r => r.id !== deletedRoom.id);
+      if (remaining.length > 0) {
+        switchRoom(remaining[0]);
+      }
     }
   };
 
@@ -716,7 +752,9 @@ const BookClub = () => {
             currentRoom={currentRoom}
             switchRoom={switchRoom}
             handleCreateRoom={handleCreateRoom}
+            onOpenRoomSettings={handleOpenRoomSettings}
             auth={auth}
+            userRole={userRole}
             uploadingImage={uploadingImage}
             fileInputRef={fileInputRef}
             handleImageUpload={handleImageUpload}
@@ -1058,20 +1096,28 @@ const BookClub = () => {
 
             {/* Message Input - Only show when not viewing special views */}
             {!showBooksHistory && !showCalendar && !showSuggestions && !showSettings && auth?.user ? (
-              <MessageInput
-                newMessage={newMessage}
-                setNewMessage={setNewMessage}
-                selectedFiles={selectedFiles}
-                uploadingFiles={uploadingFiles}
-                currentRoom={currentRoom}
-                fileUploadRef={fileUploadRef}
-                onFilesSelected={handleFilesSelected}
-                onSubmit={handleSendMessage}
-                auth={auth}
-                members={bookClubMembers}
-                replyingTo={replyingTo}
-                onCancelReply={() => setReplyingTo(null)}
-              />
+              currentRoom?.type === 'ANNOUNCEMENT' && !['OWNER', 'ADMIN', 'MODERATOR'].includes(userRole) ? (
+                <div className="bg-gray-800 border-t border-gray-700 p-4 text-center">
+                  <p className="text-gray-400 text-sm">
+                    📢 This is an announcement channel — only moderators can post.
+                  </p>
+                </div>
+              ) : (
+                <MessageInput
+                  newMessage={newMessage}
+                  setNewMessage={setNewMessage}
+                  selectedFiles={selectedFiles}
+                  uploadingFiles={uploadingFiles}
+                  currentRoom={currentRoom}
+                  fileUploadRef={fileUploadRef}
+                  onFilesSelected={handleFilesSelected}
+                  onSubmit={handleSendMessage}
+                  auth={auth}
+                  members={bookClubMembers}
+                  replyingTo={replyingTo}
+                  onCancelReply={() => setReplyingTo(null)}
+                />
+              )
             ) : !showBooksHistory && !showCalendar && !showSuggestions && !showSettings ? (
               <div className="bg-gray-800 border-t border-gray-700 p-4 text-center">
                 <p className="text-gray-400">
@@ -1168,6 +1214,28 @@ const BookClub = () => {
             onClose={() => setShowInviteModal(false)}
           />
         )}
+
+        {/* Create Room Modal */}
+        <CreateRoomModal
+          isOpen={showCreateRoomModal}
+          onClose={() => setShowCreateRoomModal(false)}
+          onCreateRoom={handleCreateRoomSubmit}
+          members={bookClubMembers}
+          currentUserId={auth?.user?.id}
+        />
+
+        {/* Room Settings Modal */}
+        <RoomSettingsModal
+          isOpen={!!roomSettingsTarget}
+          onClose={() => setRoomSettingsTarget(null)}
+          room={roomSettingsTarget}
+          bookClubId={bookClubId}
+          allMembers={bookClubMembers}
+          currentUserId={auth?.user?.id}
+          userRole={userRole}
+          onRoomUpdated={handleRoomUpdated}
+          onRoomDeleted={handleRoomDeleted}
+        />
     </div>
   );
 };

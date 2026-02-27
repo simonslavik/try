@@ -105,20 +105,46 @@ enum RequestStatus {
   REJECTED
 }
 
+enum RoomType {
+  PUBLIC       // Anyone in the book club can see and join
+  PRIVATE      // Only invited members can see and access
+  ANNOUNCEMENT // Only moderators+ can send messages, everyone can read
+}
+
 // Room model - channels within a BookClub (like Discord channels)
 model Room {
-  id         String   @id @default(uuid())
-  bookClubId String
-  bookClub   BookClub @relation(fields: [bookClubId], references: [id], onDelete: Cascade)
-  name       String   @default("general")
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String   @id @default(uuid())
+  bookClubId  String
+  bookClub    BookClub @relation(fields: [bookClubId], references: [id], onDelete: Cascade)
+  name        String   @default("general")
+  description String?
+  type        RoomType @default(PUBLIC)
+  isDefault   Boolean  @default(false)
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
   messages Message[]
+  members  RoomMember[]
 
+  @@unique([bookClubId, name])
   @@index([bookClubId])
   @@map("rooms")
+}
+
+// RoomMember model - tracks members of private rooms
+model RoomMember {
+  id       String   @id @default(uuid())
+  roomId   String
+  room     Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  userId   String
+  joinedAt DateTime @default(now())
+
+  @@unique([roomId, userId])
+  @@index([roomId])
+  @@index([userId])
+  @@map("room_members")
 }
 
 // Message model - stores chat messages in rooms (like Discord messages)

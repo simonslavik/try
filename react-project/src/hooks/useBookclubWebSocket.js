@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { WS_URL } from '@config/constants';
 import logger from '@utils/logger';
 
-export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId) => {
+export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { onInit } = {}) => {
   const ws = useRef(null);
   const [messages, setMessages] = useState([]);
   const [connectedUsers, setConnectedUsers] = useState([]);
@@ -11,6 +11,8 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId) =>
   const isIntentionalCloseRef = useRef(false);
   const currentRoomIdRef = useRef(null);
   const currentBookClubIdRef = useRef(null);
+  const onInitRef = useRef(onInit);
+  onInitRef.current = onInit;
 
   useEffect(() => {
     if (!bookClub || !auth?.token || !currentRoom) {
@@ -102,6 +104,13 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId) =>
               setConnectedUsers(data.users || []);
               if (data.members) {
                 setBookClubMembers(data.members);
+              }
+              // Notify parent about init data (rooms with types, user role)
+              if (onInitRef.current) {
+                onInitRef.current({
+                  rooms: data.bookClub?.rooms || [],
+                  userRole: data.userRole || null
+                });
               }
               break;
             
