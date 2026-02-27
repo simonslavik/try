@@ -6,5 +6,5 @@ export const STATUS_OPTIONS = [
 ];
 
 export const getStatusColor = (status) => {
-  return STATUS_OPTIONS.find(s => s.value === status)?.color || 'bg-green-500';
+  return STATUS_OPTIONS.find(s => s.value === status)?.color || 'bg-gray-500';
 };

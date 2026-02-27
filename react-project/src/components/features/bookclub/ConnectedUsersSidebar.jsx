@@ -141,7 +141,7 @@ const ConnectedUsersSidebar = ({
                           onError={(e) => { e.target.src = '/images/default.webp'; }}
                         />
                       </UserHoverCard>
-                      <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-gray-800 ${getStatusColor(user.status || (isOnline ? 'ONLINE' : 'OFFLINE'))}`} />
+                      <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-gray-800 ${getStatusColor(isOnline ? (user.status || 'ONLINE') : 'OFFLINE')}`} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -150,7 +150,7 @@ const ConnectedUsersSidebar = ({
                         <RoleBadge role={user.role} />
                         {isFriend && <FiHeart className="text-pink-500 fill-pink-500" size={14} />}
                       </div>
-                      <span className={`text-xs ${isOnline ? 'text-green-400' : 'text-gray-500'}`}>{user.status ? user.status.charAt(0) + user.status.slice(1).toLowerCase() : (isOnline ? 'Online' : 'Offline')}</span>
+                      <span className={`text-xs ${isOnline ? 'text-green-400' : 'text-gray-500'}`}>{isOnline ? (user.status ? user.status.charAt(0) + user.status.slice(1).toLowerCase() : 'Online') : 'Offline'}</span>
                     </div>
                   </div>
                 );
@@ -212,7 +212,7 @@ const ConnectedUsersSidebar = ({
                       onError={(e) => { e.target.src = '/images/default.webp'; }}
                     />
                   </UserHoverCard>
-                  <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-800 ${getStatusColor(user.status || (isOnline ? 'ONLINE' : 'OFFLINE'))}`}></div>
+                  <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-800 ${getStatusColor(isOnline ? (user.status || 'ONLINE') : 'OFFLINE')}`}></div>
                 </div>
                 <div className="flex-1 flex items-center gap-1.5 min-w-0">
                   <span className="truncate">{user.username}</span>

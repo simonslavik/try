@@ -53,7 +53,7 @@ const OtherMessage = ({
           onError={(e) => { e.target.src = '/images/default.webp'; }}
         />
       </UserHoverCard>
-      <div className="max-w-md">
+      <div className="max-w-md w-fit">
         {/* Username + Pinned badge */}
         <div className="flex items-baseline">
           <span

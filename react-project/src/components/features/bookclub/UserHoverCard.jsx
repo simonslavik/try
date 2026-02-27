@@ -89,7 +89,7 @@ const UserHoverCard = ({
     return () => window.removeEventListener('scroll', handleScroll, true);
   }, [visible]);
 
-  const status = user?.status || (isOnline ? 'ONLINE' : 'OFFLINE');
+  const status = isOnline ? (user?.status || 'ONLINE') : 'OFFLINE';
   const statusLabel = status.charAt(0) + status.slice(1).toLowerCase();
 
   return (

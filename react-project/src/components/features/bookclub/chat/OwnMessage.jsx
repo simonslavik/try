@@ -27,7 +27,7 @@ const OwnMessage = ({
 
   return (
     <div className="flex gap-1 justify-end group">
-      <div className="text-right max-w-md self-end">
+      <div className="text-right max-w-md w-fit self-end">
         {/* Pinned badge */}
         {msg.isPinned && (
           <div className="flex items-center justify-end gap-1 text-xs text-yellow-400 mb-1">
