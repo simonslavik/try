@@ -179,4 +179,42 @@ export const bookclubAPI = {
     const response = await apiClient.put(`/v1/bookclubs/${bookclubId}`, settings);
     return response.data;
   },
+
+  // ===== ROOM MANAGEMENT APIs =====
+
+  // Create room
+  createRoom: async (bookclubId, roomData) => {
+    const response = await apiClient.post(`/v1/bookclubs/${bookclubId}/rooms`, roomData);
+    return response.data;
+  },
+
+  // Update room
+  updateRoom: async (bookclubId, roomId, updates) => {
+    const response = await apiClient.patch(`/v1/bookclubs/${bookclubId}/rooms/${roomId}`, updates);
+    return response.data;
+  },
+
+  // Delete room
+  deleteRoom: async (bookclubId, roomId) => {
+    const response = await apiClient.delete(`/v1/bookclubs/${bookclubId}/rooms/${roomId}`);
+    return response.data;
+  },
+
+  // Get room members
+  getRoomMembers: async (bookclubId, roomId) => {
+    const response = await apiClient.get(`/v1/bookclubs/${bookclubId}/rooms/${roomId}/members`);
+    return response.data;
+  },
+
+  // Add members to room
+  addRoomMembers: async (bookclubId, roomId, memberIds) => {
+    const response = await apiClient.post(`/v1/bookclubs/${bookclubId}/rooms/${roomId}/members`, { memberIds });
+    return response.data;
+  },
+
+  // Remove member from room
+  removeRoomMember: async (bookclubId, roomId, userId) => {
+    const response = await apiClient.delete(`/v1/bookclubs/${bookclubId}/rooms/${roomId}/members/${userId}`);
+    return response.data;
+  },
 };

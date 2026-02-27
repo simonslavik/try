@@ -375,7 +375,11 @@ export class BookClubService {
           select: {
             id: true,
             name: true,
-            createdAt: true
+            description: true,
+            type: true,
+            isDefault: true,
+            createdAt: true,
+            _count: { select: { members: true } }
           }
         },
         events: {

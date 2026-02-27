@@ -1,6 +1,6 @@
 import { WebSocket } from 'ws';
 import { v4 as uuidv4 } from 'uuid';
-import { MembershipStatus, BookClubRole } from '@prisma/client';
+import { MembershipStatus, BookClubRole, RoomType } from '@prisma/client';
 import { verifyWebSocketToken } from '../utils/websocketAuth.js';
 import { hasMinRole } from '../utils/roles.js';
 import prisma from '../config/database.js';
@@ -13,6 +13,7 @@ import {
 } from './types.js';
 import { getReactionsForMessages } from './reactionHandler.js';
 import { extractMentions, isEveryoneMentioned } from '../utils/mentionParser.js';
+import { RoomService } from '../services/room.service.js';
 
 export const handleJoin = (
   ws: WebSocket,
@@ -51,7 +52,7 @@ export const handleJoin = (
   // Check if bookclub exists in database
   prisma.bookClub.findUnique({ 
     where: { id: bookClubId },
-    include: { rooms: { orderBy: { createdAt: 'asc' } } }
+    include: { rooms: { orderBy: { createdAt: 'asc' }, include: { _count: { select: { members: true } } } } }
   })
     .then(async (bookClub) => {
       if (!bookClub) {
@@ -104,8 +105,40 @@ export const handleJoin = (
       // Track if this is a new member (for WebSocket purposes, this is always false since they must already be a member)
       const wasNewMember = false;
 
-      // If no roomId provided, use first room (general)
-      const targetRoomId = roomId || bookClub.rooms[0]?.id;
+      // Filter rooms by visibility based on user's role
+      const canSeeAll = hasMinRole(membership.role, BookClubRole.MODERATOR);
+      const visibleRooms = bookClub.rooms.filter((room: any) => {
+        if (room.type === RoomType.PUBLIC || room.type === RoomType.ANNOUNCEMENT) return true;
+        if (canSeeAll) return true;
+        // For private rooms, we need to check membership — we'll do this async below
+        return false;
+      });
+
+      // For non-moderator users, also check private room memberships
+      if (!canSeeAll) {
+        const privateRooms = bookClub.rooms.filter((room: any) => room.type === RoomType.PRIVATE);
+        if (privateRooms.length > 0) {
+          const privateRoomMemberships = await prisma.roomMember.findMany({
+            where: {
+              userId,
+              roomId: { in: privateRooms.map((r: any) => r.id) }
+            },
+            select: { roomId: true }
+          });
+          const memberRoomIds = new Set(privateRoomMemberships.map(m => m.roomId));
+          for (const room of privateRooms) {
+            if (memberRoomIds.has(room.id)) {
+              visibleRooms.push(room);
+            }
+          }
+        }
+      }
+
+      // Sort visible rooms by createdAt
+      visibleRooms.sort((a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
+      // If no roomId provided, use first visible room (general)
+      const targetRoomId = roomId || visibleRooms[0]?.id;
       
       if (!targetRoomId) {
         ws.send(JSON.stringify({
@@ -230,10 +263,22 @@ export const handleJoin = (
       const initPayload = {
         type: 'init',
         clientId,
-        bookClub,
+        bookClub: {
+          ...bookClub,
+          rooms: visibleRooms.map((r: any) => ({
+            id: r.id,
+            name: r.name,
+            description: r.description,
+            type: r.type,
+            isDefault: r.isDefault,
+            createdAt: r.createdAt,
+            _count: r._count
+          }))
+        },
         currentRoomId: targetRoomId,
         messages: enrichedMessages,
         members: memberDetails,
+        userRole: membership.role,
         users: Array.from(activeClub.clients.values()).map(c => ({
           id: c.id,
           userId: c.userId,
@@ -293,6 +338,25 @@ export const handleSwitchRoom = (message: any, currentClient: Client | null) => 
         return;
       }
 
+      // Check if user can access this room (private rooms need membership or mod+ role)
+      const membership = await prisma.bookClubMember.findUnique({
+        where: {
+          bookClubId_userId: {
+            bookClubId: currentClient.bookClubId!,
+            userId: currentClient.userId
+          }
+        }
+      });
+
+      const canAccess = await RoomService.canAccessRoom(roomId, currentClient.userId, membership?.role);
+      if (!canAccess) {
+        currentClient.ws.send(JSON.stringify({
+          type: 'error',
+          message: 'You do not have access to this room'
+        }));
+        return;
+      }
+
       // Update client's current room
       currentClient.roomId = roomId;
 
@@ -337,6 +401,7 @@ export const handleSwitchRoom = (message: any, currentClient: Client | null) => 
       currentClient.ws.send(JSON.stringify({
         type: 'room-switched',
         roomId,
+        roomType: room.type,
         messages: messagesWithReactions
       }));
 
@@ -359,32 +424,51 @@ export const handleChatMessage = (message: any, currentClient: Client | null) =>
   const activeClub = activeBookClubs.get(currentClient.bookClubId!);
   if (!activeClub) return;
 
-  // Save message to database
-  prisma.message.create({
-    data: {
-      roomId: currentClient.roomId,
-      userId: currentClient.userId,
-      username: currentClient.username,
-      profileImage: currentClient.profileImage,
-      content: message.message || null,
-      replyToId: message.replyToId || null,
-      attachments: message.attachments && message.attachments.length > 0 ? {
-        connect: message.attachments.map((att: any) => ({ id: att.id }))
-      } : undefined
-    },
-    include: {
-      attachments: true,
-      replyTo: {
-        select: {
-          id: true,
-          content: true,
-          username: true,
-          userId: true
-        }
+  // Check send permission (announcement rooms restrict to mods+, private rooms require membership)
+  prisma.bookClubMember.findUnique({
+    where: {
+      bookClubId_userId: {
+        bookClubId: currentClient.bookClubId!,
+        userId: currentClient.userId
       }
     }
   })
-  .then((savedMessage) => {
+  .then(async (membership) => {
+    const canSend = await RoomService.canSendMessage(currentClient.roomId!, currentClient.userId, membership?.role);
+    if (!canSend) {
+      currentClient.ws.send(JSON.stringify({
+        type: 'error',
+        message: 'You do not have permission to send messages in this room'
+      }));
+      return;
+    }
+
+    // Save message to database
+    const savedMessage = await prisma.message.create({
+      data: {
+        roomId: currentClient.roomId,
+        userId: currentClient.userId,
+        username: currentClient.username,
+        profileImage: currentClient.profileImage,
+        content: message.message || null,
+        replyToId: message.replyToId || null,
+        attachments: message.attachments && message.attachments.length > 0 ? {
+          connect: message.attachments.map((att: any) => ({ id: att.id }))
+        } : undefined
+      },
+      include: {
+        attachments: true,
+        replyTo: {
+          select: {
+            id: true,
+            content: true,
+            username: true,
+            userId: true
+          }
+        }
+      }
+    });
+
     // Extract mentions from message content
     const mentionedUserIds = extractMentions(savedMessage.content || '');
     const mentionsEveryone = isEveryoneMentioned(savedMessage.content || '');

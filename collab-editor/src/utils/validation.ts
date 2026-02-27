@@ -64,6 +64,15 @@ export const eventIdSchema = z.object({
 
 export const createRoomBodySchema = z.object({
   name: z.string().min(1, 'Room name is required').max(100, 'Name too long'),
+  description: z.string().max(200, 'Description too long').optional(),
+  type: z.enum(['PUBLIC', 'PRIVATE', 'ANNOUNCEMENT']).optional(),
+  memberIds: z.array(z.string().uuid()).optional(),
+});
+
+export const updateRoomBodySchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  description: z.string().max(200).optional(),
+  type: z.enum(['PUBLIC', 'PRIVATE', 'ANNOUNCEMENT']).optional(),
 });
 
 /**

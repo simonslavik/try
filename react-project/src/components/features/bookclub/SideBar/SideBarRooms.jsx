@@ -1,10 +1,60 @@
 
 
-import React from 'react';
-import { FiHome, FiPlus, FiHash, FiMail, FiBook, FiCalendar } from 'react-icons/fi';
+import React, { useState, useRef, useEffect } from 'react';
+import { FiHome, FiPlus, FiHash, FiMail, FiBook, FiCalendar, FiLock, FiVolume2, FiSettings, FiUsers, FiMoreVertical } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import BookClubImage from './BookClubImage';
 import logger from '@utils/logger';
+
+const getRoomIcon = (room) => {
+  switch (room.type) {
+    case 'PRIVATE': return FiLock;
+    case 'ANNOUNCEMENT': return FiVolume2;
+    default: return FiHash;
+  }
+};
+
+const getRoomIconColor = (room, isActive) => {
+  if (isActive) return 'text-white';
+  switch (room.type) {
+    case 'PRIVATE': return 'text-yellow-400';
+    case 'ANNOUNCEMENT': return 'text-blue-400';
+    default: return '';
+  }
+};
+
+const RoomContextMenu = ({ room, position, onClose, onOpenSettings, userRole }) => {
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        onClose();
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [onClose]);
+
+  const canManage = ['OWNER', 'ADMIN', 'MODERATOR'].includes(userRole);
+  if (!canManage) return null;
+
+  return (
+    <div
+      ref={menuRef}
+      className="fixed bg-gray-800 border border-gray-600 rounded-lg shadow-xl py-1 z-50 min-w-[160px]"
+      style={{ top: position.y, left: position.x }}
+    >
+      <button
+        onClick={() => { onOpenSettings(room); onClose(); }}
+        className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
+      >
+        <FiSettings size={14} />
+        Room Settings
+      </button>
+    </div>
+  );
+};
 
 
 
@@ -15,7 +65,9 @@ const SideBarRooms = ({
     currentRoom,
     switchRoom,
     handleCreateRoom,
+    onOpenRoomSettings,
     auth,
+    userRole,
     uploadingImage,
     fileInputRef,
     handleImageUpload,
@@ -33,6 +85,15 @@ const SideBarRooms = ({
     showSuggestions
 }) => {
     const navigate = useNavigate();
+    const [contextMenu, setContextMenu] = useState(null);
+
+    const handleContextMenu = (e, room) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setContextMenu({ room, position: { x: e.clientX, y: e.clientY } });
+    };
+
+    const canCreateRoom = ['OWNER', 'ADMIN', 'MODERATOR'].includes(userRole);
 
     if (!bookClub) {
         return (
@@ -115,7 +176,7 @@ const SideBarRooms = ({
               <div className="p-2">
                 <div className="flex items-center justify-between px-2 py-1 mb-2">
                   <h3 className="text-gray-400 text-xs font-semibold uppercase">Rooms</h3>
-                  {auth?.user && (
+                  {canCreateRoom && (
                     <button 
                       onClick={handleCreateRoom}
                       className="text-gray-400 hover:text-white"
@@ -126,22 +187,57 @@ const SideBarRooms = ({
                   )}
                 </div>
                 
-                {rooms.map(room => (
-                  <button
-                    key={room.id}
-                    onClick={() => switchRoom(room)}
-                    className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-colors ${
-                      currentRoom?.id === room.id && !showBooksHistory && !showCalendar && !showSuggestions
-                        ? 'bg-gray-700 text-white'
-                        : 'text-gray-400 hover:bg-gray-700 hover:text-white'
-                    }`}
-                  >
-                    <FiHash size={16} />
-                    <span className="truncate">{room.name}</span>
-                  </button>
-                ))}
+                {rooms.map(room => {
+                  const Icon = getRoomIcon(room);
+                  const isActive = currentRoom?.id === room.id && !showBooksHistory && !showCalendar && !showSuggestions;
+                  const iconColor = getRoomIconColor(room, isActive);
+                  return (
+                    <div
+                      key={room.id}
+                      className="group relative"
+                      onContextMenu={(e) => handleContextMenu(e, room)}
+                    >
+                      <button
+                        onClick={() => switchRoom(room)}
+                        className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-colors ${
+                          isActive
+                            ? 'bg-gray-700 text-white'
+                            : 'text-gray-400 hover:bg-gray-700 hover:text-white'
+                        }`}
+                      >
+                        <Icon size={16} className={`flex-shrink-0 ${iconColor}`} />
+                        <span className="truncate flex-1">{room.name}</span>
+                        {room.type === 'PRIVATE' && room._count?.members > 0 && (
+                          <span className="text-[10px] text-gray-500 flex items-center gap-0.5">
+                            <FiUsers size={10} /> {room._count.members}
+                          </span>
+                        )}
+                      </button>
+                      {/* Three-dot menu on hover (for mods+) */}
+                      {['OWNER', 'ADMIN', 'MODERATOR'].includes(userRole) && (
+                        <button
+                          onClick={(e) => handleContextMenu(e, room)}
+                          className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <FiMoreVertical size={14} />
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
+
+            {/* Context Menu */}
+            {contextMenu && (
+              <RoomContextMenu
+                room={contextMenu.room}
+                position={contextMenu.position}
+                onClose={() => setContextMenu(null)}
+                onOpenSettings={onOpenRoomSettings}
+                userRole={userRole}
+              />
+            )}
           </div>
           </>
     );
