@@ -3,6 +3,7 @@ import { FiChevronLeft, FiChevronRight, FiPlus, FiEdit2, FiTrash2, FiVideo } fro
 import apiClient from '@api/axios';
 import { bookclubAPI } from '@api/bookclub.api';
 import logger from '@utils/logger';
+import { useConfirm } from '@hooks/useUIFeedback';
 
 const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent, onEventSaved }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -14,6 +15,7 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
   const [meetings, setMeetings] = useState([]);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const { confirm } = useConfirm();
 
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -420,7 +422,8 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
                 </button>
                 <button
                   onClick={async () => {
-                    if (confirm('Are you sure you want to delete this event?')) {
+                    const ok = await confirm('Are you sure you want to delete this event?', { title: 'Delete Event', variant: 'danger', confirmLabel: 'Delete' });
+                    if (ok) {
                       await onDeleteEvent(selectedEvent.id);
                       setSelectedEvent(null);
                       fetchEvents();

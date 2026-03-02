@@ -3,6 +3,7 @@ import { FiUsers, FiShield, FiUserX, FiChevronDown } from 'react-icons/fi';
 import { bookclubAPI } from '@api/bookclub.api';
 import { getProfileImageUrl } from '@config/constants';
 import logger from '@utils/logger';
+import { useConfirm, useToast } from '@hooks/useUIFeedback';
 
 const ROLE_COLORS = {
   OWNER: 'bg-purple-100 text-purple-700 border-purple-300',
@@ -20,6 +21,8 @@ const MemberManagement = ({ bookclub, currentUserId, currentUserRole, onMemberUp
 
   const isOwner = currentUserRole === 'OWNER';
   const isAdmin = currentUserRole && ['OWNER', 'ADMIN'].includes(currentUserRole);
+  const { confirm } = useConfirm();
+  const { toastError, toastWarning } = useToast();
 
   // Debug logging
   logger.debug('MemberManagement Debug:', {
@@ -33,7 +36,7 @@ const MemberManagement = ({ bookclub, currentUserId, currentUserRole, onMemberUp
 
   const handleRoleChange = async (userId, newRole) => {
     if (!isOwner) {
-      alert('Only the owner can change roles');
+      toastWarning('Only the owner can change roles');
       return;
     }
 
@@ -52,7 +55,7 @@ const MemberManagement = ({ bookclub, currentUserId, currentUserRole, onMemberUp
         delete updated[userId];
         return updated;
       });
-      alert(error.response?.data?.message || 'Failed to update role');
+      toastError(error.response?.data?.message || 'Failed to update role');
     } finally {
       setProcessingUserId(null);
     }
@@ -60,18 +63,19 @@ const MemberManagement = ({ bookclub, currentUserId, currentUserRole, onMemberUp
 
   const handleRemoveMember = async (userId) => {
     if (!isAdmin) {
-      alert('Only admins and owners can remove members');
+      toastWarning('Only admins and owners can remove members');
       return;
     }
 
-    if (!confirm('Are you sure you want to remove this member?')) return;
+    const ok = await confirm('Are you sure you want to remove this member?', { title: 'Remove Member', variant: 'danger', confirmLabel: 'Remove' });
+    if (!ok) return;
 
     setProcessingUserId(userId);
     try {
       await bookclubAPI.removeMember(bookclub.id, userId);
       onMemberUpdate?.();
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to remove member');
+      toastError(error.response?.data?.message || 'Failed to remove member');
     } finally {
       setProcessingUserId(null);
     }

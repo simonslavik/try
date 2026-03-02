@@ -5,9 +5,11 @@ import { bookclubAPI } from '@api/bookclub.api';
 import apiClient from '@api/axios';
 import { getProfileImageUrl } from '@config/constants';
 import logger from '@utils/logger';
+import { useToast } from '@hooks/useUIFeedback';
 
 const InviteModal = ({ bookClubId, bookClubName, bookClubMembers = [], currentUserRole, onClose }) => {
   const { auth } = useContext(AuthContext);
+  const { toastSuccess, toastError, toastWarning } = useToast();
   const [invite, setInvite] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -80,13 +82,13 @@ const InviteModal = ({ bookClubId, bookClubName, bookClubMembers = [], currentUs
       setSendingInvites(prev => new Set(prev).add(userId));
       
       if (!auth?.token) {
-        alert('You must be logged in to send invites');
+        toastWarning('You must be logged in to send invites');
         return;
       }
       
       if (!invite) {
         logger.error('No invite available. Invite state:', invite);
-        alert('Invite link not available. Please try closing and reopening the modal.');
+        toastWarning('Invite link not available. Please try closing and reopening the modal.');
         return;
       }
 
@@ -104,10 +106,10 @@ const InviteModal = ({ bookClubId, bookClubName, bookClubMembers = [], currentUs
 
       logger.debug('DM Response:', responseData);
 
-      alert(`Invite sent to ${username}!`);
+      toastSuccess(`Invite sent to ${username}!`);
     } catch (error) {
       logger.error('Error sending DM invite:', error);
-      alert('Failed to send invite: ' + error.message);
+      toastError('Failed to send invite: ' + error.message);
     } finally {
       setSendingInvites(prev => {
         const newSet = new Set(prev);

@@ -41,7 +41,11 @@ export const formatTimestamp = (timestamp) => {
   if (isToday) {
     return messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
-  return `${messageDate.toLocaleDateString()} ${messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  const isSameYear = messageDate.getFullYear() === today.getFullYear();
+  const dateStr = isSameYear
+    ? messageDate.toLocaleDateString([], { month: 'short', day: 'numeric' })
+    : messageDate.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+  return `${dateStr} ${messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
 };
 
 /**

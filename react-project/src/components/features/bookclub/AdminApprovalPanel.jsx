@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FiUsers, FiCheck, FiX, FiClock, FiMessageSquare } from 'react-icons/fi';
 import { bookclubAPI } from '@api/bookclub.api';
 import logger from '@utils/logger';
+import { useToast } from '@hooks/useUIFeedback';
 
 const AdminApprovalPanel = ({ bookclubId, userRole }) => {
   const [requests, setRequests] = useState([]);
@@ -9,6 +10,7 @@ const AdminApprovalPanel = ({ bookclubId, userRole }) => {
   const [processingId, setProcessingId] = useState(null);
 
   const isAdmin = userRole && ['OWNER', 'ADMIN'].includes(userRole);
+  const { toastError } = useToast();
 
   useEffect(() => {
     if (isAdmin) {
@@ -37,7 +39,7 @@ const AdminApprovalPanel = ({ bookclubId, userRole }) => {
       await bookclubAPI.approveJoinRequest(bookclubId, requestId);
       setRequests(requests.filter(r => r.id !== requestId));
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to approve request');
+      toastError(error.response?.data?.message || 'Failed to approve request');
     } finally {
       setProcessingId(null);
     }
@@ -49,7 +51,7 @@ const AdminApprovalPanel = ({ bookclubId, userRole }) => {
       await bookclubAPI.rejectJoinRequest(bookclubId, requestId);
       setRequests(requests.filter(r => r.id !== requestId));
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to reject request');
+      toastError(error.response?.data?.message || 'Failed to reject request');
     } finally {
       setProcessingId(null);
     }

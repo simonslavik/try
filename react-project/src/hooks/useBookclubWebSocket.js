@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useContext } from 'react';
 import { WS_URL } from '@config/constants';
 import logger from '@utils/logger';
+import UIFeedbackContext from '@context/UIFeedbackContext';
 
 export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { onInit } = {}) => {
   const ws = useRef(null);
@@ -10,6 +11,7 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
   const [unreadRooms, setUnreadRooms] = useState(new Set());
   const [unreadSections, setUnreadSections] = useState(new Set());
   const [lastReadAt, setLastReadAt] = useState(null);
+  const { toastError } = useContext(UIFeedbackContext);
   const reconnectTimeoutRef = useRef(null);
   const isIntentionalCloseRef = useRef(false);
   const currentRoomIdRef = useRef(null);
@@ -221,7 +223,7 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
             
             case 'error':
               logger.error('WebSocket error:', data.message);
-              alert(data.message);
+              toastError(data.message);
               break;
 
             case 'room-activity':

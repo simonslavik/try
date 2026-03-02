@@ -6,10 +6,12 @@ import HomePageHeader from '@components/layout/Header';
 import AdminApprovalPanel from '@components/features/bookclub/AdminApprovalPanel';
 import MemberManagement from '@components/features/bookclub/MemberManagement';
 import logger from '@utils/logger';
+import { useToast } from '@hooks/useUIFeedback';
 
 const BookclubSettings = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toastSuccess, toastError, toastWarning } = useToast();
   const [bookclub, setBookclub] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -47,7 +49,7 @@ const BookclubSettings = () => {
     } catch (error) {
       logger.error('Failed to fetch bookclub:', error);
       if (error.response?.status === 403) {
-        alert('You do not have access to this bookclub');
+        toastWarning('You do not have access to this bookclub');
         navigate('/discover');
       }
     } finally {
@@ -67,10 +69,10 @@ const BookclubSettings = () => {
         visibility,
         requiresApproval: visibility === 'PRIVATE' ? requiresApproval : false,
       });
-      alert('Settings updated successfully!');
+      toastSuccess('Settings updated successfully!');
       fetchBookclub();
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to update settings');
+      toastError(error.response?.data?.message || 'Failed to update settings');
     } finally {
       setSaving(false);
     }
