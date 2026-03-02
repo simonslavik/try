@@ -21,14 +21,24 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
   const onInitRef = useRef(onInit);
   onInitRef.current = onInit;
 
+  // Track the latest prop values so the cleanup can decide whether to close
+  const currentRoomPropRef = useRef(currentRoom);
+  currentRoomPropRef.current = currentRoom;
+  const bookClubIdPropRef = useRef(bookClubId);
+  bookClubIdPropRef.current = bookClubId;
+
   useEffect(() => {
-    if (!bookClub || !auth?.token || !currentRoom) {
-      logger.debug('WebSocket not connecting - missing required data:', {
-        hasBookClub: !!bookClub,
-        hasAuth: !!auth?.token,
-        hasRoom: !!currentRoom
-      });
+    if (!bookClub || !auth?.token) {
       return;
+    }
+
+    // When currentRoom is null (user is viewing a section like Suggestions/Books),
+    // keep the existing WebSocket alive so section-activity notifications still work.
+    if (!currentRoom) {
+      if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+        logger.debug('📌 currentRoom is null (section view) — keeping WebSocket alive');
+      }
+      return; // No cleanup returned — previous connection stays open
     }
 
     // Check if we're switching rooms within the same bookclub
@@ -303,6 +313,13 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
     connectWebSocket();
 
     return () => {
+      // If the user just navigated to a section view (currentRoom → null)
+      // within the same bookclub, keep the WebSocket alive.
+      if (currentRoomPropRef.current === null && bookClubIdPropRef.current === currentBookClubIdRef.current) {
+        logger.debug('📌 Cleanup skipped — staying in same bookclub (section view)');
+        return;
+      }
+
       // Mark this as an intentional close
       isIntentionalCloseRef.current = true;
       
