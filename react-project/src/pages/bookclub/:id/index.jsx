@@ -35,7 +35,6 @@ const linkifyText = (text) => {
   });
 };
 import CalendarView from '@components/features/bookclub/MainChatArea/CalendarView';
-import AddEventModal from '@components/features/bookclub/Modals/AddEventModal';
 import BookSuggestionsView from '@components/features/bookclub/MainChatArea/BookSuggestionsView';
 import MeetingsView from '@components/features/bookclub/MainChatArea/MeetingsView';
 import ScheduleMeetingModal from '@components/features/bookclub/Modals/ScheduleMeetingModal';
@@ -103,12 +102,6 @@ const BookClub = () => {
   // Books states
   const [bookclubBooks, setBookclubBooks] = useState({ current: [], upcoming: [], completed: [] });
   const [loadingBooks, setLoadingBooks] = useState(false);
-  
-  // Calendar states
-  const [showAddEventModal, setShowAddEventModal] = useState(false);
-  const [eventToEdit, setEventToEdit] = useState(null);
-  const [selectedEventDate, setSelectedEventDate] = useState(null);
-  const [calendarRefresh, setCalendarRefresh] = useState(null);
   
   // Meeting modal states
   const [showScheduleMeetingModal, setShowScheduleMeetingModal] = useState(false);
@@ -274,6 +267,8 @@ const BookClub = () => {
       logger.error('Error fetching bookclub books:', err);
     } finally {
       setLoadingBooks(false);
+      // Notify calendar to refresh book data
+      window.__calendarBookRefresh?.();
     }
   };
 
@@ -640,47 +635,6 @@ const BookClub = () => {
       logger.error('Error sending friend request:', err);
       toastError(err.response?.data?.error || err.response?.data?.message || 'Failed to send friend request');
     }
-  };
-
-  // Calendar event handlers
-  const handleAddEvent = (date = null) => {
-    setEventToEdit(null);
-    setSelectedEventDate(date);
-    setShowAddEventModal(true);
-  };
-
-  const handleEditEvent = (event) => {
-    setEventToEdit(event);
-    setShowAddEventModal(true);
-  };
-
-  const handleDeleteEvent = async (eventId) => {
-    if (!auth?.token) return;
-    
-    try {
-      await apiClient.delete(`/v1/editor/events/${eventId}`);
-      // Event deleted successfully - calendar will refetch
-      return true;
-    } catch (err) {
-      logger.error('Error deleting event:', err);
-      toastError(err.response?.data?.error || 'Failed to delete event');
-      return false;
-    }
-  };
-
-  const handleEventSaved = () => {
-    // Trigger calendar refresh
-    if (calendarRefresh) {
-      calendarRefresh();
-    }
-    setShowAddEventModal(false);
-    setEventToEdit(null);
-    setSelectedEventDate(null);
-    notifySectionActivity('calendar');
-  };
-
-  const handleCalendarRefreshCallback = (refreshFn) => {
-    setCalendarRefresh(() => refreshFn);
   };
 
 
@@ -1093,11 +1047,6 @@ const BookClub = () => {
               <div className="flex-1 overflow-hidden">
                 <CalendarView
                   bookClubId={bookClubId}
-                  auth={auth}
-                  onAddEvent={handleAddEvent}
-                  onEditEvent={handleEditEvent}
-                  onDeleteEvent={handleDeleteEvent}
-                  onEventSaved={handleCalendarRefreshCallback}
                 />
               </div>
             ) : showSuggestions ? (
@@ -1256,23 +1205,6 @@ const BookClub = () => {
               fetchBookclubBooks();
               notifySectionActivity('books');
             }}
-          />
-        )}
-
-        {/* Add/Edit Event Modal */}
-        {showAddEventModal && (
-          <AddEventModal
-            isOpen={showAddEventModal}
-            onClose={() => {
-              setShowAddEventModal(false);
-              setEventToEdit(null);
-              setSelectedEventDate(null);
-            }}
-            bookClubId={bookClubId}
-            auth={auth}
-            eventToEdit={eventToEdit}
-            selectedDate={selectedEventDate}
-            onEventSaved={handleEventSaved}
           />
         )}
 
