@@ -3,9 +3,11 @@ import { AuthContext } from '@context/index';
 import { FiX, FiSearch, FiCalendar, FiClock } from 'react-icons/fi';
 import apiClient from '@api/axios';
 import logger from '@utils/logger';
+import { useToast } from '@hooks/useUIFeedback';
 
 const AddCurrentBookModal = ({ bookClubId, onClose, onBookAdded }) => {
   const { auth } = useContext(AuthContext);
+  const { toastError } = useToast();
   const [step, setStep] = useState(1); // 1: Search, 2: Schedule
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -76,11 +78,11 @@ const AddCurrentBookModal = ({ bookClubId, onClose, onBookAdded }) => {
         onBookAdded(data.data);
         onClose();
       } else {
-        alert(data.error || 'Failed to add book');
+        toastError(data.error || 'Failed to add book');
       }
     } catch (err) {
       logger.error('Error adding book:', err);
-      alert('Failed to add book to bookclub');
+      toastError('Failed to add book to bookclub');
     } finally {
       setSubmitting(false);
     }

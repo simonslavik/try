@@ -9,6 +9,7 @@ import { linkifyText } from '../chat/messageUtils';
 import apiClient from '@api/axios';
 import { getProfileImageUrl } from '@config/constants';
 import logger from '@utils/logger';
+import { useConfirm, useToast } from '@hooks/useUIFeedback';
 
 const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, replyingTo, setReplyingTo }) => {
   const [newMessage, setNewMessage] = useState('');
@@ -22,6 +23,8 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
   const inputRef = useRef(null);
   const prevMessageCountRef = useRef(messages.length);
   const navigate = useNavigate();
+  const { confirm } = useConfirm();
+  const { toastError } = useToast();
 
   const currentUserId = auth?.user?.id;
   const dmMembers = [
@@ -123,7 +126,8 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
 
   const handleDeleteMessage = useCallback(async (messageId) => {
     setMessageMenuId(null);
-    if (!confirm('Are you sure you want to delete this message?')) return;
+    const ok = await confirm('Are you sure you want to delete this message?', { title: 'Delete Message', variant: 'danger', confirmLabel: 'Delete' });
+    if (!ok) return;
     try {
       sendWs({ type: 'delete-dm-message', messageId, receiverId: otherUser?.id });
       await apiClient.delete(`/v1/messages/${messageId}`);
@@ -136,9 +140,9 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
       );
     } catch (error) {
       logger.error('Error deleting message:', error);
-      alert('Failed to delete message');
+      toastError('Failed to delete message');
     }
-  }, [sendWs, otherUser?.id, setMessages]);
+  }, [sendWs, otherUser?.id, setMessages, confirm, toastError]);
 
   const handleCopy = useCallback(async (messageId, text) => {
     setMessageMenuId(null);
@@ -204,7 +208,7 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
       if (setReplyingTo) setReplyingTo(null);
     } catch (error) {
       logger.error('Error sending DM:', error);
-      alert('Failed to send message');
+      toastError('Failed to send message');
     } finally {
       setUploadingFiles(false);
     }

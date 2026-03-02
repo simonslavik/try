@@ -7,6 +7,7 @@ import DMChat from '@components/features/bookclub/MainChatArea/DMChat';
 import { WS_URL } from '@config/constants';
 import apiClient from '@api/axios';
 import logger from '@utils/logger';
+import { useToast } from '@hooks/useUIFeedback';
 
 // Normalize raw Prisma reactions [{userId, emoji, ...}] to grouped format [{emoji, count, userIds}]
 const normalizeReactions = (reactions) => {
@@ -32,6 +33,7 @@ const DMChatPage = () => {
   const { auth, setAuth, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const { userId } = useParams();
+  const { toastError } = useToast();
   
   const [conversations, setConversations] = useState([]);
   const [currentDMUser, setCurrentDMUser] = useState(null);
@@ -135,7 +137,7 @@ const DMChatPage = () => {
         case 'error':
           logger.error('WebSocket error:', data.message);
           setSendingMessage(false);
-          alert(data.message || 'Failed to send message');
+          toastError(data.message || 'Failed to send message');
           break;
       }
     };

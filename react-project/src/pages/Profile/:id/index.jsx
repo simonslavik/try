@@ -9,12 +9,15 @@ import BookDetailsModal from '@components/common/modals/BookDetails';
 import { COLLAB_EDITOR_URL, getProfileImageUrl } from '@config/constants';
 import apiClient from '@api/axios';
 import logger from '@utils/logger';
+import { useConfirm, useToast } from '@hooks/useUIFeedback';
 
 
 const ProfilePage = () => {
   const { id } = useParams();
   const { auth, setAuth } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { confirm } = useConfirm();
+  const { toastError, toastWarning } = useToast();
   
   const [profile, setProfile] = useState(null);
   const [createdBookClubs, setCreatedBookClubs] = useState([]);
@@ -194,7 +197,7 @@ const ProfilePage = () => {
 
   const uploadImage = async (file) => {
     if (!auth?.token) {
-      alert('Please login to change profile picture');
+      toastWarning('Please login to change profile picture');
       return;
     }
 
@@ -231,7 +234,7 @@ const ProfilePage = () => {
       setImagePreview(null);
     } catch (err) {
       logger.error('Error uploading image:', err);
-      alert(err.response?.data?.message || 'Failed to upload image');
+      toastError(err.response?.data?.message || 'Failed to upload image');
     } finally {
       setUploadingImage(false);
       if (fileInputRef.current) {
@@ -251,7 +254,7 @@ const ProfilePage = () => {
       setBooksRead(prev => prev.filter(ub => ub.id !== userBookId));
     } catch (err) {
       logger.error('Error deleting user book:', err);
-      alert(err.response?.data?.message || 'Failed to delete book');
+      toastError(err.response?.data?.message || 'Failed to delete book');
     }
   }
 
@@ -387,7 +390,7 @@ const ProfilePage = () => {
                             setProfile(prev => ({ ...prev, friendshipStatus: 'request_sent' }));
                           } catch (err) {
                             logger.error('Error sending friend request:', err);
-                            alert(err.response?.data?.message || 'Failed to send friend request');
+                            toastError(err.response?.data?.message || 'Failed to send friend request');
                           } finally {
                             setFriendRequestLoading(false);
                           }
@@ -614,11 +617,10 @@ const ProfilePage = () => {
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all rounded-lg flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100">
                         {isOwnProfile && (
                           <button
-                            onClick={(e) => {
+                            onClick={async (e) => {
                               e.stopPropagation();
-                              if (confirm('Remove this book from your library?')) {
-                                DeleteUserBook(userBook.id);
-                              }
+                              const ok = await confirm('Remove this book from your library?', { title: 'Remove Book', variant: 'danger', confirmLabel: 'Remove' });
+                              if (ok) DeleteUserBook(userBook.id);
                             }}
                             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors shadow-lg"
                           >
@@ -664,11 +666,10 @@ const ProfilePage = () => {
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all rounded-lg flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100">
                         {isOwnProfile && (
                           <button
-                            onClick={(e) => {
+                            onClick={async (e) => {
                               e.stopPropagation();
-                              if (confirm('Remove this book from your library?')) {
-                                DeleteUserBook(userBook.id);
-                              }
+                              const ok = await confirm('Remove this book from your library?', { title: 'Remove Book', variant: 'danger', confirmLabel: 'Remove' });
+                              if (ok) DeleteUserBook(userBook.id);
                             }}
                             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors shadow-lg"
                           >
@@ -711,11 +712,10 @@ const ProfilePage = () => {
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all rounded-lg flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100">
                         {isOwnProfile && (
                           <button
-                            onClick={(e) => {
+                            onClick={async (e) => {
                               e.stopPropagation();
-                              if (confirm('Remove this book from your library?')) {
-                                DeleteUserBook(userBook.id);
-                              }
+                              const ok = await confirm('Remove this book from your library?', { title: 'Remove Book', variant: 'danger', confirmLabel: 'Remove' });
+                              if (ok) DeleteUserBook(userBook.id);
                             }}
                             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors shadow-lg"
                           >
@@ -758,11 +758,10 @@ const ProfilePage = () => {
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all rounded-lg flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100">
                         {isOwnProfile && (
                           <button
-                            onClick={(e) => {
+                            onClick={async (e) => {
                               e.stopPropagation();
-                              if (confirm('Remove this book from your library?')) {
-                                DeleteUserBook(userBook.id);
-                              }
+                              const ok = await confirm('Remove this book from your library?', { title: 'Remove Book', variant: 'danger', confirmLabel: 'Remove' });
+                              if (ok) DeleteUserBook(userBook.id);
                             }}
                             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors shadow-lg"
                           >

@@ -3,9 +3,12 @@ import { FiX, FiTrash2 } from 'react-icons/fi';
 import apiClient from '@api/axios';
 import logger from '@utils/logger';
 import { getProfileImageUrl } from '@config/constants';
+import { useConfirm, useToast } from '@hooks/useUIFeedback';
 
 const BookSuggestionDetailsModal = ({ suggestion, bookClubId, auth, members = [], onClose, onDeleted }) => {
   const navigate = useNavigate();
+  const { confirm } = useConfirm();
+  const { toastError } = useToast();
 
   const suggesterId = suggestion.suggestedById || suggestion.suggestedBy?.id;
   const suggesterMember = members.find(m => m.id === suggesterId);
@@ -13,7 +16,8 @@ const BookSuggestionDetailsModal = ({ suggestion, bookClubId, auth, members = []
   const suggesterImage = getProfileImageUrl(suggesterMember?.profileImage);
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this book suggestion?')) return;
+    const ok = await confirm('Are you sure you want to delete this book suggestion?', { title: 'Delete Suggestion', variant: 'danger', confirmLabel: 'Delete' });
+    if (!ok) return;
 
     try {
       await apiClient.delete(
@@ -24,7 +28,7 @@ const BookSuggestionDetailsModal = ({ suggestion, bookClubId, auth, members = []
       onClose();
     } catch (err) {
       logger.error('Error deleting suggestion:', err);
-      alert(err.response?.data?.message || 'Failed to delete suggestion');
+      toastError(err.response?.data?.message || 'Failed to delete suggestion');
     }
   };
 

@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { FiHash } from 'react-icons/fi';
 import { messageModerationAPI } from '@api/messageModeration.api';
 import logger from '@utils/logger';
+import { useConfirm, useToast } from '@hooks/useUIFeedback';
 import OwnMessage from '../chat/OwnMessage';
 import OtherMessage from '../chat/OtherMessage';
 import { shouldGroupMessages } from '../chat/messageUtils';
@@ -15,6 +16,9 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
   const [editingMessageId, setEditingMessageId] = useState(null);
   const [editingText, setEditingText] = useState('');
   const [copiedMessageId, setCopiedMessageId] = useState(null);
+
+  const { confirm } = useConfirm();
+  const { toastError } = useToast();
 
   const canModerate = userRole && ['OWNER', 'ADMIN', 'MODERATOR'].includes(userRole);
   const currentUserId = auth?.user?.id;
@@ -73,7 +77,8 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
 
   const handleDelete = useCallback(async (messageId) => {
     setMessageMenuId(null);
-    if (!confirm('Are you sure you want to delete this message?')) return;
+    const ok = await confirm('Are you sure you want to delete this message?', { title: 'Delete Message', variant: 'danger', confirmLabel: 'Delete' });
+    if (!ok) return;
     try {
       sendWs({ type: 'delete-message', messageId });
       await messageModerationAPI.deleteMessage(messageId);
@@ -86,9 +91,9 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
       );
     } catch (err) {
       logger.error('Error deleting message:', err);
-      alert('Failed to delete message');
+      toastError('Failed to delete message');
     }
-  }, [sendWs, setMessages]);
+  }, [sendWs, setMessages, confirm, toastError]);
 
   const handlePin = useCallback(async (messageId, isPinned) => {
     setMessageMenuId(null);
@@ -99,9 +104,9 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
       setMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, isPinned: !isPinned } : m)));
     } catch (err) {
       logger.error('Error pinning message:', err);
-      alert('Failed to pin message');
+      toastError('Failed to pin message');
     }
-  }, [sendWs, setMessages]);
+  }, [sendWs, setMessages, toastError]);
 
   const handleCopy = useCallback(async (messageId, text) => {
     setMessageMenuId(null);
@@ -146,9 +151,9 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
       setEditingText('');
     } catch (err) {
       logger.error('Error editing message:', err);
-      alert('Failed to edit message');
+      toastError('Failed to edit message');
     }
-  }, [editingText, sendWs, setMessages]);
+  }, [editingText, sendWs, setMessages, toastError]);
 
   const handleEditKeyDown = useCallback((e, messageId) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveEdit(messageId); }

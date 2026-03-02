@@ -2,11 +2,13 @@ import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react'
 import { FiPaperclip, FiX, FiFile, FiImage } from 'react-icons/fi';
 import { uploadChatFile } from '@api/upload.api';
 import logger from '@utils/logger';
+import { useToast } from '@hooks/useUIFeedback';
 
 const FileUpload = forwardRef(({ onFilesSelected, auth, disabled = false }, ref) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
+  const { toastError } = useToast();
 
   // Expose uploadFiles method to parent via ref
   useImperativeHandle(ref, () => ({
@@ -32,7 +34,7 @@ const FileUpload = forwardRef(({ onFilesSelected, auth, disabled = false }, ref)
             logger.debug('FileUpload: File uploaded successfully:', data.data);
           } else {
             logger.error('FileUpload: Upload failed:', data);
-            alert(`Failed to upload ${file.name}: ${data.message || data.error || 'Unknown error'}`);
+            toastError(`Failed to upload ${file.name}: ${data.message || data.error || 'Unknown error'}`);
           }
         }
 
@@ -58,7 +60,7 @@ const FileUpload = forwardRef(({ onFilesSelected, auth, disabled = false }, ref)
     const validFiles = files.filter(file => {
       // Validate file size (10MB max)
       if (file.size > 10 * 1024 * 1024) {
-        alert(`${file.name} is too large. Max size is 10MB`);
+        toastError(`${file.name} is too large. Max size is 10MB`);
         return false;
       }
       return true;

@@ -5,10 +5,13 @@ import { FiX, FiCalendar, FiClock, FiEdit2, FiTrash2, FiBook, FiBarChart2, FiSta
 import apiClient from '@api/axios';
 import logger from '@utils/logger';
 import { getProfileImageUrl } from '@config/constants';
+import { useConfirm, useToast } from '@hooks/useUIFeedback';
 
 const CurrentBookDetailsModal = ({ bookClubId, currentBookData, members = [], onClose, onBookUpdated, onBookRemoved }) => {
   const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { confirm } = useConfirm();
+  const { toastSuccess, toastError, toastWarning } = useToast();
   const [activeTab, setActiveTab] = useState('details'); // 'details', 'schedule'
   
   // Schedule editing state
@@ -104,13 +107,13 @@ const CurrentBookDetailsModal = ({ bookClubId, currentBookData, members = [], on
 
       if (data.success) {
         setMyProgress(data.data);
-        alert('Progress saved successfully!');
+        toastSuccess('Progress saved successfully!');
       } else {
-        alert(data.error || 'Failed to save progress');
+        toastError(data.error || 'Failed to save progress');
       }
     } catch (err) {
       logger.error('Error saving progress:', err);
-      alert('Failed to save progress');
+      toastError('Failed to save progress');
     } finally {
       setSavingProgress(false);
     }
@@ -155,7 +158,7 @@ const CurrentBookDetailsModal = ({ bookClubId, currentBookData, members = [], on
 
   const handleSaveReview = async () => {
     if (!currentBookData?.id || !currentBookData?.bookClubId || !auth?.token || rating === 0) {
-      alert('Please select a rating');
+      toastWarning('Please select a rating');
       return;
     }
     
@@ -182,7 +185,7 @@ const CurrentBookDetailsModal = ({ bookClubId, currentBookData, members = [], on
       }
     } catch (err) {
       logger.error('Error saving rating:', err);
-      alert('Failed to save rating');
+      toastError('Failed to save rating');
     } finally {
       setSavingReview(false);
     }
@@ -190,7 +193,8 @@ const CurrentBookDetailsModal = ({ bookClubId, currentBookData, members = [], on
 
   const handleDeleteReview = async () => {
     if (!currentBookData?.id || !currentBookData?.bookClubId || !auth?.token) return;
-    if (!confirm('Are you sure you want to delete your rating?')) return;
+    const ok = await confirm('Are you sure you want to delete your rating?', { title: 'Delete Rating', variant: 'danger', confirmLabel: 'Delete' });
+    if (!ok) return;
     
     try {
       const { data } = await apiClient.delete(
@@ -212,7 +216,7 @@ const CurrentBookDetailsModal = ({ bookClubId, currentBookData, members = [], on
       }
     } catch (err) {
       logger.error('Error deleting rating:', err);
-      alert('Failed to delete rating');
+      toastError('Failed to delete rating');
     }
   };
 
@@ -259,20 +263,21 @@ const CurrentBookDetailsModal = ({ bookClubId, currentBookData, members = [], on
       if (data.success) {
         onBookUpdated(data.data);
         setEditingSchedule(false);
-        alert('Schedule updated successfully!');
+        toastSuccess('Schedule updated successfully!');
       } else {
-        alert(data.error || 'Failed to update schedule');
+        toastError(data.error || 'Failed to update schedule');
       }
     } catch (err) {
       logger.error('Error updating schedule:', err);
-      alert('Failed to update schedule');
+      toastError('Failed to update schedule');
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleRemoveBook = async () => {
-    if (!confirm('Are you sure you want to remove this book as the current reading?')) return;
+    const ok = await confirm('Are you sure you want to remove this book as the current reading?', { title: 'Remove Book', variant: 'danger', confirmLabel: 'Remove' });
+    if (!ok) return;
 
     setSubmitting(true);
     try {
@@ -284,11 +289,11 @@ const CurrentBookDetailsModal = ({ bookClubId, currentBookData, members = [], on
         onBookRemoved();
         onClose();
       } else {
-        alert(data.error || 'Failed to remove book');
+        toastError(data.error || 'Failed to remove book');
       }
     } catch (err) {
       logger.error('Error removing book:', err);
-      alert('Failed to remove book');
+      toastError('Failed to remove book');
     } finally {
       setSubmitting(false);
     }

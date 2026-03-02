@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { FiDownload, FiFile, FiX } from 'react-icons/fi';
 import { COLLAB_EDITOR_URL } from '@config/constants';
 import logger from '@utils/logger';
+import { useToast } from '@hooks/useUIFeedback';
 
 const MessageAttachment = ({ attachment, canDelete, onDelete, auth }) => {
   const [imageExpanded, setImageExpanded] = useState(false);
+  const { toastError } = useToast();
 
   const isImage = attachment.mimetype.startsWith('image/');
 
@@ -27,7 +29,7 @@ const MessageAttachment = ({ attachment, canDelete, onDelete, auth }) => {
       window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
       logger.error('Download failed:', error);
-      alert('Failed to download file');
+      toastError('Failed to download file');
     }
   };
 

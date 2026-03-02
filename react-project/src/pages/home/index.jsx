@@ -6,6 +6,7 @@ import HomePageHeader from '@components/layout/Header';
 import { COLLAB_EDITOR_URL, getProfileImageUrl } from '@config/constants';
 import apiClient from '@api/axios';
 import logger from '@utils/logger';
+import { useToast } from '@hooks/useUIFeedback';
 
 
 
@@ -26,6 +27,7 @@ const Home = () => {
 
 
     const navigate = useNavigate();
+    const { toastSuccess, toastError, toastWarning } = useToast();
     
     
     useEffect(() => {
@@ -108,7 +110,7 @@ const Home = () => {
     const handleSendFriendRequest = async (userId) => {
         if (!auth?.token) {
             logger.error('No auth token available');
-            alert('Please log in to send friend requests');
+            toastWarning('Please log in to send friend requests');
             return;
         }
         
@@ -122,21 +124,21 @@ const Home = () => {
             logger.debug('Friend request response:', data, 'Status:', response.status);
             
             if (response.status === 403 || response.status === 401) {
-                alert('Your session has expired. Please log out and log back in.');
+                toastWarning('Your session has expired. Please log out and log back in.');
                 return;
             }
             
-            alert('Friend request sent!');
+            toastSuccess('Friend request sent!');
             // Refetch friend requests to get the updated list with proper IDs
             await fetchFriendRequests();
         } catch (err) {
             if (err.response?.status === 403 || err.response?.status === 401) {
-                alert('Your session has expired. Please log out and log back in.');
+                toastWarning('Your session has expired. Please log out and log back in.');
                 return;
             }
             logger.error('Error sending friend request:', err);
             const errorMsg = err.response?.data?.error || err.response?.data?.message || err.message;
-            alert('Failed to send friend request: ' + errorMsg);
+            toastError('Failed to send friend request: ' + errorMsg);
         }
     };
 

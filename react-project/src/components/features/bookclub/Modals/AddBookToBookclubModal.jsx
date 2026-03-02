@@ -3,9 +3,11 @@ import { FiSearch, FiX, FiBook, FiCalendar, FiCheck } from 'react-icons/fi';
 import AuthContext from '@context/index';
 import apiClient from '@api/axios';
 import logger from '@utils/logger';
+import { useToast } from '@hooks/useUIFeedback';
 
 const AddBookToBookclubModal = ({ bookClubId, onClose, onBookAdded }) => {
   const { auth } = useContext(AuthContext);
+  const { toastError, toastWarning } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
@@ -28,11 +30,11 @@ const AddBookToBookclubModal = ({ bookClubId, onClose, onBookAdded }) => {
       if (data.success) {
         setSearchResults(data.data || []);
       } else {
-        alert('Failed to search for books');
+        toastError('Failed to search for books');
       }
     } catch (err) {
       logger.error('Error searching books:', err);
-      alert('Failed to search for books');
+      toastError('Failed to search for books');
     } finally {
       setSearching(false);
     }
@@ -42,12 +44,12 @@ const AddBookToBookclubModal = ({ bookClubId, onClose, onBookAdded }) => {
     if (!selectedBook) return;
 
     if (!auth?.token) {
-      alert('Please log in to add books');
+      toastWarning('Please log in to add books');
       return;
     }
 
     if (!selectedBook.googleBooksId) {
-      alert('Invalid book data - missing Google Books ID');
+      toastWarning('Invalid book data - missing Google Books ID');
       return;
     }
 
@@ -82,16 +84,16 @@ const AddBookToBookclubModal = ({ bookClubId, onClose, onBookAdded }) => {
         onBookAdded(data.data);
         onClose();
       } else {
-        alert(data.error || 'Failed to add book');
+        toastError(data.error || 'Failed to add book');
       }
     } catch (err) {
       logger.error('Error adding book:', err);
       if (err.name === 'AbortError') {
-        alert('Request timed out. The server might be slow. Please try again.');
+        toastError('Request timed out. The server might be slow. Please try again.');
       } else if (err.message.includes('fetch')) {
-        alert('Network error: Unable to connect to server. Please check if the backend is running.');
+        toastError('Network error: Unable to connect to server. Please check if the backend is running.');
       } else {
-        alert(`Failed to add book: ${err.message}`);
+        toastError(`Failed to add book: ${err.message}`);
       }
     } finally {
       setAdding(false);

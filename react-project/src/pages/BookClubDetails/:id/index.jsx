@@ -11,11 +11,13 @@ import RegisterModule from '@components/common/modals/registerModule';
 import { COLLAB_EDITOR_URL, getProfileImageUrl } from '@config/constants';
 import apiClient from '@api/axios';
 import logger from '@utils/logger';
+import { useToast } from '@hooks/useUIFeedback';
 
 const BookClubPage = () => {
     const { id: bookClubId } = useParams();
     const navigate = useNavigate();
     const { auth } = useContext(AuthContext);
+    const { toastSuccess, toastError } = useToast();
     
     const [bookClub, setBookClub] = useState(null);
     const [connectedUsers, setConnectedUsers] = useState([]);
@@ -204,13 +206,13 @@ const BookClubPage = () => {
                                             // Request to join private bookclub
                                             const response = await apiClient.post(`/v1/bookclubs/${bookClubId}/request`);
                                             const data = response.data;
-                                            alert('Join request sent! Wait for admin approval.');
+                                            toastSuccess('Join request sent! Wait for admin approval.');
                                             // Refresh page to update status
                                             window.location.reload();
                                         }
                                     } catch (error) {
                                         logger.error('Error joining bookclub:', error);
-                                        alert(error.response?.data?.message || 'Failed to join bookclub');
+                                        toastError(error.response?.data?.message || 'Failed to join bookclub');
                                     }
                                 }}
                                 className="px-8 py-4 bg-white text-purple-600 rounded-xl font-semibold hover:bg-purple-50 transition-all transform hover:scale-105 shadow-xl flex items-center gap-2"

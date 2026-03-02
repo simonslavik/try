@@ -9,6 +9,7 @@ import AddBookToBookclubModal from '@components/features/bookclub/Modals/AddBook
 import CreateRoomModal from '@components/features/bookclub/Modals/CreateRoomModal';
 import RoomSettingsModal from '@components/features/bookclub/Modals/RoomSettingsModal';
 import { COLLAB_EDITOR_URL } from '@config/constants';
+import { useConfirm, useToast } from '@hooks/useUIFeedback';
 
 // Function to convert URLs in text to clickable links
 const linkifyText = (text) => {
@@ -60,6 +61,8 @@ const BookClub = () => {
   const { auth, setAuth, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
+  const { confirm } = useConfirm();
+  const { toastSuccess, toastError } = useToast();
   
   // Bookclub states
   const [bookClub, setBookClub] = useState(null);
@@ -235,12 +238,12 @@ const BookClub = () => {
         ...settingsForm,
         requiresApproval: settingsForm.visibility === 'PRIVATE' ? settingsForm.requiresApproval : false
       });
-      alert('Settings updated successfully!');
+      toastSuccess('Settings updated successfully!');
       // Refresh bookclub data
       const response = await bookclubAPI.getBookclubPreview(bookClubId);
       setBookClub(response.data);
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to update settings');
+      toastError(error.response?.data?.message || 'Failed to update settings');
     } finally {
       setSavingSettings(false);
     }
@@ -295,11 +298,11 @@ const BookClub = () => {
         // Refresh the books list
         fetchBookclubBooks();
       } else {
-        alert(data.error || 'Failed to update book status');
+        toastError(data.error || 'Failed to update book status');
       }
     } catch (err) {
       logger.error('Error updating book status:', err);
-      alert('Failed to update book status');
+      toastError('Failed to update book status');
     }
   };
 
@@ -319,7 +322,7 @@ const BookClub = () => {
       }
     } catch (err) {
       logger.error('Error rating book:', err);
-      alert('Failed to rate book');
+      toastError('Failed to rate book');
       throw err;
     }
   };
@@ -339,7 +342,7 @@ const BookClub = () => {
       }
     } catch (err) {
       logger.error('Error removing rating:', err);
-      alert('Failed to remove rating');
+      toastError('Failed to remove rating');
       throw err;
     }
   };
@@ -516,7 +519,7 @@ const BookClub = () => {
       setReplyingTo(null); // Clear reply after sending
     } catch (error) {
       logger.error('Error sending message:', error);
-      alert('Failed to send message');
+      toastError('Failed to send message');
     } finally {
       setUploadingFiles(false);
     }
@@ -598,7 +601,7 @@ const BookClub = () => {
       setBookClub(prev => ({ ...prev, imageUrl: data.imageUrl }));
     } catch (err) {
       logger.error('Error uploading image:', err);
-      alert(err.response?.data?.error || 'Failed to upload image');
+      toastError(err.response?.data?.error || 'Failed to upload image');
     } finally {
       setUploadingImage(false);
       if (fileInputRef.current) {
@@ -608,14 +611,15 @@ const BookClub = () => {
   };
 
   const handleDeleteImage = async () => {
-    if (!confirm('Are you sure you want to delete the bookclub image?')) return;
+    const ok = await confirm('Are you sure you want to delete the bookclub image?', { title: 'Delete Image', variant: 'danger', confirmLabel: 'Delete' });
+    if (!ok) return;
 
     try {
       await apiClient.delete(`/v1/bookclubs/${bookClubId}/image`);
       setBookClub(prev => ({ ...prev, imageUrl: null }));
     } catch (err) {
       logger.error('Error deleting image:', err);
-      alert(err.response?.data?.error || 'Failed to delete image');
+      toastError(err.response?.data?.error || 'Failed to delete image');
     }
   };
 
@@ -627,11 +631,11 @@ const BookClub = () => {
       const data = response.data;
       logger.debug('Friend request response:', data);
       
-      alert('Friend request sent!');
+      toastSuccess('Friend request sent!');
       setSelectedUserId(null);
     } catch (err) {
       logger.error('Error sending friend request:', err);
-      alert(err.response?.data?.error || err.response?.data?.message || 'Failed to send friend request');
+      toastError(err.response?.data?.error || err.response?.data?.message || 'Failed to send friend request');
     }
   };
 
@@ -656,7 +660,7 @@ const BookClub = () => {
       return true;
     } catch (err) {
       logger.error('Error deleting event:', err);
-      alert(err.response?.data?.error || 'Failed to delete event');
+      toastError(err.response?.data?.error || 'Failed to delete event');
       return false;
     }
   };

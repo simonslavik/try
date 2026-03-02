@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FiLink, FiCopy, FiTrash2, FiPlus, FiCheck, FiCalendar, FiUsers } from 'react-icons/fi';
 import { bookclubAPI } from '@api/bookclub.api';
 import logger from '@utils/logger';
+import { useConfirm, useToast } from '@hooks/useUIFeedback';
 
 const InviteLinkManager = ({ bookclubId, userRole }) => {
   const [invites, setInvites] = useState([]);
@@ -11,6 +12,8 @@ const InviteLinkManager = ({ bookclubId, userRole }) => {
   const [expiresInDays, setExpiresInDays] = useState('');
   const [creating, setCreating] = useState(false);
   const [copiedCode, setCopiedCode] = useState(null);
+  const { confirm } = useConfirm();
+  const { toastError } = useToast();
 
   const isAdmin = userRole && ['OWNER', 'ADMIN'].includes(userRole);
 
@@ -44,20 +47,21 @@ const InviteLinkManager = ({ bookclubId, userRole }) => {
       setMaxUses('');
       setExpiresInDays('');
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to create invite');
+      toastError(error.response?.data?.message || 'Failed to create invite');
     } finally {
       setCreating(false);
     }
   };
 
   const handleDeleteInvite = async (inviteId) => {
-    if (!confirm('Are you sure you want to delete this invite?')) return;
+    const ok = await confirm('Are you sure you want to delete this invite?', { title: 'Delete Invite', variant: 'danger', confirmLabel: 'Delete' });
+    if (!ok) return;
 
     try {
       await bookclubAPI.deleteInvite(bookclubId, inviteId);
       setInvites(invites.filter(inv => inv.id !== inviteId));
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to delete invite');
+      toastError(error.response?.data?.message || 'Failed to delete invite');
     }
   };
 
