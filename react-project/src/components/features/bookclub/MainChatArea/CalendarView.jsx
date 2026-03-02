@@ -1,21 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { FiChevronLeft, FiChevronRight, FiPlus, FiEdit2, FiTrash2, FiVideo } from 'react-icons/fi';
+import { FiChevronLeft, FiChevronRight, FiVideo } from 'react-icons/fi';
 import apiClient from '@api/axios';
 import { bookclubAPI } from '@api/bookclub.api';
 import logger from '@utils/logger';
-import { useConfirm } from '@hooks/useUIFeedback';
 
-const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent, onEventSaved }) => {
+const CalendarView = ({ bookClubId }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedBook, setSelectedBook] = useState(null);
   const [bookClubBooks, setBookClubBooks] = useState([]);
   const [meetings, setMeetings] = useState([]);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const { confirm } = useConfirm();
 
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -25,19 +20,9 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   useEffect(() => {
-    fetchEvents();
     fetchBookClubBooks();
     fetchMeetings();
-  }, [bookClubId, refreshTrigger]);
-
-  // Expose refresh function to parent via callback (only once on mount)
-  useEffect(() => {
-    if (onEventSaved) {
-      // Pass refresh function to parent
-      const refresh = () => setRefreshTrigger(prev => prev + 1);
-      onEventSaved(refresh);
-    }
-  }, []);
+  }, [bookClubId]);
 
   // Listen for meeting refresh events (triggered when meetings are created/edited/deleted)
   useEffect(() => {
@@ -51,16 +36,16 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
     };
   }, [bookClubId]);
 
-  const fetchEvents = async () => {
-    try {
-      const { data } = await apiClient.get(`/v1/editor/bookclubs/${bookClubId}/events`);
-      setEvents(data.events || []);
-    } catch (error) {
-      logger.error('Error fetching events:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Listen for book changes (triggered when books are added/updated)
+  useEffect(() => {
+    const originalBookRefresh = window.__calendarBookRefresh;
+    window.__calendarBookRefresh = () => {
+      fetchBookClubBooks();
+    };
+    return () => {
+      window.__calendarBookRefresh = originalBookRefresh;
+    };
+  }, [bookClubId]);
 
   const fetchBookClubBooks = async () => {
     try {
@@ -103,19 +88,6 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
     }
     
     return days;
-  };
-
-  const getEventsForDate = (date) => {
-    if (!date) return [];
-    
-    return events.filter(event => {
-      const eventDate = new Date(event.eventDate);
-      return (
-        eventDate.getDate() === date.getDate() &&
-        eventDate.getMonth() === date.getMonth() &&
-        eventDate.getFullYear() === date.getFullYear()
-      );
-    });
   };
 
   const getMeetingsForDate = (date) => {
@@ -217,26 +189,6 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
     );
   };
 
-  const getEventTypeColor = (type) => {
-    const colors = {
-      meeting: 'bg-blue-500',
-      book_deadline: 'bg-red-500',
-      discussion: 'bg-green-500',
-      other: 'bg-purple-500'
-    };
-    return colors[type] || colors.other;
-  };
-
-  const getEventTypeLabel = (type) => {
-    const labels = {
-      meeting: 'Meeting',
-      book_deadline: 'Book Deadline',
-      discussion: 'Discussion',
-      other: 'Event'
-    };
-    return labels[type] || 'Event';
-  };
-
   const days = getDaysInMonth(currentDate);
 
   if (loading) {
@@ -268,17 +220,12 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
             <FiChevronRight className="text-white" />
           </button>
         </div>
-        <div className="flex gap-2">
-          
-          {auth?.user && (
-            <button
-              onClick={() => onAddEvent && onAddEvent()}
-              className="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded transition-colors flex items-center gap-1 text-sm"
-            >
-              <FiPlus size={16} /> Add Event
-            </button>
-          )}
-        </div>
+        <button
+          onClick={handleToday}
+          className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors text-sm"
+        >
+          Today
+        </button>
       </div>
 
       {/* Day names */}
@@ -293,7 +240,6 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
       {/* Calendar grid */}
       <div className="grid grid-cols-7 gap-1">
         {days.map((date, index) => {
-          const dayEvents = getEventsForDate(date);
           const dayBooks = getBooksForDate(date);
           const dayMeetings = getMeetingsForDate(date);
           const today = isToday(date);
@@ -307,13 +253,7 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
                     ? 'bg-purple-900 bg-opacity-30 border-purple-500'
                     : 'bg-gray-700 border-gray-600 hover:bg-gray-650'
                   : 'bg-transparent border-transparent'
-              } ${date && auth?.user ? 'cursor-pointer' : ''}`}
-              onClick={(e) => {
-                // Only trigger on the cell itself, not on events/books
-                if (date && auth?.user && e.target === e.currentTarget) {
-                  onAddEvent && onAddEvent(date);
-                }
-              }}
+              }`}
             >
               {date && (
                 <>
@@ -321,18 +261,6 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
                     {date.getDate()}
                   </div>
                   <div className="space-y-1">
-                    {/* Events */}
-                    {dayEvents.map(event => (
-                      <div
-                        key={event.id}
-                        className={`text-xs p-1 rounded ${getEventTypeColor(event.eventType)} text-white cursor-pointer hover:opacity-80 transition-opacity`}
-                        onClick={() => setSelectedEvent(event)}
-                        title={event.title}
-                      >
-                        <div className="font-semibold truncate">{event.title}</div>
-                      </div>
-                    ))}
-                    
                     {/* Meetings */}
                     {dayMeetings.map(meeting => (
                       <div
@@ -366,78 +294,6 @@ const CalendarView = ({ bookClubId, auth, onAddEvent, onEditEvent, onDeleteEvent
           );
         })}
       </div>
-
-      {/* Event details modal */}
-      {selectedEvent && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setSelectedEvent(null)}>
-          <div className="bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4 border border-gray-700" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-white text-xl font-bold">{selectedEvent.title}</h3>
-              <button
-                onClick={() => setSelectedEvent(null)}
-                className="text-gray-400 hover:text-white"
-              >
-                ✕
-              </button>
-            </div>
-            
-            <div className="space-y-3 mb-4">
-              <div>
-                <span className="text-gray-400 text-sm">Type:</span>
-                <div className={`inline-block ml-2 px-2 py-1 rounded text-xs ${getEventTypeColor(selectedEvent.eventType)} text-white`}>
-                  {getEventTypeLabel(selectedEvent.eventType)}
-                </div>
-              </div>
-              
-              <div>
-                <span className="text-gray-400 text-sm">Date:</span>
-                <div className="text-white">
-                  {new Date(selectedEvent.eventDate).toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </div>
-              </div>
-              
-              {selectedEvent.description && (
-                <div>
-                  <span className="text-gray-400 text-sm">Description:</span>
-                  <div className="text-white mt-1">{selectedEvent.description}</div>
-                </div>
-              )}
-            </div>
-
-            {auth?.user?.id && selectedEvent?.createdBy && auth.user.id === selectedEvent.createdBy && (
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    onEditEvent && onEditEvent(selectedEvent);
-                    setSelectedEvent(null);
-                  }}
-                  className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors flex items-center justify-center gap-2"
-                >
-                  <FiEdit2 size={16} /> Edit
-                </button>
-                <button
-                  onClick={async () => {
-                    const ok = await confirm('Are you sure you want to delete this event?', { title: 'Delete Event', variant: 'danger', confirmLabel: 'Delete' });
-                    if (ok) {
-                      await onDeleteEvent(selectedEvent.id);
-                      setSelectedEvent(null);
-                      fetchEvents();
-                    }
-                  }}
-                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded transition-colors flex items-center justify-center gap-2"
-                >
-                  <FiTrash2 size={16} /> Delete
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Meeting details modal */}
       {selectedMeeting && (
