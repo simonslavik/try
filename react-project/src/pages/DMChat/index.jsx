@@ -42,6 +42,8 @@ const DMChatPage = () => {
   const [friends, setFriends] = useState([]);
   const [myBookClubs, setMyBookClubs] = useState([]);
   const [replyingTo, setReplyingTo] = useState(null);
+  const [hasMoreDM, setHasMoreDM] = useState(false);
+  const [loadingOlderDM, setLoadingOlderDM] = useState(false);
   
   const dmWs = useRef(null);
 
@@ -222,6 +224,7 @@ const DMChatPage = () => {
       
       const messagesInOrder = [...(data.data.messages || [])].reverse().map(normalizeMessage);
       setDmMessages(messagesInOrder);
+      setHasMoreDM(data.pagination?.hasMore || false);
       setCurrentDMUser(data.data.otherUser);
       
       // Mark conversation as read
@@ -231,12 +234,34 @@ const DMChatPage = () => {
       if (userFromConv) {
         setCurrentDMUser(userFromConv);
         setDmMessages([]);
+        setHasMoreDM(false);
         
         // Mark conversation as read even if no messages yet
         await markConversationAsRead(userId);
       } else {
         logger.error('Error fetching DM messages:', err);
       }
+    }
+  };
+
+  const loadOlderDMMessages = async () => {
+    if (!auth?.token || !currentDMUser?.id || loadingOlderDM || !hasMoreDM || dmMessages.length === 0) return;
+    setLoadingOlderDM(true);
+    try {
+      const oldestTimestamp = dmMessages[0]?.createdAt;
+      const response = await apiClient.get(`/v1/messages/${currentDMUser.id}`, {
+        params: { before: oldestTimestamp, limit: 50 }
+      });
+      const data = response.data;
+      const olderMessages = [...(data.data.messages || [])].reverse().map(normalizeMessage);
+      setHasMoreDM(data.pagination?.hasMore || false);
+      if (olderMessages.length > 0) {
+        setDmMessages(prev => [...olderMessages, ...prev]);
+      }
+    } catch (err) {
+      logger.error('Error loading older DM messages:', err);
+    } finally {
+      setLoadingOlderDM(false);
     }
   };
 
@@ -322,6 +347,9 @@ const DMChatPage = () => {
           dmWs={dmWs}
           replyingTo={replyingTo}
           setReplyingTo={setReplyingTo}
+          hasMoreMessages={hasMoreDM}
+          loadingOlder={loadingOlderDM}
+          onLoadOlder={loadOlderDMMessages}
         />
       </div>
     </div>

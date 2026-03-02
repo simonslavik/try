@@ -167,7 +167,10 @@ const BookClub = () => {
     unreadSections,
     viewSection,
     notifySectionActivity,
-    lastReadAt
+    lastReadAt,
+    hasMoreMessages,
+    loadingOlder,
+    loadOlderMessages
   } = useBookclubWebSocket(bookClub, currentRoom, auth, bookClubId, { onInit: handleWsInit });
 
   // Extract user's role from bookClubMembers
@@ -1155,6 +1158,9 @@ const BookClub = () => {
                 onSendFriendRequest={handleSendFriendRequest}
                 connectedUsers={connectedUsers}
                 lastReadAt={lastReadAt}
+                hasMoreMessages={hasMoreMessages}
+                loadingOlder={loadingOlder}
+                onLoadOlder={loadOlderMessages}
               />
             )}
 

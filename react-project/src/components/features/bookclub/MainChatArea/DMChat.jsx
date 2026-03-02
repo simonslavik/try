@@ -11,17 +11,19 @@ import { getProfileImageUrl } from '@config/constants';
 import logger from '@utils/logger';
 import { useConfirm, useToast } from '@hooks/useUIFeedback';
 
-const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, replyingTo, setReplyingTo }) => {
+const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, replyingTo, setReplyingTo, hasMoreMessages = false, loadingOlder = false, onLoadOlder }) => {
   const [newMessage, setNewMessage] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState(false);
   const [messageMenuId, setMessageMenuId] = useState(null);
   const [copiedMessageId, setCopiedMessageId] = useState(null);
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const fileUploadRef = useRef(null);
   const menuRef = useRef(null);
   const inputRef = useRef(null);
   const prevMessageCountRef = useRef(messages.length);
+  const isLoadingOlderRef = useRef(false);
   const navigate = useNavigate();
   const { confirm } = useConfirm();
   const { toastError } = useToast();
@@ -59,19 +61,46 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
     return { groupWithPrevious, isLastInGroup };
   };
 
-  // Scroll only on new messages or conversation change
+  // Scroll only on new messages (not when prepending older ones)
   useEffect(() => {
-    if (messages.length > prevMessageCountRef.current) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messages.length > prevMessageCountRef.current && !isLoadingOlderRef.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
     }
+    isLoadingOlderRef.current = false;
     prevMessageCountRef.current = messages.length;
   }, [messages]);
 
   useEffect(() => {
     if (otherUser) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
     }
   }, [otherUser]);
+
+  // Scroll-to-top detection for loading older messages
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      if (container.scrollTop < 100 && hasMoreMessages && !loadingOlder) {
+        isLoadingOlderRef.current = true;
+        const prevScrollHeight = container.scrollHeight;
+        const prevScrollTop = container.scrollTop;
+
+        const observer = new MutationObserver(() => {
+          observer.disconnect();
+          const newScrollHeight = container.scrollHeight;
+          container.scrollTop = prevScrollTop + (newScrollHeight - prevScrollHeight);
+        });
+        observer.observe(container, { childList: true, subtree: true });
+
+        onLoadOlder?.();
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [hasMoreMessages, loadingOlder, onLoadOlder]);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -246,7 +275,12 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-900">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-900">
+        {loadingOlder && (
+          <div className="flex justify-center py-3">
+            <div className="w-5 h-5 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
         {messages.length === 0 ? (
           <div className="text-center text-gray-500 mt-8">
             <p className="text-sm">No messages yet. Start the conversation!</p>

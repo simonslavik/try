@@ -58,14 +58,18 @@ export class DirectMessageRepository {
   /**
    * Get conversation between two users
    */
-  static async getConversation(userId1: string, userId2: string, limit = 50, offset = 0) {
+  static async getConversation(userId1: string, userId2: string, limit = 50, offset = 0, before?: string) {
+    const where: any = {
+      OR: [
+        { senderId: userId1, receiverId: userId2 },
+        { senderId: userId2, receiverId: userId1 },
+      ],
+    };
+    if (before) {
+      where.createdAt = { lt: new Date(before) };
+    }
     return await prisma.directMessage.findMany({
-      where: {
-        OR: [
-          { senderId: userId1, receiverId: userId2 },
-          { senderId: userId2, receiverId: userId1 },
-        ],
-      },
+      where,
       include: {
         sender: { select: USER_BASIC_FIELDS },
         receiver: { select: USER_BASIC_FIELDS },
@@ -81,7 +85,7 @@ export class DirectMessageRepository {
       },
       orderBy: { createdAt: 'desc' },
       take: limit,
-      skip: offset,
+      skip: before ? 0 : offset,
     });
   }
 
