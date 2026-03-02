@@ -11,6 +11,8 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
   const [unreadRooms, setUnreadRooms] = useState(new Set());
   const [unreadSections, setUnreadSections] = useState(new Set());
   const [lastReadAt, setLastReadAt] = useState(null);
+  const [hasMoreMessages, setHasMoreMessages] = useState(false);
+  const [loadingOlder, setLoadingOlder] = useState(false);
   const { toastError } = useContext(UIFeedbackContext);
   const reconnectTimeoutRef = useRef(null);
   const isIntentionalCloseRef = useRef(false);
@@ -106,6 +108,7 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
                 attachments: msg.attachments || [],
                 reactions: msg.reactions || []
               })));
+              setHasMoreMessages(data.hasMore || false);
               setConnectedUsers(data.users || []);
               if (data.members) {
                 setBookClubMembers(data.members);
@@ -187,6 +190,7 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
               });
               // Set lastReadAt for the switched room
               setLastReadAt(data.lastReadAt || null);
+              setHasMoreMessages(data.hasMore || false);
               setMessages(data.messages.map(msg => ({
                 id: msg.id,
                 username: msg.username,
@@ -211,6 +215,30 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
                   ? { ...msg, reactions: data.reactions }
                   : msg
               ));
+              break;
+
+            case 'older-messages':
+              setLoadingOlder(false);
+              setHasMoreMessages(data.hasMore || false);
+              if (data.messages && data.messages.length > 0) {
+                const olderMsgs = data.messages.map(msg => ({
+                  id: msg.id,
+                  username: msg.username,
+                  profileImage: msg.profileImage,
+                  text: msg.content,
+                  timestamp: msg.createdAt,
+                  userId: msg.userId,
+                  isPinned: msg.isPinned,
+                  deletedAt: msg.deletedAt,
+                  deletedBy: msg.deletedBy,
+                  editedAt: msg.editedAt,
+                  replyToId: msg.replyToId,
+                  replyTo: msg.replyTo || null,
+                  attachments: msg.attachments || [],
+                  reactions: msg.reactions || []
+                }));
+                setMessages(prev => [...olderMsgs, ...prev]);
+              }
               break;
 
             case 'message-edited':
@@ -317,6 +345,23 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
     }
   }, []);
 
+  // Load older messages (cursor-based pagination)
+  const loadOlderMessages = useCallback(() => {
+    if (!ws.current || ws.current.readyState !== WebSocket.OPEN || loadingOlder || !hasMoreMessages) return;
+    setLoadingOlder(true);
+    // Use the timestamp of the oldest message as cursor
+    setMessages(current => {
+      if (current.length === 0) return current;
+      const oldest = current[0];
+      ws.current.send(JSON.stringify({
+        type: 'load-older-messages',
+        before: oldest.timestamp,
+        limit: 50
+      }));
+      return current;
+    });
+  }, [loadingOlder, hasMoreMessages]);
+
   return { 
     ws, 
     messages, 
@@ -330,6 +375,9 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
     unreadSections,
     viewSection,
     notifySectionActivity,
-    lastReadAt
+    lastReadAt,
+    hasMoreMessages,
+    loadingOlder,
+    loadOlderMessages
   };
 };

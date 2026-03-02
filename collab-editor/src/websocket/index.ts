@@ -15,7 +15,8 @@ import {
   handleDisconnect,
   handleStatusUpdate,
   handleViewSection,
-  handleSectionActivity
+  handleSectionActivity,
+  handleLoadOlderMessages
 } from './handlers.js';
 import { handleAddReaction, handleRemoveReaction } from './reactionHandler.js';
 
@@ -85,6 +86,10 @@ export const setupWebSocket = (wss: WebSocketServer) => {
           
           case 'switch-room':
             handleSwitchRoom(message, currentClient);
+            break;
+          
+          case 'load-older-messages':
+            handleLoadOlderMessages(message, currentClient);
             break;
           
           case 'chat-message':

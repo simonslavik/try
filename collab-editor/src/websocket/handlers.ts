@@ -338,6 +338,7 @@ export const handleJoin = (
         },
         currentRoomId: targetRoomId,
         messages: enrichedMessages,
+        hasMore: recentMessages.length === 100,
         members: memberDetails,
         userRole: membership.role,
         unreadRoomIds,
@@ -480,6 +481,7 @@ export const handleSwitchRoom = (message: any, currentClient: Client | null) => 
         roomId,
         roomType: room.type,
         messages: messagesWithReactions,
+        hasMore: messages.length === 100,
         lastReadAt: switchedLastReadAt ? switchedLastReadAt.toISOString() : null
       }));
 
@@ -650,6 +652,69 @@ export const handleJoinDM = (
   }));
   
   console.log(`📨 ${username} (${userId}) joined DM connection`);
+};
+
+export const handleLoadOlderMessages = async (message: any, currentClient: Client | null) => {
+  if (!currentClient || !currentClient.roomId) return;
+
+  const { before, limit = 50 } = message;
+  if (!before) return;
+
+  try {
+    const olderMessages = await prisma.message.findMany({
+      where: {
+        roomId: currentClient.roomId,
+        createdAt: { lt: new Date(before) }
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+      select: {
+        id: true,
+        content: true,
+        userId: true,
+        username: true,
+        profileImage: true,
+        isPinned: true,
+        deletedAt: true,
+        deletedBy: true,
+        editedAt: true,
+        replyToId: true,
+        replyTo: {
+          select: {
+            id: true,
+            content: true,
+            username: true,
+            userId: true
+          }
+        },
+        createdAt: true,
+        attachments: true
+      }
+    });
+
+    // Reverse to chronological order
+    olderMessages.reverse();
+
+    // Attach reactions
+    const messageIds = olderMessages.map(msg => msg.id);
+    const reactionsMap = await getReactionsForMessages(messageIds);
+    const enrichedMessages = olderMessages.map(msg => ({
+      ...msg,
+      reactions: reactionsMap.get(msg.id) || []
+    }));
+
+    currentClient.ws.send(JSON.stringify({
+      type: 'older-messages',
+      messages: enrichedMessages,
+      hasMore: olderMessages.length === limit
+    }));
+  } catch (error) {
+    console.error('Error loading older messages:', error);
+    currentClient.ws.send(JSON.stringify({
+      type: 'error',
+      message: 'Failed to load older messages'
+    }));
+  }
 };
 
 export const handleDMMessage = async (message: any, currentClient: Client | null) => {

@@ -22,12 +22,14 @@ export const getDirectMessages = async (req: Request, res: Response) => {
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 50;
         const offset = (page - 1) * limit;
+        const before = req.query.before as string | undefined;
 
         const result = await DirectMessageService.getConversation(
             currentUserId,
             otherUserId,
             limit,
-            offset
+            offset,
+            before
         );
 
         // Get total count for pagination

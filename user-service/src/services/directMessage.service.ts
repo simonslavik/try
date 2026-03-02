@@ -74,14 +74,16 @@ export class DirectMessageService {
     userId: string,
     partnerId: string,
     limit = 50,
-    offset = 0
+    offset = 0,
+    before?: string
   ) {
     // Allow DMs without friendship requirement (bookclub members can DM each other)
     const messages = await DirectMessageRepository.getConversation(
       userId,
       partnerId,
       limit,
-      offset
+      offset,
+      before
     );
 
     // Normalize reactions in all messages

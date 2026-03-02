@@ -7,8 +7,9 @@ import OwnMessage from '../chat/OwnMessage';
 import OtherMessage from '../chat/OtherMessage';
 import { shouldGroupMessages } from '../chat/messageUtils';
 
-const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, members = [], onReply, friends = [], onSendFriendRequest, connectedUsers = [], lastReadAt }) => {
+const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, members = [], onReply, friends = [], onSendFriendRequest, connectedUsers = [], lastReadAt, hasMoreMessages = false, loadingOlder = false, onLoadOlder }) => {
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const editInputRef = useRef(null);
   const menuRef = useRef(null);
 
@@ -23,14 +24,44 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
   const canModerate = userRole && ['OWNER', 'ADMIN', 'MODERATOR'].includes(userRole);
   const currentUserId = auth?.user?.id;
   const prevMessageCountRef = useRef(messages.length);
+  const isLoadingOlderRef = useRef(false);
 
-  // ── Scroll only on NEW messages ─────────────────────────
+  // ── Scroll only on NEW messages (not when prepending older ones) ──
   useEffect(() => {
-    if (messages.length > prevMessageCountRef.current) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messages.length > prevMessageCountRef.current && !isLoadingOlderRef.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
     }
+    isLoadingOlderRef.current = false;
     prevMessageCountRef.current = messages.length;
   }, [messages]);
+
+  // ── Scroll-to-top detection for loading older messages ──
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      if (container.scrollTop < 100 && hasMoreMessages && !loadingOlder) {
+        isLoadingOlderRef.current = true;
+        // Save scroll state to restore position after prepend
+        const prevScrollHeight = container.scrollHeight;
+        const prevScrollTop = container.scrollTop;
+
+        // Wait for messages to be prepended, then restore scroll position
+        const observer = new MutationObserver(() => {
+          observer.disconnect();
+          const newScrollHeight = container.scrollHeight;
+          container.scrollTop = prevScrollTop + (newScrollHeight - prevScrollHeight);
+        });
+        observer.observe(container, { childList: true, subtree: true });
+
+        onLoadOlder?.();
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [hasMoreMessages, loadingOlder, onLoadOlder]);
 
   // ── Close menu on outside click ─────────────────────────
   useEffect(() => {
@@ -206,7 +237,12 @@ const BookClubChat = ({ messages, setMessages, currentRoom, auth, userRole, ws, 
 
   // ── Render ──────────────────────────────────────────────
   return (
-    <div className="flex-1 overflow-y-auto p-1 space-y-1">
+    <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-1 space-y-1">
+      {loadingOlder && (
+        <div className="flex justify-center py-3">
+          <div className="w-5 h-5 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
       {messages.length === 0 ? (
         <div className="text-center text-gray-500 mt-8">
           <FiHash className="mx-auto text-4xl mb-2 opacity-30" />
