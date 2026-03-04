@@ -2,6 +2,7 @@ import { createContext, useState, useEffect, useRef, useCallback } from "react";
 import axios from 'axios';
 import { API_URL } from '@config/constants';
 import logger from '@utils/logger';
+import { clearCache } from '@utils/apiCache';
 
 const AuthContext = createContext({});
 
@@ -39,6 +40,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const logout = useCallback(() => {
+        clearCache();
         setAuth({ user: null, token: null, refreshToken: null });
     }, [setAuth]);
 
