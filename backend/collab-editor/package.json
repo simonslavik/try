@@ -21,6 +21,7 @@
     "@types/multer": "^2.0.0",
     "cors": "^2.8.5",
     "express": "^4.21.2",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.0.2",
     "prom-client": "^15.1.3",

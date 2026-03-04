@@ -238,7 +238,7 @@ const NotificationBell = () => {
 
       {/* Dropdown */}
       {showDropdown && (
-        <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-[500px] overflow-hidden flex flex-col">
+        <div className="absolute right-0 mt-2 w-60 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-[500px] overflow-hidden flex flex-col">
           {/* Header */}
           <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg">
             <div className="flex justify-center">
@@ -265,7 +265,7 @@ const NotificationBell = () => {
             )}
             {!loading && notifications.length === 0 && (
               <div className="text-center py-8">
-                <FiBell className="mx-auto h-10 w-10 text-gray-300 mb-2" />
+                <FiBell className="mx-auto h-5 w-5 text-gray-300 mb-2" />
                 <p className="text-sm text-gray-500">No notifications yet</p>
               </div>
             )}

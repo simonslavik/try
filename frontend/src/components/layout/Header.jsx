@@ -109,14 +109,14 @@ const HomePageHeader = () => {
                         </span>
                     )}
                     {newsShowDropdown && (
-                        <div className="absolute right-4 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
+                        <div className="absolute right-4 mt-2 w-60 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
                             <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg">
                                 <h3 className="text-sm font-semibold text-gray-900">Friend Requests</h3>
                                 <p className="text-xs text-gray-500 mt-0.5">{friendRequests.length} pending</p>
                             </div>
                             {friendRequests.length === 0 ? (
                                 <div className="px-4 py-8 text-center">
-                                    <FiUsers className="mx-auto h-12 w-12 text-gray-300 mb-2" />
+                                    <FiUsers className="mx-auto h-6 w-6 text-gray-300 mb-2" />
                                     <p className="text-sm text-gray-500">No new friend requests</p>
                                 </div>
                             ) : (

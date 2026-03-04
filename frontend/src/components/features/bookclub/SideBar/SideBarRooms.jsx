@@ -101,7 +101,7 @@ const SideBarRooms = ({
 
     if (!bookClub) {
         return (
-            <div className="w-64 bg-gray-800 border-r border-gray-700 flex items-center justify-center h-full">
+            <div className="w-full bg-gray-800 border-r border-gray-700 flex items-center justify-center h-full">
                 <p className="text-gray-400">Loading...</p>
             </div>
         );
@@ -109,7 +109,7 @@ const SideBarRooms = ({
 
     return (
           <>
-          <div className="w-64 bg-gray-800 border-r border-gray-700 flex flex-col h-full  overflow-y-auto">
+          <div className="w-full bg-gray-800 border-r border-gray-700 flex flex-col h-full  overflow-y-auto">
             {/* Bookclub Header with Image */}
             <div className="p-4 border-b border-gray-700 flex-shrink-0">
               {/* Bookclub Image */}

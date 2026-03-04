@@ -54,6 +54,7 @@ import { FiX, FiSettings as FiSettingsIcon, FiLock, FiUnlock, FiEyeOff, FiImage,
 import apiClient from '@api/axios';
 import logger from '@utils/logger';
 import { ChatSkeleton, SidebarSkeleton } from '@components/common/Skeleton';
+import ResizablePanel from '@components/common/ResizablePanel';
 
 
 const BookClub = () => {
@@ -759,6 +760,13 @@ const BookClub = () => {
           />
           
           {/* Bookclub Rooms Sidebar */}
+          <ResizablePanel
+            side="right"
+            defaultWidth={256}
+            minWidth={180}
+            maxWidth={400}
+            storageKey="bookclub-rooms-width"
+          >
           <SideBarRooms
             bookClub={bookClub}
             rooms={rooms}
@@ -816,6 +824,7 @@ const BookClub = () => {
             unreadRooms={unreadRooms}
             unreadSections={unreadSections}
           />
+          </ResizablePanel>
         </div>
         
         <div className="flex flex-1">
@@ -1187,6 +1196,13 @@ const BookClub = () => {
           </div>
 
           {/* Connected Users Sidebar */}
+          <ResizablePanel
+            side="left"
+            defaultWidth={176}
+            minWidth={120}
+            maxWidth={320}
+            storageKey="bookclub-users-width"
+          >
           <ConnectedUsersSidebar
               bookClubMembers={mappedBookClubMembers}
               connectedUsers={connectedUsers}
@@ -1194,6 +1210,7 @@ const BookClub = () => {
               auth={auth}
               onSendFriendRequest={handleSendFriendRequest}
             />
+          </ResizablePanel>
         </div>
 
 

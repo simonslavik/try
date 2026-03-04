@@ -4,6 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import logger from './utils/logger';
 import errorHandler from './middleware/errorHandler';
+import { requestLogger } from './middleware/requestLogger';
 import { metricsMiddleware, metricsEndpoint } from './middleware/metrics';
 import { connectRedis } from './config/redis';
 import prisma from './config/database';
@@ -15,11 +16,12 @@ import bookSuggestionsRoutes from './routes/bookSuggestionsRoutes';
 
 const app: Express = express();
 const PORT = process.env.PORT || 3002;
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 // Security Middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.GATEWAY_URL || 'http://localhost:3000',
+  origin: FRONTEND_URL,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Gateway-Source', 'X-Request-ID', 'X-Forwarded-For', 'X-User-Id', 'X-User-Email', 'X-User-Name'],
@@ -30,10 +32,7 @@ app.use(express.json({ limit: '10kb' }));
 app.use(metricsMiddleware);
 
 // Request logging middleware
-app.use((req, res, next) => {
-  logger.info(`${req.method} ${req.path}`);
-  next();
-});
+app.use(requestLogger);
 
 // Health check with DB connectivity
 app.get('/health', async (_req, res) => {
