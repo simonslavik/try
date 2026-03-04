@@ -435,7 +435,7 @@ const ProfilePage = () => {
             </div>
 
             {/* Stats Row */}
-            <div className="mt-6 pt-6 border-warmgray-200 flex items-center justify-center md:justify-start gap-4 md:gap-12">
+            <div className="mt-6 pt-6  flex items-center justify-center md:justify-start gap-4 md:gap-12">
               <div className="flex items-center">
                 <div className="w-10 h-10 rounded-xl bg-stone-50 flex items-center justify-center">
                   <FiBook className="text-stone-600" size={18} />
@@ -470,7 +470,7 @@ const ProfilePage = () => {
           </div>
 
           {createdBookClubs.length === 0 && memberBookClubs.length === 0 ? (
-            <div className="bg-white rounded-2xl shadow-sm border border-warmgray-200 p-12 text-center">
+            <div className="bg-white rounded-2xl shadow-sm  p-12 text-center">
               <div className="w-16 h-16 bg-stone-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <FiBook className="text-stone-400" size={28} />
               </div>
@@ -673,7 +673,7 @@ const ProfilePage = () => {
                           onError={(e) => { e.target.src = '/images/default.webp'; }}
                         />
                         {/* Hover overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-end p-3 gap-2">
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-100 flex flex-col items-center justify-end p-3 gap-2">
                           <div className="flex items-center gap-2">
                             {isOwnProfile && (
                               <button
@@ -695,7 +695,7 @@ const ProfilePage = () => {
                               }}
                               className="p-2 bg-white/90 hover:bg-white text-gray-800 rounded-lg transition-colors"
                             >
-                              <FiInfo size={16} />
+                              <FiInfo size={8} />
                             </button>
                           </div>
                         </div>

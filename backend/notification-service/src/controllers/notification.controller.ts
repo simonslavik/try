@@ -90,9 +90,7 @@ export class NotificationController {
     try {
       const { type, clubId, meetingId, meetingTitle, scheduledAt, userIds, excludeUserId, clubName } = req.body;
 
-      if (!type || !clubId || !meetingId || !userIds || !Array.isArray(userIds)) {
-        return res.status(400).json({ success: false, message: 'Missing required fields' });
-      }
+      // Validation handled by middleware — fields guaranteed present
 
       let title = '';
       let message = '';

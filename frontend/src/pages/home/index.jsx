@@ -201,35 +201,25 @@ const Home = () => {
                             if (displayed.length === 0) {
                                 return (
                                     <div className="flex flex-col items-center justify-center py-8 text-gray-500">
-                                        {filterCreatedByMe ? (
-                                            <>
-                                                <p className="mb-3">You haven't created any bookclubs yet.</p>
-                                                <button
-                                                    onClick={createNewBookClub}
-                                                    className="px-4 py-2 bg-stone-600 text-white rounded-lg hover:bg-stone-700 transition-colors text-sm font-medium"
-                                                >
-                                                    Create Your First Book Club
-                                                </button>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <p className="mb-3">You're not in any bookclubs yet.</p>
-                                                <div className="flex gap-3">
-                                                    <button
-                                                        onClick={createNewBookClub}
-                                                        className="px-4 py-2 bg-stone-600 text-white rounded-lg hover:bg-stone-700 transition-colors text-sm font-medium"
-                                                    >
-                                                        Create Book Club
-                                                    </button>
-                                                    <button
-                                                        onClick={() => navigate('/discover')}
-                                                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors"
-                                                    >
-                                                        Discover
-                                                    </button>
-                                                </div>
-                                            </>
-                                        )}
+                                        <p className="mb-5">
+                                            {filterCreatedByMe
+                                                ? "You haven't created any bookclubs yet."
+                                                : "You're not in any bookclubs yet."}
+                                        </p>
+                                        <div
+                                            onClick={createNewBookClub}
+                                            className="w-[300px] h-[440px] rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all duration-500 ease-out group hover:shadow-xl"
+                                            style={{
+                                                background: '#faf9f7',
+                                                border: '2px dashed #1d1104',
+                                                boxShadow: '0 12px 40px rgba(180, 160, 130, 0.15)',
+                                            }}
+                                        >
+                                            <div className="w-16 h-16 rounded-full bg-stone-100 group-hover:bg-stone-200 flex items-center justify-center transition-colors mb-3">
+                                                <span className="text-3xl text-stone-500 group-hover:text-stone-700 transition-colors">+</span>
+                                            </div>
+                                            <span className="text-sm text-gray-600 group-hover:text-stone-800 font-semibold transition-colors">Create Book Club</span>
+                                        </div>
                                     </div>
                                 );
                             }

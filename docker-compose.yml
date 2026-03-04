@@ -114,6 +114,7 @@ services:
       JWT_EXPIRATION: ${JWT_EXPIRATION:-15m}
       JWT_EXPIRES_IN: ${JWT_EXPIRATION:-15m}
       JWT_REFRESH_EXPIRES_IN: 7d
+      FRONTEND_URL: http://localhost:5173
       NODE_ENV: development
     depends_on:
       postgres-users:
@@ -170,6 +171,7 @@ services:
       USER_SERVICE_URL: http://user-service:3001/api
       BOOKS_SERVICE_URL: http://books-service:3002
       NOTIFICATION_SERVICE_URL: http://notification-service:3005
+      FRONTEND_URL: http://localhost:5173
     depends_on:
       postgres-collab:
         condition: service_healthy
@@ -194,6 +196,7 @@ services:
       GOOGLE_BOOKS_API_KEY: ${GOOGLE_BOOKS_API_KEY}
       REDIS_URL: redis://redis:6379
       COLLAB_EDITOR_URL: http://collab-editor:4000
+      FRONTEND_URL: http://localhost:5173
     depends_on:
       postgres-books:
         condition: service_healthy
@@ -225,6 +228,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       COLLAB_EDITOR_URL: http://collab-editor:4000
       USER_SERVICE_URL: http://user-service:3001
+      FRONTEND_URL: http://localhost:5173
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USER: ${SMTP_USER:-}
