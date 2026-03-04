@@ -12,25 +12,89 @@ services:
     networks:
       - microservices-network
 
-  postgres:
-    image: postgres:15
+  # ─── Databases (one per service) ─────────────────────
+  postgres-users:
+    image: postgres:16-alpine
     platform: linux/amd64
-    container_name: postgres-db
+    container_name: postgres-users
     ports:
       - "5432:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_DB: users_db
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - pgdata-users:/var/lib/postgresql/data
     restart: unless-stopped
     networks:
       - microservices-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  postgres-collab:
+    image: postgres:16-alpine
+    platform: linux/amd64
+    container_name: postgres-collab
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: collab_db
+    volumes:
+      - pgdata-collab:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  postgres-books:
+    image: postgres:16-alpine
+    platform: linux/amd64
+    container_name: postgres-books
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: books_db
+    volumes:
+      - pgdata-books:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  postgres-notifications:
+    image: postgres:16-alpine
+    platform: linux/amd64
+    container_name: postgres-notifications
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: notifications_db
+    volumes:
+      - pgdata-notifications:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
       retries: 5
 
   user-service:
@@ -42,7 +106,7 @@ services:
       - "3001"
     environment:
       PORT: 3001
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?connection_limit=20&pool_timeout=30
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-users:5432/users_db?connection_limit=20&pool_timeout=30
       JWT_SECRET: ${JWT_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
@@ -52,7 +116,7 @@ services:
       JWT_REFRESH_EXPIRES_IN: 7d
       NODE_ENV: development
     depends_on:
-      postgres:
+      postgres-users:
         condition: service_healthy
     restart: unless-stopped
     networks:
@@ -100,14 +164,14 @@ services:
       - "4000:4000"
     environment:
       PORT: 4000
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/collab_editor?connection_limit=20&pool_timeout=30
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-collab:5432/collab_db?connection_limit=20&pool_timeout=30
       NODE_ENV: development
       JWT_SECRET: ${JWT_SECRET}
       USER_SERVICE_URL: http://user-service:3001/api
       BOOKS_SERVICE_URL: http://books-service:3002
       NOTIFICATION_SERVICE_URL: http://notification-service:3005
     depends_on:
-      postgres:
+      postgres-collab:
         condition: service_healthy
     restart: unless-stopped
     networks:
@@ -125,13 +189,13 @@ services:
       - "3002"
     environment:
       PORT: 3002
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/books_service?connection_limit=20&pool_timeout=30
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-books:5432/books_db?connection_limit=20&pool_timeout=30
       NODE_ENV: development
       GOOGLE_BOOKS_API_KEY: ${GOOGLE_BOOKS_API_KEY}
       REDIS_URL: redis://redis:6379
       COLLAB_EDITOR_URL: http://collab-editor:4000
     depends_on:
-      postgres:
+      postgres-books:
         condition: service_healthy
       redis:
         condition: service_started
@@ -156,7 +220,7 @@ services:
       - "3005"
     environment:
       PORT: 3005
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/notification_service?connection_limit=20&pool_timeout=30
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-notifications:5432/notifications_db?connection_limit=20&pool_timeout=30
       NODE_ENV: development
       JWT_SECRET: ${JWT_SECRET}
       COLLAB_EDITOR_URL: http://collab-editor:4000
@@ -168,7 +232,7 @@ services:
       SMTP_FROM: ${SMTP_FROM:-BookClubs <noreply@bookclubs.app>}
       APP_URL: ${APP_URL:-http://localhost:5173}
     depends_on:
-      postgres:
+      postgres-notifications:
         condition: service_healthy
     restart: unless-stopped
     networks:
@@ -244,7 +308,10 @@ services:
 
 volumes:
   redis-data:
-  postgres-data:
+  pgdata-users:
+  pgdata-collab:
+  pgdata-books:
+  pgdata-notifications:
   prometheus-data:
   grafana-data:
 
