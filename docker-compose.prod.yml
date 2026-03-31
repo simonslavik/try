@@ -15,6 +15,7 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro          # mount certs here
       - certbot-webroot:/var/www/certbot:ro     # Let's Encrypt ACME
+      - certbot-certs:/etc/letsencrypt:ro       # Let's Encrypt certs
     depends_on:
       - frontend
       - gateway
@@ -355,6 +356,21 @@ services:
         limits:
           memory: 256M
 
+  # ─── SSL Certificate Management ─────────────────────
+  certbot:
+    image: certbot/certbot:latest
+    container_name: certbot
+    volumes:
+      - certbot-webroot:/var/www/certbot
+      - certbot-certs:/etc/letsencrypt
+    depends_on:
+      - nginx
+    # Run once to obtain/renew, then exit. 
+    # Use: docker compose -f docker-compose.prod.yml run certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 6h & wait $${!}; certbot renew; done'"
+    networks:
+      - microservices-network
+
   promtail:
     image: grafana/promtail:latest
     container_name: promtail
@@ -424,6 +440,7 @@ volumes:
   prometheus-data:
   grafana-data:
   certbot-webroot:
+  certbot-certs:
 
 networks:
   microservices-network:
