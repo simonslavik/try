@@ -125,8 +125,10 @@ const Login = ({ onClose, onSwitchToRegister }) => {
         }
     };
 
-    const handleGoogleError = () => {
-        setErrors(['Google authentication failed. Please try again.']);
+    const handleGoogleError = (error) => {
+        logger.error('Google Sign-In error:', error);
+        console.error('[Google OAuth] Login failed. Origin:', window.location.origin, 'Error:', error);
+        setErrors(['Google authentication failed. Please check that popups are not blocked and try again.']);
     };
 
     return (

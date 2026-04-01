@@ -35,6 +35,17 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
+// Build allowed origins list (support both www and non-www)
+const allowedOrigins: string[] = [FRONTEND_URL];
+if (FRONTEND_URL.includes('://www.')) {
+  allowedOrigins.push(FRONTEND_URL.replace('://www.', '://'));
+} else if (FRONTEND_URL.includes('://') && !FRONTEND_URL.includes('localhost')) {
+  allowedOrigins.push(FRONTEND_URL.replace('://', '://www.'));
+}
+if (!allowedOrigins.includes('http://localhost:5173')) {
+  allowedOrigins.push('http://localhost:5173');
+}
+
 // Middleware - order matters!
 // Security headers
 app.use(helmet({
@@ -43,7 +54,14 @@ app.use(helmet({
 }));
 // CORS configuration
 app.use(cors({
-  origin: FRONTEND_URL,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (server-to-server, same-origin, health checks)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-User-Id', 'X-User-Email', 'X-User-Name'],

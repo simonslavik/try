@@ -19,6 +19,17 @@ const PORT = Number(process.env.PORT) || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
+// Build allowed origins list (support both www and non-www)
+const ALLOWED_ORIGINS: string[] = [FRONTEND_URL];
+if (FRONTEND_URL.includes('://www.')) {
+  ALLOWED_ORIGINS.push(FRONTEND_URL.replace('://www.', '://'));
+} else if (FRONTEND_URL.includes('://') && !FRONTEND_URL.includes('localhost')) {
+  ALLOWED_ORIGINS.push(FRONTEND_URL.replace('://', '://www.'));
+}
+if (!ALLOWED_ORIGINS.includes('http://localhost:5173')) {
+  ALLOWED_ORIGINS.push('http://localhost:5173');
+}
+
 /**
  * Initialize Express application
  */
@@ -35,7 +46,15 @@ const initializeApp = async (): Promise<Express> => {
   
   // CORS configuration
   app.use(cors({
-    origin: FRONTEND_URL,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, server-to-server, same-origin)
+      if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+        callback(null, true);
+      } else {
+        logger.warn(`CORS blocked origin: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],

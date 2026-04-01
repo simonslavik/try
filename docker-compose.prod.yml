@@ -31,6 +31,7 @@ services:
 
   # ─── Frontend ────────────────────────────────────────
   frontend:
+    image: ${REGISTRY:-ghcr.io}/${IMAGE_PREFIX:-local}/frontend:${TAG:-latest}
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -162,6 +163,7 @@ services:
 
   # ─── Backend Services ───────────────────────────────
   user-service:
+    image: ${REGISTRY:-ghcr.io}/${IMAGE_PREFIX:-local}/user-service:${TAG:-latest}
     build:
       context: ./backend/user-service
       dockerfile: Dockerfile.prod
@@ -200,6 +202,7 @@ services:
           memory: 256M
 
   gateway:
+    image: ${REGISTRY:-ghcr.io}/${IMAGE_PREFIX:-local}/gateway:${TAG:-latest}
     build:
       context: ./backend/gateway
       dockerfile: Dockerfile.prod
@@ -237,6 +240,7 @@ services:
           memory: 256M
 
   collab-editor:
+    image: ${REGISTRY:-ghcr.io}/${IMAGE_PREFIX:-local}/collab-editor:${TAG:-latest}
     build:
       context: ./backend/collab-editor
       dockerfile: Dockerfile.prod
@@ -272,6 +276,7 @@ services:
           memory: 512M
 
   books-service:
+    image: ${REGISTRY:-ghcr.io}/${IMAGE_PREFIX:-local}/books-service:${TAG:-latest}
     build:
       context: ./backend/books-service
       dockerfile: Dockerfile.prod
@@ -306,6 +311,7 @@ services:
           memory: 256M
 
   notification-service:
+    image: ${REGISTRY:-ghcr.io}/${IMAGE_PREFIX:-local}/notification-service:${TAG:-latest}
     build:
       context: ./backend/notification-service
       dockerfile: Dockerfile.prod

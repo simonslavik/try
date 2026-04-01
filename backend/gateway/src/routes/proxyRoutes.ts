@@ -6,7 +6,14 @@ import authHandler, { optionalAuth } from '../middleware/authHandler.js';
 import { TIMEOUTS, HTTP_STATUS } from '../config/constants.js';
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
-const ALLOWED_ORIGINS = [FRONTEND_URL, 'http://localhost:5174', 'http://localhost:5173'];
+
+// Build allowed origins list (support both www and non-www)
+const ALLOWED_ORIGINS: string[] = [FRONTEND_URL, 'http://localhost:5174', 'http://localhost:5173'];
+if (FRONTEND_URL.includes('://www.')) {
+  ALLOWED_ORIGINS.push(FRONTEND_URL.replace('://www.', '://'));
+} else if (FRONTEND_URL.includes('://') && !FRONTEND_URL.includes('localhost')) {
+  ALLOWED_ORIGINS.push(FRONTEND_URL.replace('://', '://www.'));
+}
 
 /**
  * Service route configuration
