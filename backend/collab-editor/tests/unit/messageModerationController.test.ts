@@ -16,7 +16,7 @@ const mockBookClubService = {
   checkPermission: jest.fn(),
 };
 
-jest.mock('../../src/services/bookclub.service', () => ({
+jest.mock('../../src/services/bookClub.service', () => ({
   BookClubService: mockBookClubService,
 }));
 

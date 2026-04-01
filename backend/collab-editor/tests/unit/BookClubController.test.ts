@@ -31,8 +31,8 @@ const mockBookClubService = {
   getMembership: jest.fn(),
 };
 
-// The new BookClubController imports from bookclub.service (actual filename is lowercase)
-jest.mock('../../src/services/bookclub.service', () => ({
+// The new BookClubController imports from bookClub.service (camelCase)
+jest.mock('../../src/services/bookClub.service', () => ({
   BookClubService: mockBookClubService,
 }));
 
