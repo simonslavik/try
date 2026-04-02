@@ -136,24 +136,24 @@ const RegisterModule = ({ onClose, onSwitchToLogin }) => {
 
     return (
         <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50' onClick={onClose}>
-            <div className='bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative' onClick={(e) => e.stopPropagation()}>
+            <div className='bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md relative transition-colors duration-300' onClick={(e) => e.stopPropagation()}>
                 {/* Close Button */}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                    className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
                 >
                     <FiX size={24} />
                 </button>
 
                 {/* Header */}
                 <div className="mb-2 text-center">
-                    <h2 className='text-3xl font-bold text-gray-800 mb-2'>Create Account</h2>
-                    <p className='text-gray-600'>Join our bookclub community</p>
+                    <h2 className='text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2'>Create Account</h2>
+                    <p className='text-gray-600 dark:text-gray-400'>Join our bookclub community</p>
                 </div>
 
                 {/* Global error list */}
                 {errors && errors.length > 0 && (
-                    <div role="alert" className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-4">
+                    <div role="alert" className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-400 px-4 py-3 rounded-lg mb-4">
                         <strong className="font-semibold block mb-2">Please fix the following:</strong>
                         <ul className="list-disc list-inside space-y-1">
                             {errors.map((err, i) => (
@@ -165,14 +165,14 @@ const RegisterModule = ({ onClose, onSwitchToLogin }) => {
 
                 {/* Informational / success message */}
                 {message && (
-                    <div role="status" className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-4">
+                    <div role="status" className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 text-green-800 dark:text-green-400 px-4 py-3 rounded-lg mb-4">
                         {message}
                     </div>
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-2">
                     <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Username
                         </label>
                         <input 
@@ -181,12 +181,12 @@ const RegisterModule = ({ onClose, onSwitchToLogin }) => {
                             value={form.name} 
                             onChange={handleChange} 
                             placeholder="Enter your username" 
-                            className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-all outline-none'
+                            className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-all outline-none bg-white dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400'
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Email Address
                         </label>
                         <input 
@@ -196,12 +196,12 @@ const RegisterModule = ({ onClose, onSwitchToLogin }) => {
                             value={form.email} 
                             onChange={handleChange} 
                             placeholder="email@example.com" 
-                            className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-all outline-none'
+                            className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-all outline-none bg-white dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400'
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Password
                         </label>
                         <input 
@@ -211,12 +211,12 @@ const RegisterModule = ({ onClose, onSwitchToLogin }) => {
                             value={form.password} 
                             onChange={handleChange} 
                             placeholder="Choose a strong password" 
-                            className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-all outline-none'
+                            className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-all outline-none bg-white dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400'
                         />
                         
                         {/* Password Requirements */}
                         <div className="mt-2 space-y-1">
-                            <p className="text-xs font-medium text-gray-600">Password must contain:</p>
+                            <p className="text-xs font-medium text-gray-600 dark:text-gray-400">Password must contain:</p>
                             <div className="flex items-center gap-2">
                                 <div className={`w-1.5 h-1.5 rounded-full ${form.password.length >= 8 ? 'bg-green-500' : 'bg-gray-300'}`}></div>
                                 <span className={`text-xs ${form.password.length >= 8 ? 'text-green-600' : 'text-gray-500'}`}>
@@ -271,10 +271,10 @@ const RegisterModule = ({ onClose, onSwitchToLogin }) => {
                 <div className="mt-6">
                     <div className="relative mb-4">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-300"></div>
+                            <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
                         </div>
                         <div className="relative flex justify-center text-sm">
-                            <span className="px-2 bg-white text-gray-500">Or sign up with</span>
+                            <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">Or sign up with</span>
                         </div>
                     </div>
                     
@@ -295,17 +295,17 @@ const RegisterModule = ({ onClose, onSwitchToLogin }) => {
                 {/* Divider */}
                 <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-300"></div>
+                        <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
                     </div>
                     <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-white text-gray-500">Already have an account?</span>
+                        <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">Already have an account?</span>
                     </div>
                 </div>
 
                 {/* Login Link */}
                 <button 
                     onClick={onSwitchToLogin}
-                    className='w-full border-2 border-stone-700 text-stone-700 hover:bg-stone-50 font-semibold py-3 px-6 rounded-lg transition-all transform hover:scale-[1.02]'
+                    className='w-full border-2 border-stone-700 dark:border-stone-500 text-stone-700 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-gray-700 font-semibold py-3 px-6 rounded-lg transition-all transform hover:scale-[1.02]'
                 >
                     Sign In
                 </button>

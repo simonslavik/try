@@ -42,7 +42,8 @@ const MessageInput = ({
   members = [],
   onGetRawMessage,
   replyingTo,
-  onCancelReply
+  onCancelReply,
+  onTyping
 }) => {
   // Mention tracking
   const [mentionMarkers, setMentionMarkers] = useState([]);
@@ -50,6 +51,7 @@ const MessageInput = ({
   const [mentionVisible, setMentionVisible] = useState(false);
   const [mentionIndex, setMentionIndex] = useState(0);
   const inputRef = useRef(null);
+  const lastTypingSentRef = useRef(0);
 
   const handleEmojiInsert = (emoji) => {
     setNewMessage((prev) => prev + emoji);
@@ -60,6 +62,15 @@ const MessageInput = ({
     const value = e.target.value;
     const cursorPos = e.target.selectionStart;
     setNewMessage(value);
+
+    // Emit typing event (throttled to once every 2s)
+    if (onTyping) {
+      const now = Date.now();
+      if (now - lastTypingSentRef.current > 2000) {
+        lastTypingSentRef.current = now;
+        onTyping();
+      }
+    }
 
     // Adjust mention markers when text changes before them
     // (simple approach: invalidate markers that overlap with edits)
@@ -229,7 +240,7 @@ const MessageInput = ({
       )}
       {/* File Upload Preview */}
       
-      <div className="flex gap-2 p-4 items-center">
+      <div className="flex gap-1.5 md:gap-2 p-2 md:p-4 items-center">
         <FileUpload 
         ref={fileUploadRef}
         onFilesSelected={onFilesSelected} 
@@ -254,16 +265,16 @@ const MessageInput = ({
             value={newMessage}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            placeholder={`Message #${currentRoom?.name} — type @ to mention`}
-            className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-stone-500"
+            placeholder={`Message #${currentRoom?.name}`}
+            className="w-full px-3 md:px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white text-sm md:text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-stone-500"
           />
         </div>
         <button
           type="submit"
           disabled={(!newMessage.trim() && selectedFiles.length === 0) || uploadingFiles}
-          className="px-6 py-2 bg-stone-700 hover:bg-stone-800 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium"
+          className="px-3 md:px-6 py-2 bg-stone-700 hover:bg-stone-800 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium text-sm md:text-base"
         >
-          {uploadingFiles ? 'Sending...' : 'Send'}
+          {uploadingFiles ? '...' : 'Send'}
         </button>
       </div>
     </form>

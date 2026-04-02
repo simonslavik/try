@@ -20,3 +20,5 @@ nginx/ssl/*.crt
 
 # OS
 .DS_Store
+.deploy_key
+.deploy_key.pub

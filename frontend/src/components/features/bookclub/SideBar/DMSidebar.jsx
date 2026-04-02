@@ -68,7 +68,7 @@ const DMSidebar = ({ conversations, friends = [], currentConversation, onSelectC
   };
 
   return (
-    <div className="w-64 bg-gray-800 border-r border-gray-700 flex flex-col">
+    <div className="w-64 h-full bg-gray-800 border-r border-gray-700 flex flex-col">
       {/* Header */}
       <div className="p-3 border-b border-gray-700">
         <div className="flex items-center justify-between mb-2">

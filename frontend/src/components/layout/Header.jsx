@@ -1,7 +1,8 @@
 import { useContext, useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiBell, FiMail, FiMenu, FiX, FiUser, FiSettings, FiLogOut, FiPlusCircle, FiUsers } from 'react-icons/fi';
+import { FiBell, FiMail, FiMenu, FiX, FiUser, FiSettings, FiLogOut, FiPlusCircle, FiUsers, FiSun, FiMoon } from 'react-icons/fi';
 import AuthContext from '@context/index';
+import { useTheme } from '@context/ThemeContext';
 import LoginModule from '@components/common/modals/loginModule';
 import RegisterModule from '@components/common/modals/registerModule';
 import { getProfileImageUrl } from '@config/constants';
@@ -18,6 +19,7 @@ const DEFAULT_AVATAR = '/images/default.webp';
 const HomePageHeader = () => {
     const { auth, logout } = useContext(AuthContext);
     const navigate = useNavigate();
+    const { mode, isDark, cycleTheme } = useTheme();
     const [showDropdown, setShowDropdown] = useState(false);
     const [newsShowDropdown, setNewsShowDropdown] = useState(false);
     const [friendRequests, setFriendRequests] = useState([]);
@@ -85,9 +87,9 @@ const HomePageHeader = () => {
     };
   }, []);
     return (
-        <div className="w-full h-13 bg-warmgray-50 border-b border-warmgray-200 flex items-center px-4 md:px-10 relative">
-            <button onClick={() => navigate('/')} className={`cursor-pointer md:ml-40 mr-20 md:mr-0 flex-1 flex ${showMobileMenu ? 'justify-start' : 'justify-end'} items-center gap-2`}>
-                <h2 className=" text-lg font-semibold text-stone-800 tracking-tight">YourBookClubs</h2>
+        <div className="w-full h-13 bg-warmgray-50 dark:bg-gray-900 border-b border-warmgray-200 dark:border-gray-700 flex items-center px-4 md:px-10 relative transition-colors duration-300">
+            <button onClick={() => navigate('/')} className={`cursor-pointer md:absolute md:left-1/2 md:-translate-x-1/2 flex items-center gap-2`}>
+                <h2 className="text-lg font-semibold text-stone-800 dark:text-warmgray-100 tracking-tight">MyBookClubs</h2>
             </button>
             {auth?.user && (
             <>
@@ -97,7 +99,7 @@ const HomePageHeader = () => {
                 <div ref={newsDropdownRef} className="relative">
                     <button 
                         onClick={() => { setNewsShowDropdown(!newsShowDropdown); if (showDropdown) { setShowDropdown(false); } }} 
-                        className="relative px-2 py-2 text-black rounded hover:bg-gray-100 transition cursor-pointer"
+                        className="relative px-2 py-2 text-black dark:text-gray-300 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer"
                     >
                     <FiUsers size={15} />
                     {friendRequests.length > 0 && (
@@ -109,20 +111,20 @@ const HomePageHeader = () => {
                         </span>
                     )}
                     {newsShowDropdown && (
-                        <div className="absolute right-4 mt-2 w-60 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
-                            <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg">
-                                <h3 className="text-sm font-semibold text-gray-900">Friend Requests</h3>
-                                <p className="text-xs text-gray-500 mt-0.5">{friendRequests.length} pending</p>
+                        <div className="absolute right-4 mt-2 w-60 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
+                            <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-t-lg">
+                                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Friend Requests</h3>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{friendRequests.length} pending</p>
                             </div>
                             {friendRequests.length === 0 ? (
                                 <div className="px-4 py-8 text-center">
-                                    <FiUsers className="mx-auto h-6 w-6 text-gray-300 mb-2" />
-                                    <p className="text-sm text-gray-500">No new friend requests</p>
+                                    <FiUsers className="mx-auto h-6 w-6 text-gray-300 dark:text-gray-600 mb-2" />
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">No new friend requests</p>
                                 </div>
                             ) : (
-                                <div className="divide-y divide-gray-100">
+                                <div className="divide-y divide-gray-100 dark:divide-gray-700">
                                     {friendRequests.map((request) => (
-                                        <div key={request.friendshipId} className="px-4 py-3 hover:bg-gray-50 transition">
+                                        <div key={request.friendshipId} className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                                             <div className="flex items-start space-x-3">
                                                 <img 
                                                     src={getProfileImageUrl(request.from?.profileImage) || DEFAULT_AVATAR} 
@@ -131,9 +133,9 @@ const HomePageHeader = () => {
                                                     onError={(e) => { e.target.src = DEFAULT_AVATAR; }}
                                                 />
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="text-sm text-gray-900">
+                                                    <p className="text-sm text-gray-900 dark:text-gray-100">
                                                         <span className="font-semibold">{request.from?.name || 'Unknown User'}</span>
-                                                        <span className="text-gray-600"> sent you a friend request</span>
+                                                        <span className="text-gray-600 dark:text-gray-400"> sent you a friend request</span>
                                                     </p>
                                                     
                                                     <div className="mt-3 flex space-x-2">
@@ -162,9 +164,9 @@ const HomePageHeader = () => {
                 </div>
                 <button 
                     onClick={() => navigate('/dm')}
-                    className="flex items-center ml-2 border border-warmgray-200 rounded-full cursor-pointer px-3 py-1 hover:bg-warmgray-100 transition-colors"
+                    className="flex items-center ml-2 border border-warmgray-200 dark:border-gray-600 rounded-full cursor-pointer px-3 py-1 hover:bg-warmgray-100 dark:hover:bg-gray-700 transition-colors"
                 >
-                    <span className="font-medium text-sm text-stone-700">OpenBookClubs</span>
+                    <span className="font-medium text-sm text-stone-700 dark:text-gray-300">OpenBookClubs</span>
                 </button>
                 <div className="ml-2 mt-2 relative" ref={profileDropdownRef}>
                     <button onClick={handleProfileClick}>
@@ -177,19 +179,32 @@ const HomePageHeader = () => {
                         </div>
                     </button>
                     {showDropdown && (
-                        <div className="absolute right-4 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg z-10">
-                            <button onClick={() => { navigate(`/profile/${auth.user.id}`); setShowDropdown(false); if (newsShowDropdown) { setNewsShowDropdown(false); } }} className="px-4 py-2 border-b border-gray-300 text-sm hover:bg-gray-100 w-full text-left">
+                        <div className="absolute right-4 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow-lg z-10">
+                            <button onClick={() => { navigate(`/profile/${auth.user.id}`); setShowDropdown(false); if (newsShowDropdown) { setNewsShowDropdown(false); } }} className="px-4 py-2 border-b border-gray-300 dark:border-gray-700 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left dark:text-gray-200">
                                 View Profile
                             </button>
-                            <button onClick={() => navigate('/change-profile')} className="px-4 py-2 border-b border-gray-300 text-sm hover:bg-gray-100 w-full text-left">
+                            <button onClick={() => navigate('/change-profile')} className="px-4 py-2 border-b border-gray-300 dark:border-gray-700 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left dark:text-gray-200">
                                 Change Profile Settings
                             </button>
-                            <button onClick={() => navigate('/create-bookclub')} className="px-4 py-2 border-b border-gray-300 text-sm hover:bg-gray-100 w-full text-left">
+                            <button onClick={() => navigate('/create-bookclub')} className="px-4 py-2 border-b border-gray-300 dark:border-gray-700 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left dark:text-gray-200">
                                 Create Book Club
                             </button>
                             <button
+                                onClick={cycleTheme}
+                                className="w-full text-left px-4 py-2 border-b border-gray-300 dark:border-gray-700 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 dark:text-gray-200"
+                            >
+                                {mode === 'auto' ? (
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/><path d="M16 12a4 4 0 0 1-4 4" fill="currentColor" opacity="0.3"/></svg>
+                                ) : isDark ? (
+                                    <FiMoon size={15} />
+                                ) : (
+                                    <FiSun size={15} />
+                                )}
+                                Theme: {mode === 'auto' ? 'Auto' : mode === 'dark' ? 'Dark' : 'Light'}
+                            </button>
+                            <button
                                 onClick={handleLogout}
-                                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                                className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
                             >
                                 Logout
                             </button>
@@ -201,27 +216,33 @@ const HomePageHeader = () => {
             {/* Mobile Burger Menu Button */}
             <button 
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
-                className={`md:hidden ml-auto p-2 hover:bg-gray-100 rounded-lg transition-colors`}
+                className={`md:hidden ml-auto p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors`}
             >
-                {showMobileMenu ? <FiX size={24} /> : <FiMenu size={24} />}
+                {showMobileMenu ? <FiX size={24} className="dark:text-gray-200" /> : <FiMenu size={24} className="dark:text-gray-200" />}
             </button>
 
             {/* Mobile Sidebar Menu */}
             {showMobileMenu && (
+                <>
+                {/* Backdrop overlay */}
+                <div 
+                    className="md:hidden fixed inset-0 bg-black/50 z-40"
+                    onClick={() => setShowMobileMenu(false)}
+                />
                 <div 
                     ref={mobileMenuRef}
-                    className="md:hidden fixed top-[0px] right-0 w-80 h-full bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto"
+                    className="md:hidden fixed top-0 right-0 w-80 max-w-[85vw] h-full bg-white dark:bg-gray-800 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto"
                 >   
                     <div className='flex justify-end'>
                         <button 
                             onClick={() => setShowMobileMenu(false)}
-                            className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="absolute top-4 right-4 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                         >
-                            <FiX size={24} />
+                            <FiX size={24} className="dark:text-gray-200" />
                         </button>
                     </div>
                     {/* Profile Section */}
-                    <div className="p-6 border-b border-warmgray-200 bg-warmgray-50">
+                    <div className="p-6 border-b border-warmgray-200 dark:border-gray-700 bg-warmgray-50 dark:bg-gray-900">
                         <div className="flex items-center gap-3">
                             <img 
                                 src={getProfileImageUrl(auth.user.profileImage) || DEFAULT_AVATAR}
@@ -230,18 +251,18 @@ const HomePageHeader = () => {
                                 onError={(e) => { e.target.src = DEFAULT_AVATAR; }}
                             />
                             <div>
-                                <p className="font-semibold text-gray-900">{auth.user.name}</p>
-                                <p className="text-sm text-gray-600">{auth.user.email}</p>
+                                <p className="font-semibold text-gray-900 dark:text-gray-100">{auth.user.name}</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">{auth.user.email}</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Friend Requests Section */}
-                    <div className="border-b border-gray-200">
-                        <div className="px-4 py-3 bg-gray-50 flex items-center justify-between">
+                    <div className="border-b border-gray-200 dark:border-gray-700">
+                        <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900 flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <FiBell className="text-gray-600" size={18} />
-                                <span className="font-semibold text-sm text-gray-900">Friend Requests</span>
+                                <FiBell className="text-gray-600 dark:text-gray-400" size={18} />
+                                <span className="font-semibold text-sm text-gray-900 dark:text-gray-100">Friend Requests</span>
                             </div>
                             {friendRequests.length > 0 && (
                                 <span className="bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
@@ -251,22 +272,22 @@ const HomePageHeader = () => {
                         </div>
                         {friendRequests.length === 0 ? (
                             <div className="px-4 py-4 text-center">
-                                <p className="text-sm text-gray-500">No pending requests</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">No pending requests</p>
                             </div>
                         ) : (
                             <div className="max-h-64 overflow-y-auto">
                                 {friendRequests.map((request) => (
-                                    <div key={request.id} className="px-4 py-3 border-b border-gray-100">
+                                    <div key={request.id} className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
                                         <div className="flex items-start gap-3">
                                             <img 
                                                 src={getProfileImageUrl(request.user?.profileImage) || DEFAULT_AVATAR} 
                                                 alt={request.user?.name}
-                                                className="h-10 w-10 rounded-full object-cover border-2 border-gray-200"
+                                                className="h-10 w-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
                                                 onError={(e) => { e.target.src = DEFAULT_AVATAR; }}
                                             />
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-semibold text-gray-900 truncate">{request.user?.name}</p>
-                                                <p className="text-xs text-gray-500 truncate">{request.user?.email}</p>
+                                                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{request.user?.name}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{request.user?.email}</p>
                                                 <div className="mt-2 flex gap-2">
                                                     <button 
                                                         onClick={() => handleFriendAction(request.id, 'accept')}
@@ -296,10 +317,10 @@ const HomePageHeader = () => {
                                 navigate('/dm');
                                 setShowMobileMenu(false);
                             }}
-                            className="w-full px-4 py-3 text-left hover:bg-gray-50 transition flex items-center gap-3 border-b border-gray-100"
+                            className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition flex items-center gap-3 border-b border-gray-100 dark:border-gray-700"
                         >
-                            <FiMail className="text-stone-600" size={20} />
-                            <span className="font-medium">Messages</span>
+                            <FiMail className="text-stone-600 dark:text-stone-400" size={20} />
+                            <span className="font-medium dark:text-gray-200">Messages</span>
                         </button>
                         
                         <button 
@@ -307,10 +328,10 @@ const HomePageHeader = () => {
                                 navigate(`/profile/${auth.user.id}`); 
                                 setShowMobileMenu(false); 
                             }} 
-                            className="w-full px-4 py-3 text-left hover:bg-gray-50 transition flex items-center gap-3 border-b border-gray-100"
+                            className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition flex items-center gap-3 border-b border-gray-100 dark:border-gray-700"
                         >
-                            <FiUser className="text-stone-600" size={20} />
-                            <span className="font-medium">View Profile</span>
+                            <FiUser className="text-stone-600 dark:text-stone-400" size={20} />
+                            <span className="font-medium dark:text-gray-200">View Profile</span>
                         </button>
                         
                         <button 
@@ -318,10 +339,10 @@ const HomePageHeader = () => {
                                 navigate('/change-profile'); 
                                 setShowMobileMenu(false); 
                             }} 
-                            className="w-full px-4 py-3 text-left hover:bg-gray-50 transition flex items-center gap-3 border-b border-gray-100"
+                            className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition flex items-center gap-3 border-b border-gray-100 dark:border-gray-700"
                         >
-                            <FiSettings className="text-gray-600" size={20} />
-                            <span className="font-medium">Settings</span>
+                            <FiSettings className="text-gray-600 dark:text-gray-400" size={20} />
+                            <span className="font-medium dark:text-gray-200">Settings</span>
                         </button>
                         
                         <button 
@@ -329,10 +350,10 @@ const HomePageHeader = () => {
                                 navigate('/create-bookclub'); 
                                 setShowMobileMenu(false); 
                             }} 
-                            className="w-full px-4 py-3 text-left hover:bg-gray-50 transition flex items-center gap-3 border-b border-gray-100"
+                            className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition flex items-center gap-3 border-b border-gray-100 dark:border-gray-700"
                         >
                             <FiPlusCircle className="text-green-600" size={20} />
-                            <span className="font-medium">Create Book Club</span>
+                            <span className="font-medium dark:text-gray-200">Create Book Club</span>
                         </button>
                         
                         <button
@@ -340,19 +361,49 @@ const HomePageHeader = () => {
                                 handleLogout();
                                 setShowMobileMenu(false);
                             }}
-                            className="w-full px-4 py-3 text-left hover:bg-red-50 transition flex items-center gap-3 text-red-600 border-b border-gray-100"
+                            className="w-full px-4 py-3 text-left hover:bg-red-50 dark:hover:bg-red-900/20 transition flex items-center gap-3 text-red-600 border-b border-gray-100 dark:border-gray-700"
                         >
                             <FiLogOut size={20} />
                             <span className="font-medium">Logout</span>
                         </button>
+
+                        {/* Mobile Theme Toggle */}
+                        <button
+                            onClick={cycleTheme}
+                            className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition flex items-center gap-3 border-b border-gray-100 dark:border-gray-700"
+                        >
+                            {mode === 'auto' ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/><path d="M16 12a4 4 0 0 1-4 4" fill="currentColor" opacity="0.3"/></svg>
+                            ) : isDark ? (
+                                <FiMoon size={20} className="text-indigo-400" />
+                            ) : (
+                                <FiSun size={20} className="text-amber-500" />
+                            )}
+                            <span className="font-medium dark:text-gray-200">Theme: {mode === 'auto' ? 'Auto' : mode === 'dark' ? 'Dark' : 'Light'}</span>
+                        </button>
                     </div>
                 </div>
+                </>
             )}
             </>
             )}
 
             {!auth?.user && (
             <div className='ml-auto flex gap-2 flex-1 justify-end'>
+                {/* Theme Toggle for non-auth */}
+                <button
+                    onClick={cycleTheme}
+                    className="px-2 py-2 text-gray-600 dark:text-gray-300 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer"
+                    title={`Theme: ${mode === 'auto' ? 'Auto' : mode === 'dark' ? 'Dark' : 'Light'}`}
+                >
+                    {mode === 'auto' ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/><path d="M16 12a4 4 0 0 1-4 4" fill="currentColor" opacity="0.3"/></svg>
+                    ) : isDark ? (
+                        <FiMoon size={15} />
+                    ) : (
+                        <FiSun size={15} />
+                    )}
+                </button>
                 <button 
                     onClick={() => setOpenLogin(true)}
                     className="px-4 py-2 bg-stone-800 text-white rounded-lg hover:bg-stone-700 transition mr-1 text-sm font-medium"

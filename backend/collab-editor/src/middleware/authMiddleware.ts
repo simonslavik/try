@@ -44,7 +44,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     req.user = {
         userId,
         email: userEmail || '',
-        name: userName || undefined
+        name: userName ? decodeURIComponent(userName) : undefined
     };
 
     next();
@@ -63,7 +63,7 @@ export const optionalAuthMiddleware = (req: Request, _res: Response, next: NextF
         req.user = {
             userId,
             email: userEmail || '',
-            name: userName || undefined
+            name: userName ? decodeURIComponent(userName) : undefined
         };
     }
 

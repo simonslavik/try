@@ -19,11 +19,54 @@
 
 @import "tailwindcss";
 
+/* Tailwind v4: use class-based dark mode (controlled by .dark on <html>) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Import legacy tailwind.config.js for custom colors, fonts, etc. */
+@config "../../tailwind.config.js";
+
 @layer base {
   body {
     /* Using Outfit - Modern geometric sans-serif */
-    /* To switch back to serif: 'Cormorant Garamond', serif */
     font-family: 'Outfit', sans-serif;
+    @apply bg-warmgray-50 text-gray-900 transition-colors duration-300;
+  }
+
+  .dark body,
+  html.dark body {
+    @apply bg-gray-900 text-gray-100;
+  }
+
+  /* Dark mode global overrides */
+  html.dark {
+    color-scheme: dark;
+
+    /* ── Warm cozy dark palette ──
+       Remaps grays/stones to warm browns & taupes.
+       Feels like reading by firelight — dark but not cold. */
+    --color-gray-50:  #f5f0ea;
+    --color-gray-100: #e8e2da;
+    --color-gray-200: #c4bbb0;
+    --color-gray-300: #9c9488;
+    --color-gray-400: #79716a;
+    --color-gray-500: #5c554e;
+    --color-gray-600: #433d37;
+    --color-gray-700: #352f29;
+    --color-gray-800: #28231e;
+    --color-gray-900: #1c1814;
+    --color-gray-950: #14110e;
+
+    --color-stone-50:  #f2ece5;
+    --color-stone-100: #e5ded6;
+    --color-stone-200: #c0b7ab;
+    --color-stone-300: #998f83;
+    --color-stone-400: #766d62;
+    --color-stone-500: #594f44;
+    --color-stone-600: #403a33;
+    --color-stone-700: #322c26;
+    --color-stone-800: #25201b;
+    --color-stone-900: #1a1613;
+    --color-stone-950: #110e0c;
   }
 }
 

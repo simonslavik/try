@@ -118,14 +118,14 @@ const NewBookClubPage = () => {
     };
 
     return (
-        <div className='flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4'>
-            <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
+        <div className='flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4 transition-colors duration-300'>
+            <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <div className="flex items-center justify-center mb-6">
-                    <h2 className='text-2xl font-bold text-gray-800'>Create Book Club</h2>
+                    <h2 className='text-2xl font-bold text-gray-800 dark:text-gray-100'>Create Book Club</h2>
                 </div>
 
                 {error && (
-                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                    <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-400 rounded">
                         {error}
                     </div>
                 )}
@@ -133,7 +133,7 @@ const NewBookClubPage = () => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Book Club Name */}
                     <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Book Club Name *
                         </label>
                         <input
@@ -143,7 +143,7 @@ const NewBookClubPage = () => {
                             value={form.name}
                             onChange={handleChange}
                             placeholder="Enter book club name"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-500"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-500 bg-white dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
                             required
                         />
                     </div>
@@ -151,7 +151,7 @@ const NewBookClubPage = () => {
                     {/* Category Selection */}
                     {/* Description */}
                     <div>
-                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Description (Optional)
                         </label>
                         <textarea
@@ -161,13 +161,13 @@ const NewBookClubPage = () => {
                             onChange={handleChange}
                             placeholder="Describe your book club..."
                             rows="3"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-500 resize-none"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-500 resize-none bg-white dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
                         />
                     </div>
 
                     {/* Category Selection */}
                     <div>
-                        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Category *
                         </label>
                         <select
@@ -175,7 +175,7 @@ const NewBookClubPage = () => {
                             name="category"
                             value={form.category}
                             onChange={handleChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-500 bg-white"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                             required
                         >
                             {categories.map(cat => (
@@ -186,12 +186,12 @@ const NewBookClubPage = () => {
 
                     {/* Visibility Selection */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Visibility *
                         </label>
                         <div className="space-y-2">
                             <label className={`flex items-start gap-3 p-3 border-2 rounded-lg cursor-pointer transition-colors ${
-                                form.visibility === 'PUBLIC' ? 'border-stone-500 bg-stone-50' : 'border-gray-200 hover:border-stone-200'
+                                form.visibility === 'PUBLIC' ? 'border-stone-500 bg-stone-50 dark:bg-stone-900/30' : 'border-gray-200 dark:border-gray-600 hover:border-stone-200 dark:hover:border-stone-500'
                             }`}>
                                 <input
                                     type="radio"
@@ -204,14 +204,14 @@ const NewBookClubPage = () => {
                                 <div>
                                     <div className="flex items-center gap-2 mb-1">
                                         <FiUnlock className="w-4 h-4 text-green-600" />
-                                        <span className="font-semibold text-gray-900">Public</span>
+                                        <span className="font-semibold text-gray-900 dark:text-gray-100">Public</span>
                                     </div>
-                                    <p className="text-xs text-gray-600">Anyone can see and join instantly</p>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400">Anyone can see and join instantly</p>
                                 </div>
                             </label>
 
                             <label className={`flex items-start gap-3 p-3 border-2 rounded-lg cursor-pointer transition-colors ${
-                                form.visibility === 'PRIVATE' ? 'border-stone-500 bg-stone-50' : 'border-gray-200 hover:border-stone-200'
+                                form.visibility === 'PRIVATE' ? 'border-stone-500 bg-stone-50 dark:bg-stone-900/30' : 'border-gray-200 dark:border-gray-600 hover:border-stone-200 dark:hover:border-stone-500'
                             }`}>
                                 <input
                                     type="radio"
@@ -224,14 +224,14 @@ const NewBookClubPage = () => {
                                 <div>
                                     <div className="flex items-center gap-2 mb-1">
                                         <FiLock className="w-4 h-4 text-yellow-600" />
-                                        <span className="font-semibold text-gray-900">Private</span>
+                                        <span className="font-semibold text-gray-900 dark:text-gray-100">Private</span>
                                     </div>
-                                    <p className="text-xs text-gray-600">Anyone can see, join requires approval</p>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400">Anyone can see, join requires approval</p>
                                 </div>
                             </label>
 
                             <label className={`flex items-start gap-3 p-3 border-2 rounded-lg cursor-pointer transition-colors ${
-                                form.visibility === 'INVITE_ONLY' ? 'border-stone-500 bg-stone-50' : 'border-gray-200 hover:border-stone-200'
+                                form.visibility === 'INVITE_ONLY' ? 'border-stone-500 bg-stone-50 dark:bg-stone-900/30' : 'border-gray-200 dark:border-gray-600 hover:border-stone-200 dark:hover:border-stone-500'
                             }`}>
                                 <input
                                     type="radio"
@@ -244,9 +244,9 @@ const NewBookClubPage = () => {
                                 <div>
                                     <div className="flex items-center gap-2 mb-1">
                                         <FiEyeOff className="w-4 h-4 text-stone-700" />
-                                        <span className="font-semibold text-gray-900">Invite Only</span>
+                                        <span className="font-semibold text-gray-900 dark:text-gray-100">Invite Only</span>
                                     </div>
-                                    <p className="text-xs text-gray-600">Only visible to members, join via invite</p>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400">Only visible to members, join via invite</p>
                                 </div>
                             </label>
                         </div>
@@ -254,7 +254,7 @@ const NewBookClubPage = () => {
 
                     {/* Requires Approval (for PRIVATE) */}
                     {form.visibility === 'PRIVATE' && (
-                        <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-3">
+                        <div className="bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-200 dark:border-yellow-700 rounded-lg p-3">
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <input
                                     type="checkbox"
@@ -263,14 +263,14 @@ const NewBookClubPage = () => {
                                     onChange={handleChange}
                                     className="w-4 h-4"
                                 />
-                                <span className="text-sm font-semibold text-gray-900">Require admin approval for join requests</span>
+                                <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">Require admin approval for join requests</span>
                             </label>
                         </div>
                     )}
 
                     {/* Image Upload */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Book Club Cover Image (Optional)
                         </label>
                         
@@ -293,10 +293,10 @@ const NewBookClubPage = () => {
                             <button
                                 type="button"
                                 onClick={() => fileInputRef.current?.click()}
-                                className="w-full h-48 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center hover:border-stone-500 hover:bg-stone-50 transition-colors"
+                                className="w-full h-48 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center hover:border-stone-500 hover:bg-stone-50 dark:hover:bg-gray-700 transition-colors"
                             >
                                 <FiImage className="text-4xl text-gray-400 mb-2" />
-                                <span className="text-sm text-gray-600">Click to upload image</span>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">Click to upload image</span>
                                 <span className="text-xs text-gray-400 mt-1">PNG, JPG, GIF up to 5MB</span>
                             </button>
                         )}
@@ -323,7 +323,7 @@ const NewBookClubPage = () => {
                 <div className="mt-4 text-center">
                     <button
                         onClick={() => navigate(-1)}
-                        className="text-sm text-stone-700 hover:text-stone-900"
+                        className="text-sm text-stone-700 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-300"
                     >
                         Cancel and go back
                     </button>

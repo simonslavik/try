@@ -108,10 +108,10 @@ export class BookClubBooksService {
   static async getBatchCurrentBooks(bookClubIds: string[]) {
     const currentBooks = await BookClubBooksRepository.findCurrentByBookClubIds(bookClubIds);
 
-    // Map results back to each bookClubId, filling nulls for clubs with no current book
+    // Map results back to each bookClubId, returning all current books per club
     return bookClubIds.map((bookClubId) => ({
       bookClubId,
-      currentBook: currentBooks.find((b) => b.bookClubId === bookClubId) || null,
+      currentBooks: currentBooks.filter((b) => b.bookClubId === bookClubId),
     }));
   }
 }

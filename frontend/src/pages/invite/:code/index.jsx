@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import AuthContext from '@context/index';
 import HomePageHeader from '@components/layout/Header';
 import { FiCheck, FiX, FiUsers, FiBook } from 'react-icons/fi';
-import { COLLAB_EDITOR_URL } from '@config/constants';
+import { getCollabImageUrl } from '@config/constants';
 import apiClient from '@api/axios';
 import logger from '@utils/logger';
 
@@ -146,7 +146,7 @@ const InviteJoinPage = () => {
           <div className="mb-6">
             <img
               src={inviteInfo.bookClub.imageUrl 
-                ? `${COLLAB_EDITOR_URL}${inviteInfo.bookClub.imageUrl}` 
+                ? getCollabImageUrl(inviteInfo.bookClub.imageUrl) 
                 : '/images/default.webp'}
               alt={inviteInfo.bookClub.name}
               className="w-full h-48 object-cover rounded-xl"

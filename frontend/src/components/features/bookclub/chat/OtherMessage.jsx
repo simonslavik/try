@@ -36,7 +36,7 @@ const OtherMessage = ({
   };
 
   return (
-    <div className="flex gap-1 group">
+    <div className="flex gap-1 group w-full">
       <UserHoverCard
         user={hoverUser}
         currentUserId={auth?.user?.id}
@@ -53,7 +53,7 @@ const OtherMessage = ({
           onError={(e) => { e.target.src = '/images/default.webp'; }}
         />
       </UserHoverCard>
-      <div className="max-w-md w-fit">
+      <div className="w-full min-w-0">
         {/* Username + Pinned badge */}
         <div className="flex items-baseline">
           <span
@@ -75,10 +75,10 @@ const OtherMessage = ({
         <div className="relative">
         <div
           onClick={() => setShowFullDate((v) => !v)}
-          className="relative w-fit bg-gray-800 rounded-2xl px-2 py-3 shadow-md cursor-pointer hover:bg-gray-750 transition-colors"
+          className="relative w-fit max-w-[65%] overflow-hidden bg-gray-800 rounded-2xl px-2 py-3 shadow-md cursor-pointer hover:bg-gray-750 transition-colors"
         >
           {msg.text && (
-            <p className={`text-sm text-gray-200 break-words leading-relaxed ${msg.deletedAt ? 'italic text-gray-500' : ''}`}>
+            <p className={`text-sm text-gray-200 leading-relaxed ${msg.deletedAt ? 'italic text-gray-500' : ''}`} style={{ overflowWrap: 'break-word' }}>
               {renderMessageContent(msg.text, members, auth?.user?.id, { friends, connectedUsers, onSendFriendRequest })}
               {msg.editedAt && <span className="text-xs text-gray-500 italic ml-1">(edited)</span>}
             </p>

@@ -179,7 +179,7 @@ const createProxyConfig = (
       proxyReqOpts.headers['X-User-Id'] = (srcReq.user as any).userId;
       proxyReqOpts.headers['X-User-Email'] = (srcReq.user as any).email;
       if ((srcReq.user as any).name) {
-        proxyReqOpts.headers['X-User-Name'] = (srcReq.user as any).name;
+        proxyReqOpts.headers['X-User-Name'] = encodeURIComponent((srcReq.user as any).name);
       }
     }
 

@@ -160,8 +160,8 @@ const ChangeProfilePage = () => {
 
     if (fetchingProfile) {
         return (
-            <div className='flex items-center justify-center min-h-screen bg-gray-100'>
-                <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6 space-y-6">
+            <div className='flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300'>
+                <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 space-y-6">
                     <div className="flex justify-center">
                         <div className="animate-pulse bg-warmgray-200 w-24 h-24 rounded-full" />
                     </div>
@@ -178,14 +178,14 @@ const ChangeProfilePage = () => {
     }
 
     return (
-        <div className='flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4'>
-            <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
+        <div className='flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4 transition-colors duration-300'>
+            <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <div className="flex items-center justify-center mb-6">
-                    <h2 className='text-2xl font-bold text-gray-800'>Change Profile</h2>
+                    <h2 className='text-2xl font-bold text-gray-800 dark:text-gray-100'>Change Profile</h2>
                 </div>
 
                 {error && (
-                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                    <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-400 rounded">
                         {error}
                     </div>
                 )}
@@ -193,7 +193,7 @@ const ChangeProfilePage = () => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Image Upload */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Profile Picture
                         </label>
                         
@@ -219,7 +219,7 @@ const ChangeProfilePage = () => {
                                     )}
                                 </div>
                             ) : (
-                                <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center mb-4 border-4 border-gray-300">
+                                <div className="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mb-4 border-4 border-gray-300 dark:border-gray-600">
                                     <FiUser className="text-6xl text-gray-400" />
                                 </div>
                             )}
@@ -227,7 +227,7 @@ const ChangeProfilePage = () => {
                             <button
                                 type="button"
                                 onClick={() => fileInputRef.current?.click()}
-                                className="px-4 py-2 bg-stone-100 text-stone-800 rounded-lg hover:bg-stone-200 transition-colors font-medium"
+                                className="px-4 py-2 bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-200 rounded-lg hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors font-medium"
                             >
                                 <FiImage className="inline mr-2" />
                                 {imagePreview ? 'Change Picture' : 'Upload Picture'}
@@ -246,7 +246,7 @@ const ChangeProfilePage = () => {
                     
                     {/* Username */}
                     <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Username
                         </label>
                         <input
@@ -256,14 +256,14 @@ const ChangeProfilePage = () => {
                             value={form.name}
                             onChange={handleChange}
                             placeholder="Enter your name"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-500"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-500 bg-white dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
                             required
                         />
                     </div>
 
                     {/* Bio */}
                     <div>
-                        <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Bio
                         </label>
                         <textarea
@@ -274,7 +274,7 @@ const ChangeProfilePage = () => {
                             placeholder="Tell us about yourself..."
                             rows={3}
                             maxLength={300}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-500 resize-none"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-500 resize-none bg-white dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
                         />
                         <div className="text-xs text-gray-400 text-right mt-1">
                             {form.bio.length}/300
@@ -286,20 +286,20 @@ const ChangeProfilePage = () => {
                         <button
                             type="button"
                             onClick={() => setShowChangePassword(true)}
-                            className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                            className="w-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                         >
                             <FiLock />
                             Change Password
                         </button>
                     ) : (
-                        <div className="p-4 bg-stone-50 border border-stone-200 rounded-lg">
-                            <div className="flex items-center gap-2 text-stone-700">
+                        <div className="p-4 bg-stone-50 dark:bg-stone-900/30 border border-stone-200 dark:border-stone-700 rounded-lg">
+                            <div className="flex items-center gap-2 text-stone-700 dark:text-stone-400">
                                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                                 </svg>
                                 <span className="text-sm font-medium">You're signed in with Google</span>
                             </div>
-                            <p className="text-xs text-stone-600 mt-1">
+                            <p className="text-xs text-stone-600 dark:text-stone-500 mt-1">
                                 Password changes are managed through your Google account.
                             </p>
                         </div>
@@ -318,7 +318,7 @@ const ChangeProfilePage = () => {
                 <div className="mt-4 text-center">
                     <button
                         onClick={() => navigate(-1)}
-                        className="text-sm text-stone-700 hover:text-stone-900"
+                        className="text-sm text-stone-700 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-300"
                     >
                         Cancel and go back
                     </button>

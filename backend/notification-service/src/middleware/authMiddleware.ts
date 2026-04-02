@@ -32,6 +32,6 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     return res.status(401).json({ message: 'Authentication required' });
   }
 
-  req.user = { userId, email: userEmail || '', name: userName || undefined };
+  req.user = { userId, email: userEmail || '', name: userName ? decodeURIComponent(userName) : undefined };
   next();
 };

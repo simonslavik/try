@@ -238,7 +238,7 @@ const NotificationBell = () => {
       {/* Bell Button */}
       <button
         onClick={handleToggle}
-        className="relative px-2 py-2 text-black rounded hover:bg-gray-100 transition cursor-pointer"
+        className="relative px-2 py-2 text-black dark:text-gray-300 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer"
       >
         <FiBell size={15} />
         {unreadCount > 0 && (
@@ -253,13 +253,13 @@ const NotificationBell = () => {
 
       {/* Dropdown */}
       {showDropdown && (
-        <div className="absolute right-0 mt-2 w-60 bg-white border border-gray-200 rounded-lg shadow-xl z-50 max-h-[500px] overflow-hidden flex flex-col">
+        <div className="absolute right-0 mt-2 w-60 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-50 max-h-[500px] overflow-hidden flex flex-col">
           {/* Header */}
-          <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg">
+          <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-t-lg">
             <div className="flex justify-center">
-              <h3 className="text-sm font-semibold text-gray-900">Notifications</h3>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Notifications</h3>
               {unreadCount > 0 && (
-                <p className="text-xs text-gray-500">{unreadCount} unread</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{unreadCount} unread</p>
               )}
             </div>
             {unreadCount > 0 && (
@@ -276,31 +276,31 @@ const NotificationBell = () => {
           {/* List */}
           <div className="flex-1 overflow-y-auto">
             {loading && (
-              <div className="text-center text-gray-500 py-8 text-sm">Loading...</div>
+              <div className="text-center text-gray-500 dark:text-gray-400 py-8 text-sm">Loading...</div>
             )}
             {!loading && notifications.length === 0 && (
               <div className="text-center py-8">
-                <FiBell className="mx-auto h-5 w-5 text-gray-300 mb-2" />
-                <p className="text-sm text-gray-500">No notifications yet</p>
+                <FiBell className="mx-auto h-5 w-5 text-gray-300 dark:text-gray-600 mb-2" />
+                <p className="text-sm text-gray-500 dark:text-gray-400">No notifications yet</p>
               </div>
             )}
             {!loading && notifications.map(n => (
               <div
                 key={n.id}
                 onClick={() => handleNotificationClick(n)}
-                className={`px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer group ${
-                  !n.read ? 'bg-stone-50/50' : ''
+                className={`px-4 py-3 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer group ${
+                  !n.read ? 'bg-stone-50/50 dark:bg-stone-900/20' : ''
                 }`}
               >
                 <div className="flex items-start gap-3">
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm ${!n.read ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>
+                    <p className={`text-sm ${!n.read ? 'text-gray-900 dark:text-gray-100 font-medium' : 'text-gray-600 dark:text-gray-400'}`}>
                       {n.title}
                     </p>
-                    <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">
                       {n.message}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                       {timeAgo(n.createdAt)}
                     </p>
                   </div>

@@ -5,21 +5,21 @@ import React from 'react';
  * Accepts className for custom sizing/shape.
  */
 const Skeleton = ({ className = '', rounded = 'rounded' }) => (
-  <div className={`animate-pulse bg-warmgray-200 ${rounded} ${className}`} />
+  <div className={`animate-pulse bg-warmgray-200 dark:bg-gray-700 ${rounded} ${className}`} />
 );
 
 /**
  * Skeleton for a bookclub card (used in Home carousel and Discover grid).
  */
 export const BookClubCardSkeleton = () => (
-  <div className="w-[300px] h-[440px] rounded-2xl overflow-hidden bg-white shadow-md flex flex-col">
+  <div className="w-[300px] h-[440px] rounded-2xl overflow-hidden bg-white dark:bg-gray-800 shadow-md flex flex-col">
     {/* Cover image */}
     <Skeleton className="h-44 w-full" rounded="rounded-none" />
     {/* Body */}
     <div className="p-4 flex flex-col flex-1">
       <Skeleton className="h-5 w-3/4 mb-3" rounded="rounded" />
       {/* "Currently Reading" block */}
-      <div className="p-2.5 bg-warmgray-50 rounded-lg border border-warmgray-200 mt-1">
+      <div className="p-2.5 bg-warmgray-50 dark:bg-gray-700 rounded-lg border border-warmgray-200 dark:border-gray-600 mt-1">
         <Skeleton className="h-2.5 w-20 mb-2" rounded="rounded" />
         <div className="flex gap-2">
           <Skeleton className="w-10 h-14" rounded="rounded" />
@@ -46,7 +46,7 @@ export const BookClubCardSkeleton = () => (
  * Skeleton for the Discover grid cards.
  */
 export const DiscoverCardSkeleton = () => (
-  <div className="bg-white rounded-xl shadow-lg overflow-hidden w-full h-[420px] flex flex-col">
+  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden w-full h-[420px] flex flex-col">
     <Skeleton className="h-48 w-full" rounded="rounded-none" />
     <div className="p-5 flex flex-col flex-1">
       <Skeleton className="h-5 w-3/4 mb-2" rounded="rounded" />

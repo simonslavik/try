@@ -152,7 +152,8 @@ const UserHoverCard = ({
           {/* Action buttons */}
           <div className="px-3 pb-3 flex gap-2">
             <button
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 setVisible(false);
                 navigate(`/dm/${user?.id}`);
               }}
@@ -163,7 +164,8 @@ const UserHoverCard = ({
             </button>
             {!isFriend && onSendFriendRequest && (
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   onSendFriendRequest(user?.id);
                   setVisible(false);
                 }}

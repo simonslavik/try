@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { FiHome, FiSend } from 'react-icons/fi';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { COLLAB_EDITOR_URL, getProfileImageUrl } from '@config/constants';
+import { getProfileImageUrl, getCollabImageUrl } from '@config/constants';
 import StatusPopup from './StatusPopup';
 import { getStatusColor } from './statusUtils';
 
@@ -23,7 +23,7 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, on
     }, [auth, setAuth]);
 
     return (
-        <div className="w-20 bg-gray-900 border-r border-gray-700 flex flex-col items-center py-4 gap-3 overflow-y-auto">
+        <div className="w-full h-full bg-gray-900 border-r border-gray-700 flex flex-col items-center py-4 gap-3 overflow-y-auto overflow-x-hidden">
           {/* Home Button */}
           <button
             onClick={() => navigate('/')}
@@ -63,7 +63,7 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, on
             >
               {club.imageUrl ? (
                 <img
-                  src={`${COLLAB_EDITOR_URL}${club.imageUrl}`}
+                  src={getCollabImageUrl(club.imageUrl)}
                   alt={club.name}
                   className="w-full h-full rounded-full object-cover"
                   onError={(e) => { 
@@ -86,7 +86,11 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, on
           >
             +
           </button>
-          <button className='cursor-pointer absolute bottom-4' onClick={() => setShowStatusPopup(prev => !prev)}>
+
+          {/* Spacer to push avatar to bottom */}
+          <div className="flex-1" />
+
+          <button className='cursor-pointer flex-shrink-0' onClick={() => setShowStatusPopup(prev => !prev)}>
             <div className="relative">
               <img
                 src={getProfileImageUrl(auth.user.profileImage) || '/images/default.webp'} 

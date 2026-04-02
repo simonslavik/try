@@ -93,8 +93,8 @@ export const deleteBookClubBook = async (req: AuthRequest, res: Response, next: 
 export const getBatchCurrentBooks = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { bookClubIds } = req.body;
-    const currentBooks = await BookClubBooksService.getBatchCurrentBooks(bookClubIds);
-    res.json({ success: true, currentBooks });
+    const result = await BookClubBooksService.getBatchCurrentBooks(bookClubIds);
+    res.json({ success: true, currentBooks: result });
   } catch (error) {
     next(error);
   }

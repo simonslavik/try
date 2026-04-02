@@ -13,6 +13,7 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
   const [lastReadAt, setLastReadAt] = useState(null);
   const [hasMoreMessages, setHasMoreMessages] = useState(false);
   const [loadingOlder, setLoadingOlder] = useState(false);
+  const [typingUsers, setTypingUsers] = useState([]);
   const { toastError } = useContext(UIFeedbackContext);
   const reconnectTimeoutRef = useRef(null);
   const isIntentionalCloseRef = useRef(false);
@@ -22,6 +23,7 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
   const currentBookClubIdRef = useRef(null);
   const onInitRef = useRef(onInit);
   onInitRef.current = onInit;
+  const typingTimersRef = useRef({});
 
   // Track the latest prop values so the cleanup can decide whether to close
   const currentRoomPropRef = useRef(currentRoom);
@@ -51,6 +53,10 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
       // Just switch rooms without reconnecting
       logger.debug('🔄 Switching room from', currentRoomIdRef.current, 'to', currentRoom.id);
       currentRoomIdRef.current = currentRoom.id;
+      // Clear typing indicator for the old room
+      setTypingUsers([]);
+      Object.values(typingTimersRef.current).forEach(clearTimeout);
+      typingTimersRef.current = {};
       ws.current.send(JSON.stringify({
         type: 'switch-room',
         roomId: currentRoom.id,
@@ -277,6 +283,23 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
                 setUnreadSections(prev => new Set([...prev, data.section]));
               }
               break;
+
+            case 'typing': {
+              const name = data.username;
+              const id = data.userId;
+              // Skip own typing events
+              if (id === auth?.user?.id) break;
+              // Add user to typing list
+              setTypingUsers(prev => prev.includes(name) ? prev : [...prev, name]);
+              // Clear previous timer for this user
+              if (typingTimersRef.current[id]) clearTimeout(typingTimersRef.current[id]);
+              // Remove after 3s of no typing events
+              typingTimersRef.current[id] = setTimeout(() => {
+                setTypingUsers(prev => prev.filter(u => u !== name));
+                delete typingTimersRef.current[id];
+              }, 3000);
+              break;
+            }
           }
         } catch (err) {
           logger.error('Error processing WebSocket message:', err);
@@ -347,6 +370,13 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
     };
   }, [bookClubId, currentRoom?.id, auth?.token]); // Reconnect when bookclub, room, or auth changes
 
+  // Send a typing event to the bookclub room (throttled by caller)
+  const sendTyping = useCallback(() => {
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({ type: 'typing' }));
+    }
+  }, []);
+
   // Mark a section as viewed — clears the unread indicator and tells the server
   const viewSection = useCallback((section) => {
     setUnreadSections(prev => {
@@ -399,6 +429,8 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
     lastReadAt,
     hasMoreMessages,
     loadingOlder,
-    loadOlderMessages
+    loadOlderMessages,
+    typingUsers,
+    sendTyping
   };
 };

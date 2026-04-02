@@ -142,8 +142,11 @@ export const uploadBookClubImage = async (req: AuthRequest, res: Response) => {
     if (!hasPermission) {
       return res.status(403).json({ error: 'Only admins can change the bookclub image' });
     }
-    
-    const imageUrl = `/uploads/bookclub-images/${req.file.filename}`;
+
+    // Upload to Cloudinary
+    const { uploadToCloudinary, deleteFromCloudinary, extractPublicId } = await import('../config/cloudinary.js');
+
+    const { url: imageUrl } = await uploadToCloudinary(req.file.buffer, 'bookclub/bookclub-images');
     await BookClubService.updateClub(bookClubId, userId, { imageUrl });
     
     res.json({ message: 'Image uploaded successfully', imageUrl });

@@ -8,7 +8,7 @@ import CurrentBookDetailsModal from '@components/features/bookclub/Modals/Curren
 import AddBookToBookclubModal from '@components/features/bookclub/Modals/AddBookToBookclubModal';
 import CreateRoomModal from '@components/features/bookclub/Modals/CreateRoomModal';
 import RoomSettingsModal from '@components/features/bookclub/Modals/RoomSettingsModal';
-import { COLLAB_EDITOR_URL } from '@config/constants';
+import { getCollabImageUrl } from '@config/constants';
 import { useConfirm, useToast } from '@hooks/useUIFeedback';
 
 // Function to convert URLs in text to clickable links
@@ -42,6 +42,7 @@ import BookClubBookView from '@components/features/bookclub/MainChatArea/BookClu
 import BookClubChat from '@components/features/bookclub/MainChatArea/BookClubChat';
 import ConnectedUsersSidebar from '@components/features/bookclub/ConnectedUsersSidebar';
 import MessageInput from '@components/features/bookclub/MessageInput';
+import TypingIndicator from '@components/common/TypingIndicator';
 import BookclubHeader from '@components/features/bookclub/MainChatArea/BookclubHeader';
 import InviteModal from '@components/common/modals/InviteModal';
 import AdminApprovalPanel from '@components/features/bookclub/AdminApprovalPanel';
@@ -50,7 +51,7 @@ import MemberManagement from '@components/features/bookclub/MemberManagement';
 import { useBookclubWebSocket } from '@hooks/useBookclubWebSocket';
 import { messageModerationAPI } from '@api/messageModeration.api';
 import { bookclubAPI } from '@api/bookclub.api';
-import { FiX, FiSettings as FiSettingsIcon, FiLock, FiUnlock, FiEyeOff, FiImage, FiTrash2 } from 'react-icons/fi';
+import { FiX, FiSettings as FiSettingsIcon, FiLock, FiUnlock, FiEyeOff, FiImage, FiTrash2, FiMenu, FiUsers } from 'react-icons/fi';
 import apiClient from '@api/axios';
 import logger from '@utils/logger';
 import { ChatSkeleton, SidebarSkeleton } from '@components/common/Skeleton';
@@ -128,6 +129,24 @@ const BookClub = () => {
   // Force re-render counter for role updates
   const [roleUpdateCounter, setRoleUpdateCounter] = useState(0);
   
+  // Mobile sidebar visibility
+  const [showMobileLeftSidebar, setShowMobileLeftSidebar] = useState(false);
+  const [showMobileRightSidebar, setShowMobileRightSidebar] = useState(false);
+
+  // Auto-close mobile sidebars when resizing to/from mobile
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    const onChange = (e) => {
+      if (e.matches) {
+        // Going to desktop — dismiss mobile overlays
+        setShowMobileLeftSidebar(false);
+        setShowMobileRightSidebar(false);
+      }
+    };
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  
   const fileInputRef = useRef(null);
   const fileUploadRef = useRef(null);
 
@@ -165,7 +184,9 @@ const BookClub = () => {
     lastReadAt,
     hasMoreMessages,
     loadingOlder,
-    loadOlderMessages
+    loadOlderMessages,
+    typingUsers,
+    sendTyping
   } = useBookclubWebSocket(bookClub, currentRoom, auth, bookClubId, { onInit: handleWsInit });
 
   // Extract user's role from bookClubMembers
@@ -631,8 +652,15 @@ const BookClub = () => {
       const data = response.data;
       logger.debug('Friend request response:', data);
       
-      toastSuccess('Friend request sent!');
-      setSelectedUserId(null);
+      toastSuccess(data.message || 'Friend request sent!');
+      
+      // Refresh friends list to update UI immediately
+      try {
+        const friendsResponse = await apiClient.get('/v1/friends/list');
+        setFriends(friendsResponse.data.data || []);
+      } catch (fetchErr) {
+        logger.debug('Could not refresh friends list:', fetchErr);
+      }
     } catch (err) {
       logger.error('Error sending friend request:', err);
       toastError(err.response?.data?.error || err.response?.data?.message || 'Failed to send friend request');
@@ -744,8 +772,25 @@ const BookClub = () => {
 
   return (
     <div className="flex h-screen bg-gray-900">
-        <div className='flex justify-center'>
+        {/* Mobile overlay backdrop */}
+        {(showMobileLeftSidebar || showMobileRightSidebar) && (
+          <div 
+            className="md:hidden fixed inset-0 bg-black/50 z-[70]"
+            onClick={() => { setShowMobileLeftSidebar(false); setShowMobileRightSidebar(false); }}
+          />
+        )}
+
+        {/* Left sidebars - hidden on mobile, shown as overlay when toggled */}
+        <div className={`${showMobileLeftSidebar ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:static inset-y-0 left-0 z-[80] flex transition-transform duration-300 ease-in-out`}>
           {/* My Bookclubs Sidebar */}
+          <ResizablePanel
+            side="right"
+            defaultWidth={80}
+            minWidth={80}
+            maxWidth={80}
+            collapseThreshold={50}
+            storageKey="bookclub-mybookclubs-width"
+          >
           <MyBookClubsSidebar 
             bookClubs={myBookClubs} 
             currentBookClubId={bookClubId}
@@ -758,6 +803,7 @@ const BookClub = () => {
             wsRef={ws}
             onLogout={logout}
           />
+          </ResizablePanel>
           
           {/* Bookclub Rooms Sidebar */}
           <ResizablePanel
@@ -827,9 +873,26 @@ const BookClub = () => {
           </ResizablePanel>
         </div>
         
-        <div className="flex flex-1">
+        <div className="flex flex-1 min-w-0">
+
+        {/* Mobile top bar with toggle buttons */}
+        <div className="md:hidden fixed top-0 left-0 right-0 z-30 flex items-center justify-between bg-gray-800 border-b border-gray-700 px-3 py-2">
+          <button
+            onClick={() => setShowMobileLeftSidebar(true)}
+            className="p-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <FiMenu size={20} />
+          </button>
+          <span className="text-white font-medium text-sm truncate mx-2">{bookClub?.name || 'Book Club'}</span>
+          <button
+            onClick={() => setShowMobileRightSidebar(true)}
+            className="p-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <FiUsers size={20} />
+          </button>
+        </div>
         {/* Main Chat Area */}
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 min-w-0 pt-12 md:pt-0">
           {/* Room Header */}
           <BookclubHeader 
             showBooksHistory={showBooksHistory}
@@ -862,12 +925,12 @@ const BookClub = () => {
 
           {/* Content Area - Settings, Calendar, Books History, Suggestions, or Messages */}
           {showSettings ? (
-            <div className="flex-1 overflow-y-auto bg-gray-900 p-6">
+            <div className="flex-1 overflow-y-auto bg-gray-900 p-3 md:p-6">
               {/* Settings Header */}
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <FiSettingsIcon className="w-6 h-6 text-stone-500" />
-                    <h2 className="text-2xl font-bold text-white">Bookclub Settings</h2>
+                <div className="flex items-center justify-between mb-4 md:mb-6">
+                  <div className="flex items-center gap-2 md:gap-3">
+                    <FiSettingsIcon className="w-5 h-5 md:w-6 md:h-6 text-stone-500" />
+                    <h2 className="text-lg md:text-2xl font-bold text-white">Bookclub Settings</h2>
                   </div>
                   <button
                     onClick={() => {
@@ -888,15 +951,15 @@ const BookClub = () => {
                 </div>
 
                 {/* Settings Form */}
-                <div className="bg-gray-800 rounded-xl p-6 mb-6">
-                  <h3 className="text-xl font-bold text-white mb-6">General Settings</h3>
+                <div className="bg-gray-800 rounded-xl p-4 md:p-6 mb-4 md:mb-6">
+                  <h3 className="text-lg md:text-xl font-bold text-white mb-4 md:mb-6">General Settings</h3>
                   <form onSubmit={handleSaveSettings} className="space-y-6">
                     {/* Bookclub Image */}
                     <div>
                       <label className="block text-sm font-semibold text-gray-300 mb-2">Bookclub Image</label>
-                      <div className="relative group w-52 h-52">
+                      <div className="relative group w-36 h-36 md:w-52 md:h-52">
                         <img 
-                          src={bookClub?.imageUrl ? `${COLLAB_EDITOR_URL}${bookClub.imageUrl}` : '/images/default.webp'}
+                          src={bookClub?.imageUrl ? getCollabImageUrl(bookClub.imageUrl) : '/images/default.webp'}
                           alt={bookClub?.name}
                           className="w-full h-full object-cover rounded-lg"
                           onError={(e) => { e.target.src = '/images/default.webp'; }}
@@ -1113,7 +1176,7 @@ const BookClub = () => {
                 }}
               />
             ) : showBooksHistory ? (
-              <div className="flex-1 overflow-y-auto p-6">
+              <div className="flex-1 overflow-y-auto p-3 md:p-6">
                 {loadingBooks ? (
                   <div className="space-y-4 mt-4">
                     {[...Array(3)].map((_, i) => (
@@ -1161,6 +1224,11 @@ const BookClub = () => {
               />
             )}
 
+            {/* Typing indicator */}
+            {!showBooksHistory && !showCalendar && !showSuggestions && !showMeetings && !showSettings && (
+              <TypingIndicator typingUsers={typingUsers} />
+            )}
+
             {/* Message Input - Only show when not viewing special views */}
             {!showBooksHistory && !showCalendar && !showSuggestions && !showMeetings && !showSettings && auth?.user ? (
               currentRoom?.type === 'ANNOUNCEMENT' && !['OWNER', 'ADMIN', 'MODERATOR'].includes(userRole) ? (
@@ -1183,6 +1251,7 @@ const BookClub = () => {
                   members={bookClubMembers}
                   replyingTo={replyingTo}
                   onCancelReply={() => setReplyingTo(null)}
+                  onTyping={sendTyping}
                 />
               )
             ) : !showBooksHistory && !showCalendar && !showSuggestions && !showMeetings && !showSettings ? (
@@ -1195,7 +1264,8 @@ const BookClub = () => {
 
           </div>
 
-          {/* Connected Users Sidebar */}
+          {/* Connected Users Sidebar - hidden on mobile, overlay when toggled */}
+          <div className={`${showMobileRightSidebar ? 'fixed inset-y-0 right-0 translate-x-0' : 'hidden md:block md:static'} md:translate-x-0 z-[80] transition-transform duration-300 ease-in-out`}>
           <ResizablePanel
             side="left"
             defaultWidth={176}
@@ -1211,6 +1281,7 @@ const BookClub = () => {
               onSendFriendRequest={handleSendFriendRequest}
             />
           </ResizablePanel>
+          </div>
         </div>
 
 

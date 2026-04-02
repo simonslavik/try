@@ -313,10 +313,11 @@ export const handleJoin = (
       });
 
       const unreadSections: string[] = [];
+      const memberJoinedAt = (membership as any).joinedAt || (membership as any).createdAt || new Date(0);
       for (const sa of sectionActivities) {
         const lastViewed = sectionReadMap[sa.section];
-        // Unread if: user never viewed, or activity is newer than last view, and not by the user themselves
-        if (sa.lastActivityBy !== userId && (!lastViewed || sa.lastActivityAt > lastViewed)) {
+        // Unread if: activity is after user joined, not by this user, and user hasn't viewed it since
+        if (sa.lastActivityBy !== userId && sa.lastActivityAt > memberJoinedAt && (!lastViewed || sa.lastActivityAt > lastViewed)) {
           unreadSections.push(sa.section);
         }
       }
@@ -1299,5 +1300,49 @@ export const handleSectionActivity = async (message: any, currentClient: Client 
     console.log(`📢 Section activity: ${currentClient.username} added to '${section}' in club ${clubId}`);
   } catch (err) {
     console.error('Error handling section activity:', err);
+  }
+};
+
+// ── Typing indicators ────────────────────────────────────
+
+/** Bookclub room typing — broadcast to same room, exclude sender */
+export const handleTyping = (message: any, currentClient: Client | null) => {
+  if (!currentClient || !currentClient.bookClubId || !currentClient.roomId) return;
+
+  const activeClub = activeBookClubs.get(currentClient.bookClubId);
+  if (!activeClub) return;
+
+  const payload = JSON.stringify({
+    type: 'typing',
+    userId: currentClient.userId,
+    username: currentClient.username,
+    roomId: currentClient.roomId,
+  });
+
+  activeClub.clients.forEach((client) => {
+    if (
+      client.id !== currentClient.id &&
+      client.roomId === currentClient.roomId &&
+      client.ws.readyState === WebSocket.OPEN
+    ) {
+      client.ws.send(payload);
+    }
+  });
+};
+
+/** DM typing — send to receiver only */
+export const handleTypingDM = (message: any, currentClient: Client | null) => {
+  if (!currentClient || !currentClient.isDMConnection) return;
+
+  const { receiverId } = message;
+  if (!receiverId) return;
+
+  const receiverClient = activeDMClients.get(receiverId);
+  if (receiverClient && receiverClient.ws.readyState === WebSocket.OPEN) {
+    receiverClient.ws.send(JSON.stringify({
+      type: 'typing-dm',
+      userId: currentClient.userId,
+      username: currentClient.username,
+    }));
   }
 };

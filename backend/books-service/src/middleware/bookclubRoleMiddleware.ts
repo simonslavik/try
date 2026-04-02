@@ -37,7 +37,7 @@ export const requireBookClubRole = (
           'Content-Type': 'application/json',
           'x-user-id': userId,
           'x-user-email': req.user?.email || '',
-          ...(req.user?.name && { 'x-user-name': req.user.name }),
+          ...(req.user?.name && { 'x-user-name': encodeURIComponent(req.user.name) }),
           ...(req.headers.authorization && {
             Authorization: req.headers.authorization,
           }),

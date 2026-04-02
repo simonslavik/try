@@ -48,7 +48,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     userId,
     email: userEmail || '',
     role: 'user',
-    name: userName || undefined,
+    name: userName ? decodeURIComponent(userName) : undefined,
   };
 
   next();

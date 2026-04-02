@@ -8,7 +8,7 @@ import HomePageHeader from '@components/layout/Header';
 import AuthContext from '@context/index';
 import LoginModule from '@components/common/modals/loginModule';
 import RegisterModule from '@components/common/modals/registerModule';
-import { COLLAB_EDITOR_URL, getProfileImageUrl } from '@config/constants';
+import { getProfileImageUrl, getCollabImageUrl } from '@config/constants';
 import apiClient from '@api/axios';
 import logger from '@utils/logger';
 import { useToast } from '@hooks/useUIFeedback';
@@ -105,7 +105,7 @@ const BookClubPage = () => {
         return (
             <>
                 <HomePageHeader />
-                <div className="min-h-screen bg-gray-50 pt-8">
+                <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-8 transition-colors duration-300">
                     <div className="max-w-6xl mx-auto px-6 space-y-6">
                         {/* Hero skeleton */}
                         <div className="relative rounded-2xl overflow-hidden">
@@ -137,13 +137,13 @@ const BookClubPage = () => {
         return (
             <>
                 <HomePageHeader />
-                <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-20">
+                <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-20 dark:bg-gray-900 transition-colors duration-300">
                     <div className="text-center max-w-md">
-                        <div className="w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-5">
+                        <div className="w-16 h-16 rounded-2xl bg-red-50 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-5">
                             <FiBook className="w-7 h-7 text-red-500" />
                         </div>
-                        <h2 className="text-xl font-semibold text-gray-900 mb-2 font-display">Couldn't Load Book Club</h2>
-                        <p className="text-sm text-gray-500 mb-6 font-outfit">{error}</p>
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2 font-display">Couldn't Load Book Club</h2>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 font-outfit">{error}</p>
                         <div className="flex items-center justify-center gap-3">
                             <button
                                 onClick={() => window.location.reload()}
@@ -167,31 +167,31 @@ const BookClubPage = () => {
     return (
         <>
             <HomePageHeader />
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
                 {/* Hero Section */}
                 <div className="bg-stone-700 text-white">
-                    <div className="max-w-7xl mx-auto px-6 py-12">
-                        <div className="flex items-center gap-8">
+                    <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
+                        <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
                             {/* BookClub Image */}
                             <div className="flex-shrink-0">
                                 {bookClub?.imageUrl ? (
                                     <img
-                                        src={`${COLLAB_EDITOR_URL}${bookClub.imageUrl}`}
+                                        src={getCollabImageUrl(bookClub.imageUrl)}
                                         alt={bookClub.name}
-                                        className="w-32 h-32 rounded-2xl object-cover border-4 border-white shadow-2xl"
+                                        className="w-24 h-24 md:w-32 md:h-32 rounded-2xl object-cover border-4 border-white shadow-2xl"
                                         onError={(e) => { e.target.src = '/images/default.webp'; }}
                                     />
                                 ) : (
-                                    <div className="w-32 h-32 rounded-2xl bg-white/20 flex items-center justify-center border-4 border-white shadow-2xl">
+                                    <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-white/20 flex items-center justify-center border-4 border-white shadow-2xl">
                                         <FiBook className="text-white text-5xl" />
                                     </div>
                                 )}
                             </div>
 
                             {/* BookClub Info */}
-                            <div className="flex-1">
-                                <h1 className="text-4xl font-bold mb-3">{bookClub?.name}</h1>
-                                <div className="flex items-center gap-6 text-white/90">
+                            <div className="flex-1 text-center md:text-left">
+                                <h1 className="text-2xl md:text-4xl font-bold mb-2 md:mb-3">{bookClub?.name}</h1>
+                                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 md:gap-6 text-white/90 text-sm md:text-base">
                                     <div className="flex items-center gap-2">
                                         <FiUsers size={20} />
                                         <span>{bookClubMembers.length} member{bookClubMembers.length !== 1 ? 's' : ''}</span>
@@ -244,7 +244,7 @@ const BookClubPage = () => {
                                         toastError(error.response?.data?.message || 'Failed to join bookclub');
                                     }
                                 }}
-                                className="px-8 py-4 bg-white text-stone-700 rounded-xl font-semibold hover:bg-stone-50 transition-all transform hover:scale-105 shadow-xl flex items-center gap-2"
+                                className="w-full md:w-auto px-6 md:px-8 py-3 md:py-4 bg-white text-stone-700 rounded-xl font-semibold hover:bg-stone-50 transition-all transform hover:scale-105 shadow-xl flex items-center justify-center gap-2"
                             >
                                 <FiMessageSquare size={20} />
                                 {!auth?.user 
@@ -259,13 +259,13 @@ const BookClubPage = () => {
                 </div>
 
                 {/* Main Content */}
-                <div className="max-w-7xl mx-auto px-6 py-8">
+                <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Left Column - Current Book & Activity */}
                         <div className="lg:col-span-2 space-y-8">
                             {/* Current Book Section */}
                             {currentBook ? (
-                                <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
                                     <div className="bg-gradient-to-r from-stone-600 to-stone-700 px-6 py-4">
                                         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                                             <FiBook />
@@ -281,20 +281,20 @@ const BookClubPage = () => {
                                                 onError={(e) => { e.target.src = '/images/default.webp'; }}
                                             />
                                             <div className="flex-1">
-                                                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                                                <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                                                     {currentBook.book?.title}
                                                 </h3>
-                                                <p className="text-lg text-gray-600 mb-4">
+                                                <p className="text-lg text-gray-600 dark:text-gray-400 mb-4">
                                                     {currentBook.book?.author}
                                                 </p>
                                                 
                                                 {/* Progress Bar */}
                                                 <div className="mb-4">
-                                                    <div className="flex justify-between text-sm text-gray-600 mb-2">
+                                                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
                                                         <span>Reading Progress</span>
-                                                        <span className="font-semibold text-stone-700">{calculateProgress()}%</span>
+                                                        <span className="font-semibold text-stone-700 dark:text-stone-400">{calculateProgress()}%</span>
                                                     </div>
-                                                    <div className="w-full bg-gray-200 rounded-full h-3">
+                                                    <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-3">
                                                         <div
                                                             className="bg-gradient-to-r from-stone-600 to-stone-700 h-3 rounded-full transition-all"
                                                             style={{ width: `${calculateProgress()}%` }}
@@ -304,18 +304,18 @@ const BookClubPage = () => {
 
                                                 {/* Timeline */}
                                                 <div className="grid grid-cols-2 gap-4 mb-4">
-                                                    <div className="bg-stone-50 rounded-lg p-3">
-                                                        <p className="text-xs text-gray-600 mb-1">Started</p>
-                                                        <p className="font-semibold text-stone-700">
+                                                    <div className="bg-stone-50 dark:bg-gray-700 rounded-lg p-3">
+                                                        <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Started</p>
+                                                        <p className="font-semibold text-stone-700 dark:text-stone-400">
                                                             {new Date(currentBook.startDate).toLocaleDateString('en-US', {
                                                                 month: 'short',
                                                                 day: 'numeric'
                                                             })}
                                                         </p>
                                                     </div>
-                                                    <div className="bg-stone-50 rounded-lg p-3">
-                                                        <p className="text-xs text-gray-600 mb-1">Target Finish</p>
-                                                        <p className="font-semibold text-stone-600">
+                                                    <div className="bg-stone-50 dark:bg-gray-700 rounded-lg p-3">
+                                                        <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Target Finish</p>
+                                                        <p className="font-semibold text-stone-600 dark:text-stone-400">
                                                             {new Date(currentBook.endDate).toLocaleDateString('en-US', {
                                                                 month: 'short',
                                                                 day: 'numeric'
@@ -327,16 +327,16 @@ const BookClubPage = () => {
                                                 {/* Stats */}
                                                 <div className="flex gap-4">
                                                     <div className="text-center">
-                                                        <p className="text-2xl font-bold text-stone-700">
+                                                        <p className="text-2xl font-bold text-stone-700 dark:text-stone-400">
                                                             {currentBook.book?.pageCount || '?'}
                                                         </p>
-                                                        <p className="text-xs text-gray-600">Total Pages</p>
+                                                        <p className="text-xs text-gray-600 dark:text-gray-400">Total Pages</p>
                                                     </div>
                                                     <div className="text-center">
-                                                        <p className="text-2xl font-bold text-stone-600">
+                                                        <p className="text-2xl font-bold text-stone-600 dark:text-stone-400">
                                                             {calculateDaysRemaining()}
                                                         </p>
-                                                        <p className="text-xs text-gray-600">Days Left</p>
+                                                        <p className="text-xs text-gray-600 dark:text-gray-400">Days Left</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -344,16 +344,16 @@ const BookClubPage = () => {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-                                    <FiBook className="mx-auto text-6xl text-gray-300 mb-4" />
-                                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No Current Book</h3>
-                                    <p className="text-gray-600">This bookclub hasn't selected a book to read yet.</p>
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-12 text-center">
+                                    <FiBook className="mx-auto text-6xl text-gray-300 dark:text-gray-600 mb-4" />
+                                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">No Current Book</h3>
+                                    <p className="text-gray-600 dark:text-gray-400">This bookclub hasn't selected a book to read yet.</p>
                                 </div>
                             )}
 
                             {/* Upcoming Books */}
                             {upcomingBooks.length > 0 && (
-                                <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
                                     <div className="bg-gradient-to-r from-stone-600 to-stone-700 px-6 py-4">
                                         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                                             <FiCalendar />
@@ -363,7 +363,7 @@ const BookClubPage = () => {
                                     <div className="p-6">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             {upcomingBooks.slice(0, 4).map((bookClubBook) => (
-                                                <div key={bookClubBook.id} className="flex gap-3 bg-stone-50 rounded-lg p-3 hover:shadow-md transition-shadow">
+                                                <div key={bookClubBook.id} className="flex gap-3 bg-stone-50 dark:bg-gray-700 rounded-lg p-3 hover:shadow-md transition-shadow">
                                                     <img
                                                         src={bookClubBook.book?.coverUrl || '/images/default.webp'}
                                                         alt={bookClubBook.book?.title}
@@ -371,14 +371,14 @@ const BookClubPage = () => {
                                                         onError={(e) => { e.target.src = '/images/default.webp'; }}
                                                     />
                                                     <div className="flex-1">
-                                                        <h4 className="font-semibold text-gray-900 line-clamp-2 text-sm mb-1">
+                                                        <h4 className="font-semibold text-gray-900 dark:text-gray-100 line-clamp-2 text-sm mb-1">
                                                             {bookClubBook.book?.title}
                                                         </h4>
-                                                        <p className="text-xs text-gray-600 mb-2">
+                                                        <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
                                                             {bookClubBook.book?.author}
                                                         </p>
                                                         {bookClubBook.startDate && (
-                                                            <p className="text-xs text-stone-600 font-medium">
+                                                            <p className="text-xs text-stone-600 dark:text-stone-400 font-medium">
                                                                 Starts {new Date(bookClubBook.startDate).toLocaleDateString()}
                                                             </p>
                                                         )}
@@ -392,7 +392,7 @@ const BookClubPage = () => {
 
                             {/* Completed Books */}
                             {completedBooks.length > 0 && (
-                                <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
                                     <div className="bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-4">
                                         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                                             <FiStar />
@@ -409,7 +409,7 @@ const BookClubPage = () => {
                                                         className="w-full h-40 object-cover rounded-lg shadow-md mb-2 hover:scale-105 transition-transform"
                                                         onError={(e) => { e.target.src = '/images/default.webp'; }}
                                                     />
-                                                    <h4 className="font-semibold text-gray-900 text-sm line-clamp-2">
+                                                    <h4 className="font-semibold text-gray-900 dark:text-gray-100 text-sm line-clamp-2">
                                                         {bookClubBook.book?.title}
                                                     </h4>
                                                 </div>
@@ -423,7 +423,7 @@ const BookClubPage = () => {
                         {/* Right Column - Members & Stats */}
                         <div className="space-y-8">
                             {/* Members Section */}
-                            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
                                 <div className="bg-gradient-to-r from-stone-500 to-stone-600 px-6 py-4">
                                     <h2 className="text-xl font-bold text-white flex items-center gap-2">
                                         <FiUsers />
@@ -437,7 +437,7 @@ const BookClubPage = () => {
                                             return (
                                                 <div
                                                     key={member.id}
-                                                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-stone-50 transition-colors cursor-pointer"
+                                                    className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-stone-50 dark:hover:bg-gray-600 transition-colors cursor-pointer"
                                                     onClick={() => navigate(`/profile/${member.id}`)}
                                                 >
                                                     <div className="relative">
@@ -452,8 +452,8 @@ const BookClubPage = () => {
                                                         }`}></div>
                                                     </div>
                                                     <div className="flex-1">
-                                                        <p className="font-semibold text-gray-900">{member.username}</p>
-                                                        <p className="text-xs text-gray-500">
+                                                        <p className="font-semibold text-gray-900 dark:text-gray-100">{member.username}</p>
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400">
                                                             {isOnline ? '🟢 Online' : 'Offline'}
                                                         </p>
                                                     </div>
@@ -462,7 +462,7 @@ const BookClubPage = () => {
                                         })}
                                     </div>
                                     {bookClubMembers.length > 10 && (
-                                        <p className="text-center text-sm text-gray-500 mt-3">
+                                        <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-3">
                                             +{bookClubMembers.length - 10} more members
                                         </p>
                                     )}

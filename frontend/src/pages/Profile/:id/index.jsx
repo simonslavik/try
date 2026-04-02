@@ -6,7 +6,7 @@ import HomePageHeader from '@components/layout/Header';
 import { FiInfo, FiMail, FiMessageCircle, FiPlus, FiEdit2, FiUserPlus, FiUserCheck, FiClock, FiBook, FiUsers, FiCalendar } from 'react-icons/fi';
 import AddBookToLibraryModal from '@components/common/modals/AddBookToLibraryModal';
 import BookDetailsModal from '@components/common/modals/BookDetails';
-import { COLLAB_EDITOR_URL, getProfileImageUrl } from '@config/constants';
+import { getProfileImageUrl, getCollabImageUrl } from '@config/constants';
 import apiClient from '@api/axios';
 import logger from '@utils/logger';
 import { useConfirm, useToast } from '@hooks/useUIFeedback';
@@ -263,7 +263,7 @@ const ProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-warmgray-50">
+      <div className="min-h-screen bg-warmgray-50 dark:bg-gray-900 transition-colors duration-300">
         <HomePageHeader />
         <ProfileSkeleton />
       </div>
@@ -272,17 +272,17 @@ const ProfilePage = () => {
 
   if (error || !profile) {
     return (
-      <div className="min-h-screen bg-warmgray-50">
+      <div className="min-h-screen bg-warmgray-50 dark:bg-gray-900 transition-colors duration-300">
         <HomePageHeader />
         <div className="flex flex-col items-center justify-center" style={{ minHeight: 'calc(100vh - 80px)' }}>
           <div className="text-center max-w-md">
-            <div className="w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-5">
+            <div className="w-16 h-16 rounded-2xl bg-red-50 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-5">
               <FiInfo className="w-7 h-7 text-red-500" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2 font-display">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2 font-display">
               {error ? 'Something Went Wrong' : 'Profile Not Found'}
             </h2>
-            <p className="text-sm text-gray-500 mb-6 font-outfit">{error || 'This profile doesn\'t exist or has been removed.'}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 font-outfit">{error || 'This profile doesn\'t exist or has been removed.'}</p>
             <button
               onClick={() => navigate('/')}
               className="px-5 py-2.5 bg-stone-700 text-white rounded-xl text-sm font-semibold hover:bg-stone-800 transition-colors font-outfit"
@@ -301,7 +301,7 @@ const ProfilePage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-warmgray-50">
+    <div className="min-h-screen bg-warmgray-50 dark:bg-gray-900 transition-colors duration-300">
       <HomePageHeader />
       
       {/* Hero Banner */}
@@ -314,7 +314,7 @@ const ProfilePage = () => {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Profile Card — overlaps the banner */}
         <div className="relative -mt-24 mb-8">
-          <div className="bg-white rounded-2xl shadow-sm  p-6 md:p-8">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 md:p-8 transition-colors duration-300">
             <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
               {/* Avatar */}
               <div className="relative -mt-20 md:-mt-24 flex-shrink-0">
@@ -355,9 +355,9 @@ const ProfilePage = () => {
 
               {/* Name & Bio */}
               <div className="flex-1 text-center md:text-left pb-1">
-                <h1 className="text-2xl md:text-3xl font-serif font-bold text-stone-800">{profile.name}</h1>
+                <h1 className="text-2xl md:text-3xl font-serif font-bold text-stone-800 dark:text-warmgray-100">{profile.name}</h1>
                 {profile.bio && (
-                  <p className="mt-1.5 text-gray-500 text-sm max-w-lg leading-relaxed">{profile.bio}</p>
+                  <p className="mt-1.5 text-gray-500 dark:text-gray-400 text-sm max-w-lg leading-relaxed">{profile.bio}</p>
                 )}
               </div>
 
@@ -437,21 +437,21 @@ const ProfilePage = () => {
             {/* Stats Row */}
             <div className="mt-6 pt-6  flex items-center justify-center md:justify-start gap-4 md:gap-12">
               <div className="flex items-center">
-                <div className="w-10 h-10 rounded-xl bg-stone-50 flex items-center justify-center">
-                  <FiBook className="text-stone-600" size={18} />
+                <div className="w-10 h-10 rounded-xl bg-stone-50 dark:bg-gray-700 flex items-center justify-center">
+                  <FiBook className="text-stone-600 dark:text-stone-400" size={18} />
                 </div>
                 <div>
-                  <div className="text-lg font-bold text-stone-800">{createdBookClubs.length + memberBookClubs.length}</div>
-                  <div className="text-xs text-stone-500">Book Clubs</div>
+                  <div className="text-lg font-bold text-stone-800 dark:text-gray-100">{createdBookClubs.length + memberBookClubs.length}</div>
+                  <div className="text-xs text-stone-500 dark:text-gray-400">Book Clubs</div>
                 </div>
               </div>
               <div className="flex items-center">
-                <div className="w-10 h-10 rounded-xl bg-warmgray-100 flex items-center justify-center">
-                  <FiUsers className="text-stone-600" size={18} />
+                <div className="w-10 h-10 rounded-xl bg-warmgray-100 dark:bg-gray-700 flex items-center justify-center">
+                  <FiUsers className="text-stone-600 dark:text-stone-400" size={18} />
                 </div>
                 <div>
-                  <div className="text-lg font-bold text-stone-800">{profile.numberOfFriends || 0}</div>
-                  <div className="text-xs text-stone-500">Friends</div>
+                  <div className="text-lg font-bold text-stone-800 dark:text-gray-100">{profile.numberOfFriends || 0}</div>
+                  <div className="text-xs text-stone-500 dark:text-gray-400">Friends</div>
                 </div>
               </div>
             </div>
@@ -461,20 +461,20 @@ const ProfilePage = () => {
         {/* Book Clubs Sections */}
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-5">
-            <h2 className="text-xl font-serif font-bold text-stone-800">
+            <h2 className="text-xl font-serif font-bold text-stone-800 dark:text-gray-100">
               {isOwnProfile ? 'My Book Clubs' : `${profile.name}'s Book Clubs`}
             </h2>
-            <span className="text-xs font-semibold bg-stone-100 text-stone-700 px-2.5 py-0.5 rounded-full">
+            <span className="text-xs font-semibold bg-stone-100 dark:bg-gray-700 text-stone-700 dark:text-gray-300 px-2.5 py-0.5 rounded-full">
               {createdBookClubs.length + memberBookClubs.length}
             </span>
           </div>
 
           {createdBookClubs.length === 0 && memberBookClubs.length === 0 ? (
-            <div className="bg-white rounded-2xl shadow-sm  p-12 text-center">
-              <div className="w-16 h-16 bg-stone-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm  p-6 md:p-12 text-center">
+              <div className="w-16 h-16 bg-stone-50 dark:bg-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <FiBook className="text-stone-400" size={28} />
               </div>
-              <p className="text-stone-500 mb-4">
+              <p className="text-stone-500 dark:text-gray-400 mb-4">
                 {isOwnProfile ? "You haven't joined any book clubs yet" : "No book clubs yet"}
               </p>
               {isOwnProfile && (
@@ -494,12 +494,12 @@ const ProfilePage = () => {
                   <div
                     key={club.id}
                     onClick={() => navigate(`/bookclub/${club.id}`)}
-                    className="group bg-white rounded-2xl shadow-sm border border-warmgray-200 overflow-hidden cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+                    className="group bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-warmgray-200 dark:border-gray-700 overflow-hidden cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
                   >
                     {/* Club image */}
                     <div className="relative h-40 overflow-hidden">
                       <img 
-                        src={club.imageUrl ? `${COLLAB_EDITOR_URL}${club.imageUrl}` : '/images/default.webp'}
+                        src={club.imageUrl ? getCollabImageUrl(club.imageUrl) : '/images/default.webp'}
                         alt={club.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => { e.target.src = '/images/default.webp'; }}
@@ -526,11 +526,11 @@ const ProfilePage = () => {
                     
                     {/* Card body */}
                     <div className="p-4">
-                      <h3 className="font-semibold text-stone-800 truncate">{club.name}</h3>
+                      <h3 className="font-semibold text-stone-800 dark:text-gray-100 truncate">{club.name}</h3>
                       
                       {/* Current Book */}
                       {club.currentBook && (
-                        <div className="mt-2.5 p-2.5 bg-warmgray-50 rounded-lg border border-warmgray-200">
+                        <div className="mt-2.5 p-2.5 bg-warmgray-50 dark:bg-gray-700 rounded-lg border border-warmgray-200 dark:border-gray-600">
                           <p className="text-[10px] uppercase tracking-wider text-stone-600 font-bold mb-1.5">Currently Reading</p>
                           <div className="flex gap-2">
                             <img 
@@ -540,8 +540,8 @@ const ProfilePage = () => {
                               onError={(e) => { e.target.src = '/images/default.webp'; }}
                             />
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs font-semibold text-gray-800 line-clamp-2 leading-tight">{club.currentBook.book?.title}</p>
-                              <p className="text-[11px] text-gray-500 truncate mt-0.5">{club.currentBook.book?.author}</p>
+                              <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 line-clamp-2 leading-tight">{club.currentBook.book?.title}</p>
+                              <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate mt-0.5">{club.currentBook.book?.author}</p>
                             </div>
                           </div>
                         </div>
@@ -582,9 +582,9 @@ const ProfilePage = () => {
         {/* Books Library Section */}
         {(favoriteBooks.length > 0 || booksImReading.length > 0 || booksToRead.length > 0 || booksRead.length > 0 || isOwnProfile) && (
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-5 gap-3">
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-serif font-bold text-stone-800">
+                <h2 className="text-xl font-serif font-bold text-stone-800 dark:text-gray-100">
                   {isOwnProfile ? 'My Library' : `${profile.name}'s Library`}
                 </h2>
               </div>
@@ -614,7 +614,7 @@ const ProfilePage = () => {
                   className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                     bookFilter === tab.key
                       ? 'bg-stone-800 text-white shadow-sm'
-                      : 'bg-white text-stone-600 hover:bg-warmgray-100 border border-warmgray-200'
+                      : 'bg-white dark:bg-gray-800 text-stone-600 dark:text-gray-300 hover:bg-warmgray-100 dark:hover:bg-gray-700 border border-warmgray-200 dark:border-gray-600'
                   }`}
                 >
                   {tab.label}
@@ -646,11 +646,11 @@ const ProfilePage = () => {
 
               if (filteredBooks.length === 0) {
                 return (
-                  <div className="bg-white rounded-2xl shadow-sm border border-warmgray-200 p-12 text-center">
-                    <div className="w-16 h-16 bg-stone-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-warmgray-200 dark:border-gray-700 p-12 text-center">
+                    <div className="w-16 h-16 bg-stone-50 dark:bg-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                       <FiBook className="text-stone-400" size={28} />
                     </div>
-                    <p className="text-gray-500">
+                    <p className="text-gray-500 dark:text-gray-400">
                       {isOwnProfile
                         ? bookFilter === 'all'
                           ? 'No books in your library yet. Click "Add Books" to get started!'
@@ -714,8 +714,8 @@ const ProfilePage = () => {
                           </div>
                         )}
                       </div>
-                      <h4 className="mt-2.5 text-sm font-semibold text-gray-800 line-clamp-2 leading-snug">{userBook.book.title}</h4>
-                      <p className="text-xs text-gray-500 mt-0.5">{userBook.book.author}</p>
+                      <h4 className="mt-2.5 text-sm font-semibold text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug">{userBook.book.title}</h4>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{userBook.book.author}</p>
                     </div>
                   ))}
                 </div>

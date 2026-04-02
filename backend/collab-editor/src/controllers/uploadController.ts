@@ -1,13 +1,8 @@
 import { Response } from 'express';
 import prisma from '../config/database.js';
 import { AuthRequest } from '../middleware/authMiddleware.js';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import logger from '../utils/logger.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { uploadToCloudinary, deleteFromCloudinary, extractPublicId } from '../config/cloudinary.js';
 
 // Upload chat file
 export const uploadChatFile = async (req: AuthRequest, res: Response) => {
@@ -16,12 +11,21 @@ export const uploadChatFile = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    const fileUrl = `/uploads/chat-files/${req.file.filename}`;
+    // Determine resource type based on mimetype
+    const isImage = /^image\//.test(req.file.mimetype);
+    const resourceType = isImage ? 'image' as const : 'auto' as const;
+
+    // Upload to Cloudinary
+    const { url: fileUrl, publicId } = await uploadToCloudinary(
+      req.file.buffer,
+      'bookclub/chat-files',
+      resourceType
+    );
     
     // Save file metadata to database
     const chatFile = await prisma.chatFile.create({
       data: {
-        filename: req.file.filename,
+        filename: publicId.split('/').pop() || req.file.originalname,
         originalName: req.file.originalname,
         mimetype: req.file.mimetype,
         size: req.file.size,
@@ -43,14 +47,6 @@ export const uploadChatFile = async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     logger.error('ERROR_UPLOAD_FILE', { error: error instanceof Error ? error.message : 'Unknown error' });
-    // Clean up uploaded file on error
-    if (req.file) {
-      try {
-        fs.unlinkSync(req.file.path);
-      } catch {
-        // Ignore cleanup errors
-      }
-    }
     res.status(500).json({ error: 'Failed to upload file' });
   }
 };
@@ -74,10 +70,11 @@ export const deleteChatFile = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ error: 'Unauthorized' });
     }
     
-    // Delete from filesystem
-    const filePath = path.join(__dirname, '../..', file.url);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+    // Delete from Cloudinary
+    const publicId = extractPublicId(file.url);
+    if (publicId) {
+      const isImage = /^image\//.test(file.mimetype);
+      await deleteFromCloudinary(publicId, isImage ? 'image' : 'raw').catch(() => {});
     }
     
     // Delete from database

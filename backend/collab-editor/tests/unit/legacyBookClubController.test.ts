@@ -23,6 +23,20 @@ jest.mock('../../src/services/bookClub.service', () => ({
   BookClubService: mockBookClubService,
 }));
 
+const mockUploadToCloudinary = jest.fn().mockResolvedValue({
+  url: 'https://res.cloudinary.com/test/image/upload/v1/bookclub/bookclub-images/test.jpg',
+  publicId: 'bookclub/bookclub-images/test',
+});
+const mockDeleteFromCloudinary = jest.fn().mockResolvedValue(undefined);
+const mockExtractPublicId = jest.fn().mockReturnValue('bookclub/bookclub-images/test');
+
+jest.mock('../../src/config/cloudinary', () => ({
+  __esModule: true,
+  uploadToCloudinary: mockUploadToCloudinary,
+  deleteFromCloudinary: mockDeleteFromCloudinary,
+  extractPublicId: mockExtractPublicId,
+}));
+
 import { Request, Response } from 'express';
 import {
   createBookClub,
@@ -322,18 +336,19 @@ describe('bookClubController (legacy)', () => {
       const req = mockReq({
         params: { id: 'c-1' },
         user: { userId: 'admin' },
-        file: { filename: 'photo.jpg' },
+        file: { buffer: Buffer.from('fake-image'), mimetype: 'image/jpeg', originalname: 'photo.jpg' },
       });
       const res = mockRes();
 
       await uploadBookClubImage(req as any, res as any);
 
+      expect(mockUploadToCloudinary).toHaveBeenCalledWith(expect.any(Buffer), 'bookclub/bookclub-images');
       expect(mockBookClubService.updateClub).toHaveBeenCalledWith('c-1', 'admin', {
-        imageUrl: '/uploads/bookclub-images/photo.jpg',
+        imageUrl: 'https://res.cloudinary.com/test/image/upload/v1/bookclub/bookclub-images/test.jpg',
       });
       expect(res.json).toHaveBeenCalledWith({
         message: 'Image uploaded successfully',
-        imageUrl: '/uploads/bookclub-images/photo.jpg',
+        imageUrl: 'https://res.cloudinary.com/test/image/upload/v1/bookclub/bookclub-images/test.jpg',
       });
     });
 
@@ -356,7 +371,7 @@ describe('bookClubController (legacy)', () => {
       const req = mockReq({
         params: { id: 'c-1' },
         user: { userId: 'member' },
-        file: { filename: 'photo.jpg' },
+        file: { buffer: Buffer.from('fake-image'), mimetype: 'image/jpeg', originalname: 'photo.jpg' },
       });
       const res = mockRes();
 

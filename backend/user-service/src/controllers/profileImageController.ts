@@ -1,33 +1,13 @@
 import multer from 'multer';
 import path from 'path';
-import fs from 'fs';
-import { v4 as uuidv4 } from 'uuid';
 import { Request, Response } from 'express';
 import { UserService } from '../services/user.service.js';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 import { logger, logError } from '../utils/logger.js';
+import { uploadToCloudinary, deleteFromCloudinary, extractPublicId } from '../config/cloudinary.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, '../../uploads/profile-images');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${uuidv4()}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
-  }
-});
-
+// Configure multer for memory storage (buffer → Cloudinary)
 export const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|gif|webp/;
@@ -52,9 +32,22 @@ export const addProfileImage = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'No image file provided' });
     }
     
-    const imageUrl = `/uploads/profile-images/${req.file.filename}`;
+    // Upload to Cloudinary
+    const { url: imageUrl } = await uploadToCloudinary(
+      req.file.buffer,
+      'bookclub/profile-images'
+    );
     
     try {
+      // Delete old image from Cloudinary if exists
+      const currentUser = await UserService.getProfile(userId).catch(() => null);
+      if (currentUser?.profileImage) {
+        const oldPublicId = extractPublicId(currentUser.profileImage);
+        if (oldPublicId) {
+          await deleteFromCloudinary(oldPublicId).catch(() => {});
+        }
+      }
+
       const updatedUser = await UserService.updateProfileImage(userId, imageUrl);
       
       logger.info({
@@ -64,11 +57,6 @@ export const addProfileImage = async (req: Request, res: Response) => {
       });
       res.json({ message: 'Profile image uploaded successfully', imageUrl: updatedUser.profileImage });
     } catch (error: any) {
-      // Clean up uploaded file if service fails
-      if (req.file && fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-      }
-      
       if (error.message === 'USER_NOT_FOUND') {
         return res.status(404).json({ error: 'User not found' });
       }
@@ -76,10 +64,6 @@ export const addProfileImage = async (req: Request, res: Response) => {
     }
   } catch (error) {
     logError(error, 'Error uploading profile image', { userId: req.user?.userId });
-    // Clean up uploaded file on error
-    if (req.file && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
-    }
     res.status(500).json({ error: 'Failed to upload profile image' });
   }
 };
@@ -89,6 +73,15 @@ export const deleteProfileImage = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.userId;
     
+    // Get current user to find the image URL for Cloudinary cleanup
+    const currentUser = await UserService.getProfile(userId).catch(() => null);
+    if (currentUser?.profileImage) {
+      const publicId = extractPublicId(currentUser.profileImage);
+      if (publicId) {
+        await deleteFromCloudinary(publicId).catch(() => {});
+      }
+    }
+
     await UserService.deleteProfileImage(userId);
     
     logger.info({

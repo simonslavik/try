@@ -16,7 +16,9 @@ import {
   handleStatusUpdate,
   handleViewSection,
   handleSectionActivity,
-  handleLoadOlderMessages
+  handleLoadOlderMessages,
+  handleTyping,
+  handleTypingDM
 } from './handlers.js';
 import { handleAddReaction, handleRemoveReaction } from './reactionHandler.js';
 
@@ -142,6 +144,14 @@ export const setupWebSocket = (wss: WebSocketServer) => {
           
           case 'section-activity':
             handleSectionActivity(message, currentClient);
+            break;
+          
+          case 'typing':
+            handleTyping(message, currentClient);
+            break;
+          
+          case 'typing-dm':
+            handleTypingDM(message, currentClient);
             break;
           
           default:

@@ -59,7 +59,7 @@ const authHandler = (req: Request, res: Response, next: NextFunction): void => {
     req.headers['x-user-id'] = decoded.userId;
     req.headers['x-user-email'] = decoded.email;
     if (decoded.name) {
-      req.headers['x-user-name'] = decoded.name.replace(/[\r\n]/g, '');
+      req.headers['x-user-name'] = encodeURIComponent(decoded.name.replace(/[\r\n]/g, ''));
     }
 
     logger.debug(`Auth: user ${decoded.userId} → ${req.method} ${req.path}`);
@@ -114,7 +114,7 @@ export const optionalAuth = (req: Request, res: Response, next: NextFunction): v
     req.headers['x-user-id'] = decoded.userId;
     req.headers['x-user-email'] = decoded.email;
     if (decoded.name) {
-      req.headers['x-user-name'] = decoded.name.replace(/[\r\n]/g, '');
+      req.headers['x-user-name'] = encodeURIComponent(decoded.name.replace(/[\r\n]/g, ''));
     }
   } catch {
     // Invalid/expired token on optional auth — continue without user

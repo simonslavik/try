@@ -40,7 +40,7 @@ const StatusPopup = ({ user, onClose, onStatusChange, wsRef, onLogout }) => {
   return (
     <div
       ref={popupRef}
-      className="absolute bottom-16 left-2 w-56 bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-50 overflow-hidden"
+      className="fixed bottom-16 left-2 w-56 bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-[9999] overflow-hidden"
     >
       {/* User info */}
       <div className="p-3 border-b border-gray-700 flex items-center gap-3">

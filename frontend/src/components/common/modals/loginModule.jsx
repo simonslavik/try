@@ -133,11 +133,11 @@ const Login = ({ onClose, onSwitchToRegister }) => {
 
     return (
         <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50' onClick={onClose}>
-            <div className='bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative' onClick={(e) => e.stopPropagation()}>
+            <div className='bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md relative transition-colors duration-300' onClick={(e) => e.stopPropagation()}>
                 {/* Close Button */}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                    className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
                 >
                     <FiX size={24} />
                 </button>
@@ -149,13 +149,13 @@ const Login = ({ onClose, onSwitchToRegister }) => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                     </div>
-                    <h2 className='text-3xl font-bold text-gray-800 mb-2'>Welcome Back</h2>
-                    <p className='text-gray-600'>Sign in to your account</p>
+                    <h2 className='text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2'>Welcome Back</h2>
+                    <p className='text-gray-600 dark:text-gray-400'>Sign in to your account</p>
                 </div>
 
                 {/* Global error list */}
                 {errors && errors.length > 0 && (
-                    <div role="alert" className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-4">
+                    <div role="alert" className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-400 px-4 py-3 rounded-lg mb-4">
                         <strong className="font-semibold block mb-2">Please fix the following:</strong>
                         <ul className="list-disc list-inside space-y-1">
                             {errors.map((err, i) => (
@@ -167,14 +167,14 @@ const Login = ({ onClose, onSwitchToRegister }) => {
 
                 {/* Informational / success message */}
                 {message && (
-                    <div role="status" className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-4">
+                    <div role="status" className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 text-green-800 dark:text-green-400 px-4 py-3 rounded-lg mb-4">
                         {message}
                     </div>
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Email Address
                         </label>
                         <input 
@@ -184,12 +184,12 @@ const Login = ({ onClose, onSwitchToRegister }) => {
                             value={formData.email} 
                             onChange={handleChange}
                             placeholder="email@example.com"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-all outline-none"
+                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-all outline-none bg-white dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Password
                         </label>
                         <input 
@@ -199,13 +199,13 @@ const Login = ({ onClose, onSwitchToRegister }) => {
                             value={formData.password} 
                             onChange={handleChange}
                             placeholder="Enter your password"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-all outline-none"
+                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-all outline-none bg-white dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
                         />
                         <div className="text-right mt-1">
                             <button
                                 type="button"
                                 onClick={() => setShowForgotPassword(true)}
-                                className="text-sm text-stone-700 hover:text-stone-800"
+                                className="text-sm text-stone-700 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-300"
                             >
                                 Forgot password?
                             </button>
@@ -233,10 +233,10 @@ const Login = ({ onClose, onSwitchToRegister }) => {
                 <div className="mt-6">
                     <div className="relative mb-4">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-300"></div>
+                            <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
                         </div>
                         <div className="relative flex justify-center text-sm">
-                            <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                            <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">Or continue with</span>
                         </div>
                     </div>
                     
@@ -257,10 +257,10 @@ const Login = ({ onClose, onSwitchToRegister }) => {
                 {/* Divider */}
                 <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-300"></div>
+                        <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
                     </div>
                     <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-white text-gray-500">Don't have an account?</span>
+                        <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">Don't have an account?</span>
                     </div>
                 </div>
 
@@ -273,7 +273,7 @@ const Login = ({ onClose, onSwitchToRegister }) => {
                 {/* Register Link */}
                 <button 
                     onClick={onSwitchToRegister}
-                    className='w-full border-2 border-stone-700 text-stone-700 hover:bg-stone-50 font-semibold py-3 px-6 rounded-lg transition-all transform hover:scale-[1.02]'
+                    className='w-full border-2 border-stone-700 dark:border-stone-500 text-stone-700 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-gray-700 font-semibold py-3 px-6 rounded-lg transition-all transform hover:scale-[1.02]'
                 >
                     Create Account
                 </button>

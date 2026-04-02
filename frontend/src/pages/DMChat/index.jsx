@@ -8,6 +8,7 @@ import { WS_URL } from '@config/constants';
 import apiClient from '@api/axios';
 import logger from '@utils/logger';
 import { useToast } from '@hooks/useUIFeedback';
+import { FiMenu } from 'react-icons/fi';
 
 // Normalize raw Prisma reactions [{userId, emoji, ...}] to grouped format [{emoji, count, userIds}]
 const normalizeReactions = (reactions) => {
@@ -44,8 +45,12 @@ const DMChatPage = () => {
   const [replyingTo, setReplyingTo] = useState(null);
   const [hasMoreDM, setHasMoreDM] = useState(false);
   const [loadingOlderDM, setLoadingOlderDM] = useState(false);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  const [typingUsers, setTypingUsers] = useState([]);
   
   const dmWs = useRef(null);
+  const typingTimersRef = useRef({});
+  const lastTypingSentRef = useRef(0);
 
   // Fetch my bookclubs for sidebar
   useEffect(() => {
@@ -135,6 +140,19 @@ const DMChatPage = () => {
             )
           );
           break;
+
+        case 'typing-dm': {
+          const name = data.username;
+          const id = data.userId;
+          if (id === auth?.user?.id) break;
+          setTypingUsers(prev => prev.includes(name) ? prev : [...prev, name]);
+          if (typingTimersRef.current[id]) clearTimeout(typingTimersRef.current[id]);
+          typingTimersRef.current[id] = setTimeout(() => {
+            setTypingUsers(prev => prev.filter(u => u !== name));
+            delete typingTimersRef.current[id];
+          }, 3000);
+          break;
+        }
           
         case 'error':
           logger.error('WebSocket error:', data.message);
@@ -218,6 +236,14 @@ const DMChatPage = () => {
   const fetchDMMessages = async (userId) => {
     if (!auth?.token) return;
     
+    // Helper: ensure user appears in sidebar conversations list
+    const ensureInConversations = (user) => {
+      setConversations(prev => {
+        if (prev.some(c => c.friend?.id === user.id)) return prev;
+        return [{ friend: user, lastMessage: null, unreadCount: 0 }, ...prev];
+      });
+    };
+
     try {
       const response = await apiClient.get(`/v1/messages/${userId}`);
       const data = response.data;
@@ -226,6 +252,11 @@ const DMChatPage = () => {
       setDmMessages(messagesInOrder);
       setHasMoreDM(data.pagination?.hasMore || false);
       setCurrentDMUser(data.data.otherUser);
+
+      // Add to sidebar if not already there
+      if (data.data.otherUser) {
+        ensureInConversations(data.data.otherUser);
+      }
       
       // Mark conversation as read
       await markConversationAsRead(userId);
@@ -239,7 +270,23 @@ const DMChatPage = () => {
         // Mark conversation as read even if no messages yet
         await markConversationAsRead(userId);
       } else {
-        logger.error('Error fetching DM messages:', err);
+        // No conversation exists yet — fetch user profile and add to sidebar
+        try {
+          const profileRes = await apiClient.get(`/v1/profile/${userId}`);
+          const profile = profileRes.data?.data || profileRes.data;
+          const newUser = {
+            id: profile.id,
+            name: profile.name || profile.username,
+            username: profile.username,
+            profileImage: profile.profileImage,
+          };
+          setCurrentDMUser(newUser);
+          setDmMessages([]);
+          setHasMoreDM(false);
+          ensureInConversations(newUser);
+        } catch (profileErr) {
+          logger.error('Error fetching user profile for DM:', profileErr);
+        }
       }
     }
   };
@@ -285,6 +332,10 @@ const DMChatPage = () => {
   };
 
   const handleSelectDMConversation = async (userId) => {
+    // Clear typing state when switching conversations
+    setTypingUsers([]);
+    Object.values(typingTimersRef.current).forEach(clearTimeout);
+    typingTimersRef.current = {};
     navigate(`/dm/${userId}`, { replace: true });
     await fetchDMMessages(userId);
   };
@@ -309,35 +360,69 @@ const DMChatPage = () => {
     }));
   };
 
+  const handleDMTyping = () => {
+    if (!dmWs.current || dmWs.current.readyState !== WebSocket.OPEN || !currentDMUser) return;
+    const now = Date.now();
+    if (now - lastTypingSentRef.current > 2000) {
+      lastTypingSentRef.current = now;
+      dmWs.current.send(JSON.stringify({
+        type: 'typing-dm',
+        receiverId: currentDMUser.id
+      }));
+    }
+  };
+
   return (
     <div className="flex h-screen bg-gray-900">
-      <div className='flex justify-center'>
-        {/* My Bookclubs Sidebar */}
-        <MyBookClubsSidebar 
-          bookClubs={myBookClubs}
-          viewMode="dm"
-          onSelectBookClub={(id) => navigate(`/bookclub/${id}`)}
-          onOpenDM={() => {}} // Already in DM mode
-          auth={auth}
-          setAuth={setAuth}
-          wsRef={dmWs}
-          onLogout={logout}
+      {/* Mobile overlay backdrop */}
+      {showMobileSidebar && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setShowMobileSidebar(false)}
         />
+      )}
+
+      {/* Left sidebars - hidden on mobile, overlay when toggled */}
+      <div className={`${showMobileSidebar ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 fixed md:static inset-y-0 left-0 z-50 flex h-full transition-transform duration-300 ease-in-out`}>
+        {/* My Bookclubs Sidebar */}
+        <div className="w-20 h-full flex-shrink-0">
+          <MyBookClubsSidebar 
+            bookClubs={myBookClubs}
+            viewMode="dm"
+            onSelectBookClub={(id) => { setShowMobileSidebar(false); navigate(`/bookclub/${id}`); }}
+            onOpenDM={() => {}} // Already in DM mode
+            auth={auth}
+            setAuth={setAuth}
+            wsRef={dmWs}
+            onLogout={logout}
+          />
+        </div>
         
         {/* DM Conversations Sidebar */}
         <DMSidebar
           conversations={conversations}
           friends={friends}
           currentConversation={currentDMUser?.id}
-          onSelectConversation={handleSelectDMConversation}
-          onStartConversation={handleSelectDMConversation}
+          onSelectConversation={(user) => { setShowMobileSidebar(false); handleSelectDMConversation(user); }}
+          onStartConversation={(user) => { setShowMobileSidebar(false); handleSelectDMConversation(user); }}
           onBackToBookclub={() => navigate('/')}
           auth={auth}
         />
       </div>
       
-      <div className="flex flex-1">
+      <div className="flex flex-col flex-1 min-w-0 h-screen">
+        {/* Mobile top bar */}
+        <div className="md:hidden flex items-center bg-gray-800 border-b border-gray-700 px-3 py-2 flex-shrink-0">
+          <button
+            onClick={() => setShowMobileSidebar(true)}
+            className="p-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <FiMenu size={20} />
+          </button>
+          <span className="text-white font-medium text-sm truncate ml-2">{currentDMUser?.name || 'Direct Messages'}</span>
+        </div>
         {/* DM Chat Area */}
+        <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <DMChat
           otherUser={currentDMUser}
           messages={dmMessages}
@@ -350,7 +435,10 @@ const DMChatPage = () => {
           hasMoreMessages={hasMoreDM}
           loadingOlder={loadingOlderDM}
           onLoadOlder={loadOlderDMMessages}
+          typingUsers={typingUsers}
+          onTyping={handleDMTyping}
         />
+        </div>
       </div>
     </div>
   );

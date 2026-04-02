@@ -114,6 +114,9 @@ services:
       JWT_EXPIRATION: ${JWT_EXPIRATION:-15m}
       JWT_EXPIRES_IN: ${JWT_EXPIRATION:-15m}
       JWT_REFRESH_EXPIRES_IN: 7d
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
       FRONTEND_URL: http://localhost:5173
       NODE_ENV: development
     depends_on:
@@ -177,6 +180,9 @@ services:
       USER_SERVICE_URL: http://user-service:3001/api
       BOOKS_SERVICE_URL: http://books-service:3002
       NOTIFICATION_SERVICE_URL: http://notification-service:3005
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
       FRONTEND_URL: http://localhost:5173
     depends_on:
       postgres-collab:

@@ -5,13 +5,14 @@ import FileUpload from '../../../common/FileUpload';
 import MessageAttachment from '../../../common/MessageAttachment';
 import MessageActions from '../chat/MessageActions';
 import ReactionBar from '../chat/ReactionBar';
+import TypingIndicator from '../../../common/TypingIndicator';
 import { linkifyText } from '../chat/messageUtils';
 import apiClient from '@api/axios';
 import { getProfileImageUrl } from '@config/constants';
 import logger from '@utils/logger';
 import { useConfirm, useToast } from '@hooks/useUIFeedback';
 
-const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, replyingTo, setReplyingTo, hasMoreMessages = false, loadingOlder = false, onLoadOlder }) => {
+const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, replyingTo, setReplyingTo, hasMoreMessages = false, loadingOlder = false, onLoadOlder, typingUsers = [], onTyping }) => {
   const [newMessage, setNewMessage] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState(false);
@@ -24,6 +25,7 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
   const inputRef = useRef(null);
   const prevMessageCountRef = useRef(messages.length);
   const isLoadingOlderRef = useRef(false);
+  const lastTypingSentRef = useRef(0);
   const navigate = useNavigate();
   const { confirm } = useConfirm();
   const { toastError } = useToast();
@@ -254,7 +256,7 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
   }
 
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-col flex-1 min-h-0">
       {/* DM Header */}
       <div className="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center gap-3">
         <img 
@@ -299,11 +301,11 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
             <div 
               key={msg.id || idx}
               id={`dm-msg-${msg.id}`}
-              className={`flex gap-1 group ${
+              className={`flex gap-1 group w-full ${
                 isOwn ? 'justify-end' : 'justify-start'
               } ${groupWithPrevious ? 'mt-1' : 'mt-1'} transition-all duration-300 rounded-lg`}
             >
-              <div className="flex flex-col max-w-xs lg:max-w-md">
+              <div className={`flex flex-col w-full ${isOwn ? 'items-end' : 'items-start'}`}>
                 {/* Reply quote block */}
                 {msg.replyTo && (
                   <div
@@ -320,12 +322,12 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
                 )}
 
                 {/* Message bubble + attachments + actions wrapper */}
-                <div className="relative">
+                <div className="relative w-full">
                   {msg.content && (
-                    <div className={`relative px-4 py-2 rounded-2xl break-words ${msg.deletedAt ? 'opacity-60' : ''} ${
-                        isOwn ? 'bg-stone-700 text-white' : 'bg-gray-700 text-gray-200'
+                    <div className={`relative w-fit px-4 py-2 rounded-2xl max-w-[65%] overflow-hidden ${msg.deletedAt ? 'opacity-60' : ''} ${
+                        isOwn ? 'bg-stone-700 text-white ml-auto' : 'bg-gray-700 text-gray-200'
                     }`}>
-                      <p className={`text-sm ${msg.deletedAt ? 'italic text-gray-300' : ''}`}>{linkifyText(msg.content)}</p>
+                      <p className={`text-sm ${msg.deletedAt ? 'italic text-gray-300' : ''}`} style={{ overflowWrap: 'break-word' }}>{linkifyText(msg.content)}</p>
                       {isLastInGroup && (
                         <p className="text-xs opacity-70 mt-1">
                           {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -381,6 +383,9 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Typing indicator */}
+      <TypingIndicator typingUsers={typingUsers} />
+
       {/* Message Input */}
       <form onSubmit={handleSubmit} className="bg-gray-800 border-t border-gray-700 p-4">
         {/* Reply preview bar */}
@@ -411,7 +416,10 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
             ref={inputRef}
             type="text"
             value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
+            onChange={(e) => {
+              setNewMessage(e.target.value);
+              if (onTyping) onTyping();
+            }}
             placeholder={`Message ${otherUser.name}`}
             className="flex-1 px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-stone-500"
           />

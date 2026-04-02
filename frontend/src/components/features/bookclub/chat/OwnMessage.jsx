@@ -26,8 +26,8 @@ const OwnMessage = ({
   const isEditing = editingMessageId === msg.id;
 
   return (
-    <div className="flex gap-1 justify-end group">
-      <div className="text-right max-w-md w-fit self-end">
+    <div className="flex gap-1 justify-end group w-full">
+      <div className="text-right w-full">
         {/* Pinned badge */}
         {msg.isPinned && (
           <div className="flex items-center justify-end gap-1 text-xs text-yellow-400 mb-1">
@@ -61,8 +61,8 @@ const OwnMessage = ({
             </div>
           </div>
         ) : msg.text && (
-          <div className={`relative w-fit bg-stone-700 rounded-2xl px-2 py-3 shadow-lg mb-1 ml-auto ${msg.deletedAt ? 'opacity-60 italic' : ''}`}>
-            <p className="text-sm text-white break-words font-medium">
+          <div className={`relative w-fit max-w-[65%] overflow-hidden bg-stone-700 rounded-2xl px-2 py-3 shadow-lg mb-1 ml-auto ${msg.deletedAt ? 'opacity-60 italic' : ''}`}>
+            <p className="text-sm text-white font-medium" style={{ overflowWrap: 'break-word' }}>
               {renderMessageContent(msg.text, members, auth?.user?.id, { friends, connectedUsers, onSendFriendRequest })}
               {msg.editedAt && <span className="text-xs text-stone-200 italic ml-1">(edited)</span>}
             </p>

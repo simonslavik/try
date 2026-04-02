@@ -5,6 +5,7 @@ import App from '@/App.jsx';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@context/index.jsx';
 import { UIFeedbackProvider } from '@context/UIFeedbackContext.jsx';
+import { ThemeProvider } from '@context/ThemeContext.jsx';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // Google Client ID from environment variables
@@ -14,11 +15,13 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <BrowserRouter>
-        <AuthProvider>
-          <UIFeedbackProvider>
-            <App />
-          </UIFeedbackProvider>
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <UIFeedbackProvider>
+              <App />
+            </UIFeedbackProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </BrowserRouter>
     </GoogleOAuthProvider>
   </StrictMode>

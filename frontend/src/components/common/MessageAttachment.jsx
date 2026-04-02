@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FiDownload, FiFile, FiX } from 'react-icons/fi';
-import { COLLAB_EDITOR_URL } from '@config/constants';
+import { getCollabImageUrl } from '@config/constants';
 import logger from '@utils/logger';
 import { useToast } from '@hooks/useUIFeedback';
 
@@ -13,7 +13,7 @@ const MessageAttachment = ({ attachment, canDelete, onDelete, auth }) => {
   const handleDownload = async () => {
     try {
       // Fetch the file as a blob to force download instead of opening in browser
-      const response = await fetch(`${COLLAB_EDITOR_URL}${attachment.url}`);
+      const response = await fetch(getCollabImageUrl(attachment.url));
       const blob = await response.blob();
       
       // Create a blob URL and trigger download
@@ -42,11 +42,11 @@ const MessageAttachment = ({ attachment, canDelete, onDelete, auth }) => {
   if (isImage) {
     return (
       <>
-        <div className="relative inline-block mt-2 group z-50">
+        <div className="relative inline-block mt-2 group">
           <img
-            src={`${COLLAB_EDITOR_URL}${attachment.url}`}
+            src={getCollabImageUrl(attachment.url)}
             alt={attachment.filename}
-            className="max-w-sm max-h-64 rounded-lg cursor-pointer hover:brightness-110 transition-all duration-200 border border-gray-600/30 hover:border-stone-500/50 shadow-lg"
+            className="max-w-[200px] sm:max-w-xs md:max-w-sm max-h-48 md:max-h-64 rounded-lg cursor-pointer hover:brightness-110 transition-all duration-200 border border-gray-600/30 hover:border-stone-500/50 shadow-lg"
             onClick={() => setImageExpanded(true)}
             onError={(e) => { e.target.src = '/images/default.webp'; }}
           />
@@ -84,7 +84,7 @@ const MessageAttachment = ({ attachment, canDelete, onDelete, auth }) => {
           >
             <div className="relative max-w-7xl max-h-full">
               <img
-                src={`${COLLAB_EDITOR_URL}${attachment.url}`}
+                src={getCollabImageUrl(attachment.url)}
                 alt={attachment.filename}
                 className="max-w-full max-h-[90vh] object-contain"
                 onError={(e) => { e.target.src = '/images/default.webp'; }}
@@ -106,7 +106,7 @@ const MessageAttachment = ({ attachment, canDelete, onDelete, auth }) => {
   }
 
   return (
-    <div className="flex items-center gap-3 bg-gradient-to-r from-gray-700 to-gray-750 rounded-lg p-3 mt-2 max-w-xs hover:from-gray-650 hover:to-gray-700 transition-all duration-200 border border-gray-600/50 hover:border-stone-500/50 shadow-md hover:shadow-lg group">
+    <div className="flex items-center gap-3 bg-gradient-to-r from-gray-700 to-gray-750 rounded-lg p-3 mt-2 max-w-[200px] sm:max-w-xs hover:from-gray-650 hover:to-gray-700 transition-all duration-200 border border-gray-600/50 hover:border-stone-500/50 shadow-md hover:shadow-lg group">
       <div className="bg-stone-700/20 p-2 rounded-lg group-hover:bg-stone-700/30 transition-colors">
         <FiFile className="text-stone-500 flex-shrink-0" size={24} />
       </div>

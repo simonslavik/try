@@ -1,7 +1,7 @@
 import React from 'react';
 import { FiImage } from 'react-icons/fi';
 import { FiTrash2 } from 'react-icons/fi';
-import { COLLAB_EDITOR_URL } from '@config/constants';
+import { getCollabImageUrl } from '@config/constants';
 import logger from '@utils/logger';
 
 
@@ -9,7 +9,7 @@ const BookClubImage = ({ bookClub, auth, uploadingImage, fileInputRef, handleIma
     return (
         <div className="relative mb-3 group">
                     <img 
-                      src={bookClub?.imageUrl ? `${COLLAB_EDITOR_URL}${bookClub.imageUrl}` : '/images/default.webp'}
+                      src={bookClub?.imageUrl ? getCollabImageUrl(bookClub.imageUrl) : '/images/default.webp'}
                       alt={bookClub?.name}
                       className="w-full h-52 object-cover rounded"
                       onError={(e) => { e.target.src = '/images/IMG_2650.jpg'; }}
