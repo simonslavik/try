@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { authMiddleware, AuthRequest } from '../../../src/middleware/authMiddleware';
-import jwt from 'jsonwebtoken';
 
 jest.mock('../../../src/utils/logger', () => ({
   __esModule: true,
@@ -14,101 +13,73 @@ describe('authMiddleware', () => {
   let jsonMock: jest.Mock;
   let statusMock: jest.Mock;
 
-  const JWT_SECRET = 'test-secret-key-for-testing';
-
   beforeEach(() => {
     jsonMock = jest.fn();
     statusMock = jest.fn().mockReturnValue({ json: jsonMock });
     mockNext = jest.fn();
     mockReq = { headers: {} };
     mockRes = { status: statusMock } as Partial<Response>;
-    process.env.JWT_SECRET = JWT_SECRET;
   });
 
-  it('should return 401 when no authorization header', async () => {
-    await authMiddleware(mockReq as Request, mockRes as Response, mockNext);
+  it('should return 401 when no x-user-id header is present', () => {
+    authMiddleware(mockReq as Request, mockRes as Response, mockNext);
 
     expect(statusMock).toHaveBeenCalledWith(401);
-    expect(jsonMock).toHaveBeenCalledWith({ message: 'No authorization token provided' });
+    expect(jsonMock).toHaveBeenCalledWith({ message: 'Authentication required' });
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('should return 401 for invalid authorization format (no Bearer)', async () => {
-    mockReq.headers = { authorization: 'Basic abc123' };
+  it('should set req.user and call next() when x-user-id header is present', () => {
+    mockReq.headers = {
+      'x-user-id': 'user-1',
+      'x-user-email': 'test@test.com',
+      'x-user-name': 'TestUser',
+    };
 
-    await authMiddleware(mockReq as Request, mockRes as Response, mockNext);
-
-    expect(statusMock).toHaveBeenCalledWith(401);
-    expect(jsonMock).toHaveBeenCalledWith({
-      message: 'Invalid authorization format. Expected: Bearer <token>',
-    });
-  });
-
-  it('should return 401 for invalid token', async () => {
-    mockReq.headers = { authorization: 'Bearer invalid-token' };
-
-    await authMiddleware(mockReq as Request, mockRes as Response, mockNext);
-
-    expect(statusMock).toHaveBeenCalledWith(401);
-    expect(jsonMock).toHaveBeenCalledWith({ message: 'Invalid token' });
-  });
-
-  it('should return 401 for expired token', async () => {
-    const token = jwt.sign(
-      { userId: 'u1', email: 'test@test.com' },
-      JWT_SECRET,
-      { expiresIn: '-1s' } // already expired
-    );
-    mockReq.headers = { authorization: `Bearer ${token}` };
-
-    await authMiddleware(mockReq as Request, mockRes as Response, mockNext);
-
-    expect(statusMock).toHaveBeenCalledWith(401);
-    expect(jsonMock).toHaveBeenCalledWith({
-      message: 'Token expired. Please refresh your token.',
-    });
-  });
-
-  it('should set req.user and call next() for valid token', async () => {
-    const token = jwt.sign(
-      { userId: 'user-1', email: 'test@test.com', role: 'admin' },
-      JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-    mockReq.headers = { authorization: `Bearer ${token}` };
-
-    await authMiddleware(mockReq as Request, mockRes as Response, mockNext);
+    authMiddleware(mockReq as Request, mockRes as Response, mockNext);
 
     expect(mockNext).toHaveBeenCalled();
     expect(mockReq.user).toEqual({
       userId: 'user-1',
       email: 'test@test.com',
-      role: 'admin',
+      role: 'user',
+      name: 'TestUser',
     });
   });
 
-  it('should default role to "user" when not in token', async () => {
-    const token = jwt.sign(
-      { userId: 'user-1', email: 'test@test.com' },
-      JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-    mockReq.headers = { authorization: `Bearer ${token}` };
+  it('should default email to empty string when x-user-email is missing', () => {
+    mockReq.headers = { 'x-user-id': 'user-1' };
 
-    await authMiddleware(mockReq as Request, mockRes as Response, mockNext);
+    authMiddleware(mockReq as Request, mockRes as Response, mockNext);
+
+    expect(mockNext).toHaveBeenCalled();
+    expect(mockReq.user?.email).toBe('');
+  });
+
+  it('should always set role to "user"', () => {
+    mockReq.headers = { 'x-user-id': 'user-1', 'x-user-email': 'test@test.com' };
+
+    authMiddleware(mockReq as Request, mockRes as Response, mockNext);
 
     expect(mockReq.user?.role).toBe('user');
   });
 
-  it('should return 500 for unknown errors (without leaking details)', async () => {
-    // Force an unexpected error by removing JWT_SECRET
-    delete process.env.JWT_SECRET;
-    const token = jwt.sign({ userId: 'u1', email: 'test@test.com' }, 'wrong-secret');
-    mockReq.headers = { authorization: `Bearer ${token}` };
+  it('should decode URI-encoded x-user-name header', () => {
+    mockReq.headers = {
+      'x-user-id': 'user-1',
+      'x-user-name': 'John%20Doe',
+    };
 
-    await authMiddleware(mockReq as Request, mockRes as Response, mockNext);
+    authMiddleware(mockReq as Request, mockRes as Response, mockNext);
 
-    // Should return 401 for invalid token (signed with different secret)
-    expect(statusMock).toHaveBeenCalledWith(401);
+    expect(mockReq.user?.name).toBe('John Doe');
+  });
+
+  it('should set name to undefined when x-user-name is missing', () => {
+    mockReq.headers = { 'x-user-id': 'user-1' };
+
+    authMiddleware(mockReq as Request, mockRes as Response, mockNext);
+
+    expect(mockReq.user?.name).toBeUndefined();
   });
 });

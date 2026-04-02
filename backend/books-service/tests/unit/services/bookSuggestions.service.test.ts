@@ -12,8 +12,17 @@ jest.mock('../../../src/utils/logger', () => ({
   default: { info: jest.fn(), error: jest.fn(), warn: jest.fn() },
 }));
 
+// Mock global fetch for user-service calls
+global.fetch = jest.fn();
+
 describe('BookSuggestionsService', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, users: [{ id: 'user-2', username: 'User' }] }),
+    });
+  });
 
   describe('getSuggestions', () => {
     it('should return suggestions with user vote info', async () => {
@@ -145,7 +154,7 @@ describe('BookSuggestionsService', () => {
 
   describe('acceptSuggestion', () => {
     it('should accept suggestion', async () => {
-      const suggestion = { id: 's1', bookId: 'b-1' };
+      const suggestion = { id: 's1', bookId: 'b-1', bookClubId: 'bc-1' };
       const bookClubBook = { id: 'bcb-1', status: 'current' };
       (BookSuggestionsRepository.findById as jest.Mock).mockResolvedValue(suggestion);
       (BookSuggestionsRepository.acceptSuggestion as jest.Mock).mockResolvedValue(bookClubBook);

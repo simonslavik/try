@@ -148,9 +148,9 @@ describe('BookClubBooksService', () => {
 
       expect(BookClubBooksRepository.findCurrentByBookClubIds).toHaveBeenCalledWith(['bc-1', 'bc-2', 'bc-3']);
       expect(result).toEqual([
-        { bookClubId: 'bc-1', currentBook: currentBooks[0] },
-        { bookClubId: 'bc-2', currentBook: null },
-        { bookClubId: 'bc-3', currentBook: currentBooks[1] },
+        { bookClubId: 'bc-1', currentBooks: [currentBooks[0]] },
+        { bookClubId: 'bc-2', currentBooks: [] },
+        { bookClubId: 'bc-3', currentBooks: [currentBooks[1]] },
       ]);
     });
 
@@ -159,7 +159,7 @@ describe('BookClubBooksService', () => {
 
       const result = await BookClubBooksService.getBatchCurrentBooks(['bc-1']);
 
-      expect(result).toEqual([{ bookClubId: 'bc-1', currentBook: null }]);
+      expect(result).toEqual([{ bookClubId: 'bc-1', currentBooks: [] }]);
     });
   });
 });

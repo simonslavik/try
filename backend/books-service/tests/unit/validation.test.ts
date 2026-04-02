@@ -259,9 +259,9 @@ describe('Validation Schemas', () => {
       expect(error).toBeUndefined();
     });
 
-    it('should reject reason over 1000 chars', () => {
-      const { error } = createSuggestionSchema.validate({ googleBooksId: 'abc', reason: 'a'.repeat(1001) });
-      expect(error?.details[0].message).toBe('Reason cannot exceed 1000 characters');
+    it('should reject reason over 200 chars', () => {
+      const { error } = createSuggestionSchema.validate({ googleBooksId: 'abc', reason: 'a'.repeat(201) });
+      expect(error?.details[0].message).toBe('Reason cannot exceed 200 characters');
     });
   });
 
@@ -289,8 +289,10 @@ describe('Validation Schemas', () => {
 
   describe('acceptSuggestionSchema', () => {
     it('should validate correct data', () => {
+      const now = new Date();
+      const later = new Date(now.getTime() + 86400000);
       const { error } = acceptSuggestionSchema.validate({
-        startDate: new Date(), endDate: new Date(),
+        startDate: now, endDate: later,
       });
       expect(error).toBeUndefined();
     });

@@ -12,12 +12,12 @@ describe('BookSearchService', () => {
   beforeEach(() => jest.clearAllMocks());
 
   describe('searchBooks', () => {
-    it('should prefix plain queries with intitle:', async () => {
+    it('should pass plain queries as-is', async () => {
       (GoogleBooksService.searchBooks as jest.Mock).mockResolvedValue([]);
 
       await BookSearchService.searchBooks('typescript');
 
-      expect(GoogleBooksService.searchBooks).toHaveBeenCalledWith('intitle:typescript', 20);
+      expect(GoogleBooksService.searchBooks).toHaveBeenCalledWith('typescript', 20);
     });
 
     it('should not add prefix when query already has an operator', async () => {
@@ -41,7 +41,7 @@ describe('BookSearchService', () => {
 
       await BookSearchService.searchBooks('test', 100);
 
-      expect(GoogleBooksService.searchBooks).toHaveBeenCalledWith('intitle:test', 40);
+      expect(GoogleBooksService.searchBooks).toHaveBeenCalledWith('test', 40);
     });
 
     it('should throw ValidationError for empty query', async () => {
