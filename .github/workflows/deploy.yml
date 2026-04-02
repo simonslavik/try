@@ -122,24 +122,41 @@ jobs:
           envs: TAG,REGISTRY,IMAGE_PREFIX
           script_stop: true
           script: |
-            cd ${{ vars.DEPLOY_PATH || '~/app' }}
+            DEPLOY_DIR="${{ vars.DEPLOY_PATH || '~/app' }}"
+            cd "$DEPLOY_DIR"
 
             echo "── Logging into GHCR ──"
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-            # Save CI-provided values before sourcing .env.production
+            # Save CI-provided values
             _TAG="$TAG"
             _REGISTRY="$REGISTRY"
             _IMAGE_PREFIX="$IMAGE_PREFIX"
 
-            # Source production env vars (DB passwords, secrets, etc.)
-            if [ -f .env.production ]; then
-              echo "── Loading .env.production ──"
+            # Find and source .env.production (check multiple locations)
+            ENV_FILE=""
+            for f in "$DEPLOY_DIR/.env.production" "$HOME/.env.production" "$HOME/app/.env.production" "$HOME/BookClub-SocialMediaApp/.env.production" "$HOME/bookclub/.env.production"; do
+              if [ -f "$f" ]; then
+                ENV_FILE="$f"
+                break
+              fi
+            done
+
+            if [ -n "$ENV_FILE" ]; then
+              echo "── Loading env from: $ENV_FILE ──"
               set -a
-              . .env.production
+              . "$ENV_FILE"
               set +a
+              # Copy to deploy dir if not already there
+              if [ "$ENV_FILE" != "$DEPLOY_DIR/.env.production" ]; then
+                cp "$ENV_FILE" "$DEPLOY_DIR/.env.production"
+              fi
             else
-              echo "⚠️  No .env.production found — using compose defaults"
+              echo "⚠️  No .env.production found! Searching..."
+              find "$HOME" -name '.env.production' -maxdepth 4 2>/dev/null || true
+              find "$HOME" -name '.env' -maxdepth 4 2>/dev/null || true
+              echo "ERROR: Cannot deploy without .env.production"
+              exit 1
             fi
 
             # Restore CI-provided values (must override .env.production)
@@ -148,9 +165,10 @@ jobs:
             export IMAGE_PREFIX="$_IMAGE_PREFIX"
 
             echo "── Deploying: $REGISTRY/$IMAGE_PREFIX/*:$TAG ──"
+            echo "── ENV check: POSTGRES_USER=${POSTGRES_USER:-MISSING} REDIS_PASSWORD=${REDIS_PASSWORD:+SET} JWT_SECRET=${JWT_SECRET:+SET} ──"
 
-            # Stop any existing containers that may conflict (from other compose projects)
-            echo "── Removing existing containers ──"
+            # Stop any existing containers that may conflict
+            echo "── Removing conflicting containers ──"
             CONTAINERS="nginx-proxy frontend api-gateway user-service books-service collab-editor notification-service redis-cache postgres-users postgres-collab postgres-books postgres-notifications loki promtail prometheus grafana certbot"
             for c in $CONTAINERS; do
               docker rm -f "$c" 2>/dev/null || true
@@ -163,7 +181,7 @@ jobs:
             echo "── Starting services ──"
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
-            # Wait for services to start, then check status
+            # Wait and check status
             echo "── Waiting for services to start ──"
             sleep 15
             docker compose -f docker-compose.prod.yml ps
