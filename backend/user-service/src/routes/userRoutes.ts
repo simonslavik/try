@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { registerUser, loginUser, refreshAccessToken, logoutUser, logoutAllDevices } from '../controllers/userController.js';
-import { getProfileById, updateMyProfile, updateMyStatus, getUserById, listUsers, getUsersByIds, searchUsers } from '../controllers/profileController.js';
+import { getProfileById, updateMyProfile, updateMyStatus, getUserById, listUsers, getUsersByIds, searchUsers, getSuggestedUsers } from '../controllers/profileController.js';
 import { authMiddleware, optionalAuthMiddleware } from '../middleware/authMiddleware.js';
 import { addProfileImage, deleteProfileImage, upload } from '../controllers/profileImageController.js';
 import { sendFriendRequest, acceptFriendRequest, rejectFriendRequest, removeFriend, listFriends, listFriendRequests} from '../controllers/friendsController.js';
@@ -67,6 +67,7 @@ userRoutes.delete('/profile/image', authMiddleware, asyncHandler(deleteProfileIm
 
 // Admin routes (requires authentication)
 userRoutes.get('/users/search', authMiddleware, asyncHandler(searchUsers));
+userRoutes.get('/users/suggestions', authMiddleware, asyncHandler(getSuggestedUsers));
 userRoutes.get('/users', authMiddleware, asyncHandler(listUsers));
 userRoutes.get('/users/:id', authMiddleware, asyncHandler(getUserById));
 

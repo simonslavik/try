@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react';
-import { FiHome, FiSend } from 'react-icons/fi';
+import React, { useState, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { FiHome, FiSend, FiUsers, FiBook } from 'react-icons/fi';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getProfileImageUrl, getCollabImageUrl } from '@config/constants';
 import StatusPopup from './StatusPopup';
@@ -9,6 +10,8 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, on
     const navigate = useNavigate();
     const location = useLocation();
     const [showStatusPopup, setShowStatusPopup] = useState(false);
+    const [hoveredClub, setHoveredClub] = useState(null);
+    const hoverTimeoutRef = useRef(null);
     
     // Check if we're on the DM page
     const isOnDMPage = location.pathname.startsWith('/dm');
@@ -21,6 +24,20 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, on
         });
       }
     }, [auth, setAuth]);
+
+    const handleMouseEnter = useCallback((club, e) => {
+      clearTimeout(hoverTimeoutRef.current);
+      const rect = e.currentTarget.getBoundingClientRect();
+      setHoveredClub({
+        ...club,
+        x: rect.right + 12,
+        y: rect.top + rect.height / 2,
+      });
+    }, []);
+
+    const handleMouseLeave = useCallback(() => {
+      hoverTimeoutRef.current = setTimeout(() => setHoveredClub(null), 150);
+    }, []);
 
     return (
         <div className="w-full h-full bg-gray-900 border-r border-gray-700 flex flex-col items-center py-4 gap-3 overflow-y-auto overflow-x-hidden">
@@ -54,12 +71,14 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, on
             <button
               key={club.id}
               onClick={() => onSelectBookClub(club.id)}
+              onMouseEnter={(e) => handleMouseEnter(club, e)}
+              onMouseLeave={handleMouseLeave}
               className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 ${
                 !isOnDMPage && club.id === currentBookClubId
                   ? 'bg-stone-700 ring-2 ring-stone-500'
                   : 'bg-gray-700 hover:bg-stone-700'
               }`}
-              title={club.name}
+              title=""
             >
               {club.imageUrl ? (
                 <img
@@ -108,6 +127,66 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, on
               wsRef={wsRef}
               onLogout={onLogout}
             />
+          )}
+
+          {/* Hover info card for bookclubs */}
+          {hoveredClub && createPortal(
+            <div
+              className="fixed bg-gray-800 text-white rounded-xl shadow-2xl border border-gray-600 p-3 w-56 pointer-events-none"
+              style={{
+                zIndex: 99999,
+                left: hoveredClub.x,
+                top: hoveredClub.y,
+                transform: 'translateY(-50%)',
+              }}
+            >
+              {/* Arrow */}
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-800 border-l border-b border-gray-600 rotate-45" />
+              
+              {/* Club image + name */}
+              <div className="flex items-center gap-2.5 mb-2">
+                {hoveredClub.imageUrl ? (
+                  <img
+                    src={getCollabImageUrl(hoveredClub.imageUrl)}
+                    alt={hoveredClub.name}
+                    className="w-9 h-9 rounded-full object-cover flex-shrink-0"
+                    onError={(e) => { e.target.src = '/images/default.webp'; }}
+                  />
+                ) : (
+                  <div className="w-9 h-9 rounded-full bg-stone-600 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+                    {hoveredClub.name.substring(0, 2).toUpperCase()}
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold truncate">{hoveredClub.name}</p>
+                  {hoveredClub.category && (
+                    <p className="text-[10px] text-gray-400 truncate">{hoveredClub.category}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Stats row */}
+              <div className="flex items-center gap-3 text-[11px] text-gray-300">
+                <span className="flex items-center gap-1">
+                  <FiUsers className="w-3 h-3" />
+                  {hoveredClub.memberCount || 0} {(hoveredClub.memberCount || 0) === 1 ? 'member' : 'members'}
+                </span>
+                {hoveredClub.currentBooks?.length > 0 && (
+                  <span className="flex items-center gap-1">
+                    <FiBook className="w-3 h-3" />
+                    {hoveredClub.currentBooks.length} {hoveredClub.currentBooks.length === 1 ? 'book' : 'books'}
+                  </span>
+                )}
+              </div>
+
+              {/* Description preview */}
+              {hoveredClub.description && (
+                <p className="text-[11px] text-gray-400 mt-1.5 line-clamp-2 leading-tight">
+                  {hoveredClub.description}
+                </p>
+              )}
+            </div>,
+            document.body
           )}
           
         </div>

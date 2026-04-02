@@ -243,4 +243,26 @@ export class FriendshipService {
   static async countFriends(userId: string): Promise<number> {
     return await FriendshipRepository.countFriends(userId);
   }
+
+  /**
+   * Get IDs of users that are accepted friends with current user
+   */
+  static async getRelatedUserIds(userId: string): Promise<string[]> {
+    const friendships = await FriendshipRepository.getAcceptedFriends(userId, 1000);
+    const ids = new Set<string>();
+    for (const f of friendships) {
+      ids.add(f.userId);
+      ids.add(f.friendId);
+    }
+    ids.delete(userId);
+    return Array.from(ids);
+  }
+
+  /**
+   * Get IDs of users with pending sent requests from current user
+   */
+  static async getSentPendingIds(userId: string): Promise<string[]> {
+    const sent = await FriendshipRepository.getSentRequests(userId, 1000);
+    return sent.map(f => f.friendId);
+  }
 }

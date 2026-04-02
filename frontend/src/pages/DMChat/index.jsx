@@ -437,6 +437,9 @@ const DMChatPage = () => {
           onLoadOlder={loadOlderDMMessages}
           typingUsers={typingUsers}
           onTyping={handleDMTyping}
+          friends={friends}
+          conversations={conversations}
+          onSelectConversation={handleSelectDMConversation}
         />
         </div>
       </div>

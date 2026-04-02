@@ -39,7 +39,7 @@ const OwnMessage = ({
         {/* Reply quote */}
         <ReplyPreview replyTo={msg.replyTo} onScrollTo={onScrollToMessage} alignRight />
 
-        <div className="relative">
+        <div className="relative w-fit max-w-[65%] ml-auto">
         {/* Message body */}
         {isEditing ? (
           <div className="bg-gray-800 rounded-2xl px-2 py-3 shadow-lg mb-1 border border-stone-500">
@@ -61,34 +61,36 @@ const OwnMessage = ({
             </div>
           </div>
         ) : msg.text && (
-          <div className={`relative w-fit max-w-[65%] overflow-hidden bg-stone-700 rounded-2xl px-2 py-3 shadow-lg mb-1 ml-auto ${msg.deletedAt ? 'opacity-60 italic' : ''}`}>
+          <div className={`overflow-hidden bg-stone-700 rounded-2xl px-2 py-3 shadow-lg mb-1 ${msg.deletedAt ? 'opacity-60 italic' : ''}`}>
             <p className="text-sm text-white font-medium" style={{ overflowWrap: 'break-word' }}>
               {renderMessageContent(msg.text, members, auth?.user?.id, { friends, connectedUsers, onSendFriendRequest })}
               {msg.editedAt && <span className="text-xs text-stone-200 italic ml-1">(edited)</span>}
             </p>
             {copiedMessageId === msg.id && (
-              <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-green-600 text-white text-xs px-2 py-1 rounded-md shadow-lg whitespace-nowrap">
+              <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-green-600 text-white text-xs px-2 py-1 rounded-md shadow-lg whitespace-nowrap z-10">
                 Copied!
               </div>
             )}
-            {/* Floating actions (reaction picker + menu) */}
-            <MessageActions
-              msg={msg}
-              isOwn
-              canModerate={canModerate}
-              currentUserEmoji={getUserReactionEmoji(msg.reactions)}
-              isMenuOpen={isMenuOpen}
-              menuRef={menuRef}
-              onToggleReaction={onToggleReaction}
-              onToggleMenu={onToggleMenu}
-              onPin={onPin}
-              onEdit={onEdit}
-              onCopy={onCopy}
-              onReply={onReply}
-              onDelete={onDelete}
-              position="left"
-            />
           </div>
+        )}
+        {/* Floating actions (reaction picker + menu) — outside overflow-hidden */}
+        {!isEditing && msg.text && !msg.deletedAt && (
+          <MessageActions
+            msg={msg}
+            isOwn
+            canModerate={canModerate}
+            currentUserEmoji={getUserReactionEmoji(msg.reactions)}
+            isMenuOpen={isMenuOpen}
+            menuRef={menuRef}
+            onToggleReaction={onToggleReaction}
+            onToggleMenu={onToggleMenu}
+            onPin={onPin}
+            onEdit={onEdit}
+            onCopy={onCopy}
+            onReply={onReply}
+            onDelete={onDelete}
+            position="left"
+          />
         )}
 
         {/* Attachments */}

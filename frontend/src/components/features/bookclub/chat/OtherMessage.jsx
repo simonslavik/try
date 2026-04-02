@@ -72,10 +72,10 @@ const OtherMessage = ({
         <ReplyPreview replyTo={msg.replyTo} onScrollTo={onScrollToMessage} />
 
         {/* Message bubble */}
-        <div className="relative">
+        <div className="relative w-fit max-w-[65%]">
         <div
           onClick={() => setShowFullDate((v) => !v)}
-          className="relative w-fit max-w-[65%] overflow-hidden bg-gray-800 rounded-2xl px-2 py-3 shadow-md cursor-pointer hover:bg-gray-750 transition-colors"
+          className="overflow-hidden bg-gray-800 rounded-2xl px-2 py-3 shadow-md cursor-pointer hover:bg-gray-750 transition-colors"
         >
           {msg.text && (
             <p className={`text-sm text-gray-200 leading-relaxed ${msg.deletedAt ? 'italic text-gray-500' : ''}`} style={{ overflowWrap: 'break-word' }}>
@@ -91,11 +91,13 @@ const OtherMessage = ({
             </div>
           )}
           {copiedMessageId === msg.id && (
-            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-green-600 text-white text-xs px-2 py-1 rounded-md shadow-lg whitespace-nowrap">
+            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-green-600 text-white text-xs px-2 py-1 rounded-md shadow-lg whitespace-nowrap z-10">
               Copied!
             </div>
           )}
-          {/* Floating actions (reaction picker + menu) */}
+        </div>
+        {/* Floating actions (reaction picker + menu) — outside overflow-hidden */}
+        {!msg.deletedAt && (
           <MessageActions
             msg={msg}
             isOwn={false}
@@ -111,7 +113,7 @@ const OtherMessage = ({
             onDelete={onDelete}
             position="right"
           />
-        </div>
+        )}
         </div>
 
         {/* Reactions */}

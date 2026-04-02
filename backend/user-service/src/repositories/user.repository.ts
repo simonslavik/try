@@ -208,4 +208,26 @@ export class UserRepository {
       select: USER_BASIC_FIELDS,
     });
   }
+
+  /**
+   * Get suggested users (not self, not already friends/pending)
+   */
+  static async getSuggestedUsers(currentUserId: string, excludeIds: string[], limit = 20) {
+    return await prisma.user.findMany({
+      where: {
+        id: {
+          notIn: [currentUserId, ...excludeIds],
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        profileImage: true,
+        status: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    });
+  }
 }

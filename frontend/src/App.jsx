@@ -12,6 +12,7 @@ import ResetPasswordPage from "@pages/ResetPassword";
 import VerifyEmailPage from "@pages/VerifyEmail";
 import BookclubSettings from "@pages/BookclubSettings";
 import DMChatPage from "@pages/DMChat";
+import FindPeople from "@pages/people";
 import ErrorBoundary from "@components/common/ErrorBoundary";
 import PageTransition from "@components/common/PageTransition";
 
@@ -49,6 +50,11 @@ function App() {
       <Route path="/dm/:userId?" element={
         <ProtectedRoute>
           <DMChatPage />
+        </ProtectedRoute>
+      }/>
+      <Route path="/people" element={
+        <ProtectedRoute>
+          <FindPeople />
         </ProtectedRoute>
       }/>
       <Route path="/reset-password" element={<ResetPasswordPage />}/>

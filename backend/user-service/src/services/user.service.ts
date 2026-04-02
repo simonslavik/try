@@ -103,6 +103,13 @@ export class UserService {
   }
 
   /**
+   * Get suggested users (excludes self and related users)
+   */
+  static async getSuggestedUsers(currentUserId: string, excludeIds: string[], limit = 20) {
+    return await UserRepository.getSuggestedUsers(currentUserId, excludeIds, limit);
+  }
+
+  /**
    * Delete user account
    */
   static async deleteAccount(userId: string) {

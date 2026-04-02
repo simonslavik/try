@@ -59,6 +59,8 @@ export class GoogleBooksService {
         q: query,
         maxResults,
         printType: 'books',
+        langRestrict: 'en',
+        orderBy: 'relevance',
       };
 
       if (API_KEY) {
@@ -96,7 +98,7 @@ export class GoogleBooksService {
         logger.warn('Google Books API returned 503, retrying in 1s...', { query });
         await new Promise(resolve => setTimeout(resolve, 1000));
         try {
-          const params2: any = { q: query, maxResults, printType: 'books' };
+          const params2: any = { q: query, maxResults, printType: 'books', langRestrict: 'en', orderBy: 'relevance' };
           if (API_KEY) params2.key = API_KEY;
           const retryResponse = await axios.get(GOOGLE_BOOKS_API, { params: params2 });
           const retryBooks = retryResponse.data.items?.map((item: GoogleBook) => ({

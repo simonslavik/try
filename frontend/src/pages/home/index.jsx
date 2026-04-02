@@ -72,6 +72,7 @@ const Home = () => {
             // Fetch friends and friend requests
             fetchFriends();
             fetchFriendRequests();
+            fetchSuggestedUsers();
         }
         
         // Always fetch all public bookclubs using discover API
@@ -114,10 +115,7 @@ const Home = () => {
                     // Get suggested users from all bookclubs user is in
                     const allUserBookClubs = clubsWithBooks.filter(club => club.isMember === true);
                     
-                    // Note: Suggested users feature would need a separate API endpoint
-                    // that returns member details for each club. For now, we'll skip this.
-                    // The discover API doesn't include full member arrays to optimize performance.
-                    setSuggestedUsers([]);
+                    // Suggested users are now fetched from a dedicated endpoint
                 }
             })
             .catch(error => logger.error('Error fetching all book clubs:', error));
@@ -193,6 +191,16 @@ const Home = () => {
             setFriendRequests(data.data || []);
         } catch (err) {
             logger.error('Error fetching friend requests:', err);
+        }
+    };
+
+    const fetchSuggestedUsers = async () => {
+        if (!auth?.token) return;
+        try {
+            const response = await apiClient.get('/v1/users/suggestions?limit=12');
+            setSuggestedUsers(response.data?.data || []);
+        } catch (err) {
+            logger.error('Error fetching suggested users:', err);
         }
     };
 
@@ -541,6 +549,179 @@ const Home = () => {
                         Discover More Book Clubs
                     </button>
                 </div>
+
+                {/* Most Popular Book Clubs */}
+                {(() => {
+                    const popularClubs = [...bookClubs]
+                        .sort((a, b) => (b.memberCount || 0) - (a.memberCount || 0))
+                        .slice(0, 5);
+
+                    if (popularClubs.length === 0) return null;
+
+                    // Tournament bracket: 1st in center (largest), 2nd & 3rd flanking, 4th & 5th on edges
+                    const bracketOrder = [popularClubs[3], popularClubs[1], popularClubs[0], popularClubs[2], popularClubs[4]].filter(Boolean);
+
+                    const rankStyles = {
+                        0: { size: 'w-36 h-44', ring: 'ring-4 ring-yellow-400', badge: 'bg-yellow-500', emoji: '👑', textSize: 'text-sm' },
+                        1: { size: 'w-28 h-36', ring: 'ring-2 ring-gray-300', badge: 'bg-gray-400', emoji: '🥈', textSize: 'text-xs' },
+                        2: { size: 'w-28 h-36', ring: 'ring-2 ring-amber-600', badge: 'bg-amber-600', emoji: '🥉', textSize: 'text-xs' },
+                        3: { size: 'w-24 h-32', ring: 'ring-1 ring-stone-300', badge: 'bg-stone-400', emoji: '', textSize: 'text-xs' },
+                        4: { size: 'w-24 h-32', ring: 'ring-1 ring-stone-300', badge: 'bg-stone-400', emoji: '', textSize: 'text-xs' },
+                    };
+
+                    return (
+                        <div className="mt-10 md:mt-16">
+                            <h3 className="text-lg font-bold text-stone-800 dark:text-warmgray-100 mb-6 text-center">
+                                🔥 Most Popular Book Clubs
+                            </h3>
+                            <div className="flex items-end justify-center gap-2 sm:gap-4 flex-wrap">
+                                {bracketOrder.map((club) => {
+                                    const originalIdx = popularClubs.indexOf(club);
+                                    const rank = originalIdx;
+                                    const style = rankStyles[rank];
+                                    const isFirst = rank === 0;
+
+                                    return (
+                                        <button
+                                            key={club.id}
+                                            onClick={() => navigate(`/bookclubpage/${club.id}`)}
+                                            className={`${style.size} flex flex-col items-center justify-end p-2 bg-white dark:bg-gray-800 rounded-xl border border-warmgray-200 dark:border-gray-700 hover:shadow-lg hover:border-stone-400 dark:hover:border-gray-500 transition-all cursor-pointer group relative ${isFirst ? 'mb-2' : ''}`}
+                                        >
+                                            {/* Rank badge */}
+                                            <div className={`absolute -top-3 left-1/2 -translate-x-1/2 ${style.badge} text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-md`}>
+                                                {style.emoji || (rank + 1)}
+                                            </div>
+
+                                            {/* Club image */}
+                                            <img
+                                                src={getCollabImageUrl(club.image) || '/images/default.webp'}
+                                                alt={club.name}
+                                                className={`${isFirst ? 'w-14 h-14' : 'w-10 h-10'} rounded-full object-cover ${style.ring} shadow-md mb-2`}
+                                                onError={(e) => { e.target.src = '/images/default.webp'; }}
+                                            />
+
+                                            {/* Club name */}
+                                            <p className={`${style.textSize} font-semibold text-stone-800 dark:text-warmgray-100 text-center line-clamp-2 leading-tight group-hover:text-stone-600 dark:group-hover:text-white transition-colors`}>
+                                                {club.name}
+                                            </p>
+
+                                            {/* Member count */}
+                                            <div className="flex items-center gap-1 mt-1">
+                                                <svg className="w-3 h-3 text-stone-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                </svg>
+                                                <span className="text-[10px] font-medium text-stone-500 dark:text-gray-400">{club.memberCount || 0}</span>
+                                            </div>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    );
+                })()}
+
+                {/* Friends & Suggestions Panel */}
+                {auth?.user && (
+                    <div className="mt-10 md:mt-16">
+                        <h3 className="text-lg font-bold text-stone-800 dark:text-warmgray-100 mb-4 text-center">
+                            👥 Your Friends
+                        </h3>
+                        {friends.length > 0 && (
+                            <div className="overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+                                <div className="flex gap-3 justify-center flex-wrap">
+                                    {friends.map((f) => {
+                                        const friend = f.friend;
+                                        if (!friend) return null;
+                                        return (
+                                            <button
+                                                key={friend.id}
+                                                onClick={() => navigate(`/profile/${friend.id}`)}
+                                                className="flex flex-col items-center gap-2 p-3 bg-white dark:bg-gray-800 rounded-xl border border-warmgray-200 dark:border-gray-700 hover:shadow-md hover:border-stone-300 dark:hover:border-gray-600 transition-all cursor-pointer group w-24 flex-shrink-0"
+                                            >
+                                                <img
+                                                    src={getProfileImageUrl(friend.profileImage) || '/images/default.webp'}
+                                                    alt={friend.name || friend.username}
+                                                    className="w-12 h-12 rounded-full object-cover ring-2 ring-warmgray-200 dark:ring-gray-600 group-hover:ring-stone-400 transition-all"
+                                                    onError={(e) => { e.target.src = '/images/default.webp'; }}
+                                                />
+                                                <span className="text-xs font-medium text-stone-700 dark:text-warmgray-200 text-center truncate w-full group-hover:text-stone-500 dark:group-hover:text-white transition-colors">
+                                                    {friend.name || friend.username}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Suggested Users */}
+                        {suggestedUsers.length > 0 && (
+                            <div className="mt-6">
+                                <div className="flex items-center justify-between mb-3">
+                                    <h4 className="text-sm font-semibold text-stone-600 dark:text-gray-400">
+                                        People You Might Know
+                                    </h4>
+                                    <button
+                                        onClick={() => navigate('/people')}
+                                        className="text-xs text-stone-500 hover:text-stone-700 dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer"
+                                    >
+                                        Find More →
+                                    </button>
+                                </div>
+                                <div className="overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+                                    <div className="flex gap-3 justify-center flex-wrap">
+                                        {suggestedUsers.slice(0, 8).map((user) => (
+                                            <div
+                                                key={user.id}
+                                                className="flex flex-col items-center gap-2 p-3 bg-white dark:bg-gray-800 rounded-xl border border-warmgray-200 dark:border-gray-700 hover:shadow-md hover:border-stone-300 dark:hover:border-gray-600 transition-all group w-24 flex-shrink-0"
+                                            >
+                                                <button
+                                                    onClick={() => navigate(`/profile/${user.id}`)}
+                                                    className="flex flex-col items-center gap-1 cursor-pointer"
+                                                >
+                                                    <img
+                                                        src={getProfileImageUrl(user.profileImage) || '/images/default.webp'}
+                                                        alt={user.name}
+                                                        className="w-12 h-12 rounded-full object-cover ring-2 ring-warmgray-200 dark:ring-gray-600 group-hover:ring-emerald-400 transition-all"
+                                                        onError={(e) => { e.target.src = '/images/default.webp'; }}
+                                                    />
+                                                    <span className="text-xs font-medium text-stone-700 dark:text-warmgray-200 text-center truncate w-full">
+                                                        {user.name}
+                                                    </span>
+                                                </button>
+                                                {user.friendshipStatus === 'pending' ? (
+                                                    <span className="text-[10px] px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-full font-medium">
+                                                        Pending
+                                                    </span>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => handleSendFriendRequest(user.id)}
+                                                        className="text-[10px] px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-800/60 transition-colors cursor-pointer font-medium"
+                                                    >
+                                                        + Add
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Empty state - no friends AND no suggestions */}
+                        {friends.length === 0 && suggestedUsers.length === 0 && (
+                            <div className="text-center py-6 bg-white dark:bg-gray-800 rounded-xl border border-warmgray-200 dark:border-gray-700 max-w-md mx-auto">
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">You haven't added any friends yet.</p>
+                                <button
+                                    onClick={() => navigate('/people')}
+                                    className="px-4 py-2 bg-stone-800 text-white text-sm rounded-lg hover:bg-stone-700 transition-colors cursor-pointer font-medium"
+                                >
+                                    Find People
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Portal tooltip for member avatars */}

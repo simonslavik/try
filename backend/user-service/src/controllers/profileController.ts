@@ -131,6 +131,40 @@ export const listUsers = async (req: Request, res: Response) => {
 };
 
 /**
+ * Get suggested users (people you might want to add)
+ */
+export const getSuggestedUsers = async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+        throw new UnauthorizedError('User not authenticated');
+    }
+
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+
+    // Get accepted friend IDs to exclude, and pending sent IDs for status
+    const [relatedIds, sentPendingIds] = await Promise.all([
+        FriendshipService.getRelatedUserIds(userId),
+        FriendshipService.getSentPendingIds(userId),
+    ]);
+
+    // Get users excluding self and accepted friends
+    const users = await UserService.getSuggestedUsers(userId, relatedIds, limit);
+
+    const pendingSet = new Set(sentPendingIds);
+
+    return res.status(200).json({
+        success: true,
+        data: users.map(user => ({
+            id: user.id,
+            name: user.name,
+            profileImage: user.profileImage,
+            status: user.status,
+            friendshipStatus: pendingSet.has(user.id) ? 'pending' : null
+        }))
+    });
+};
+
+/**
  * Search users by name/username
  */
 export const searchUsers = async (req: Request, res: Response) => {
