@@ -50,9 +50,9 @@ jobs:
             context: frontend
             dockerfile: frontend/Dockerfile
             build-args: |
-              VITE_API_URL=${{ vars.VITE_API_URL }}
-              VITE_WS_URL=${{ vars.VITE_WS_URL }}
-              VITE_NOTIFICATION_WS_URL=${{ vars.VITE_NOTIFICATION_WS_URL }}
+              VITE_API_URL=${{ vars.VITE_API_URL || 'https://mybookclub.win' }}
+              VITE_WS_URL=${{ vars.VITE_WS_URL || 'wss://mybookclub.win/ws/collab' }}
+              VITE_NOTIFICATION_WS_URL=${{ vars.VITE_NOTIFICATION_WS_URL || 'wss://mybookclub.win/ws/notifications' }}
               VITE_GOOGLE_CLIENT_ID=${{ vars.VITE_GOOGLE_CLIENT_ID }}
           - name: gateway
             context: backend/gateway
@@ -126,18 +126,26 @@ jobs:
             # Pull latest images
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-            export TAG=$TAG
-            export REGISTRY=$REGISTRY
-            export IMAGE_PREFIX=$IMAGE_PREFIX
+            # Save CI-provided values before sourcing .env.production
+            _TAG="$TAG"
+            _REGISTRY="$REGISTRY"
+            _IMAGE_PREFIX="$IMAGE_PREFIX"
 
-            # Source production env vars
+            # Source production env vars (DB passwords, secrets, etc.)
             set -a
-            source .env.production
+            source .env.production 2>/dev/null || true
             set +a
 
-            # Deploy
+            # Restore CI-provided values (must override .env.production)
+            export TAG="$_TAG"
+            export REGISTRY="$_REGISTRY"
+            export IMAGE_PREFIX="$_IMAGE_PREFIX"
+
+            echo "Deploying images: $REGISTRY/$IMAGE_PREFIX/*:$TAG"
+
+            # Deploy — force-recreate ensures containers restart with new images
             docker compose -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+            docker compose -f docker-compose.prod.yml up -d --force-recreate --remove-orphans
 
             # Cleanup old images
             docker image prune -f
