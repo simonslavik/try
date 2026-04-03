@@ -212,6 +212,19 @@ jobs:
             echo "── Starting services ──"
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
+            # Force nginx to reload config (bind mount may have changed)
+            echo "── Reloading nginx config ──"
+            sleep 5
+            docker exec nginx-proxy nginx -s reload 2>/dev/null || true
+
+            # Debug: show what nginx config is mounted
+            echo "── Nginx config on disk: ──"
+            head -10 "$DEPLOY_DIR/nginx/nginx.conf" 2>/dev/null || echo "FILE NOT FOUND"
+            echo "── Nginx config in container: ──"
+            docker exec nginx-proxy head -10 /etc/nginx/nginx.conf 2>/dev/null || echo "CONTAINER NOT FOUND"
+            echo "── Checking for map directive (Cloudflare fix): ──"
+            docker exec nginx-proxy grep -c 'real_scheme' /etc/nginx/nginx.conf 2>/dev/null || echo "NOT FOUND"
+
             # ── Health verification ──
             echo "── Waiting for services to start (30s) ──"
             sleep 30
