@@ -1,4 +1,5 @@
 import { useContext, useEffect, useRef, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { FiBell, FiMail, FiMenu, FiX, FiUser, FiSettings, FiLogOut, FiPlusCircle, FiUsers, FiSun, FiMoon } from 'react-icons/fi';
 import AuthContext from '@context/index';
@@ -412,18 +413,20 @@ const HomePageHeader = () => {
             
             )}
 
-            {/* Login and Register Modals */}
-            {openLogin && (
+            {/* Login and Register Modals — portalled to body */}
+            {openLogin && createPortal(
                 <LoginModule 
                     onClose={() => setOpenLogin(false)} 
                     onSwitchToRegister={() => { setOpenLogin(false); setOpenRegister(true); }}
-                />
+                />,
+                document.body
             )}
-            {openRegister && (
+            {openRegister && createPortal(
                 <RegisterModule 
                     onClose={() => setOpenRegister(false)} 
                     onSwitchToLogin={() => { setOpenRegister(false); setOpenLogin(true); }}
-                />
+                />,
+                document.body
             )}
         </div>
     );

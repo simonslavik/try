@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation } from "react-router-dom";
 import AuthContext from '@context/index';
@@ -12,6 +12,13 @@ const Login = ({ onClose, onSwitchToRegister }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { setAuth } = useContext(AuthContext);
+
+    // Lock body scroll while modal is open
+    useEffect(() => {
+        const original = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => { document.body.style.overflow = original; };
+    }, []);
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -132,8 +139,8 @@ const Login = ({ onClose, onSwitchToRegister }) => {
     };
 
     return (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50' onClick={onClose}>
-            <div className='bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md relative transition-colors duration-300' onClick={(e) => e.stopPropagation()}>
+        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-y-auto py-8' onClick={onClose}>
+            <div className='bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md relative transition-colors duration-300 my-auto mx-4' onClick={(e) => e.stopPropagation()}>
                 {/* Close Button */}
                 <button
                     onClick={onClose}

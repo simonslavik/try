@@ -212,7 +212,7 @@ const Home = () => {
 
             {/* ===== LOGGED-OUT LANDING PAGE ===== */}
             {!auth?.user && (
-                <div className="min-h-screen bg-warmgray-50 dark:bg-gray-900 transition-colors duration-300">
+                <div className="min-h-screen bg-parchment dark:bg-gray-900 transition-colors duration-300">
                     {/* Hero Section */}
                     <section className="relative overflow-hidden px-6 md:px-16 py-16 md:py-28">
                         {/* Background watermark text */}
@@ -244,7 +244,7 @@ const Home = () => {
                     </section>
 
                     {/* Feature Section */}
-                    <section className="bg-warmgray-100 dark:bg-gray-800 transition-colors duration-300">
+                    <section className="bg-parchment-dark dark:bg-gray-800 transition-colors duration-300">
                         <div className="max-w-6xl mx-auto px-6 md:px-16 py-16 md:py-24 flex flex-col md:flex-row items-center gap-10 md:gap-16">
                             {/* Image placeholder */}
                             <div className="w-full md:w-1/2 aspect-[4/3] bg-warmgray-400 dark:bg-gray-600 rounded-sm overflow-hidden">
@@ -262,7 +262,7 @@ const Home = () => {
                     </section>
 
                     {/* Feature Section 2 — text left, image right */}
-                    <section className="bg-warmgray-50 dark:bg-gray-900 transition-colors duration-300">
+                    <section className="bg-parchment dark:bg-gray-900 transition-colors duration-300">
                         <div className="max-w-6xl mx-auto px-6 md:px-16 py-16 md:py-24 flex flex-col md:flex-row items-center gap-10 md:gap-16">
                             {/* Text */}
                             <div className="w-full md:w-1/2 order-2 md:order-1">
@@ -279,7 +279,7 @@ const Home = () => {
                         </div>
                     </section>
 
-                    <section className="bg-warmgray-100 dark:bg-gray-800 transition-colors duration-300">
+                    <section className="bg-parchment-dark dark:bg-gray-800 transition-colors duration-300">
                         <div className="max-w-6xl mx-auto px-6 md:px-16 py-16 md:py-24 flex flex-col md:flex-row items-center gap-10 md:gap-16">
                             {/* Image placeholder */}
                             <div className="w-full md:w-1/2 aspect-[4/3] bg-warmgray-400 dark:bg-gray-600 rounded-sm overflow-hidden">
@@ -300,7 +300,7 @@ const Home = () => {
 
                     {/* Top Charting BookClubs Section */}
                     <section className="px-6 md:px-16 py-16 md:py-24">
-                        <div className="max-w-5xl mx-auto text-center">
+                        <div className="max-w-6xl mx-auto text-center">
                             <h2 className="font-display text-4xl md:text-5xl font-bold text-stone-900 dark:text-warmgray-100 mb-2 leading-tight">
                                 Top Charting
                             </h2>
@@ -308,17 +308,20 @@ const Home = () => {
                                 BookClubs people love right now
                             </p>
 
-                            <div className="flex flex-wrap justify-center gap-5 md:gap-8">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                                 {(() => {
                                     const topClubs = [...bookClubs]
                                         .sort((a, b) => (b.memberCount || 0) - (a.memberCount || 0))
-                                        .slice(0, 4);
+                                        .slice(0, 3);
 
                                     if (topClubs.length === 0) {
-                                        return Array.from({ length: 4 }).map((_, i) => (
-                                            <div key={i} className="flex flex-col items-center w-40 sm:w-48">
-                                                <div className="w-full aspect-[3/4] bg-warmgray-200 dark:bg-gray-700 rounded-lg" />
-                                                <div className="mt-3 h-4 w-24 bg-warmgray-200 dark:bg-gray-700 rounded" />
+                                        return Array.from({ length: 3 }).map((_, i) => (
+                                            <div key={i} className="flex flex-col bg-parchment-light dark:bg-gray-800 p-5 pb-8 shadow-md">
+                                                <div className="w-full aspect-[4/5] bg-warmgray-200 dark:bg-gray-700" />
+                                                <div className="mt-6 flex flex-col items-center gap-2">
+                                                    <div className="h-4 w-28 bg-warmgray-200 dark:bg-gray-700 rounded" />
+                                                    <div className="h-3 w-20 bg-warmgray-200 dark:bg-gray-700 rounded" />
+                                                </div>
                                             </div>
                                         ));
                                     }
@@ -327,9 +330,10 @@ const Home = () => {
                                         <button
                                             key={club.id}
                                             onClick={() => navigate(`/bookclubpage/${club.id}`)}
-                                            className="flex flex-col items-center group cursor-pointer w-40 sm:w-48"
+                                            className="flex flex-col bg-parchment-light dark:bg-gray-800 p-5 pb-8 shadow-md hover:shadow-xl transition-all duration-300 group cursor-pointer"
                                         >
-                                            <div className="w-full aspect-[3/4] bg-warmgray-200 dark:bg-gray-700 rounded-lg overflow-hidden shadow-md group-hover:shadow-xl transition-shadow duration-300">
+                                            {/* Image area */}
+                                            <div className="w-full aspect-[4/5] overflow-hidden bg-warmgray-300 dark:bg-gray-700">
                                                 <img
                                                     src={getCollabImageUrl(club.image) || '/images/default.webp'}
                                                     alt={club.name}
@@ -337,12 +341,15 @@ const Home = () => {
                                                     onError={(e) => { e.target.src = '/images/default.webp'; }}
                                                 />
                                             </div>
-                                            <p className="mt-3 text-sm font-semibold text-stone-800 dark:text-warmgray-200 line-clamp-1 group-hover:text-stone-600 dark:group-hover:text-white transition-colors">
-                                                {club.name}
-                                            </p>
-                                            <p className="text-xs text-stone-400 dark:text-gray-500 mt-0.5">
-                                                {club.memberCount || 0} members
-                                            </p>
+                                            {/* Text caption area */}
+                                            <div className="mt-5 flex flex-col items-center gap-1">
+                                                <p className="text-sm font-semibold text-stone-800 dark:text-warmgray-200 line-clamp-1 group-hover:text-stone-600 dark:group-hover:text-white transition-colors">
+                                                    {club.name}
+                                                </p>
+                                                <p className="text-xs text-stone-400 dark:text-gray-500 font-serif italic">
+                                                    {club.memberCount || 0} members
+                                                </p>
+                                            </div>
                                         </button>
                                     ));
                                 })()}
@@ -364,7 +371,7 @@ const Home = () => {
 
             {/* ===== LOGGED-IN DASHBOARD ===== */}
             {auth?.user && (
-            <div className="flex flex-col p-4 md:p-8 w-full min-h-screen gap-4 bg-warmgray-50 dark:bg-gray-900 transition-colors duration-300">
+            <div className="flex flex-col p-4 md:p-8 w-full min-h-screen gap-4 bg-parchment dark:bg-gray-900 transition-colors duration-300">
                     <div className="flex flex-col p-4 rounded w-full">
                         {/* Header with title and filter */}
                         <div className="flex items-center justify-end mb-4">
