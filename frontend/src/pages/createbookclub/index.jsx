@@ -4,25 +4,9 @@ import { FiImage, FiX, FiUnlock, FiLock, FiEyeOff } from 'react-icons/fi';
 import { bookclubAPI } from '@api/bookclub.api';
 import AuthContext from '@context/index';
 import logger from '@utils/logger';
+import { BOOKCLUB_CATEGORIES } from '@config/constants';
 
-const categories = [
-    'General',
-    'Fiction',
-    'Non-Fiction',
-    'Mystery',
-    'Romance',
-    'Science Fiction',
-    'Fantasy',
-    'Thriller',
-    'Biography',
-    'Self-Help',
-    'History',
-    'Poetry',
-    'Young Adult',
-    'Classic Literature',
-    'Horror',
-    'Philosophy'
-];
+const categories = BOOKCLUB_CATEGORIES;
 
 const NewBookClubPage = () => {
     const { auth } = useContext(AuthContext);

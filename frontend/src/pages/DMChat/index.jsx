@@ -68,7 +68,7 @@ const DMChatPage = () => {
         })
         .catch(error => logger.error('Error fetching my book clubs:', error));
     }
-  }, [auth]);
+  }, [auth?.user?.id]);
 
   // DM WebSocket connection
   useEffect(() => {
@@ -208,7 +208,7 @@ const DMChatPage = () => {
   useEffect(() => {
     fetchConversations();
     fetchFriends();
-  }, [auth]);
+  }, [auth?.token]);
 
   // Handle userId from URL params
   useEffect(() => {
@@ -230,7 +230,7 @@ const DMChatPage = () => {
         sessionStorage.removeItem('openDM');
       }
     }
-  }, [auth]);
+  }, [auth?.user?.id]);
 
   // Fetch messages for selected DM conversation
   const fetchDMMessages = async (userId) => {

@@ -42,20 +42,11 @@ export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 export const ALLOWED_DOCUMENT_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 
-// Reading Status
-export const READING_STATUS = {
-  WANT_TO_READ: 'WANT_TO_READ',
-  CURRENTLY_READING: 'CURRENTLY_READING',
-  FINISHED: 'FINISHED',
-  DNF: 'DNF', // Did Not Finish
-};
+// Reading Status — canonical definition lives in ui.constants.js
+// (removed duplicate to avoid conflicting exports)
 
-// Bookclub Roles
-export const BOOKCLUB_ROLES = {
-  ADMIN: 'ADMIN',
-  MODERATOR: 'MODERATOR',
-  MEMBER: 'MEMBER',
-};
+// Bookclub Roles — canonical definition lives in ui.constants.js as ROLES
+// (removed duplicate to avoid conflicting exports — ROLES includes OWNER)
 
 // Message Types
 export const MESSAGE_TYPES = {
@@ -96,6 +87,26 @@ export const TIME_FORMAT = 'HH:mm';
 // Debounce Delays
 export const SEARCH_DEBOUNCE_MS = 300;
 export const AUTO_SAVE_DEBOUNCE_MS = 1000;
+
+// Book Club Categories (shared across discover & create pages)
+export const BOOKCLUB_CATEGORIES = [
+  'General',
+  'Fiction',
+  'Non-Fiction',
+  'Mystery',
+  'Romance',
+  'Science Fiction',
+  'Fantasy',
+  'Thriller',
+  'Biography',
+  'Self-Help',
+  'History',
+  'Poetry',
+  'Young Adult',
+  'Classic Literature',
+  'Horror',
+  'Philosophy',
+];
 
 // UI Constants
 export const TOAST_DURATION = 3000;

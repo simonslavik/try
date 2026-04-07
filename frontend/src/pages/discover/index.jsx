@@ -11,26 +11,9 @@ import apiClient from '@api/axios';
 import logger from '@utils/logger';
 import { DiscoverCardSkeleton } from '@components/common/Skeleton';
 import EmptyState from '@components/common/EmptyState';
+import { BOOKCLUB_CATEGORIES } from '@config/constants';
 
-const categories = [
-    'All',
-    'General',
-    'Fiction',
-    'Non-Fiction',
-    'Mystery',
-    'Romance',
-    'Science Fiction',
-    'Fantasy',
-    'Thriller',
-    'Biography',
-    'Self-Help',
-    'History',
-    'Poetry',
-    'Young Adult',
-    'Classic Literature',
-    'Horror',
-    'Philosophy'
-];
+const categories = ['All', ...BOOKCLUB_CATEGORIES];
 
 const DiscoverBookClubs = () => {
     const { auth } = useContext(AuthContext);
@@ -59,7 +42,7 @@ const DiscoverBookClubs = () => {
             }
         };
         fetchFriends();
-    }, [auth]);
+    }, [auth?.token]);
 
     // Fetch all bookclubs
     useEffect(() => {

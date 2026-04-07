@@ -53,7 +53,7 @@ const FindPeople = () => {
             }
         };
         fetchData();
-    }, [auth]);
+    }, [auth?.user?.id]);
 
     // Search users with debounce
     useEffect(() => {

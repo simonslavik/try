@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useRef, useCallback } from "react";
+import { createContext, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import axios from 'axios';
 import { API_URL } from '@config/constants';
 import logger from '@utils/logger';
@@ -90,8 +90,10 @@ export const AuthProvider = ({ children }) => {
         };
     }, [setAuth]);
 
+    const value = useMemo(() => ({ auth, setAuth, logout }), [auth, setAuth, logout]);
+
     return (
-        <AuthContext.Provider value={{ auth, setAuth, logout }}>
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     )
