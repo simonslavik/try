@@ -26,9 +26,10 @@ const TopClubCard = ({ club }) => {
       {/* Image area */}
       <div className="w-full aspect-[4/5] overflow-hidden bg-warmgray-300 dark:bg-gray-700">
         <img
-          src={getCollabImageUrl(club.image) || DEFAULT_IMAGE}
+          src={club.imageUrl ? getCollabImageUrl(club.imageUrl) : DEFAULT_IMAGE}
           alt={club.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
           onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
         />
       </div>

@@ -29,9 +29,10 @@ const RankedClubCard = ({ club, rank }) => {
 
       {/* Club image */}
       <img
-        src={getCollabImageUrl(club.image) || DEFAULT_IMAGE}
+        src={club.imageUrl ? getCollabImageUrl(club.imageUrl) : DEFAULT_IMAGE}
         alt={club.name}
         className={`${isFirst ? 'w-14 h-14' : 'w-10 h-10'} rounded-full object-cover ${style.ring} shadow-md mb-2`}
+        loading="lazy"
         onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
       />
 

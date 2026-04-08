@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
+import { lazy, Suspense, useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useBookclubData } from '@hooks/useBookclubData';
 import { useBookclubViews } from '@hooks/useBookclubViews';
@@ -21,14 +21,14 @@ import BookSuggestionsView from '@components/features/bookclub/MainChatArea/Book
 import MeetingsView from '@components/features/bookclub/MainChatArea/MeetingsView';
 import BookclubSettingsPanel from './BookclubSettingsPanel';
 
-// Modals
-import AddCurrentBookModal from '@components/features/bookclub/Modals/AddCurrentBookModal';
-import CurrentBookDetailsModal from '@components/features/bookclub/Modals/CurrentBookDetailsModal';
-import AddBookToBookclubModal from '@components/features/bookclub/Modals/AddBookToBookclubModal';
-import CreateRoomModal from '@components/features/bookclub/Modals/CreateRoomModal';
-import RoomSettingsModal from '@components/features/bookclub/Modals/RoomSettingsModal';
-import ScheduleMeetingModal from '@components/features/bookclub/Modals/ScheduleMeetingModal';
-import InviteModal from '@components/common/modals/InviteModal';
+// Modals — lazy-loaded (only fetched when a modal is actually opened)
+const AddCurrentBookModal = lazy(() => import('@components/features/bookclub/Modals/AddCurrentBookModal'));
+const CurrentBookDetailsModal = lazy(() => import('@components/features/bookclub/Modals/CurrentBookDetailsModal'));
+const AddBookToBookclubModal = lazy(() => import('@components/features/bookclub/Modals/AddBookToBookclubModal'));
+const CreateRoomModal = lazy(() => import('@components/features/bookclub/Modals/CreateRoomModal'));
+const RoomSettingsModal = lazy(() => import('@components/features/bookclub/Modals/RoomSettingsModal'));
+const ScheduleMeetingModal = lazy(() => import('@components/features/bookclub/Modals/ScheduleMeetingModal'));
+const InviteModal = lazy(() => import('@components/common/modals/InviteModal'));
 
 // Input area
 import MessageInput from '@components/features/bookclub/MessageInput';
@@ -419,8 +419,9 @@ const BookClub = () => {
         </div>
       </div>
 
-      {/* ── Modals ──────────────────────────────────────── */}
-      {modals.isOpen('addCurrentBook') && (
+      {/* ── Modals (lazy-loaded) ─────────────────────────── */}
+      <Suspense fallback={null}>
+        {modals.isOpen('addCurrentBook') && (
         <AddCurrentBookModal
           bookClubId={bookClubId}
           onClose={() => modals.close('addCurrentBook')}
@@ -481,6 +482,7 @@ const BookClub = () => {
           notifySectionActivity('meetings');
         }}
       />
+      </Suspense>
     </div>
   );
 };

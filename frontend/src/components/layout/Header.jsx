@@ -119,10 +119,10 @@ const HomePageHeader = () => {
       {/* Logo */}
       <button
         onClick={() => navigate('/')}
-        className={`cursor-pointer ${auth?.user ? 'md:absolute md:left-1/2 md:-translate-x-1/2' : ''} flex items-center gap-2`}
+        className={`cursor-pointer  flex items-center gap-2`}
       >
         <h2 className="text-lg font-semibold text-stone-800 dark:text-warmgray-100 tracking-tight">
-          {auth?.user ? 'MyBookClubs' : 'YourBookClubs.com'}
+           YourBookClubs.com
         </h2>
       </button>
 

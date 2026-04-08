@@ -1,4 +1,4 @@
-import { useState, useContext, useMemo, useCallback } from 'react';
+import { useState, useEffect, useContext, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { getCollabImageUrl, getProfileImageUrl } from '@config/constants';
@@ -170,6 +170,7 @@ const ClubCard = ({ bookClub, scale, opacity, zIndex, isCenter, cardBookIndex, o
           src={bookClub.imageUrl ? getCollabImageUrl(bookClub.imageUrl) : DEFAULT_IMAGE}
           alt={bookClub.name}
           className="w-full h-full object-cover"
+          loading="lazy"
           onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
@@ -247,6 +248,23 @@ const MyClubsCarousel = ({
 
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [cardBookIndex, setCardBookIndex] = useState({});
+
+  // Responsive breakpoint — tracks sm (640px) via matchMedia instead of
+  // reading window.innerWidth on every render (stale + no resize updates).
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 639px)').matches,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 639px)');
+    const onChange = (e) => setIsMobile(e.matches);
+    setIsMobile(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  const cardWidth = isMobile ? 240 : 300;
+  const gap = isMobile ? 12 : 20;
 
   const displayed = useMemo(
     () =>
@@ -333,10 +351,7 @@ const MyClubsCarousel = ({
     };
   };
 
-  const cardWidth = typeof window !== 'undefined' && window.innerWidth < 640 ? 240 : 300;
-  const gap = typeof window !== 'undefined' && window.innerWidth < 640 ? 12 : 20;
   const stripOffset = -(idx * (cardWidth + gap));
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
 
   return (
     <div className="flex flex-col p-4 rounded w-full">

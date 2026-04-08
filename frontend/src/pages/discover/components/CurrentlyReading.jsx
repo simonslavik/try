@@ -49,6 +49,7 @@ const CurrentlyReading = ({ books, activeIndex, onIndexChange }) => {
           src={current.book?.coverUrl || DEFAULT_IMAGE}
           alt={current.book?.title}
           className="w-9 h-[50px] object-cover rounded-md shadow-sm flex-shrink-0"
+          loading="lazy"
           onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
         />
 

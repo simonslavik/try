@@ -42,6 +42,7 @@ const MemberAvatars = ({ members, memberCount, friendIds, onHoverMember }) => {
             className={`w-7 h-7 rounded-full border-2 object-cover cursor-pointer hover:ring-2 hover:ring-stone-400 transition-all hover:z-10 relative ${
               friendIds.has(m.id) ? 'border-green-400' : 'border-white dark:border-gray-800'
             }`}
+            loading="lazy"
             onClick={(e) => { e.stopPropagation(); navigate(`/profile/${m.id}`); }}
             onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
             onMouseEnter={(e) => {

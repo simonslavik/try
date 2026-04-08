@@ -23,6 +23,17 @@ export default defineConfig({
       '@lib': path.resolve(__dirname, './src/lib'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-monaco': ['@monaco-editor/react'],
+          'vendor-emoji': ['emoji-mart', '@emoji-mart/data', '@emoji-mart/react'],
+        },
+      },
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',
