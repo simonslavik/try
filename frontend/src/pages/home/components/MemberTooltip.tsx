@@ -23,7 +23,7 @@ const MemberTooltip = ({ member }) => {
         src={member.image}
         alt={member.name}
         className="w-6 h-6 rounded-full object-cover"
-        onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
+        onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE; }}
       />
       <span className="font-medium">{member.name}</span>
       <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45 -mt-1" />

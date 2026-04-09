@@ -151,7 +151,7 @@ const ConnectedUsersSidebar = ({
                           src={getProfileImageUrl(user.profileImage) || '/images/default.webp'}
                           alt={user.username}
                           className="w-10 h-10 rounded-full object-cover"
-                          onError={(e) => { e.target.src = '/images/default.webp'; }}
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
                         />
                       </UserHoverCard>
                       <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-gray-800 ${getStatusColor(isOnline ? (user.status || 'ONLINE') : 'OFFLINE')}`} />
@@ -222,7 +222,7 @@ const ConnectedUsersSidebar = ({
                       src={getProfileImageUrl(user.profileImage) || '/images/default.webp'} 
                       alt={user.username} 
                       className="w-8 h-8 rounded-full object-cover"
-                      onError={(e) => { e.target.src = '/images/default.webp'; }}
+                      onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
                     />
                   </UserHoverCard>
                   <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-800 ${getStatusColor(isOnline ? (user.status || 'ONLINE') : 'OFFLINE')}`}></div>

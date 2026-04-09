@@ -191,7 +191,7 @@ const FindPeople = () => {
                                                     src={getProfileImageUrl(sender.profileImage) || '/images/default.webp'}
                                                     alt={sender.name}
                                                     className="w-10 h-10 rounded-full object-cover ring-2 ring-amber-200 dark:ring-amber-700 flex-shrink-0"
-                                                    onError={(e) => { e.target.src = '/images/default.webp'; }}
+                                                    onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
                                                 />
                                                 <span className="text-sm font-medium text-stone-700 dark:text-warmgray-200 truncate">
                                                     {sender.name}
@@ -248,7 +248,7 @@ const FindPeople = () => {
                                             src={getProfileImageUrl(user.profileImage) || '/images/default.webp'}
                                             alt={user.name}
                                             className="w-16 h-16 rounded-full object-cover ring-2 ring-warmgray-200 dark:ring-gray-600 group-hover:ring-stone-400 dark:group-hover:ring-gray-500 transition-all"
-                                            onError={(e) => { e.target.src = '/images/default.webp'; }}
+                                            onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
                                         />
                                         <span className="text-sm font-medium text-stone-700 dark:text-warmgray-200 text-center truncate w-full">
                                             {user.name || user.username}

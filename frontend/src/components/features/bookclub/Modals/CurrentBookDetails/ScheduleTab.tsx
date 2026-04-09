@@ -14,7 +14,7 @@ const deriveSchedule = (currentBookData) => {
     end = new Date(currentBookData.endDate).toISOString().split('T')[0];
   }
   if (currentBookData?.startDate && currentBookData?.endDate) {
-    const diffMs = Math.abs(new Date(currentBookData.endDate) - new Date(currentBookData.startDate));
+    const diffMs = Math.abs(new Date(currentBookData.endDate).getTime() - new Date(currentBookData.startDate).getTime());
     days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
   }
 
@@ -56,7 +56,8 @@ const ScheduleTab = ({
 
   const calculateDaysRemaining = () => {
     if (!currentBookData?.endDate) return 0;
-    const diffDays = Math.ceil((new Date(currentBookData.endDate) - new Date()) / (1000 * 60 * 60 * 24));
+    const now = new Date();
+    const diffDays = Math.ceil((new Date(currentBookData.endDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     return Math.max(0, diffDays);
   };
 

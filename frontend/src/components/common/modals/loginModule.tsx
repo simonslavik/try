@@ -79,7 +79,7 @@ const Login = ({ onClose, onSwitchToRegister }) => {
                 user: user
             });
             
-            onClose && onClose();
+            onClose?.();
             window.location.reload();
         } catch (err) {
             const respMsg = err?.response?.data?.message;
@@ -119,7 +119,7 @@ const Login = ({ onClose, onSwitchToRegister }) => {
                     user: user
                 });
                 
-                onClose && onClose();
+                onClose?.();
                 window.location.reload();
             } else {
                 setErrors(['Google login succeeded but received incomplete data from server']);
@@ -132,9 +132,9 @@ const Login = ({ onClose, onSwitchToRegister }) => {
         }
     };
 
-    const handleGoogleError = (error) => {
-        logger.error('Google Sign-In error:', error);
-        console.error('[Google OAuth] Login failed. Origin:', window.location.origin, 'Error:', error);
+    const handleGoogleError = () => {
+        logger.error('Google Sign-In error');
+        console.error('[Google OAuth] Login failed. Origin:', window.location.origin);
         setErrors(['Google authentication failed. Please check that popups are not blocked and try again.']);
     };
 

@@ -409,7 +409,7 @@ const RoomSettingsModal = ({ isOpen, onClose, room, bookClubId, allMembers, curr
     setSaving(true);
     setError('');
     try {
-      const updates = {};
+      const updates: Record<string, any> = {};
       if (form.name.trim() !== room.name) updates.name = form.name.trim();
       if ((form.description || '') !== (room.description || '')) updates.description = form.description.trim();
       if (form.type !== room.type && !room.isDefault) updates.type = form.type;

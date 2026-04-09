@@ -28,7 +28,7 @@ const ResizablePanel = ({
   storageKey,
   className = '',
   children,
-}) => {
+}: any) => {
   const threshold = collapseThreshold ?? Math.round(minWidth * 0.6);
 
   const [width, setWidth] = useState(() => {

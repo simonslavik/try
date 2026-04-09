@@ -49,7 +49,7 @@ const DMChatPage = () => {
   const [typingUsers, setTypingUsers] = useState([]);
   
   const dmWs = useRef(null);
-  const typingTimersRef = useRef({});
+  const typingTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const lastTypingSentRef = useRef(0);
 
   // Fetch my bookclubs for sidebar

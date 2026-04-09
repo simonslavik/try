@@ -46,7 +46,19 @@ const THEME_LABEL = { auto: 'Auto', dark: 'Dark', light: 'Light' };
 /**
  * Full-height slide-over sidebar for mobile navigation.
  */
-const MobileSidebar = forwardRef(({
+interface MobileSidebarProps {
+  user: any;
+  friendRequests: any[];
+  mode: string;
+  isDark: boolean;
+  onClose: () => void;
+  onNavigate: (path: string) => void;
+  onLogout: () => void;
+  onCycleTheme: () => void;
+  onFriendAction: (requestId: any, action: any) => Promise<void>;
+}
+
+const MobileSidebar = forwardRef<HTMLDivElement, MobileSidebarProps>(({
   user,
   friendRequests,
   mode,
@@ -91,7 +103,7 @@ const MobileSidebar = forwardRef(({
               src={getProfileImageUrl(user.profileImage) || DEFAULT_AVATAR}
               alt="Profile"
               className="h-14 w-14 rounded-full object-cover border-2 border-warmgray-300"
-              onError={(e) => { e.target.src = DEFAULT_AVATAR; }}
+              onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_AVATAR; }}
             />
             <div>
               <p className="font-semibold text-gray-900 dark:text-gray-100">{user.name}</p>
@@ -127,7 +139,7 @@ const MobileSidebar = forwardRef(({
                       src={getProfileImageUrl(request.user?.profileImage) || DEFAULT_AVATAR}
                       alt={request.user?.name}
                       className="h-10 w-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
-                      onError={(e) => { e.target.src = DEFAULT_AVATAR; }}
+                      onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_AVATAR; }}
                     />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{request.user?.name}</p>

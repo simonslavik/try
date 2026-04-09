@@ -89,7 +89,7 @@ const AddEventModal = ({ isOpen, onClose, bookClubId, auth, eventToEdit, onEvent
         ? await apiClient.patch(path, body)
         : await apiClient.post(path, body);
       
-      onEventSaved && onEventSaved(data.event);
+      onEventSaved?.(data.event);
       onClose();
     } catch (err) {
       logger.error('Error saving event:', err);

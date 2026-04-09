@@ -90,7 +90,7 @@ const MentionAutocomplete = ({
                 src={getProfileImageUrl(member.profileImage) || '/images/default.webp'}
                 alt={member.username}
                 className="w-7 h-7 rounded-full object-cover flex-shrink-0"
-                onError={(e) => { e.target.src = '/images/default.webp'; }}
+                onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
               />
             )}
             <span className="font-medium truncate">

@@ -75,7 +75,7 @@ const EmptyState = ({
   onSecondary,
   variant = 'light',
   className = '',
-}) => {
+}: any) => {
   const navigate = useNavigate();
   const p = preset ? presets[preset] || {} : {};
 

@@ -65,7 +65,7 @@ const CurrentBooksPreview = ({ books, clubId, bookIdx, onChangeIndex }) => {
           src={currentEntry.book?.coverUrl || DEFAULT_IMAGE}
           alt={currentEntry.book?.title}
           className="w-10 h-14 object-cover rounded shadow-sm flex-shrink-0"
-          onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
+          onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE; }}
         />
 
         <div className="flex-1 min-w-0">
@@ -126,7 +126,7 @@ const MemberAvatars = ({ members, onHover, onLeave }) => {
               alt={member.username}
               className="w-7 h-7 rounded-full border-2 border-white object-cover shadow-sm cursor-pointer hover:ring-2 hover:ring-stone-400 transition-all hover:z-10 relative"
               onClick={(e) => { e.stopPropagation(); navigate(`/profile/${member.id}`); }}
-              onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
+              onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE; }}
               onMouseEnter={(e) => onHover(e, member)}
               onMouseLeave={onLeave}
             />
@@ -171,7 +171,7 @@ const ClubCard = ({ bookClub, scale, opacity, zIndex, isCenter, cardBookIndex, o
           alt={bookClub.name}
           className="w-full h-full object-cover"
           loading="lazy"
-          onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
+          onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE; }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
 
@@ -330,8 +330,8 @@ const MyClubsCarousel = ({
   }
 
   // ── Carousel items ──
-  const items = [
-    ...displayed.map((c) => ({ type: 'club', data: c })),
+  const items: { type: string; data?: any }[] = [
+    ...displayed.map((c) => ({ type: 'club' as const, data: c })),
     { type: 'create' },
   ];
   const idx = Math.min(carouselIndex, items.length - 1);

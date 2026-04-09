@@ -1,6 +1,13 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
-const ThemeContext = createContext();
+interface ThemeContextValue {
+  mode: string;
+  isDark: boolean;
+  setTheme: (mode: string) => void;
+  cycleTheme: () => void;
+}
+
+const ThemeContext = createContext<ThemeContextValue>({} as ThemeContextValue);
 
 // Auto dark mode: system preference OR time-based (8PM - 7AM)
 const shouldBeDark = () => {

@@ -4,9 +4,10 @@ import { getCollabImageUrl } from '@config/constants';
 const DEFAULT_IMG = '/images/default.webp';
 
 export default function ClubHero({ bookClub, members, totalBooks, currentBooks, actionLabel, onAction }) {
+    const now = new Date();
     const nearestEnd = currentBooks.length
         ? currentBooks.reduce((nearest, b) => {
-            const d = b.endDate ? Math.max(0, Math.ceil((new Date(b.endDate) - new Date()) / 86400000)) : Infinity;
+            const d = b.endDate ? Math.max(0, Math.ceil((new Date(b.endDate).getTime() - now.getTime()) / 86400000)) : Infinity;
             return d < nearest ? d : nearest;
         }, Infinity)
         : null;
@@ -19,7 +20,7 @@ export default function ClubHero({ bookClub, members, totalBooks, currentBooks, 
                         src={getCollabImageUrl(bookClub.imageUrl)}
                         alt={bookClub.name}
                         className="w-28 h-28 md:w-36 md:h-36 rounded-2xl object-cover ring-4 ring-white/10 flex-shrink-0"
-                        onError={(e) => { e.target.src = DEFAULT_IMG; }}
+                        onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMG; }}
                     />
                 ) : (
                     <div className="w-28 h-28 md:w-36 md:h-36 rounded-2xl bg-white/10 flex items-center justify-center flex-shrink-0">

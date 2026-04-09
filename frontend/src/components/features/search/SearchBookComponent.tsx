@@ -144,8 +144,8 @@ const BookSearch = () => {
                   alt={`${book.title} cover`}
                   className="h-full w-full object-cover rounded-t-lg"
                   onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
+                    (e.target as HTMLElement).style.display = 'none';
+                    ((e.target as HTMLElement).nextSibling as HTMLElement).style.display = 'flex';
                   }}
                 />
               ) : null}

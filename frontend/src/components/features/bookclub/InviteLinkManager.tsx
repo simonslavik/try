@@ -37,7 +37,7 @@ const InviteLinkManager = ({ bookclubId, userRole }) => {
   const handleCreateInvite = async () => {
     setCreating(true);
     try {
-      const payload = {};
+      const payload: Record<string, any> = {};
       if (maxUses) payload.maxUses = parseInt(maxUses);
       if (expiresInDays) payload.expiresInDays = parseInt(expiresInDays);
 

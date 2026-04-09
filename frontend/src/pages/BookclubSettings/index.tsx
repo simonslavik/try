@@ -164,7 +164,7 @@ const BookclubSettings = () => {
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  rows="3"
+                  rows={3}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-stone-500 focus:outline-none font-outfit resize-none"
                 />
               </div>

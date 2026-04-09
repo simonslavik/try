@@ -85,7 +85,7 @@ const BookClubBookView = ({
             src={bookClubBook.book?.coverUrl || '/images/default.webp'}
             alt={bookClubBook.book?.title}
             className="w-20 h-28 object-cover rounded shadow-md"
-            onError={(e) => { e.target.src = '/images/default.webp'; }}
+            onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
           />
           <div className="flex-1 min-w-0">
             <h4 className="text-white font-semibold text-sm line-clamp-2 mb-1">

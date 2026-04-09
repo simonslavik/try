@@ -31,7 +31,7 @@ const FriendRequestDropdown = ({ requests, isOpen, onFriendAction }) => {
                   src={getProfileImageUrl(request.from?.profileImage) || DEFAULT_AVATAR}
                   alt={request.from?.name || 'User'}
                   className="h-10 w-10 rounded-full object-cover border-2 border-gray-200"
-                  onError={(e) => { e.target.src = DEFAULT_AVATAR; }}
+                  onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_AVATAR; }}
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-gray-900 dark:text-gray-100">

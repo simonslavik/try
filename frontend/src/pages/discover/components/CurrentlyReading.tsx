@@ -50,7 +50,7 @@ const CurrentlyReading = ({ books, activeIndex, onIndexChange }) => {
           alt={current.book?.title}
           className="w-9 h-[50px] object-cover rounded-md shadow-sm flex-shrink-0"
           loading="lazy"
-          onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
+          onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE; }}
         />
 
         <div className="flex-1 min-w-0">

@@ -42,7 +42,7 @@ export const formatDate = (date, format = 'MMM dd, yyyy') => {
 
   let formatted = format;
   for (const [key, value] of Object.entries(replacements)) {
-    formatted = formatted.replace(new RegExp(key, 'g'), value);
+    formatted = formatted.replace(new RegExp(key, 'g'), String(value));
   }
 
   return formatted;
@@ -56,7 +56,7 @@ export const formatRelativeTime = (date) => {
   if (isNaN(d.getTime())) return '';
 
   const now = new Date();
-  const diff = now - d;
+  const diff = now.getTime() - d.getTime();
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);

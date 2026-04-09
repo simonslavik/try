@@ -174,8 +174,8 @@ const AddBookToLibraryModal = ({ onClose, onBookAdded }) => {
                           alt={book.title}
                           className="h-full w-full object-cover"
                           onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
+                            (e.target as HTMLElement).style.display = 'none';
+                            ((e.target as HTMLElement).nextSibling as HTMLElement).style.display = 'flex';
                           }}
                         />
                       ) : null}

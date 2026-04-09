@@ -49,7 +49,7 @@ const BookClubCard = ({ bookClub, bookIndex = 0, onBookIndexChange, friendIds, o
           alt={bookClub.name}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
-          onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
+          onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE; }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 

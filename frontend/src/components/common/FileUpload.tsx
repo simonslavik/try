@@ -4,7 +4,17 @@ import { uploadChatFile } from '@api/upload.api';
 import logger from '@utils/logger';
 import { useToast } from '@hooks/useUIFeedback';
 
-const FileUpload = forwardRef(({ onFilesSelected, auth, disabled = false }, ref) => {
+interface FileUploadProps {
+  onFilesSelected: (files: any[]) => void;
+  auth: any;
+  disabled?: boolean;
+}
+
+export interface FileUploadHandle {
+  uploadFiles: () => Promise<any[]>;
+}
+
+const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(({ onFilesSelected, auth, disabled = false }, ref) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);

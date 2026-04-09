@@ -75,7 +75,7 @@ const ConnectedUsersArea = (
                             src={getProfileImageUrl(user.profileImage) || '/images/default.webp'} 
                             alt={user.username} 
                             className="w-8 h-8 rounded-full object-cover"
-                            onError={(e) => { e.target.src = '/images/default.webp'; }}
+                            onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
                           />
                         </UserHoverCard>
                         <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-800 ${getStatusColor(user.status || (isOnline ? 'ONLINE' : 'OFFLINE'))}`}></div>
@@ -95,7 +95,7 @@ const ConnectedUsersArea = (
                         }}
                         onClick={(e) => e.stopPropagation()}
                       >
-                        {logger.debug('Rendering menu at:', menuPosition, 'for user:', user.id)}
+                        {(logger.debug('Rendering menu at:', menuPosition, 'for user:', user.id), null)}
                         <button
                           onClick={(e) => {
                             e.stopPropagation();

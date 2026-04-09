@@ -142,7 +142,7 @@ export const shouldGroupMessages = (currentMsg, previousMsg, nextMsg) => {
   if (!previousMsg) {
     let isLastInGroup = true;
     if (nextMsg && nextMsg.type !== 'system' && nextMsg.userId === currentMsg.userId) {
-      isLastInGroup = new Date(nextMsg.timestamp) - new Date(currentMsg.timestamp) > FIVE_MINUTES;
+      isLastInGroup = new Date(nextMsg.timestamp).getTime() - new Date(currentMsg.timestamp).getTime() > FIVE_MINUTES;
     }
     return { groupWithPrevious: false, isLastInGroup };
   }
@@ -155,12 +155,12 @@ export const shouldGroupMessages = (currentMsg, previousMsg, nextMsg) => {
     return { groupWithPrevious: false, isLastInGroup: !nextMsg || nextMsg.userId !== currentMsg.userId };
   }
 
-  const timeDiff = new Date(currentMsg.timestamp) - new Date(previousMsg.timestamp);
+  const timeDiff = new Date(currentMsg.timestamp).getTime() - new Date(previousMsg.timestamp).getTime();
   const groupWithPrevious = timeDiff <= FIVE_MINUTES;
 
   let isLastInGroup = true;
   if (nextMsg && nextMsg.userId === currentMsg.userId) {
-    isLastInGroup = new Date(nextMsg.timestamp) - new Date(currentMsg.timestamp) > FIVE_MINUTES;
+    isLastInGroup = new Date(nextMsg.timestamp).getTime() - new Date(currentMsg.timestamp).getTime() > FIVE_MINUTES;
   }
 
   return { groupWithPrevious, isLastInGroup };

@@ -27,7 +27,7 @@ const BookDetailsModal = ({ onClose, book }) => {
                 src={book?.coverUrl || '/images/default.webp'}
                 alt={book?.title}
                 className="w-48 h-72 object-cover rounded-lg shadow-lg flex-shrink-0"
-                onError={(e) => { e.target.src = '/images/default.webp'; }}
+                onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
               />
               <div className="flex-1">
                 <h3 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">

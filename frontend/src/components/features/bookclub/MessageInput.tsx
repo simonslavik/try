@@ -44,7 +44,7 @@ const MessageInput = ({
   replyingTo,
   onCancelReply,
   onTyping
-}) => {
+}: any) => {
   // Mention tracking
   const [mentionMarkers, setMentionMarkers] = useState([]);
   const [mentionQuery, setMentionQuery] = useState('');

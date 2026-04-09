@@ -22,7 +22,7 @@ const MessageActions = ({
   onToggleReaction, onToggleMenu,
   onPin, onEdit, onCopy, onReply, onDelete,
   position = 'left',
-}) => {
+}: any) => {
   if (msg.deletedAt) return null;
 
   const positionClass = position === 'left'

@@ -144,7 +144,7 @@ const NewBookClubPage = () => {
                             value={form.description}
                             onChange={handleChange}
                             placeholder="Describe your book club..."
-                            rows="3"
+                            rows={3}
                             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-500 resize-none bg-white dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
                         />
                     </div>

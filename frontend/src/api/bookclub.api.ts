@@ -56,6 +56,24 @@ export const bookclubAPI = {
     return response.data;
   },
 
+  // Get all invites for a bookclub
+  getInvites: async (bookclubId) => {
+    const response = await apiClient.get(`/v1/bookclubs/${bookclubId}/invites`);
+    return response.data;
+  },
+
+  // Create a new invite
+  createInvite: async (bookclubId, payload: Record<string, any>) => {
+    const response = await apiClient.post(`/v1/bookclubs/${bookclubId}/invites`, payload);
+    return response.data;
+  },
+
+  // Delete an invite
+  deleteInvite: async (bookclubId, inviteId) => {
+    const response = await apiClient.delete(`/v1/bookclubs/${bookclubId}/invites/${inviteId}`);
+    return response.data;
+  },
+
   // Get bookclub books (cached 2 min)
   getBookclubBooks: async (bookclubId) => {
     return cachedFetch(`bookclub:books:${bookclubId}`, async () => {

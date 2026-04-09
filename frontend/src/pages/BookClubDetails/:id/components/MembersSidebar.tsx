@@ -25,7 +25,7 @@ export default function MembersSidebar({ members, connectedUsers }) {
                                     src={getProfileImageUrl(member.profileImage) || DEFAULT_IMG}
                                     alt={member.username}
                                     className="w-9 h-9 rounded-full object-cover"
-                                    onError={(e) => { e.target.src = DEFAULT_IMG; }}
+                                    onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMG; }}
                                 />
                                 <span className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-gray-800 ${online ? 'bg-green-500' : 'bg-stone-300 dark:bg-gray-600'}`} />
                             </div>

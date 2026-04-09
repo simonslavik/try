@@ -16,7 +16,7 @@ const FriendCard = ({ friend }) => {
         src={getProfileImageUrl(friend.profileImage) || DEFAULT_IMAGE}
         alt={friend.name || friend.username}
         className="w-12 h-12 rounded-full object-cover ring-2 ring-warmgray-200 dark:ring-gray-600 group-hover:ring-stone-400 transition-all"
-        onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
+        onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE; }}
       />
       <span className="text-xs font-medium text-stone-700 dark:text-warmgray-200 text-center truncate w-full group-hover:text-stone-500 dark:group-hover:text-white transition-colors">
         {friend.name || friend.username}
@@ -39,7 +39,7 @@ const SuggestedUserCard = ({ user, onSendRequest }) => {
           src={getProfileImageUrl(user.profileImage) || DEFAULT_IMAGE}
           alt={user.name}
           className="w-12 h-12 rounded-full object-cover ring-2 ring-warmgray-200 dark:ring-gray-600 group-hover:ring-emerald-400 transition-all"
-          onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
+          onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE; }}
         />
         <span className="text-xs font-medium text-stone-700 dark:text-warmgray-200 text-center truncate w-full">
           {user.name}

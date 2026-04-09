@@ -3,7 +3,7 @@ import { getProfileImageUrl, getCollabImageUrl } from '@config/constants';
 
 const DEFAULT_IMG = '/images/default.webp';
 
-export default function BookClubsGrid({ clubs, isOwnProfile, profileId, navigate }) {
+export default function BookClubsGrid({ clubs, isOwnProfile, profileId, navigate, profileName }: any) {
     const count = clubs.length;
 
     return (
@@ -62,7 +62,7 @@ function ClubCard({ club, profileId, navigate }) {
                     alt={club.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
-                    onError={(e) => { e.target.src = DEFAULT_IMG; }}
+                    onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMG; }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
 
@@ -96,7 +96,7 @@ function ClubCard({ club, profileId, navigate }) {
                                 src={club.currentBook.book?.coverUrl || DEFAULT_IMG}
                                 alt={club.currentBook.book?.title}
                                 className="w-9 h-12 object-cover rounded shadow-sm"
-                                onError={(e) => { e.target.src = DEFAULT_IMG; }}
+                                onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMG; }}
                             />
                             <div className="flex-1 min-w-0">
                                 <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 line-clamp-2 leading-tight">{club.currentBook.book?.title}</p>
@@ -117,7 +117,7 @@ function ClubCard({ club, profileId, navigate }) {
                                     alt=""
                                     className="w-6 h-6 rounded-full border-2 border-white object-cover"
                                     loading="lazy"
-                                    onError={(e) => { e.target.src = DEFAULT_IMG; }}
+                                    onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMG; }}
                                 />
                             ))}
                             {club.members.length > 4 && (

@@ -3,7 +3,7 @@ import { WS_URL } from '@config/constants';
 import logger from '@utils/logger';
 import UIFeedbackContext from '@context/UIFeedbackContext';
 
-export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { onInit } = {}) => {
+export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { onInit }: { onInit?: (...args: any[]) => void } = {}) => {
   const ws = useRef(null);
   const [messages, setMessages] = useState([]);
   const [connectedUsers, setConnectedUsers] = useState([]);
@@ -23,7 +23,7 @@ export const useBookclubWebSocket = (bookClub, currentRoom, auth, bookClubId, { 
   const currentBookClubIdRef = useRef(null);
   const onInitRef = useRef(onInit);
   onInitRef.current = onInit;
-  const typingTimersRef = useRef({});
+  const typingTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   // Track the latest prop values so the cleanup can decide whether to close
   const currentRoomPropRef = useRef(currentRoom);

@@ -12,7 +12,7 @@ const BookClubImage = ({ bookClub, auth, uploadingImage, fileInputRef, handleIma
                       src={bookClub?.imageUrl ? getCollabImageUrl(bookClub.imageUrl) : '/images/default.webp'}
                       alt={bookClub?.name}
                       className="w-full h-52 object-cover rounded"
-                      onError={(e) => { e.target.src = '/images/IMG_2650.jpg'; }}
+                      onError={(e) => { (e.target as HTMLImageElement).src = '/images/IMG_2650.jpg'; }}
                     />
                     {auth?.user && auth.user.id === bookClub?.creatorId && (
                       <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 rounded">

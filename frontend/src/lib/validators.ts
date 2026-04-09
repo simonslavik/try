@@ -168,7 +168,7 @@ export const validateForm = (values, rules) => {
   for (const [field, fieldRules] of Object.entries(rules)) {
     const value = values[field];
     
-    for (const rule of fieldRules) {
+    for (const rule of fieldRules as any[]) {
       const { type, message, ...params } = rule;
       
       let isValid = true;

@@ -61,7 +61,7 @@ const BookClub = () => {
   // ─── View state machine ────────────────────────────────
   const {
     activeView, switchView, openSettings, closeSettings, is, isSpecialView,
-  } = useBookclubViews(bookClubId, null); // viewSection wired after WS hook
+  } = useBookclubViews(bookClubId); // viewSection wired after WS hook
 
   // ─── Modals (simple open/close) ────────────────────────
   const modals = useModals([

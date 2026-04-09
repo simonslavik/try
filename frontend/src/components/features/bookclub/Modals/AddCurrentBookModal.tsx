@@ -92,7 +92,7 @@ const AddCurrentBookModal = ({ bookClubId, onClose, onBookAdded }) => {
     if (!endDate) return 0;
     const today = new Date();
     const end = new Date(endDate);
-    const diffTime = end - today;
+    const diffTime = end.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return Math.max(0, diffDays);
   };
@@ -153,7 +153,7 @@ const AddCurrentBookModal = ({ bookClubId, onClose, onBookAdded }) => {
                       src={book.coverUrl || '/images/default.webp'}
                       alt={book.title}
                       className="w-20 h-28 object-cover rounded"
-                      onError={(e) => { e.target.src = '/images/default.webp'; }}
+                      onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
                     />
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 line-clamp-2 mb-1">

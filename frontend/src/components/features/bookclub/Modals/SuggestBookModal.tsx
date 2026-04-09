@@ -61,7 +61,7 @@ const SuggestBookModal = ({ isOpen, onClose, bookClubId, auth, onBookSuggested }
         }
       );
 
-      onBookSuggested && onBookSuggested(data.data);
+      onBookSuggested?.(data.data);
       onClose();
     } catch (err) {
       logger.error('Error suggesting book:', err);
@@ -112,7 +112,7 @@ const SuggestBookModal = ({ isOpen, onClose, bookClubId, auth, onBookSuggested }
                 src={selectedBook.coverUrl || '/images/default.webp'}
                 alt={selectedBook.title}
                 className="w-20 h-28 object-cover rounded shadow-md"
-                onError={(e) => { e.target.src = '/images/default.webp'; }}
+                onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
               />
               <div className="flex-1">
                 <h4 className="text-white font-semibold mb-1">{selectedBook.title}</h4>
@@ -169,7 +169,7 @@ const SuggestBookModal = ({ isOpen, onClose, bookClubId, auth, onBookSuggested }
                         src={book.coverUrl || '/images/default.webp'}
                         alt={book.title}
                         className="w-12 h-16 object-cover rounded"
-                        onError={(e) => { e.target.src = '/images/default.webp'; }}
+                        onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
                       />
                       <div className="flex-1 min-w-0">
                         <h4 className="text-white font-semibold text-sm line-clamp-1">

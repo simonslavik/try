@@ -147,7 +147,7 @@ const JoinBookclubModal = ({ isOpen, onClose, bookclub, onJoinSuccess }) => {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Tell the admins why you'd like to join..."
-                    rows="3"
+                    rows={3}
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-stone-500 focus:outline-none font-outfit resize-none"
                     maxLength={500}
                   />

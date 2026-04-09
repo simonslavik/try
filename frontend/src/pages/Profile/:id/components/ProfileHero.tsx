@@ -26,7 +26,7 @@ export default function ProfileHero({
                                 alt={profile.name}
                                 className={`w-full h-full object-cover ${isOwnProfile ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
                                 onClick={() => isOwnProfile && fileInputRef.current?.click()}
-                                onError={(e) => { e.target.src = DEFAULT_IMG; }}
+                                onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMG; }}
                             />
                         </div>
                         {uploadingImage && (

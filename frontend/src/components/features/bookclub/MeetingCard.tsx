@@ -34,7 +34,7 @@ const MeetingCard = ({ meeting, currentUserId, allMembers, onRSVP, onEdit, onDel
   const isUpcoming = scheduledDate > now && !isLive;
 
   // Check if meeting starts within 15 minutes
-  const minutesUntil = (scheduledDate - now) / 60000;
+  const minutesUntil = (scheduledDate.getTime() - now.getTime()) / 60000;
   const isStartingSoon = minutesUntil > 0 && minutesUntil <= 15;
 
   // User's RSVP

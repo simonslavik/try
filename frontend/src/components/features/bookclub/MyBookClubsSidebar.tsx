@@ -6,7 +6,7 @@ import { getProfileImageUrl, getCollabImageUrl } from '@config/constants';
 import StatusPopup from './StatusPopup';
 import { getStatusColor } from './statusUtils';
 
-const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, onOpenDM, auth, setAuth, wsRef, onLogout }) => {
+const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, onOpenDM, auth, setAuth, wsRef, onLogout, viewMode }: any) => {
     const navigate = useNavigate();
     const location = useLocation();
     const [showStatusPopup, setShowStatusPopup] = useState(false);
@@ -86,8 +86,8 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, on
                   alt={club.name}
                   className="w-full h-full rounded-full object-cover"
                   onError={(e) => { 
-                    e.target.style.display = 'none';
-                    if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                    (e.target as HTMLElement).style.display = 'none';
+                    if ((e.target as HTMLElement).nextSibling) ((e.target as HTMLElement).nextSibling as HTMLElement).style.display = 'flex';
                   }}
                 />
               ) : null}
@@ -115,7 +115,7 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, on
                 src={getProfileImageUrl(auth.user.profileImage) || '/images/default.webp'} 
                 alt={auth.user.name}
                 className="w-10 h-10 rounded-full object-cover hover:bg-gray-50 cursor-pointer"
-                onError={(e) => { e.target.src = '/images/default.webp'; }}
+                onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
               />
               <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-900 ${getStatusColor(auth.user.status || 'ONLINE')}`}></div>
             </div>
@@ -123,6 +123,7 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, on
           {showStatusPopup && (
             <StatusPopup
               user={auth.user}
+              onClose={() => setShowStatusPopup(false)}
               onStatusChange={handleStatusChange}
               wsRef={wsRef}
               onLogout={onLogout}
@@ -150,7 +151,7 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, on
                     src={getCollabImageUrl(hoveredClub.imageUrl)}
                     alt={hoveredClub.name}
                     className="w-9 h-9 rounded-full object-cover flex-shrink-0"
-                    onError={(e) => { e.target.src = '/images/default.webp'; }}
+                    onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
                   />
                 ) : (
                   <div className="w-9 h-9 rounded-full bg-stone-600 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">

@@ -123,7 +123,7 @@ const UserHoverCard = ({
                     setVisible(false);
                     navigate(`/profile/${user?.id}`);
                   }}
-                  onError={(e) => { e.target.src = '/images/default.webp'; }}
+                  onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
                 />
                 <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-gray-800 ${getStatusColor(status)}`} />
               </div>

@@ -85,7 +85,7 @@ const MemberManagement = ({ bookclub, currentUserId, currentUserRole, onMemberUp
     const aIndex = ROLE_ORDER.indexOf(a.role);
     const bIndex = ROLE_ORDER.indexOf(b.role);
     if (aIndex !== bIndex) return aIndex - bIndex;
-    return new Date(a.joinedAt || 0) - new Date(b.joinedAt || 0);
+    return new Date(a.joinedAt || 0).getTime() - new Date(b.joinedAt || 0).getTime();
   });
 
   logger.debug('Sorted Members:', sortedMembers);
@@ -137,7 +137,7 @@ const MemberManagement = ({ bookclub, currentUserId, currentUserRole, onMemberUp
                     src={getProfileImageUrl(member.profileImage) || '/images/default.webp'}
                     alt={member.username}
                     className="w-12 h-12 rounded-full object-cover border-2 border-stone-200"
-                    onError={(e) => { e.target.src = '/images/default.webp'; }}
+                    onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">

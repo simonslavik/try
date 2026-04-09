@@ -4,7 +4,19 @@ import { API_URL } from '@config/constants';
 import logger from '@utils/logger';
 import { clearCache } from '@utils/apiCache';
 
-const AuthContext = createContext({});
+interface AuthState {
+  user: any;
+  token: string | null;
+  refreshToken: string | null;
+}
+
+interface AuthContextValue {
+  auth: AuthState;
+  setAuth: (payload: Partial<AuthState>) => void;
+  logout: () => void;
+}
+
+const AuthContext = createContext<AuthContextValue>({} as AuthContextValue);
 
 export const AuthProvider = ({ children }) => {
     // initialize from localStorage so auth persists across refresh

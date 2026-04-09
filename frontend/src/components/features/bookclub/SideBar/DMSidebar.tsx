@@ -4,7 +4,7 @@ import { getProfileImageUrl } from '@config/constants';
 import { userAPI } from '@api/user.api';
 import logger from '@utils/logger';
 
-const DMSidebar = ({ conversations, friends = [], currentConversation, onSelectConversation, onStartConversation }) => {
+const DMSidebar = ({ conversations, friends = [], currentConversation, onSelectConversation, onStartConversation, onBackToBookclub, auth }: any) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
@@ -120,7 +120,7 @@ const DMSidebar = ({ conversations, friends = [], currentConversation, onSelectC
                 src={getProfileImageUrl(user.profileImage) || '/images/default.webp'}
                 alt={user.name || user.username}
                 className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                onError={(e) => { e.target.src = '/images/default.webp'; }}
+                onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
               />
               <div className="flex-1 min-w-0">
                 <span className="text-white text-sm truncate block">{user.name || user.username}</span>
@@ -158,7 +158,7 @@ const DMSidebar = ({ conversations, friends = [], currentConversation, onSelectC
                     src={getProfileImageUrl(conv.friend.profileImage) || '/images/default.webp'}
                     alt={conv.friend.name || 'User'}
                     className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                    onError={(e) => { e.target.src = '/images/default.webp'; }}
+                    onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">

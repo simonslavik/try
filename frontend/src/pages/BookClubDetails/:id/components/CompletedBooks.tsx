@@ -17,7 +17,7 @@ export default function CompletedBooks({ books }) {
                             src={entry.book?.coverUrl || DEFAULT_IMG}
                             alt={entry.book?.title}
                             className="w-24 h-36 object-cover rounded-lg shadow-sm"
-                            onError={(e) => { e.target.src = DEFAULT_IMG; }}
+                            onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMG; }}
                         />
                         <p className="text-xs font-medium text-stone-700 dark:text-gray-200 line-clamp-2 mt-2 font-outfit">{entry.book?.title}</p>
                     </div>

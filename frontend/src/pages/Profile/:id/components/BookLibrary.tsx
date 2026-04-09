@@ -122,7 +122,7 @@ function BookCard({ userBook, showShelf, isOwnProfile, onDelete, onView }) {
                     alt={userBook.book.title}
                     className="w-full h-56 object-cover"
                     loading="lazy"
-                    onError={(e) => { e.target.src = '/images/default.webp'; }}
+                    onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
                 />
 
                 {/* Hover overlay */}

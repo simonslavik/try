@@ -8,7 +8,7 @@ const DetailsTab = ({ book, currentBookData }) => (
         src={book?.coverUrl || DEFAULT_IMAGE}
         alt={book?.title}
         className="w-48 h-72 object-cover rounded-lg shadow-lg"
-        onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
+        onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE; }}
       />
       <div className="flex-1">
         <h3 className="text-3xl font-bold text-gray-900 mb-3">{book?.title}</h3>

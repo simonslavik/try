@@ -86,8 +86,9 @@ const SideBarRooms = ({
     onShowMeetings,
     showMeetings,
     unreadRooms = new Set(),
-    unreadSections = new Set()
-}) => {
+    unreadSections = new Set(),
+    onNameUpdate,
+}: any) => {
     const navigate = useNavigate();
     const [contextMenu, setContextMenu] = useState(null);
 

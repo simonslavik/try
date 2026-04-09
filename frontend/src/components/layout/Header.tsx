@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState, useCallback } from 'react';
+import { useContext, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { FiMenu, FiX, FiUsers, FiSun, FiMoon } from 'react-icons/fi';
@@ -101,7 +101,7 @@ const HomePageHeader = () => {
 
   // ─── Theme icon helper ─────────────────────────────────
 
-  const ThemeIcon = () => {
+  const themeIcon = useMemo(() => {
     if (mode === 'auto') {
       return (
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -112,7 +112,7 @@ const HomePageHeader = () => {
       );
     }
     return isDark ? <FiMoon size={15} /> : <FiSun size={15} />;
-  };
+  }, [mode, isDark]);
 
   const themeLabel = mode === 'auto' ? 'Auto' : mode === 'dark' ? 'Dark' : 'Light';
 
@@ -174,7 +174,7 @@ const HomePageHeader = () => {
                   src={getProfileImageUrl(auth.user.profileImage) || DEFAULT_AVATAR}
                   alt="Profile"
                   className="h-7.5 w-7.5 rounded-full object-cover border-1 border-gray-200 cursor-pointer"
-                  onError={(e) => { e.target.src = DEFAULT_AVATAR; }}
+                  onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_AVATAR; }}
                 />
               </button>
               {showDropdown && (
@@ -192,7 +192,7 @@ const HomePageHeader = () => {
                     onClick={cycleTheme}
                     className="w-full text-left px-4 py-2 border-b border-gray-300 dark:border-gray-700 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 dark:text-gray-200"
                   >
-                    <ThemeIcon />
+                    {themeIcon}
                     Theme: {themeLabel}
                   </button>
                   <button

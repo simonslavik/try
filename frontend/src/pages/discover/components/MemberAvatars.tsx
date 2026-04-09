@@ -44,7 +44,7 @@ const MemberAvatars = ({ members, memberCount, friendIds, onHoverMember }) => {
             }`}
             loading="lazy"
             onClick={(e) => { e.stopPropagation(); navigate(`/profile/${m.id}`); }}
-            onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
+            onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE; }}
             onMouseEnter={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
               onHoverMember({

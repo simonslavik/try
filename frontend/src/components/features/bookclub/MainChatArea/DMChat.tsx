@@ -266,7 +266,7 @@ const DMChat = ({ otherUser, messages, onSendMessage, auth, setMessages, dmWs, r
           alt={otherUser.name}
           className="w-10 h-10 rounded-full object-cover cursor-pointer"
           onClick={() => navigate(`/profile/${otherUser.id}`)}
-          onError={(e) => { e.target.src = '/images/default.webp'; }}
+          onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
         />
         <div className="flex-1">
           <h2 

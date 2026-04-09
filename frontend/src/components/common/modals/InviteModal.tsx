@@ -253,7 +253,7 @@ const InviteModal = ({ bookClubId, bookClubName, bookClubMembers = [], currentUs
                               src={friendImage}
                               alt={friendName}
                               className="w-10 h-10 rounded-full object-cover border-2 border-stone-200"
-                              onError={(e) => { e.target.src = '/images/default.webp'; }}
+                              onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
                             />
                             <div>
                               <div className="font-semibold text-gray-900">{friendName}</div>

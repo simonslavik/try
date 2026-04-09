@@ -150,7 +150,7 @@ const InviteJoinPage = () => {
                 : '/images/default.webp'}
               alt={inviteInfo.bookClub.name}
               className="w-full h-48 object-cover rounded-xl"
-              onError={(e) => { e.target.src = '/images/default.webp'; }}
+              onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
             />
           </div>
 

@@ -50,7 +50,7 @@ const OtherMessage = ({
           alt={msg.username}
           className="w-7 h-7 rounded-[50%] object-cover cursor-pointer hover:ring-2 hover:ring-stone-500 transition-all"
           onClick={() => msg.userId && navigate(`/profile/${msg.userId}`)}
-          onError={(e) => { e.target.src = '/images/default.webp'; }}
+          onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
         />
       </UserHoverCard>
       <div className="w-full min-w-0">

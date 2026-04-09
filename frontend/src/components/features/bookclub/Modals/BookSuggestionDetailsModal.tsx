@@ -58,7 +58,7 @@ const BookSuggestionDetailsModal = ({ suggestion, bookClubId, auth, members = []
                 src={suggestion.book?.coverUrl || '/images/default.webp'}
                 alt={suggestion.book?.title}
                 className="w-48 h-72 object-cover rounded-lg shadow-xl"
-                onError={(e) => { e.target.src = '/images/default.webp'; }}
+                onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
               />
             </div>
 

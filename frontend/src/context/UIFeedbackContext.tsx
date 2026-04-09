@@ -2,7 +2,16 @@ import React, { createContext, useState, useCallback, useRef } from 'react';
 import ConfirmDialog from '@components/common/ConfirmDialog';
 import ToastContainer from '@components/common/ToastContainer';
 
-const UIFeedbackContext = createContext({});
+interface UIFeedbackContextValue {
+  confirm: (message: string, options?: Record<string, any>) => Promise<boolean>;
+  toast: (message: string, options?: Record<string, any>) => number;
+  toastSuccess: (msg: string, opts?: Record<string, any>) => number;
+  toastError: (msg: string, opts?: Record<string, any>) => number;
+  toastWarning: (msg: string, opts?: Record<string, any>) => number;
+  toastInfo: (msg: string, opts?: Record<string, any>) => number;
+}
+
+const UIFeedbackContext = createContext<UIFeedbackContextValue>({} as UIFeedbackContextValue);
 
 let toastIdCounter = 0;
 
@@ -19,8 +28,8 @@ export const UIFeedbackProvider = ({ children }) => {
   const resolveRef = useRef(null);
 
   const confirm = useCallback(
-    (message, options = {}) => {
-      return new Promise((resolve) => {
+    (message: string, options: Record<string, any> = {}) => {
+      return new Promise<boolean>((resolve) => {
         resolveRef.current = resolve;
         setConfirmState({
           isOpen: true,
@@ -55,7 +64,7 @@ export const UIFeedbackProvider = ({ children }) => {
   }, []);
 
   const toast = useCallback(
-    (message, options = {}) => {
+    (message: string, options: Record<string, any> = {}) => {
       const id = ++toastIdCounter;
       const newToast = {
         id,
@@ -75,7 +84,7 @@ export const UIFeedbackProvider = ({ children }) => {
   const toastWarning = useCallback((msg, opts) => toast(msg, { ...opts, type: 'warning' }), [toast]);
   const toastInfo = useCallback((msg, opts) => toast(msg, { ...opts, type: 'info' }), [toast]);
 
-  const value = {
+  const value: UIFeedbackContextValue = {
     confirm,
     toast,
     toastSuccess,

@@ -8,12 +8,12 @@ function calcProgress(book) {
     if (!book?.startDate || !book?.endDate) return 0;
     const start = new Date(book.startDate);
     const end = new Date(book.endDate);
-    return Math.round(Math.min(100, Math.max(0, ((new Date() - start) / (end - start)) * 100)));
+    return Math.round(Math.min(100, Math.max(0, ((Date.now() - start.getTime()) / (end.getTime() - start.getTime())) * 100)));
 }
 
 function calcDaysLeft(book) {
     if (!book?.endDate) return 0;
-    return Math.max(0, Math.ceil((new Date(book.endDate) - new Date()) / 86400000));
+    return Math.max(0, Math.ceil((new Date(book.endDate).getTime() - Date.now()) / 86400000));
 }
 
 export default function CurrentBookCard({ books = [] }) {
@@ -66,7 +66,7 @@ export default function CurrentBookCard({ books = [] }) {
                     src={book.book?.coverUrl || DEFAULT_IMG}
                     alt={book.book?.title}
                     className="w-24 h-36 md:w-28 md:h-[168px] object-cover rounded-lg shadow-sm flex-shrink-0"
-                    onError={(e) => { e.target.src = DEFAULT_IMG; }}
+                    onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMG; }}
                 />
                 <div className="flex-1 min-w-0">
                     <h3 className="text-lg font-bold text-stone-900 dark:text-gray-100 font-display leading-snug line-clamp-2">

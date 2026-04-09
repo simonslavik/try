@@ -123,7 +123,7 @@ const BookSuggestionsView = ({ bookClubId, auth, members = [], onSuggestionAdded
                     src={suggestion.book?.coverUrl || '/images/default.webp'}
                     alt={suggestion.book?.title}
                     className="w-24 h-32 object-cover rounded shadow-lg"
-                    onError={(e) => { e.target.src = '/images/default.webp'; }}
+                    onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
                   />
                   <div className="flex-1 min-w-0">
                     <h3 className="text-white font-semibold text-base line-clamp-2 mb-2">

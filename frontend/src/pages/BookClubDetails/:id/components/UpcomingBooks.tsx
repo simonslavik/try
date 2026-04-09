@@ -18,7 +18,7 @@ export default function UpcomingBooks({ books }) {
                             src={entry.book?.coverUrl || DEFAULT_IMG}
                             alt={entry.book?.title}
                             className="w-10 h-14 object-cover rounded-md shadow-sm flex-shrink-0"
-                            onError={(e) => { e.target.src = DEFAULT_IMG; }}
+                            onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMG; }}
                         />
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-stone-800 dark:text-gray-100 line-clamp-1 font-outfit">{entry.book?.title}</p>

@@ -4,7 +4,7 @@ import { getCollabImageUrl } from '@config/constants';
 import logger from '@utils/logger';
 import { useToast } from '@hooks/useUIFeedback';
 
-const MessageAttachment = ({ attachment, canDelete, onDelete, auth }) => {
+const MessageAttachment = ({ attachment, canDelete = false, onDelete, auth, isSender }: { attachment: any; canDelete?: boolean; onDelete?: (...args: any[]) => void; auth?: any; isSender?: boolean }) => {
   const [imageExpanded, setImageExpanded] = useState(false);
   const { toastError } = useToast();
 
@@ -48,7 +48,7 @@ const MessageAttachment = ({ attachment, canDelete, onDelete, auth }) => {
             alt={attachment.filename}
             className="max-w-[200px] sm:max-w-xs md:max-w-sm max-h-48 md:max-h-64 rounded-lg cursor-pointer hover:brightness-110 transition-all duration-200 border border-gray-600/30 hover:border-stone-500/50 shadow-lg"
             onClick={() => setImageExpanded(true)}
-            onError={(e) => { e.target.src = '/images/default.webp'; }}
+            onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
           />
           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-all duration-200 flex gap-2">
             <button
@@ -87,7 +87,7 @@ const MessageAttachment = ({ attachment, canDelete, onDelete, auth }) => {
                 src={getCollabImageUrl(attachment.url)}
                 alt={attachment.filename}
                 className="max-w-full max-h-[90vh] object-contain"
-                onError={(e) => { e.target.src = '/images/default.webp'; }}
+                onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
               />
               <button
                 onClick={(e) => {

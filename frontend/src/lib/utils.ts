@@ -100,7 +100,7 @@ export const buildQueryString = (params) => {
   const queryParams = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
     if (value !== null && value !== undefined && value !== '') {
-      queryParams.append(key, value);
+      queryParams.append(key, String(value));
     }
   }
   return queryParams.toString();

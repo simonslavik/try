@@ -59,7 +59,7 @@ const DMWelcomeScreen = ({ auth, friends = [], conversations = [], onSelectConve
 
           <button
             onClick={() => {
-              const searchInput = document.querySelector('input[placeholder="Find or start a conversation"]');
+              const searchInput = document.querySelector<HTMLInputElement>('input[placeholder="Find or start a conversation"]');
               if (searchInput) { searchInput.focus(); searchInput.click(); }
             }}
             className="flex flex-col items-center gap-2 p-4 bg-gray-800 hover:bg-gray-750 border border-gray-700 hover:border-stone-600 rounded-xl transition-all group cursor-pointer"
@@ -90,7 +90,7 @@ const DMWelcomeScreen = ({ auth, friends = [], conversations = [], onSelectConve
                     alt={friend.name || friend.username}
                     className="w-9 h-9 rounded-full object-cover flex-shrink-0"
                     loading="lazy"
-                    onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
+                    onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE; }}
                   />
                   <span className="text-sm text-gray-300 group-hover:text-white font-medium truncate">{friend.name || friend.username}</span>
                   <FiMessageCircle className="w-4 h-4 text-gray-600 group-hover:text-stone-400 ml-auto flex-shrink-0 transition-colors" />

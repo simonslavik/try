@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { FiSend, FiMessageSquare } from 'react-icons/fi';
 import logger from '@utils/logger';
 
-export default function ChatSidebar({ ws, username, messages, onSendMessage }) {
+export default function ChatSidebar({ ws, username, messages, onSendMessage, ...rest }: any) {
   const [message, setMessage] = useState('');
   const messagesEndRef = useRef(null);
 

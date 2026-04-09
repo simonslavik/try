@@ -9,3 +9,9 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+// Custom window properties used for cross-component refresh signals
+interface Window {
+  __meetingsRefresh?: () => void;
+  __calendarBookRefresh?: () => void;
+}

@@ -58,7 +58,7 @@ const BookclubSettingsPanel = ({
               src={bookClub?.imageUrl ? getCollabImageUrl(bookClub.imageUrl) : '/images/default.webp'}
               alt={bookClub?.name}
               className="w-full h-full object-cover rounded-lg"
-              onError={(e) => { e.target.src = '/images/default.webp'; }}
+              onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
             />
             <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 rounded-lg">
               <button

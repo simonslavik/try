@@ -33,7 +33,7 @@ const RankedClubCard = ({ club, rank }) => {
         alt={club.name}
         className={`${isFirst ? 'w-14 h-14' : 'w-10 h-10'} rounded-full object-cover ${style.ring} shadow-md mb-2`}
         loading="lazy"
-        onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
+        onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE; }}
       />
 
       {/* Club name */}

@@ -49,7 +49,7 @@ const StatusPopup = ({ user, onClose, onStatusChange, wsRef, onLogout }) => {
             src={getProfileImageUrl(user?.profileImage) || '/images/default.webp'}
             alt={user?.name}
             className="w-10 h-10 rounded-full object-cover"
-            onError={(e) => { e.target.src = '/images/default.webp'; }}
+            onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
           />
           <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-gray-800 ${getStatusColor(currentStatus)}`} />
         </div>
