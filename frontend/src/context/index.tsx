@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import axios from 'axios';
+import apiClient from '@api/axios';
 import { API_URL } from '@config/constants';
 import logger from '@utils/logger';
 import { clearCache } from '@utils/apiCache';
@@ -62,9 +63,9 @@ export const AuthProvider = ({ children }) => {
         else delete axios.defaults.headers.common['Authorization'];
     }, [auth?.token]);
 
-    // Register interceptor ONCE (not on every auth change)
+    // Register interceptor on apiClient (the instance all API calls use) — ONCE
     useEffect(() => {
-        const interceptor = axios.interceptors.response.use(
+        const interceptor = apiClient.interceptors.response.use(
             (response) => response,
             async (error) => {
                 const originalRequest = error.config;
@@ -74,6 +75,7 @@ export const AuthProvider = ({ children }) => {
                     originalRequest._retry = true;
 
                     try {
+                        // Use plain axios for refresh to avoid infinite loop through apiClient interceptor
                         const { data } = await axios.post(`${API_URL}/v1/auth/refresh`, {
                             refreshToken: currentAuth.refreshToken
                         });
@@ -85,7 +87,7 @@ export const AuthProvider = ({ children }) => {
                         });
 
                         originalRequest.headers['Authorization'] = `Bearer ${data.accessToken}`;
-                        return axios(originalRequest);
+                        return apiClient(originalRequest);
                     } catch (refreshError) {
                         logger.error('Token refresh failed:', refreshError);
                         setAuth({ user: null, token: null, refreshToken: null });
@@ -98,7 +100,7 @@ export const AuthProvider = ({ children }) => {
         );
 
         return () => {
-            axios.interceptors.response.eject(interceptor);
+            apiClient.interceptors.response.eject(interceptor);
         };
     }, [setAuth]);
 
