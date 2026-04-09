@@ -83,12 +83,18 @@ const NewBookClubPage = () => {
             const bookClubId = response.success ? response.data.id : response.data?.data?.id || response.data.id;
             logger.debug('Created Bookclub:', bookClubId);
 
-            // Upload image if selected
+            // Upload image if selected (non-blocking — club already exists)
             if (selectedImage) {
-                const formData = new FormData();
-                formData.append('image', selectedImage);
-
-                await bookclubAPI.uploadImage(bookClubId, formData);
+                try {
+                    const formData = new FormData();
+                    formData.append('image', selectedImage);
+                    await bookclubAPI.uploadImage(bookClubId, formData);
+                } catch (imgErr) {
+                    logger.error('Image upload failed:', imgErr);
+                    // Club was created — navigate anyway but show the error briefly
+                    navigate(`/bookclub/${bookClubId}`);
+                    return;
+                }
             }
 
             // Redirect to the bookclub chat page
