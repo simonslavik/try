@@ -1,14 +1,12 @@
 import { FiSearch, FiFilter, FiX } from 'react-icons/fi';
 import { BOOKCLUB_CATEGORIES } from '@config/constants';
 
-const CATEGORIES = ['All', ...BOOKCLUB_CATEGORIES];
-
 /**
- * Search bar + category pill filters.
+ * Search bar + multi-select category pill filters.
  *
- * @param {{ searchQuery: string, onSearchChange: (v:string)=>void, selectedCategory: string, onCategoryChange: (c:string)=>void }} props
+ * @param {{ searchQuery: string, onSearchChange: (v:string)=>void, selectedCategories: string[], onToggleCategory: (c:string)=>void }} props
  */
-const SearchFilterBar = ({ searchQuery, onSearchChange, selectedCategory, onCategoryChange }) => (
+const SearchFilterBar = ({ searchQuery, onSearchChange, selectedCategories, onToggleCategory }) => (
   <div className="max-w-7xl mx-auto px-5 md:px-8 -mt-7">
     <div className="rounded-2xl">
       {/* Search input */}
@@ -38,21 +36,29 @@ const SearchFilterBar = ({ searchQuery, onSearchChange, selectedCategory, onCate
           <span className="text-xs font-semibold uppercase tracking-wider text-stone-500 dark:text-gray-400 font-outfit">
             Categories
           </span>
+          {selectedCategories.length > 0 && (
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-stone-800 dark:bg-warmgray-200 text-white dark:text-stone-900 text-[10px] font-bold font-outfit">
+              {selectedCategories.length}
+            </span>
+          )}
         </div>
         <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => onCategoryChange(cat)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 font-outfit ${
-                selectedCategory === cat
-                  ? 'bg-stone-800 dark:bg-warmgray-200 text-white dark:text-stone-900 shadow-md'
-                  : 'bg-stone-100 dark:bg-gray-700 text-stone-600 dark:text-gray-300 hover:bg-stone-200 dark:hover:bg-gray-600'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+          {BOOKCLUB_CATEGORIES.map((cat) => {
+            const isActive = selectedCategories.includes(cat);
+            return (
+              <button
+                key={cat}
+                onClick={() => onToggleCategory(cat)}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 font-outfit ${
+                  isActive
+                    ? 'bg-stone-800 dark:bg-warmgray-200 text-white dark:text-stone-900 shadow-md'
+                    : 'bg-stone-100 dark:bg-gray-700 text-stone-600 dark:text-gray-300 hover:bg-stone-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                {cat}
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

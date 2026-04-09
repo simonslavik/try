@@ -19,7 +19,7 @@ const DiscoverBookClubs = () => {
   // ── State ──────────────────────────────────────────────
   const [bookClubs, setBookClubs] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [cardBookIndex, setCardBookIndex] = useState({});
   const [friends, setFriends] = useState([]);
@@ -49,8 +49,8 @@ const DiscoverBookClubs = () => {
   useEffect(() => {
     const fetchBookclubs = async () => {
       try {
-        const category = selectedCategory === 'All' ? undefined : selectedCategory;
-        const response = await bookclubAPI.discoverBookclubs(category);
+        const categories = selectedCategories.length > 0 ? selectedCategories : undefined;
+        const response = await bookclubAPI.discoverBookclubs(categories);
         const clubs = response.data || [];
 
         // Batch-fetch currently-reading books
@@ -79,7 +79,7 @@ const DiscoverBookClubs = () => {
     };
 
     fetchBookclubs();
-  }, [selectedCategory]);
+  }, [selectedCategories]);
 
   // ── Handlers ───────────────────────────────────────────
   const handleBookclubClick = useCallback(
@@ -95,11 +95,17 @@ const DiscoverBookClubs = () => {
   }, []);
 
   // ── Render helpers ─────────────────────────────────────
-  const hasFilters = searchQuery || selectedCategory !== 'All';
+  const hasFilters = searchQuery || selectedCategories.length > 0;
+
+  const toggleCategory = useCallback((cat: string) => {
+    setSelectedCategories(prev =>
+      prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+    );
+  }, []);
 
   const clearFilters = useCallback(() => {
     setSearchQuery('');
-    setSelectedCategory('All');
+    setSelectedCategories([]);
   }, []);
 
   // ── JSX ────────────────────────────────────────────────
@@ -112,8 +118,8 @@ const DiscoverBookClubs = () => {
         <SearchFilterBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
+          selectedCategories={selectedCategories}
+          onToggleCategory={toggleCategory}
         />
 
         {/* Results */}

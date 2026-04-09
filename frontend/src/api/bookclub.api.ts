@@ -139,10 +139,14 @@ export const bookclubAPI = {
   // ===== NEW ACCESS CONTROL APIs =====
   
   // Discover bookclubs (public endpoint with optional auth, cached 1 min)
-  discoverBookclubs: async (category) => {
-    const cacheKey = category ? `discover:${category}` : 'discover:all';
+  // Supports multi-category: pass string[] to filter by multiple categories
+  discoverBookclubs: async (categories?: string[]) => {
+    const cacheKey = categories?.length ? `discover:${categories.sort().join(',')}` : 'discover:all';
     return cachedFetch(cacheKey, async () => {
-      const url = category ? `/v1/bookclubs/discover?category=${encodeURIComponent(category)}` : '/v1/bookclubs/discover';
+      let url = '/v1/bookclubs/discover';
+      if (categories?.length) {
+        url += `?category=${categories.map(encodeURIComponent).join(',')}`;
+      }
       const response = await apiClient.get(url);
       return response.data;
     }, 60_000);
