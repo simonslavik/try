@@ -123,11 +123,13 @@ const HomePageHeader = () => {
       {/* Logo */}
       <button
         onClick={() => navigate('/')}
-        className={`cursor-pointer  flex items-center gap-2`}
+        className={`cursor-pointer flex items-center gap-2`}
       >
-        <h2 className="text-lg font-semibold text-stone-800 dark:text-warmgray-100 tracking-tight">
-           YourBookClubs.com
-        </h2>
+        <img
+          src="/images/logo3.png"
+          alt="MyBookClubs"
+          className="h-12 w-32 dark:invert"
+        />
       </button>
 
       {/* ── Authenticated Desktop Nav ── */}

@@ -260,7 +260,7 @@ const createProxyConfig = (
     });
   },
 
-  timeout: TIMEOUTS.DEFAULT,
+  timeout: TIMEOUTS.UPLOAD,
 });
 
 /**

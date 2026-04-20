@@ -13,6 +13,7 @@ const FeatureSection = ({
   text,
   reverse = false,
   bgClass = 'bg-parchment-dark dark:bg-gray-800',
+  image = null,
 }) => (
   <section className={`${bgClass} transition-colors duration-300`}>
     <div className="max-w-6xl mx-auto px-6 md:px-16 py-16 md:py-24 flex flex-col md:flex-row items-center gap-10 md:gap-16">
@@ -22,13 +23,16 @@ const FeatureSection = ({
       </div>
 
       {/* Text */}
-      <div className={`w-full md:w-1/2 ${reverse ? 'order-2 md:order-1' : ''}`}>
+      <div className={`w-full md:w-1/2 relative ${reverse ? 'order-2 md:order-1' : ''}`}>
         <p className="text-xl md:text-2xl leading-relaxed text-stone-800 dark:text-warmgray-200 font-serif">
-          <span className="text-5xl md:text-6xl font-display font-bold float-left mr-2 leading-[0.85] mt-1 text-stone-900 dark:text-warmgray-100">
+          <span className="text-5xl md:text-6xl font-display font-bold mr-1 leading-none align-baseline text-stone-900 dark:text-warmgray-100">
             {initial}
           </span>
           {text}
         </p>
+        {image && (
+          <img src={image} alt="" className="absolute mt-1 right-0 top-20 h-20 md:h-24 opacity-80 dark:invert" />
+        )}
       </div>
     </div>
   </section>

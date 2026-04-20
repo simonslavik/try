@@ -40,11 +40,30 @@ const Home = () => {
         <div className="min-h-screen bg-parchment dark:bg-gray-900 transition-colors duration-300">
           <HeroSection />
 
+          <div className="flex justify-center -mt-8  dark:bg-gray-800">
+            <img src="/images/logo4.png" alt="" className="h-14 opacity-60 dark:invert" />
+            <img src="/images/logo4.png" alt="" className="h-14 opacity-60 dark:invert" />
+            <img src="/images/logo4.png" alt="" className="h-14 opacity-60 dark:invert" />
+          </div>
+
           <FeatureSection
             initial="C"
             text="reate your own bookclub channel and have whole bookloving community together."
             bgClass="bg-[#F0EFEB] dark:bg-gray-800"
+            image="/images/friends.png"
           />
+
+          <div className="flex justify-center -mt-10 bg-parchment dark:bg-gray-900">
+            <img src="/images/grass2.png" alt="" className="h-14 -ml-4 opacity-60 dark:invert" />
+            <img src="/images/grass2.png" alt="" className="h-14 -ml-4 opacity-60 dark:invert" />
+            <img src="/images/grass2.png" alt="" className="h-14 -ml-4 opacity-60 dark:invert" />
+            <img src="/images/grass2.png" alt="" className="h-14 -ml-4 opacity-60 dark:invert" />
+            <img src="/images/grass2.png" alt="" className="h-14 -ml-4 opacity-60 dark:invert" />
+            <img src="/images/grass2.png" alt="" className="h-14 -ml-4 opacity-60 dark:invert" />
+            <img src="/images/grass2.png" alt="" className="h-14 -ml-4 opacity-60 dark:invert" />
+            <img src="/images/grass2.png" alt="" className="h-14 -ml-4 opacity-60 dark:invert" />
+            <img src="/images/grass2.png" alt="" className="h-14 -ml-4 opacity-60 dark:invert" />
+          </div>
 
           <FeatureSection
             initial="D"
@@ -53,11 +72,38 @@ const Home = () => {
             bgClass="bg-parchment dark:bg-gray-900"
           />
 
+          <div className="flex justify-center bg-parchment dark:bg-gray-900">
+            <img src="/images/flowers.png" alt="" className="h-14 -ml-1 opacity-60 dark:invert" />
+            <img src="/images/flowers.png" alt="" className="h-14 -ml-1 opacity-60 dark:invert" />
+            <img src="/images/flowers.png" alt="" className="h-14 -ml-1 opacity-60 dark:invert" />
+            <img src="/images/flowers.png" alt="" className="h-14 -ml-1 opacity-60 dark:invert" />
+            <img src="/images/flowers.png" alt="" className="h-14 -ml-1 opacity-60 dark:invert" />
+            <img src="/images/flowers.png" alt="" className="h-14 -ml-1 opacity-60 dark:invert" />
+            <img src="/images/flowers.png" alt="" className="h-14 -ml-1 opacity-60 dark:invert" />
+            <img src="/images/flowers.png" alt="" className="h-14 -ml-1 opacity-60 dark:invert" />
+            <img src="/images/flowers.png" alt="" className="h-14 -ml-1 opacity-60 dark:invert" />
+            <img src="/images/flowers.png" alt="" className="h-14 -ml-2 opacity-60 dark:invert" />
+            <img src="/images/flowers.png" alt="" className="h-14 -ml-2 opacity-60 dark:invert" />
+            <img src="/images/flowers.png" alt="" className="h-14 -ml-1 opacity-60 dark:invert" />
+            <img src="/images/flowers.png" alt="" className="h-14 -ml-1 opacity-60 dark:invert" />
+            <img src="/images/flowers.png" alt="" className="h-14 -ml-1 opacity-60 dark:invert" />
+            <img src="/images/flowers.png" alt="" className="h-14 -ml-1 opacity-60 dark:invert" />
+          </div>
+
           <FeatureSection
             initial="C"
             text="reate your own bookclub channel and have whole bookloving community together."
             bgClass="bg-[#F0EFEB] dark:bg-gray-800"
           />
+
+          <div className="flex justify-center -mt-2 bg-parchment dark:bg-gray-900">
+            <img src="/images/balls.png" alt="" className="h-14 -ml-1 opacity-60 dark:invert" />
+            <img src="/images/balls.png" alt="" className="h-14 -ml-1 opacity-60 dark:invert" />
+            <img src="/images/balls.png" alt="" className="h-14 -ml-1 opacity-60 dark:invert" />
+            <img src="/images/balls.png" alt="" className="h-14 -ml-1 opacity-60 dark:invert" />
+            <img src="/images/balls.png" alt="" className="h-14 -ml-1 opacity-60 dark:invert" />
+
+          </div>
 
           <TopChartingSection bookClubs={bookClubs} />
 

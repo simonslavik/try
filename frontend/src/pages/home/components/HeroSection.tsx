@@ -22,6 +22,13 @@ const HeroSection = () => {
         <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.05] text-stone-900 dark:text-warmgray-100 tracking-tight">
           &ldquo;Connect With<br />Your Fellow<br />BookLovers&rdquo;
         </h1>
+        <div className='flex justify-end'>
+          <img src="/images/logo5.png" alt="MyBookClubs" className="h-6 -mt-2 opacity-70 dark:invert" />
+          <img src="/images/logo5.png" alt="MyBookClubs" className="h-9 mt-2 opacity-70 dark:invert" />
+          <img src="/images/logo5.png" alt="MyBookClubs" className="w-8   opacity-60 dark:invert" />
+          <img src="/images/logo5.png" alt="MyBookClubs" className="h-12 mt-4 opacity-50 dark:invert" />
+          
+        </div>
       </div>
 
       {/* Image placeholder */}
