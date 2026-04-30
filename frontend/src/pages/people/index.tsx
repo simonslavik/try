@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FiSearch, FiUserPlus, FiCheck, FiClock, FiArrowLeft, FiMessageCircle, FiX } from 'react-icons/fi';
 import HomePageHeader from '@components/layout/Header';
 import { AuthContext } from '@context/index';
@@ -13,9 +13,11 @@ type Tab = 'friends' | 'requests' | 'discover';
 const FriendsPage = () => {
     const { auth } = useContext(AuthContext);
     const navigate = useNavigate();
+    const location = useLocation();
     const { toastSuccess, toastError, toastWarning } = useToast();
 
-    const [activeTab, setActiveTab] = useState<Tab>('friends');
+    const initialTab = (location.state as any)?.tab as Tab | undefined;
+    const [activeTab, setActiveTab] = useState<Tab>(initialTab && ['friends','requests','discover'].includes(initialTab) ? initialTab : 'friends');
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [suggestedUsers, setSuggestedUsers] = useState([]);
@@ -164,11 +166,13 @@ const FriendsPage = () => {
 
                 {/* Tabs */}
                 <div className="flex gap-1 bg-white dark:bg-gray-800 rounded-xl p-1 border border-warmgray-200 dark:border-gray-700 mb-6">
-                    {tabs.map(tab => (
+                    {tabs.map(tab => {
+                        const isPendingPing = tab.key === 'requests' && incomingRequests.length > 0 && activeTab !== 'requests';
+                        return (
                         <button
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
-                            className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                            className={`relative flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                                 activeTab === tab.key
                                     ? 'bg-stone-800 dark:bg-stone-700 text-white shadow-sm'
                                     : 'text-stone-600 dark:text-gray-400 hover:text-stone-800 dark:hover:text-gray-200'
@@ -186,8 +190,15 @@ const FriendsPage = () => {
                                     {tab.count}
                                 </span>
                             )}
+                            {isPendingPing && (
+                                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
+                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500" />
+                                </span>
+                            )}
                         </button>
-                    ))}
+                        );
+                    })}
                 </div>
 
                 {/* ── Friends Tab ── */}

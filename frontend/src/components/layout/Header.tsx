@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { FiMenu, FiX, FiUsers, FiSun, FiMoon } from 'react-icons/fi';
+import { FiMenu, FiX, FiSun, FiMoon } from 'react-icons/fi';
 import AuthContext from '@context/index';
 import { useTheme } from '@context/ThemeContext';
 import LoginModule from '@components/common/modals/loginModule';
@@ -10,7 +10,6 @@ import { getProfileImageUrl } from '@config/constants';
 import apiClient from '@api/axios';
 import logger from '@utils/logger';
 import NotificationBell from '@components/features/notifications/NotificationBell';
-import FriendRequestDropdown from './FriendRequestDropdown';
 import MobileSidebar from './MobileSidebar';
 
 const DEFAULT_AVATAR = '/images/default.webp';
@@ -21,13 +20,11 @@ const HomePageHeader = () => {
   const { mode, isDark, cycleTheme } = useTheme();
 
   const [showDropdown, setShowDropdown] = useState(false);
-  const [newsShowDropdown, setNewsShowDropdown] = useState(false);
   const [friendRequests, setFriendRequests] = useState([]);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [openLogin, setOpenLogin] = useState(false);
   const [openRegister, setOpenRegister] = useState(false);
 
-  const newsDropdownRef = useRef(null);
   const profileDropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
 
@@ -41,7 +38,6 @@ const HomePageHeader = () => {
 
   const handleProfileClick = () => {
     setShowDropdown((prev) => !prev);
-    if (newsShowDropdown) setNewsShowDropdown(false);
   };
 
   const handleFriendAction = useCallback(async (requestId, action) => {
@@ -84,9 +80,6 @@ const HomePageHeader = () => {
       // don't close dropdowns — the element was inside the dropdown before removal.
       if (!document.body.contains(event.target)) return;
 
-      if (newsDropdownRef.current && !newsDropdownRef.current.contains(event.target)) {
-        setNewsShowDropdown(false);
-      }
       if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
         setShowDropdown(false);
       }
@@ -138,36 +131,21 @@ const HomePageHeader = () => {
           <div className="hidden md:flex md:flex-1 md:items-center md:justify-end">
             <NotificationBell />
 
-            {/* Friend requests button */}
-            <div ref={newsDropdownRef} className="relative">
-              <button
-                onClick={() => { setNewsShowDropdown(!newsShowDropdown); if (showDropdown) setShowDropdown(false); }}
-                className="relative px-2 py-2 text-black dark:text-gray-300 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition cursor-pointer"
-              >
-                <FiUsers size={15} />
-                {friendRequests.length > 0 && (
-                  <span className="absolute top-1 right-3 flex h-5 w-5 items-center justify-center">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-4 w-4 bg-orange-500 text-white text-xs items-center justify-center font-semibold">
-                      {friendRequests.length}
-                    </span>
-                  </span>
-                )}
-                <FriendRequestDropdown
-                  requests={friendRequests}
-                  isOpen={newsShowDropdown}
-                  onFriendAction={handleFriendAction}
-                  onViewAll={() => { setNewsShowDropdown(false); navigate('/people'); }}
-                />
-              </button>
-            </div>
-
-            {/* Friends link */}
+            {/* Friends link (with pending-request badge) */}
             <button
-              onClick={() => navigate('/people')}
-              className="flex items-center ml-2 rounded-full cursor-pointer px-3 py-1 hover:bg-warmgray-100 dark:hover:bg-gray-700 transition-colors"
+              onClick={() => navigate('/people', friendRequests.length > 0 ? { state: { tab: 'requests' } } : undefined)}
+              className="relative flex items-center ml-2 rounded-full cursor-pointer px-3 py-1 hover:bg-warmgray-100 dark:hover:bg-gray-700 transition-colors"
+              title={friendRequests.length > 0 ? `${friendRequests.length} pending friend request${friendRequests.length === 1 ? '' : 's'}` : 'Friends'}
             >
               <span className="font-medium text-sm text-stone-700 dark:text-gray-300">Friends</span>
+              {friendRequests.length > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-4 w-4 bg-orange-500 text-white text-[10px] items-center justify-center font-semibold">
+                    {friendRequests.length > 9 ? '9+' : friendRequests.length}
+                  </span>
+                </span>
+              )}
             </button>
 
             {/* Discover link */}
