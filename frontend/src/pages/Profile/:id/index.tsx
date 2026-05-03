@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { FiBook } from 'react-icons/fi';
 import HomePageHeader from '@components/layout/Header';
 import AddBookToLibraryModal from '@components/common/modals/AddBookToLibraryModal';
 import BookDetailsModal from '@components/common/modals/BookDetails';
+import LoginModule from '@components/common/modals/loginModule';
+import RegisterModule from '@components/common/modals/registerModule';
 import { ProfileSkeleton } from '@components/common/Skeleton';
 import useProfileData from './useProfileData';
 import { ProfileHero, BookClubsGrid, BookLibrary } from './components';
@@ -15,10 +18,21 @@ const ProfilePage = () => {
         friendRequestLoading, sendFriendRequest,
         favoriteBooks, booksReading, booksToRead, booksRead,
         fetchBooks, deleteBook, navigate,
+        isAuthed,
     } = useProfileData();
 
     const [showAddBookModal, setShowAddBookModal] = useState(false);
     const [selectedBook, setSelectedBook] = useState(null);
+    const [openLogin, setOpenLogin] = useState(false);
+    const [openRegister, setOpenRegister] = useState(false);
+
+    const requireAuth = () => setOpenLogin(true);
+
+    const handleSendFriendRequest = () => sendFriendRequest(requireAuth);
+    const handleMessage = () => {
+        if (!isAuthed) return requireAuth();
+        navigate(`/dm/${profile?.id || ''}`);
+    };
 
     // ── Loading ──────────────────────────────────────────
     if (loading) {
@@ -71,7 +85,8 @@ const ProfilePage = () => {
                 fileInputRef={fileInputRef}
                 onImageSelect={handleImageSelect}
                 friendRequestLoading={friendRequestLoading}
-                onSendFriendRequest={sendFriendRequest}
+                onSendFriendRequest={handleSendFriendRequest}
+                onMessage={handleMessage}
                 clubCount={allClubs.length}
                 navigate={navigate}
             />
@@ -110,6 +125,21 @@ const ProfilePage = () => {
                     onClose={() => setSelectedBook(null)}
                     book={selectedBook}
                 />
+            )}
+
+            {openLogin && createPortal(
+                <LoginModule
+                    onClose={() => setOpenLogin(false)}
+                    onSwitchToRegister={() => { setOpenLogin(false); setOpenRegister(true); }}
+                />,
+                document.body
+            )}
+            {openRegister && createPortal(
+                <RegisterModule
+                    onClose={() => setOpenRegister(false)}
+                    onSwitchToLogin={() => { setOpenRegister(false); setOpenLogin(true); }}
+                />,
+                document.body
             )}
         </div>
     );

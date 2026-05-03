@@ -75,18 +75,18 @@ const SuggestBookModal = ({ isOpen, onClose, bookClubId, auth, onBookSuggested }
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={onClose}>
-      <div className="bg-gray-800 p-6 rounded-lg max-w-2xl w-full mx-4 border border-gray-700 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-white text-xl font-bold flex items-center gap-2">
-            <FiBook />
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-gray-800 p-4 rounded-lg max-w-2xl w-full border border-gray-700 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="text-white text-sm font-semibold flex items-center gap-2">
+            <FiBook size={14} />
             Suggest a Book
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="p-1 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
           >
-            <FiX size={24} />
+            <FiX size={14} />
           </button>
         </div>
 

@@ -75,8 +75,9 @@ const OwnMessage = ({
             )}
           </div>
         )}
-        {/* Floating actions (reaction picker + menu) — outside overflow-hidden */}
-        {!isEditing && msg.text && !msg.deletedAt && (
+        {/* Floating actions (reaction picker + menu) — outside overflow-hidden.
+            Renders for attachment-only messages too, not just text. */}
+        {!isEditing && !msg.deletedAt && (msg.text || msg.attachments?.length > 0) && (
           <MessageActions
             msg={msg}
             isOwn

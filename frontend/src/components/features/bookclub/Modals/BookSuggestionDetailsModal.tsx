@@ -6,7 +6,7 @@ import logger from '@utils/logger';
 import { getProfileImageUrl } from '@config/constants';
 import { useConfirm, useToast } from '@hooks/useUIFeedback';
 
-const BookSuggestionDetailsModal = ({ suggestion, bookClubId, auth, members = [], onClose, onDeleted }) => {
+const BookSuggestionDetailsModal = ({ suggestion, bookClubId, auth, members = [], userRole, onClose, onDeleted }: any) => {
   const navigate = useNavigate();
   const { confirm } = useConfirm();
   const { toastError } = useToast();
@@ -33,57 +33,59 @@ const BookSuggestionDetailsModal = ({ suggestion, bookClubId, auth, members = []
     }
   };
 
-  // Check if user is the one who suggested this book
+  // Check if user is the suggester or has moderator+ role
   const isOwnSuggestion = auth?.user?.id === suggestion.suggestedById;
+  const isModerator = userRole === 'OWNER' || userRole === 'ADMIN' || userRole === 'MODERATOR';
+  const canDelete = isOwnSuggestion || isModerator;
 
   return createPortal(
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-900 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-gray-700">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-700">
-          <h2 className="text-2xl font-bold text-white">Book Suggestion Details</h2>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+          <h2 className="text-sm font-semibold text-white">Book Suggestion Details</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="p-1 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
           >
-            <FiX size={24} />
+            <FiX size={14} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <div className="flex flex-col md:flex-row gap-6">
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex flex-col md:flex-row gap-4">
             {/* Book Cover */}
             <div className="flex-shrink-0">
               <img
                 src={suggestion.book?.coverUrl || '/images/default.webp'}
                 alt={suggestion.book?.title}
-                className="w-48 h-72 object-cover rounded-lg shadow-xl"
+                className="w-32 h-48 object-cover rounded shadow-lg"
                 onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
               />
             </div>
 
             {/* Book Details */}
             <div className="flex-1">
-              <h3 className="text-3xl font-bold text-white mb-2">
+              <h3 className="text-base font-semibold text-white mb-1">
                 {suggestion.book?.title}
               </h3>
-              <p className="text-xl text-gray-300 mb-4">
+              <p className="text-sm text-gray-400 mb-3">
                 by {suggestion.book?.author}
               </p>
 
               {/* Book Info */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="grid grid-cols-2 gap-2 mb-4">
                 {suggestion.book?.pageCount && (
-                  <div className="bg-gray-800 rounded-lg p-3">
-                    <p className="text-gray-400 text-sm">Pages</p>
-                    <p className="text-white font-semibold">{suggestion.book.pageCount}</p>
+                  <div className="bg-gray-800 rounded p-2">
+                    <p className="text-gray-500 text-[11px] uppercase tracking-wider">Pages</p>
+                    <p className="text-gray-200 text-sm font-medium">{suggestion.book.pageCount}</p>
                   </div>
                 )}
                 {suggestion.book?.publishedDate && (
-                  <div className="bg-gray-800 rounded-lg p-3">
-                    <p className="text-gray-400 text-sm">Published</p>
-                    <p className="text-white font-semibold">
+                  <div className="bg-gray-800 rounded p-2">
+                    <p className="text-gray-500 text-[11px] uppercase tracking-wider">Published</p>
+                    <p className="text-gray-200 text-sm font-medium">
                       {new Date(suggestion.book.publishedDate).getFullYear()}
                     </p>
                   </div>
@@ -92,37 +94,35 @@ const BookSuggestionDetailsModal = ({ suggestion, bookClubId, auth, members = []
 
               {/* Suggestion Reason */}
               {suggestion.reason && (
-                <div className="mb-6">
-                  <h4 className="text-white font-semibold mb-2">Why this book?</h4>
-                  <div className="bg-indigo-950/30 border border-indigo-800/50 rounded-lg p-4">
-                    <p className="text-gray-200 italic">"{suggestion.reason}"</p>
+                <div className="mb-4">
+                  <h4 className="text-gray-400 text-[11px] uppercase tracking-wider font-semibold mb-1.5">Why this book?</h4>
+                  <div className="bg-indigo-950/30 border border-indigo-800/50 rounded p-2.5">
+                    <p className="text-gray-200 text-xs italic">"{suggestion.reason}"</p>
                   </div>
                 </div>
               )}
 
               {/* Suggested By */}
               <div
-                className="flex items-center gap-3 mb-6 cursor-pointer group"
+                className="flex items-center gap-2 mb-4 cursor-pointer group"
                 onClick={() => navigate(`/profile/${suggesterId}`)}
               >
-                <span className="text-gray-400">
-                  Suggested by 
-                </span>
-                <span className="text-gray-400 group-hover:text-indigo-500 transition-colors flex items-center gap-2">
+                <span className="text-gray-500 text-xs">Suggested by</span>
+                <span className="text-gray-400 group-hover:text-indigo-500 transition-colors flex items-center gap-1.5">
                   <img
-                  src={suggesterImage || '/images/default-avatar.png'}
-                  alt={suggesterName}
-                  className="w-8 h-8 rounded-full object-cover group-hover:ring-2 group-hover:ring-indigo-500 transition-all"
+                    src={suggesterImage || '/images/default-avatar.png'}
+                    alt={suggesterName}
+                    className="w-6 h-6 rounded-full object-cover group-hover:ring-1 group-hover:ring-indigo-500 transition-all"
                   />
-                  <span className="font-medium text-gray-300 group-hover:underline">{suggesterName}</span>
+                  <span className="text-xs font-medium text-gray-300 group-hover:underline">{suggesterName}</span>
                 </span>
               </div>
 
               {/* Book Description */}
               {suggestion.book?.description && (
                 <div>
-                  <h4 className="text-white font-semibold mb-2">Description</h4>
-                  <p className="text-gray-300 leading-relaxed">
+                  <h4 className="text-gray-400 text-[11px] uppercase tracking-wider font-semibold mb-1.5">Description</h4>
+                  <p className="text-gray-300 text-xs leading-relaxed">
                     {suggestion.book.description}
                   </p>
                 </div>
@@ -132,21 +132,22 @@ const BookSuggestionDetailsModal = ({ suggestion, bookClubId, auth, members = []
         </div>
 
         {/* Footer Actions */}
-        <div className="border-t border-gray-700 bg-gray-800 px-6 py-4 flex justify-between items-center">
+        <div className="border-t border-gray-700 bg-gray-800 px-4 py-3 flex justify-between items-center">
           <div>
-            {isOwnSuggestion && (
+            {canDelete && (
               <button
                 onClick={handleDelete}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600 text-white rounded text-xs hover:bg-red-700 transition-colors"
+                title={isOwnSuggestion ? 'Delete your suggestion' : 'Delete (moderator action)'}
               >
-                <FiTrash2 size={16} />
+                <FiTrash2 size={12} />
                 Delete Suggestion
               </button>
             )}
           </div>
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            className="px-3 py-1.5 bg-gray-600 text-white rounded text-xs hover:bg-gray-700 transition-colors"
           >
             Close
           </button>

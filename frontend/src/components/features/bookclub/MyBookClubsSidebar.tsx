@@ -12,6 +12,7 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, on
     const [showStatusPopup, setShowStatusPopup] = useState(false);
     const [hoveredClub, setHoveredClub] = useState(null);
     const hoverTimeoutRef = useRef(null);
+    const avatarBtnRef = useRef(null);
     
     // Check if we're on the DM page
     const isOnDMPage = location.pathname.startsWith('/dm');
@@ -109,10 +110,14 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, on
           {/* Spacer to push avatar to bottom */}
           <div className="flex-1" />
 
-          <button className='cursor-pointer flex-shrink-0' onClick={() => setShowStatusPopup(prev => !prev)}>
+          <button
+            ref={avatarBtnRef}
+            className='cursor-pointer flex-shrink-0'
+            onClick={() => setShowStatusPopup(prev => !prev)}
+          >
             <div className="relative">
               <img
-                src={getProfileImageUrl(auth.user.profileImage) || '/images/default.webp'} 
+                src={getProfileImageUrl(auth.user.profileImage) || '/images/default.webp'}
                 alt={auth.user.name}
                 className="w-10 h-10 rounded-full object-cover hover:bg-gray-50 cursor-pointer"
                 onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
@@ -127,6 +132,7 @@ const MyBookClubsSidebar = ({ bookClubs, currentBookClubId, onSelectBookClub, on
               onStatusChange={handleStatusChange}
               wsRef={wsRef}
               onLogout={onLogout}
+              anchorRef={avatarBtnRef}
             />
           )}
 

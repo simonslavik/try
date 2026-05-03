@@ -436,18 +436,18 @@ const RoomSettingsModal = ({ isOpen, onClose, room, bookClubId, allMembers, curr
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-700 flex-shrink-0">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700 flex-shrink-0">
           <div className="flex items-center gap-2 min-w-0">
-            <RoomIcon size={18} className={
+            <RoomIcon size={14} className={
               room.type === 'PRIVATE' ? 'text-yellow-400' :
               room.type === 'ANNOUNCEMENT' ? 'text-indigo-400' :
               'text-gray-400'
             } />
-            <h2 className="text-white font-semibold text-lg truncate">Room Settings</h2>
-            <span className="text-gray-500 text-sm truncate">#{room.name}</span>
+            <h2 className="text-white font-semibold text-sm truncate">Room Settings</h2>
+            <span className="text-gray-500 text-xs truncate">#{room.name}</span>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors flex-shrink-0 ml-2">
-            <FiX size={20} />
+          <button onClick={onClose} className="p-1 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors flex-shrink-0 ml-2">
+            <FiX size={14} />
           </button>
         </div>
 
@@ -462,13 +462,13 @@ const RoomSettingsModal = ({ isOpen, onClose, room, bookClubId, allMembers, curr
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium transition-colors border-b-2 ${
+                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-colors border-b-2 ${
                   isActive
                     ? 'text-indigo-500 border-indigo-500'
                     : 'text-gray-400 border-transparent hover:text-gray-200 hover:border-gray-600'
                 }`}
               >
-                <Icon size={14} />
+                <Icon size={12} />
                 {tab.label}
               </button>
             );

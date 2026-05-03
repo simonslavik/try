@@ -130,8 +130,10 @@ export default function useProfileData() {
     }, [auth, isOwnProfile, setAuth, toastError, toastWarning]);
 
     // ── Friend request ───────────────────────────────────
-    const sendFriendRequest = useCallback(async () => {
-        if (!auth?.token) { navigate('/login'); return; }
+    // Pass `onRequireAuth` from the page so unauthenticated users can be
+    // shown the login modal instead of redirected to a non-existent /login.
+    const sendFriendRequest = useCallback(async (onRequireAuth?: () => void) => {
+        if (!auth?.token) { onRequireAuth?.(); return; }
         setFriendRequestLoading(true);
         try {
             await apiClient.post('/v1/friends/request', { recipientId: id });
@@ -142,7 +144,7 @@ export default function useProfileData() {
         } finally {
             setFriendRequestLoading(false);
         }
-    }, [auth?.token, id, navigate, toastError]);
+    }, [auth?.token, id, toastError]);
 
     // ── Delete book ──────────────────────────────────────
     const deleteBook = useCallback(async (userBookId) => {
@@ -170,5 +172,6 @@ export default function useProfileData() {
         friendRequestLoading, sendFriendRequest,
         favoriteBooks, booksReading, booksToRead, booksRead,
         fetchBooks, deleteBook, navigate,
+        isAuthed: !!auth?.token,
     };
 }

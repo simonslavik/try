@@ -61,9 +61,9 @@ const AdminApprovalPanel = ({ bookclubId, userRole }) => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center justify-center py-8">
-          <div className="w-8 h-8 border-2 border-indigo-700 border-t-transparent rounded-full animate-spin" />
+      <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+        <div className="flex items-center justify-center py-6">
+          <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     );
@@ -71,95 +71,92 @@ const AdminApprovalPanel = ({ bookclubId, userRole }) => {
 
   if (requests.length === 0) {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <FiUsers className="w-6 h-6 text-indigo-700" />
-          <h3 className="text-xl font-bold text-gray-900 font-display">Join Requests</h3>
+      <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <FiUsers className="w-3.5 h-3.5 text-indigo-500" />
+          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Join Requests</h3>
         </div>
-        <div className="text-center py-8">
-          <FiClock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 font-outfit">No pending requests</p>
-        </div>
+        <p className="text-gray-500 text-xs text-center py-6">No pending requests</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <FiUsers className="w-6 h-6 text-indigo-700" />
-        <h3 className="text-xl font-bold text-gray-900 font-display">Join Requests</h3>
-        <span className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-semibold">
+    <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <FiUsers className="w-3.5 h-3.5 text-indigo-500" />
+        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Join Requests</h3>
+        <span className="bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded-full text-[10px] font-medium leading-none">
           {requests.length}
         </span>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-2">
         {requests.map((request) => (
           <div
             key={request.id}
-            className="border-2 border-gray-200 rounded-xl p-4 hover:border-indigo-300 transition-colors"
+            className="border border-gray-700 rounded-md p-2.5 hover:border-gray-600 transition-colors"
           >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center gap-3">
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex items-center gap-2 min-w-0">
                 {request.user?.profilePicture ? (
-                  <img 
-                    src={request.user.profilePicture} 
+                  <img
+                    src={request.user.profilePicture}
                     alt={request.user.username}
-                    className="w-10 h-10 rounded-full object-cover"
+                    className="w-7 h-7 rounded-full object-cover flex-shrink-0"
                   />
                 ) : (
-                  <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
+                  <div className="w-7 h-7 bg-indigo-600 rounded-full flex items-center justify-center text-white font-medium text-xs flex-shrink-0">
                     {request.user?.username?.charAt(0)?.toUpperCase() || request.userId?.charAt(0)?.toUpperCase() || '?'}
                   </div>
                 )}
-                <div>
-                  <p className="font-semibold text-gray-900 font-outfit">
+                <div className="min-w-0">
+                  <p className="text-[13px] font-medium text-white truncate">
                     {request.user?.username || `User ${request.userId.slice(0, 8)}`}
                   </p>
-                  <p className="text-sm text-gray-500 font-outfit">
+                  <p className="text-[11px] text-gray-500">
                     {new Date(request.createdAt).toLocaleDateString()}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-1 bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-semibold">
-                <FiClock className="w-4 h-4" />
+              <div className="flex items-center gap-1 bg-yellow-500/15 text-yellow-400 border border-yellow-500/30 px-1.5 py-0.5 rounded-full text-[10px] font-medium leading-none flex-shrink-0 ml-2">
+                <FiClock className="w-2.5 h-2.5" />
                 Pending
               </div>
             </div>
 
             {request.message && (
-              <div className="bg-gray-50 rounded-lg p-3 mb-3">
-                <div className="flex items-start gap-2">
-                  <FiMessageSquare className="w-4 h-4 text-gray-400 mt-1 flex-shrink-0" />
-                  <p className="text-gray-700 text-sm font-outfit">{request.message}</p>
+              <div className="bg-white/[0.03] border-l-2 border-gray-600 rounded-r p-2 mb-2">
+                <div className="flex items-start gap-1.5">
+                  <FiMessageSquare className="w-3 h-3 text-gray-500 mt-0.5 flex-shrink-0" />
+                  <p className="text-gray-300 text-xs">{request.message}</p>
                 </div>
               </div>
             )}
 
-            <div className="flex gap-2">
+            <div className="flex gap-1.5">
               <button
                 onClick={() => handleApprove(request.id)}
                 disabled={processingId === request.id}
-                className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-colors font-outfit flex items-center justify-center gap-2 ${
+                className={`flex-1 px-2.5 py-1 rounded text-xs transition-colors flex items-center justify-center gap-1 ${
                   processingId === request.id
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-green-500 text-white hover:bg-green-600'
+                    ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                    : 'bg-green-600 text-white hover:bg-green-700'
                 }`}
               >
-                <FiCheck className="w-4 h-4" />
+                <FiCheck className="w-3 h-3" />
                 Approve
               </button>
               <button
                 onClick={() => handleReject(request.id)}
                 disabled={processingId === request.id}
-                className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-colors font-outfit flex items-center justify-center gap-2 ${
+                className={`flex-1 px-2.5 py-1 rounded text-xs transition-colors flex items-center justify-center gap-1 ${
                   processingId === request.id
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-red-500 text-white hover:bg-red-600'
+                    ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                    : 'bg-red-600 text-white hover:bg-red-700'
                 }`}
               >
-                <FiX className="w-4 h-4" />
+                <FiX className="w-3 h-3" />
                 Reject
               </button>
             </div>

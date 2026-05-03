@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiChevronLeft, FiChevronRight, FiVideo } from 'react-icons/fi';
+import { FiChevronLeft, FiChevronRight, FiVideo, FiX } from 'react-icons/fi';
 import apiClient from '@api/axios';
 import { bookclubAPI } from '@api/bookclub.api';
 import logger from '@utils/logger';
@@ -159,10 +159,10 @@ const CalendarView = ({ bookClubId }) => {
 
   const getBookStatusLabel = (book, date) => {
     if (book.startDate && new Date(book.startDate).toDateString() === date.toDateString()) {
-      return '📖 Start';
+      return 'Start';
     }
     if (book.endDate && new Date(book.endDate).toDateString() === date.toDateString()) {
-      return '✓ Due';
+      return 'Due';
     }
     return book.status;
   };
@@ -200,38 +200,38 @@ const CalendarView = ({ bookClubId }) => {
   }
 
   return (
-    <div className="bg-gray-800 p-4 rounded-lg h-full overflow-y-auto">
+    <div className="bg-gray-800 p-3 rounded-lg h-full overflow-y-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-1">
           <button
             onClick={handlePrevMonth}
-            className="p-2 hover:bg-gray-700 rounded transition-colors"
+            className="p-1.5 hover:bg-gray-700 rounded transition-colors"
           >
-            <FiChevronLeft className="text-white" />
+            <FiChevronLeft size={14} className="text-white" />
           </button>
-          <h2 className="text-white font-bold text-xl min-w-[200px] text-center">
+          <h2 className="text-white font-semibold text-sm min-w-[160px] text-center">
             {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
           </h2>
           <button
             onClick={handleNextMonth}
-            className="p-2 hover:bg-gray-700 rounded transition-colors"
+            className="p-1.5 hover:bg-gray-700 rounded transition-colors"
           >
-            <FiChevronRight className="text-white" />
+            <FiChevronRight size={14} className="text-white" />
           </button>
         </div>
         <button
           onClick={handleToday}
-          className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors text-sm"
+          className="px-2.5 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors text-xs"
         >
           Today
         </button>
       </div>
 
       {/* Day names */}
-      <div className="grid grid-cols-7 gap-1 mb-2">
+      <div className="grid grid-cols-7 gap-1 mb-1">
         {dayNames.map(day => (
-          <div key={day} className="text-center text-gray-400 text-sm font-semibold py-2">
+          <div key={day} className="text-center text-gray-500 text-[11px] font-semibold uppercase tracking-wider py-1.5">
             {day}
           </div>
         ))}
@@ -297,27 +297,29 @@ const CalendarView = ({ bookClubId }) => {
 
       {/* Meeting details modal */}
       {selectedMeeting && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setSelectedMeeting(null)}>
-          <div className="bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4 border border-gray-700" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-white text-xl font-bold flex items-center gap-2">
-                <FiVideo className="text-indigo-500" />
-                {selectedMeeting.title}
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setSelectedMeeting(null)}>
+          <div className="bg-gray-800 p-4 rounded-lg max-w-md w-full border border-gray-700" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-start mb-3">
+              <h3 className="text-white text-sm font-semibold flex items-center gap-2 min-w-0">
+                <FiVideo size={14} className="text-indigo-500 flex-shrink-0" />
+                <span className="truncate">{selectedMeeting.title}</span>
               </h3>
-              <button onClick={() => setSelectedMeeting(null)} className="text-gray-400 hover:text-white">✕</button>
+              <button onClick={() => setSelectedMeeting(null)} className="p-1 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors flex-shrink-0">
+                <FiX size={14} />
+              </button>
             </div>
 
-            <div className="space-y-3 mb-4">
+            <div className="space-y-2 mb-3 text-xs">
               <div>
-                <span className="text-gray-400 text-sm">Platform:</span>
-                <div className={`inline-block ml-2 px-2 py-1 rounded text-xs ${getMeetingPlatformColor(selectedMeeting.platform)} text-white`}>
+                <span className="text-gray-400">Platform:</span>
+                <span className={`inline-block ml-2 px-1.5 py-0.5 rounded text-[11px] ${getMeetingPlatformColor(selectedMeeting.platform)} text-white`}>
                   {getMeetingPlatformLabel(selectedMeeting.platform)}
-                </div>
+                </span>
               </div>
 
               <div>
-                <span className="text-gray-400 text-sm">Date & Time:</span>
-                <div className="text-white">
+                <span className="text-gray-400">Date & Time:</span>
+                <div className="text-gray-200">
                   {new Date(selectedMeeting.scheduledAt).toLocaleDateString('en-US', {
                     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
                   })} at {new Date(selectedMeeting.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -325,35 +327,35 @@ const CalendarView = ({ bookClubId }) => {
               </div>
 
               <div>
-                <span className="text-gray-400 text-sm">Duration:</span>
-                <div className="text-white">{selectedMeeting.duration} minutes</div>
+                <span className="text-gray-400">Duration:</span>
+                <span className="text-gray-200 ml-2">{selectedMeeting.duration} minutes</span>
               </div>
 
               {selectedMeeting.description && (
                 <div>
-                  <span className="text-gray-400 text-sm">Description:</span>
-                  <div className="text-white mt-1">{selectedMeeting.description}</div>
+                  <span className="text-gray-400">Description:</span>
+                  <div className="text-gray-200 mt-0.5">{selectedMeeting.description}</div>
                 </div>
               )}
 
               <div>
-                <span className="text-gray-400 text-sm">Status:</span>
-                <div className={`inline-block ml-2 px-2 py-1 rounded text-xs ${
+                <span className="text-gray-400">Status:</span>
+                <span className={`inline-block ml-2 px-1.5 py-0.5 rounded text-[11px] ${
                   selectedMeeting.status === 'LIVE' ? 'bg-green-500' :
                   selectedMeeting.status === 'CANCELLED' ? 'bg-red-500' :
                   selectedMeeting.status === 'ENDED' ? 'bg-gray-500' : 'bg-indigo-500'
                 } text-white`}>
                   {selectedMeeting.status}
-                </div>
+                </span>
               </div>
 
               {selectedMeeting.rsvps && selectedMeeting.rsvps.length > 0 && (
                 <div>
-                  <span className="text-gray-400 text-sm">RSVPs:</span>
-                  <div className="text-white text-sm mt-1">
+                  <span className="text-gray-400">RSVPs:</span>
+                  <span className="text-gray-200 ml-2">
                     {selectedMeeting.rsvps.filter(r => r.status === 'ATTENDING').length} going
                     {selectedMeeting.rsvps.filter(r => r.status === 'MAYBE').length > 0 && `, ${selectedMeeting.rsvps.filter(r => r.status === 'MAYBE').length} maybe`}
-                  </div>
+                  </span>
                 </div>
               )}
             </div>
@@ -363,7 +365,7 @@ const CalendarView = ({ bookClubId }) => {
                 href={selectedMeeting.meetingUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block w-full text-center px-4 py-2 bg-indigo-700 hover:bg-indigo-800 text-white rounded transition-colors"
+                className="block w-full text-center px-3 py-1.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded text-xs transition-colors"
               >
                 Join Meeting
               </a>
@@ -374,47 +376,47 @@ const CalendarView = ({ bookClubId }) => {
 
       {/* Book details modal */}
       {selectedBook && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setSelectedBook(null)}>
-          <div className="bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4 border border-gray-700" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-white text-xl font-bold">{selectedBook.book.title}</h3>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setSelectedBook(null)}>
+          <div className="bg-gray-800 p-4 rounded-lg max-w-md w-full border border-gray-700" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-start mb-3">
+              <h3 className="text-white text-sm font-semibold truncate">{selectedBook.book.title}</h3>
               <button
                 onClick={() => setSelectedBook(null)}
-                className="text-gray-400 hover:text-white"
+                className="p-1 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors flex-shrink-0"
               >
-                ✕
+                <FiX size={14} />
               </button>
             </div>
 
             {selectedBook.book.thumbnail && (
-              <div className="flex justify-center mb-4">
+              <div className="flex justify-center mb-3">
                 <img
                   src={selectedBook.book.thumbnail}
                   alt={selectedBook.book.title}
-                  className="h-40 rounded shadow-lg"
+                  className="h-32 rounded shadow"
                 />
               </div>
             )}
 
-            <div className="space-y-3">
+            <div className="space-y-2 text-xs">
               {selectedBook.book.authors && (
                 <div>
-                  <span className="text-gray-400 text-sm">Author:</span>
-                  <div className="text-white">{selectedBook.book.authors}</div>
+                  <span className="text-gray-400">Author:</span>
+                  <span className="text-gray-200 ml-2">{selectedBook.book.authors}</span>
                 </div>
               )}
 
               <div>
-                <span className="text-gray-400 text-sm">Status:</span>
-                <div className={`inline-block ml-2 px-2 py-1 rounded text-xs ${getBookStatusColor(selectedBook.status)} text-white`}>
+                <span className="text-gray-400">Status:</span>
+                <span className={`inline-block ml-2 px-1.5 py-0.5 rounded text-[11px] ${getBookStatusColor(selectedBook.status)} text-white`}>
                   {selectedBook.status?.charAt(0).toUpperCase() + selectedBook.status?.slice(1)}
-                </div>
+                </span>
               </div>
 
               {selectedBook.startDate && (
                 <div>
-                  <span className="text-gray-400 text-sm">Start Date:</span>
-                  <div className="text-white">
+                  <span className="text-gray-400">Start Date:</span>
+                  <div className="text-gray-200 mt-0.5">
                     {new Date(selectedBook.startDate).toLocaleDateString('en-US', {
                       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
                     })}
@@ -424,8 +426,8 @@ const CalendarView = ({ bookClubId }) => {
 
               {selectedBook.endDate && (
                 <div>
-                  <span className="text-gray-400 text-sm">Due Date:</span>
-                  <div className="text-white">
+                  <span className="text-gray-400">Due Date:</span>
+                  <div className="text-gray-200 mt-0.5">
                     {new Date(selectedBook.endDate).toLocaleDateString('en-US', {
                       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
                     })}

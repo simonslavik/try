@@ -29,27 +29,27 @@ const MessageContextMenu = ({ msg, isOwn, canModerate, menuRef, onPin, onEdit, o
   const menuItems = [
     canModerate && onPin && {
       label: msg.isPinned ? 'Unpin message' : 'Pin message',
-      icon: <BsPinAngle className="w-4 h-4" />,
+      icon: <BsPinAngle className="w-3 h-3" />,
       onClick: () => onPin(msg.id, msg.isPinned),
     },
     isOwn && msg.text && !msg.deletedAt && onEdit && {
       label: 'Edit message',
-      icon: <FiEdit2 className="w-4 h-4" />,
+      icon: <FiEdit2 className="w-3 h-3" />,
       onClick: () => onEdit(msg),
     },
     msg.text && !msg.deletedAt && {
       label: 'Copy text',
-      icon: <FiCopy className="w-4 h-4" />,
+      icon: <FiCopy className="w-3 h-3" />,
       onClick: () => onCopy(msg.id, msg.text),
     },
     !msg.deletedAt && {
       label: 'Reply',
-      icon: <FiCornerUpLeft className="w-4 h-4" />,
+      icon: <FiCornerUpLeft className="w-3 h-3" />,
       onClick: () => onReply(msg),
     },
     (canModerate || isOwn) && {
       label: 'Delete message',
-      icon: <FiTrash2 className="w-4 h-4" />,
+      icon: <FiTrash2 className="w-3 h-3" />,
       onClick: () => onDelete(msg.id),
       danger: true,
     },
@@ -60,16 +60,14 @@ const MessageContextMenu = ({ msg, isOwn, canModerate, menuRef, onPin, onEdit, o
   return (
     <div
       ref={setRefs}
-      className={`absolute z-[60] ${verticalClass} ${isOwn ? 'right-0' : 'left-0'} bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-2 min-w-[180px]`}
+      className={`absolute z-[60] ${verticalClass} ${isOwn ? 'right-0' : 'left-0'} bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-1 min-w-[150px]`}
       onClick={(e) => e.stopPropagation()}
     >
       {menuItems.map((item, idx) => (
         <button
           key={idx}
           onClick={item.onClick}
-          className={`w-full px-4 py-2 text-left text-sm flex items-center gap-2 hover:bg-gray-700 ${
-            idx === 0 ? 'rounded-t-lg' : ''
-          } ${idx === menuItems.length - 1 ? 'rounded-b-lg' : ''} ${
+          className={`w-full px-2.5 py-1.5 text-left text-xs flex items-center gap-2 hover:bg-gray-700 rounded ${
             item.danger ? 'text-red-400' : 'text-gray-200'
           }`}
         >

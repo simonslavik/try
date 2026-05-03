@@ -103,39 +103,39 @@ const AddBookToBookclubModal = ({ bookClubId, onClose, onBookAdded }) => {
 
   return createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-gray-700">
         {/* Header */}
-        <div className="bg-indigo-700 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-            <FiBook />
+        <div className="px-4 py-3 flex items-center justify-between border-b border-gray-700">
+          <h2 className="text-sm font-semibold text-white flex items-center gap-2">
+            <FiBook size={14} />
             Add Book to BookClub
           </h2>
           <button
             onClick={onClose}
-            className="text-white hover:bg-white/20 rounded-full p-2 transition-colors"
+            className="text-gray-400 hover:text-white p-1 hover:bg-gray-700 rounded transition-colors"
           >
-            <FiX size={24} />
+            <FiX size={14} />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-4">
           {/* Search Form */}
-          <form onSubmit={handleSearch} className="mb-6">
+          <form onSubmit={handleSearch} className="mb-4">
             <div className="flex gap-2">
               <div className="flex-1 relative">
-                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={14} />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search by title, author, or ISBN..."
-                  className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full pl-9 pr-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
               <button
                 type="submit"
                 disabled={searching || !searchQuery.trim()}
-                className="px-6 py-3 bg-indigo-700 hover:bg-indigo-800 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-semibold"
+                className="px-3 py-2 bg-indigo-700 hover:bg-indigo-800 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded text-xs transition-colors"
               >
                 {searching ? 'Searching...' : 'Search'}
               </button>
@@ -144,76 +144,76 @@ const AddBookToBookclubModal = ({ bookClubId, onClose, onBookAdded }) => {
 
           {/* Selected Book Configuration */}
           {selectedBook && (
-            <div className="mb-6 bg-gray-700 rounded-lg p-4 border-2 border-indigo-500">
-              <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                <FiCheck className="text-green-400" />
+            <div className="mb-4 bg-gray-700 rounded-lg p-3 border border-indigo-500">
+              <h3 className="text-white font-semibold text-xs uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                <FiCheck className="text-green-400" size={13} />
                 Selected Book
               </h3>
-              <div className="flex gap-4 mb-4">
+              <div className="flex gap-3 mb-3">
                 <img
                   src={selectedBook.coverUrl || '/images/default.webp'}
                   alt={selectedBook.title}
-                  className="w-20 h-28 object-cover rounded shadow-md"
+                  className="w-14 h-20 object-cover rounded shadow"
                   onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
                 />
                 <div className="flex-1">
-                  <h4 className="text-white font-semibold mb-1">{selectedBook.title}</h4>
-                  <p className="text-gray-400 text-sm mb-2">{selectedBook.author}</p>
-                  <p className="text-gray-400 text-xs">{selectedBook.pageCount} pages</p>
+                  <h4 className="text-white font-medium text-sm mb-0.5">{selectedBook.title}</h4>
+                  <p className="text-gray-400 text-xs mb-0.5">{selectedBook.author}</p>
+                  <p className="text-gray-500 text-[11px]">{selectedBook.pageCount} pages</p>
                 </div>
               </div>
 
               {/* Status Selection */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
                 <button
                   onClick={() => setStatus('current')}
-                  className={`px-4 py-3 rounded-lg font-semibold transition-all ${
+                  className={`px-2.5 py-1.5 rounded text-xs transition-all ${
                     status === 'current'
-                      ? 'bg-indigo-700 text-white ring-2 ring-indigo-500'
+                      ? 'bg-indigo-700 text-white ring-1 ring-indigo-500'
                       : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
                   }`}
                 >
-                  📖 Currently Reading
+                  Currently Reading
                 </button>
                 <button
                   onClick={() => setStatus('upcoming')}
-                  className={`px-4 py-3 rounded-lg font-semibold transition-all ${
+                  className={`px-2.5 py-1.5 rounded text-xs transition-all ${
                     status === 'upcoming'
-                      ? 'bg-indigo-600 text-white ring-2 ring-indigo-400'
+                      ? 'bg-indigo-600 text-white ring-1 ring-indigo-400'
                       : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
                   }`}
                 >
-                  📚 Coming Up Next
+                  Coming Up Next
                 </button>
                 <button
                   onClick={() => setStatus('completed')}
-                  className={`px-4 py-3 rounded-lg font-semibold transition-all ${
+                  className={`px-2.5 py-1.5 rounded text-xs transition-all ${
                     status === 'completed'
-                      ? 'bg-green-600 text-white ring-2 ring-green-400'
+                      ? 'bg-green-600 text-white ring-1 ring-green-400'
                       : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
                   }`}
                 >
-                  ✅ Completed
+                  Completed
                 </button>
               </div>
 
               {/* Date Selection */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1 flex items-center gap-1">
-                    <FiCalendar size={14} />
+                  <label className="block text-xs text-gray-400 mb-1 flex items-center gap-1">
+                    <FiCalendar size={12} />
                     Start Date {status !== 'completed' && '(optional)'}
                   </label>
                   <input
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-2.5 py-1.5 bg-gray-600 border border-gray-500 rounded text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1 flex items-center gap-1">
-                    <FiCalendar size={14} />
+                  <label className="block text-xs text-gray-400 mb-1 flex items-center gap-1">
+                    <FiCalendar size={12} />
                     {status === 'completed' ? 'Finished Date' : 'Target End Date'} (optional)
                   </label>
                   <input
@@ -221,7 +221,7 @@ const AddBookToBookclubModal = ({ bookClubId, onClose, onBookAdded }) => {
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
                     min={startDate}
-                    className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-2.5 py-1.5 bg-gray-600 border border-gray-500 rounded text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
               </div>
@@ -229,7 +229,7 @@ const AddBookToBookclubModal = ({ bookClubId, onClose, onBookAdded }) => {
               <button
                 onClick={handleAddBook}
                 disabled={adding}
-                className="w-full mt-4 px-6 py-3 bg-indigo-700 hover:bg-indigo-800 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-all font-semibold text-lg shadow-lg"
+                className="w-full mt-3 px-3 py-1.5 bg-indigo-700 hover:bg-indigo-800 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded transition-all text-xs"
               >
                 {adding ? 'Adding Book...' : 'Add Book to BookClub'}
               </button>

@@ -3,24 +3,29 @@ import { useLocation } from 'react-router-dom';
 
 /**
  * Wraps route content with a smooth fade+slide entrance animation.
- * Triggered on route change via React Router's `useLocation`.
  *
- * Uses two effects to be resilient to React.lazy / Suspense:
- *  1. Route-change effect → sets `visible=false`
+ * Only animates when crossing route SECTIONS (e.g. /home → /bookclub/X), not
+ * when params change within the same section (e.g. /bookclub/A → /bookclub/B).
+ * Param-only navigations re-render the same component instantly with no fade,
+ * which avoids a perceptible white flash when switching between bookclubs or
+ * DM conversations.
+ *
+ * Resilient to React.lazy / Suspense:
+ *  1. Section-change effect → sets `visible=false`
  *  2. Recovery effect → whenever `visible` is false, schedules rAF to fade in
- *
- * If Suspense cleans up the recovery rAF while loading a chunk, the next
- * commit will see `visible` is still false and retry automatically.
  */
+const sectionOf = (pathname: string): string => pathname.split('/')[1] || '';
+
 const PageTransition = ({ children }) => {
   const location = useLocation();
   const [visible, setVisible] = useState(true);
-  const prevPath = useRef(location.pathname);
+  const prevSection = useRef(sectionOf(location.pathname));
 
-  // 1) Trigger exit animation on route change (skip initial mount)
+  // 1) Trigger exit animation only on SECTION change (skip param-only nav)
   useEffect(() => {
-    if (prevPath.current !== location.pathname) {
-      prevPath.current = location.pathname;
+    const next = sectionOf(location.pathname);
+    if (prevSection.current !== next) {
+      prevSection.current = next;
       setVisible(false);
     }
   }, [location.pathname]);
@@ -37,10 +42,10 @@ const PageTransition = ({ children }) => {
 
   return (
     <div
-      className={`transition-all duration-300 ease-out ${
+      className={`transition-all duration-200 ease-out ${
         visible
           ? 'opacity-100 translate-y-0'
-          : 'opacity-0 translate-y-2'
+          : 'opacity-0 translate-y-1'
       }`}
     >
       {children}

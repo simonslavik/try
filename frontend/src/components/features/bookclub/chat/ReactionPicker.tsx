@@ -58,17 +58,17 @@ const ReactionPicker = ({ onSelectEmoji, position = 'top', currentUserEmoji = nu
           ref={dropdownRef}
           className={`absolute z-[60] ${
             openAbove ? 'bottom-full mb-2' : 'top-full mt-2'
-          } ${isOwn ? 'right-0' : 'left-0'} bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-2 w-[240px]`}
+          } ${isOwn ? 'right-0' : 'left-0'} bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-1.5 w-[200px]`}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="grid grid-cols-5 gap-1">
+          <div className="grid grid-cols-5 gap-0.5">
             {QUICK_EMOJIS.map((emoji) => (
               <button
                 key={emoji}
                 onClick={() => handleSelect(emoji)}
-                className={`text-xl p-1.5 rounded-lg transition-colors flex items-center justify-center ${
+                className={`text-base p-1 rounded transition-colors flex items-center justify-center ${
                   emoji === currentUserEmoji
-                    ? 'bg-indigo-700/40 ring-2 ring-indigo-500'
+                    ? 'bg-indigo-700/40 ring-1 ring-indigo-500'
                     : 'hover:bg-gray-700'
                 }`}
               >

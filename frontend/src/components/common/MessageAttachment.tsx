@@ -42,24 +42,24 @@ const MessageAttachment = ({ attachment, canDelete = false, onDelete, auth, isSe
   if (isImage) {
     return (
       <>
-        <div className="relative inline-block mt-2 group">
+        <div className="relative inline-block group">
           <img
             src={getCollabImageUrl(attachment.url)}
             alt={attachment.filename}
-            className="max-w-[200px] sm:max-w-xs md:max-w-sm max-h-48 md:max-h-64 rounded-lg cursor-pointer hover:brightness-110 transition-all duration-200 border border-gray-600/30 hover:border-stone-500/50 shadow-lg"
+            className="max-w-[200px] sm:max-w-xs md:max-w-sm max-h-48 md:max-h-64 rounded-md cursor-pointer hover:brightness-110 transition-colors border border-white/[0.06]"
             onClick={() => setImageExpanded(true)}
             onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
           />
-          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-all duration-200 flex gap-2">
+          <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1.5">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleDownload();
               }}
-              className="bg-gray-900/90 backdrop-blur-sm text-white p-2 rounded-full hover:bg-gray-800 hover:scale-110 transition-all duration-200 shadow-lg"
+              className="bg-gray-900/80 backdrop-blur-sm text-white p-1 rounded-full hover:bg-gray-800 transition-colors"
               title="Download"
             >
-              <FiDownload size={16} />
+              <FiDownload size={12} />
             </button>
             {canDelete && (
               <button
@@ -67,10 +67,10 @@ const MessageAttachment = ({ attachment, canDelete = false, onDelete, auth, isSe
                   e.stopPropagation();
                   onDelete();
                 }}
-                className="bg-red-600/90 backdrop-blur-sm text-white p-2 rounded-full hover:bg-red-500 hover:scale-110 transition-all duration-200 shadow-lg"
+                className="bg-red-600/80 backdrop-blur-sm text-white p-1 rounded-full hover:bg-red-500 transition-colors"
                 title="Delete"
               >
-                <FiX size={16} />
+                <FiX size={12} />
               </button>
             )}
           </div>
@@ -106,30 +106,28 @@ const MessageAttachment = ({ attachment, canDelete = false, onDelete, auth, isSe
   }
 
   return (
-    <div className="flex items-center gap-3 bg-gradient-to-r from-gray-700 to-gray-750 rounded-lg p-3 mt-2 max-w-[200px] sm:max-w-xs hover:from-gray-650 hover:to-gray-700 transition-all duration-200 border border-gray-600/50 hover:border-stone-500/50 shadow-md hover:shadow-lg group">
-      <div className="bg-stone-700/20 p-2 rounded-lg group-hover:bg-stone-700/30 transition-colors">
-        <FiFile className="text-stone-500 flex-shrink-0" size={24} />
-      </div>
+    <div className="flex items-center gap-2 bg-white/[0.04] hover:bg-white/[0.06] rounded-md px-2 py-1.5 max-w-[220px] border border-white/[0.06] transition-colors group">
+      <FiFile className="text-gray-400 flex-shrink-0" size={14} />
       <div className="flex-1 min-w-0">
-        <p className="text-white text-sm font-medium truncate" title={attachment.filename}>{attachment.filename}</p>
-        <p className="text-gray-400 text-xs mt-0.5">
+        <p className="text-gray-200 text-xs truncate" title={attachment.filename}>{attachment.filename}</p>
+        <p className="text-gray-500 text-[10px]">
           {formatFileSize(attachment.size)}
         </p>
       </div>
       <button
         onClick={handleDownload}
-        className="text-stone-400 hover:text-stone-300 flex-shrink-0 p-1.5 hover:bg-stone-400/10 rounded-lg transition-all duration-200 hover:scale-110"
+        className="text-gray-400 hover:text-gray-200 flex-shrink-0 p-1 rounded transition-colors"
         title="Download"
       >
-        <FiDownload size={18} />
+        <FiDownload size={12} />
       </button>
       {canDelete && (
         <button
           onClick={onDelete}
-          className="text-red-400 hover:text-red-300 flex-shrink-0 p-1.5 hover:bg-red-400/10 rounded-lg transition-all duration-200 hover:scale-110"
+          className="text-red-400 hover:text-red-300 flex-shrink-0 p-1 rounded transition-colors"
           title="Delete"
         >
-          <FiX size={18} />
+          <FiX size={12} />
         </button>
       )}
     </div>

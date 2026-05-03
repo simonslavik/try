@@ -78,33 +78,33 @@ const MeetingsView = ({
   return (
     <div className="flex-1 overflow-y-auto bg-gray-900">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-gray-900/95 backdrop-blur-sm border-b border-gray-700/50 px-6 py-4">
+      <div className="sticky top-0 z-10 bg-gray-900/95 backdrop-blur-sm border-b border-gray-700/50 px-4 py-2.5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <FiCalendar size={22} className="text-indigo-500" />
-            <h2 className="text-xl font-bold text-white">Meetings</h2>
-            <span className="text-sm text-gray-500">
+          <div className="flex items-center gap-2">
+            <FiCalendar size={14} className="text-indigo-500" />
+            <h2 className="text-sm font-semibold text-white">Meetings</h2>
+            <span className="text-xs text-gray-500">
               {liveMeetings.length + upcomingMeetings.length} upcoming
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => setShowPast(!showPast)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+              className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs border transition-colors ${
                 showPast
                   ? 'bg-indigo-700/20 text-indigo-500 border-indigo-500/30'
                   : 'text-gray-400 border-gray-600 hover:bg-gray-800'
               }`}
             >
-              <FiFilter size={13} />
+              <FiFilter size={11} />
               {showPast ? 'Showing All' : 'Show Past'}
             </button>
             {canManage && (
               <button
                 onClick={onScheduleMeeting}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-700 text-white rounded-lg hover:bg-indigo-500 transition-colors text-sm font-medium"
+                className="flex items-center gap-1 px-2.5 py-1 bg-indigo-700 text-white rounded-md hover:bg-indigo-800 transition-colors text-xs"
               >
-                <FiPlus size={15} />
+                <FiPlus size={13} />
                 Schedule
               </button>
             )}
@@ -113,44 +113,43 @@ const MeetingsView = ({
       </div>
 
       {/* Content */}
-      <div className="p-6">
+      <div className="p-4">
         {loading ? (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {[1, 2, 3].map(i => (
-              <div key={i} className="bg-gray-800 rounded-xl border border-gray-700 p-4 animate-pulse">
-                <div className="h-5 w-48 bg-gray-700 rounded mb-3" />
-                <div className="h-4 w-64 bg-gray-700 rounded mb-3" />
-                <div className="h-8 w-full bg-gray-700 rounded" />
+              <div key={i} className="bg-gray-800 rounded-lg border border-gray-700 p-3 animate-pulse">
+                <div className="h-4 w-48 bg-gray-700 rounded mb-2" />
+                <div className="h-3 w-64 bg-gray-700 rounded mb-2" />
+                <div className="h-7 w-full bg-gray-700 rounded" />
               </div>
             ))}
           </div>
         ) : meetings.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="text-5xl mb-4">📅</div>
-            <h3 className="text-lg font-semibold text-white mb-2">No meetings scheduled</h3>
-            <p className="text-gray-400 text-sm mb-6">
+          <div className="text-center py-12">
+            <h3 className="text-sm font-semibold text-white mb-1">No meetings scheduled</h3>
+            <p className="text-gray-400 text-xs mb-4">
               Schedule a meeting with a Zoom, Google Meet, or Teams link for your book club.
             </p>
             {canManage && (
               <button
                 onClick={onScheduleMeeting}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-700 text-white rounded-lg hover:bg-indigo-500 transition-colors font-medium"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-700 text-white rounded-md hover:bg-indigo-800 transition-colors text-xs"
               >
-                <FiPlus size={16} />
+                <FiPlus size={13} />
                 Schedule First Meeting
               </button>
             )}
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {/* Live Meetings */}
             {liveMeetings.length > 0 && (
               <section>
-                <h3 className="text-sm font-semibold text-green-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-green-400 uppercase tracking-wider mb-2 flex items-center gap-2">
                   <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                   Live Now
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {liveMeetings.map(meeting => (
                     <MeetingCard
                       key={meeting.id}
@@ -170,10 +169,10 @@ const MeetingsView = ({
             {/* Upcoming */}
             {upcomingMeetings.length > 0 && (
               <section>
-                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">
                   Upcoming
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {upcomingMeetings.map(meeting => (
                     <MeetingCard
                       key={meeting.id}
@@ -193,10 +192,10 @@ const MeetingsView = ({
             {/* Past */}
             {showPast && pastMeetings.length > 0 && (
               <section>
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
                   Past Meetings
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {pastMeetings.map(meeting => (
                     <MeetingCard
                       key={meeting.id}

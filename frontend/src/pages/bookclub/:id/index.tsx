@@ -4,6 +4,7 @@ import { useBookclubData } from '@hooks/useBookclubData';
 import { useBookclubViews } from '@hooks/useBookclubViews';
 import { useModals } from '@hooks/useModals';
 import { useBookclubWebSocket } from '@hooks/useBookclubWebSocket';
+import useDarkBodyLock from '@hooks/useDarkBodyLock';
 import { bookclubAPI } from '@api/bookclub.api';
 
 // Layout / chrome
@@ -42,6 +43,7 @@ import logger from '@utils/logger';
 const BookClub = () => {
   const { id: bookClubId } = useParams();
   const navigate = useNavigate();
+  useDarkBodyLock();
 
   // ─── Data layer ─────────────────────────────────────────
   const data = useBookclubData(bookClubId);
@@ -349,6 +351,7 @@ const BookClub = () => {
             <div className="flex-1 flex flex-col overflow-hidden">
               <BookSuggestionsView
                 bookClubId={bookClubId} auth={auth} members={bookClubMembers}
+                userRole={userRole}
                 onSuggestionAdded={() => notifySectionActivity('suggestions')}
               />
             </div>

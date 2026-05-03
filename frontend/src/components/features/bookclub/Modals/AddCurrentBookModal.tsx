@@ -104,23 +104,23 @@ const AddCurrentBookModal = ({ bookClubId, onClose, onBookAdded }) => {
   };
 
   return createPortal(
-    <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b bg-indigo-700 text-white">
-          <h2 className="text-2xl font-bold">
-            {step === 1 ? '📚 Search for a Book' : '📅 Set Reading Schedule'}
+        <div className="flex items-center justify-between px-4 py-3 border-b bg-indigo-700 text-white">
+          <h2 className="text-sm font-semibold">
+            {step === 1 ? 'Search for a Book' : 'Set Reading Schedule'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white/20 rounded-full transition-colors"
+            className="p-1 hover:bg-white/20 rounded transition-colors"
           >
-            <FiX size={24} />
+            <FiX size={14} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-4">
           {step === 1 ? (
             // Step 1: Search Books
             <>

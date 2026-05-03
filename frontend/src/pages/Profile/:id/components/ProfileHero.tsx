@@ -6,7 +6,7 @@ const DEFAULT_IMG = '/images/default.webp';
 export default function ProfileHero({
     profile, isOwnProfile,
     imagePreview, uploadingImage, fileInputRef, onImageSelect,
-    friendRequestLoading, onSendFriendRequest,
+    friendRequestLoading, onSendFriendRequest, onMessage,
     clubCount, navigate,
 }) {
     const joinDate = new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
@@ -83,7 +83,7 @@ export default function ProfileHero({
                         ) : (
                             <>
                                 <button
-                                    onClick={() => navigate(`/dm/${profile.id || ''}`)}
+                                    onClick={onMessage}
                                     className="px-5 py-2.5 bg-white text-stone-800 rounded-xl text-sm font-semibold hover:bg-stone-100 transition-colors flex items-center gap-2"
                                 >
                                     <FiMessageCircle size={15} />

@@ -8,6 +8,7 @@ import { WS_URL } from '@config/constants';
 import apiClient from '@api/axios';
 import logger from '@utils/logger';
 import { useToast } from '@hooks/useUIFeedback';
+import useDarkBodyLock from '@hooks/useDarkBodyLock';
 import { FiMenu } from 'react-icons/fi';
 
 // Normalize raw Prisma reactions [{userId, emoji, ...}] to grouped format [{emoji, count, userIds}]
@@ -31,6 +32,7 @@ const normalizeMessage = (msg) => ({
 });
 
 const DMChatPage = () => {
+  useDarkBodyLock();
   const { auth, setAuth, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const { userId } = useParams();

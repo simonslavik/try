@@ -133,12 +133,12 @@ const SideBarRooms = ({
 
             {/* Navigation */}
             <div className="p-2 border-b border-gray-700 flex-shrink-0">
-              <div className="flex items-center justify-between px-2 py-1 mb-1">
-                <h3 className="text-gray-400 text-xs font-semibold uppercase">Navigation</h3>
+              <div className="flex items-center justify-between px-2 py-0.5 mb-1">
+                <h3 className="text-gray-500 text-[11px] font-semibold uppercase tracking-wider">Navigation</h3>
               </div>
               <button
                 onClick={() => onShowSuggestions && onShowSuggestions()}
-                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-colors text-sm ${
+                className={`w-full flex items-center gap-1.5 px-2 py-1 rounded text-left transition-colors text-[13px] ${
                   showSuggestions 
                     ? 'bg-gray-700 text-white' 
                     : !showSuggestions && unreadSections.has('suggestions')
@@ -146,15 +146,15 @@ const SideBarRooms = ({
                       : 'text-gray-400 hover:bg-gray-700 hover:text-white'
                 }`}
               >
-                <FiMessageSquare size={16} className="flex-shrink-0 text-green-400" />
+                <FiMessageSquare size={13} className="flex-shrink-0 text-green-400" />
                 <span className="truncate flex-1">Book Suggestions</span>
                 {!showSuggestions && unreadSections.has('suggestions') && (
-                  <span className="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0" />
                 )}
               </button>
               <button
                 onClick={() => onShowBooksHistory && onShowBooksHistory()}
-                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-colors text-sm ${
+                className={`w-full flex items-center gap-1.5 px-2 py-1 rounded text-left transition-colors text-[13px] ${
                   showBooksHistory 
                     ? 'bg-gray-700 text-white' 
                     : !showBooksHistory && unreadSections.has('books')
@@ -162,15 +162,15 @@ const SideBarRooms = ({
                       : 'text-gray-400 hover:bg-gray-700 hover:text-white'
                 }`}
               >
-                <FiBook size={16} className="flex-shrink-0 text-orange-400" />
+                <FiBook size={13} className="flex-shrink-0 text-orange-400" />
                 <span className="truncate flex-1">BookClub Books</span>
                 {!showBooksHistory && unreadSections.has('books') && (
-                  <span className="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0" />
                 )}
               </button>
               <button
                 onClick={() => onShowCalendar && onShowCalendar()}
-                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-colors text-sm ${
+                className={`w-full flex items-center gap-1.5 px-2 py-1 rounded text-left transition-colors text-[13px] ${
                   showCalendar 
                     ? 'bg-gray-700 text-white' 
                     : !showCalendar && unreadSections.has('calendar')
@@ -178,15 +178,15 @@ const SideBarRooms = ({
                       : 'text-gray-400 hover:bg-gray-700 hover:text-white'
                 }`}
               >
-                <FiCalendar size={16} className="flex-shrink-0 text-indigo-500" />
+                <FiCalendar size={13} className="flex-shrink-0 text-indigo-500" />
                 <span className="truncate flex-1">BookClub Calendar</span>
                 {!showCalendar && unreadSections.has('calendar') && (
-                  <span className="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0" />
                 )}
               </button>
               <button
                 onClick={() => onShowMeetings && onShowMeetings()}
-                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-colors text-sm ${
+                className={`w-full flex items-center gap-1.5 px-2 py-1 rounded text-left transition-colors text-[13px] ${
                   showMeetings 
                     ? 'bg-gray-700 text-white' 
                     : !showMeetings && unreadSections.has('meetings')
@@ -194,10 +194,10 @@ const SideBarRooms = ({
                       : 'text-gray-400 hover:bg-gray-700 hover:text-white'
                 }`}
               >
-                <FiVideo size={16} className="flex-shrink-0 text-pink-400" />
+                <FiVideo size={13} className="flex-shrink-0 text-pink-400" />
                 <span className="truncate flex-1">Meetings</span>
                 {!showMeetings && unreadSections.has('meetings') && (
-                  <span className="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0" />
                 )}
               </button>
             </div>
@@ -205,19 +205,19 @@ const SideBarRooms = ({
             {/* Rooms List */}
             <div className="flex-1">
               <div className="p-2">
-                <div className="flex items-center justify-between px-2 py-1 mb-2">
-                  <h3 className="text-gray-400 text-xs font-semibold uppercase">Rooms</h3>
+                <div className="flex items-center justify-between px-2 py-0.5 mb-1">
+                  <h3 className="text-gray-500 text-[11px] font-semibold uppercase tracking-wider">Rooms</h3>
                   {canCreateRoom && (
-                    <button 
+                    <button
                       onClick={handleCreateRoom}
-                      className="text-gray-400 hover:text-white"
+                      className="text-gray-500 hover:text-white p-0.5"
                       title="Create Room"
                     >
-                      <FiPlus size={14} />
+                      <FiPlus size={12} />
                     </button>
                   )}
                 </div>
-                
+
                 {rooms.map(room => {
                   const Icon = getRoomIcon(room);
                   const isActive = currentRoom?.id === room.id && !showBooksHistory && !showCalendar && !showSuggestions && !showMeetings;
@@ -234,29 +234,29 @@ const SideBarRooms = ({
                         onClick={() => !isLocked && switchRoom(room)}
                         disabled={isLocked}
                         title={isLocked ? 'You do not have access to this private room' : room.name}
-                        className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-colors ${
+                        className={`w-full flex items-center gap-1.5 px-2 py-1 rounded text-left text-[13px] transition-colors ${
                           isLocked
                             ? 'text-gray-600 cursor-not-allowed opacity-60'
                             : isActive
                               ? 'bg-gray-700 text-white'
                               : hasUnread
-                                ? 'text-white font-semibold'
+                                ? 'text-white font-medium'
                                 : 'text-gray-400 hover:bg-gray-700 hover:text-white'
                         }`}
                       >
-                        <Icon size={16} className={`flex-shrink-0 ${isLocked ? 'text-gray-600' : iconColor}`} />
+                        <Icon size={13} className={`flex-shrink-0 ${isLocked ? 'text-gray-600' : iconColor}`} />
                         <span className="truncate flex-1">{room.name}</span>
                         {hasUnread && (
-                          <span className="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0" />
                         )}
                       </button>
                       {/* Three-dot menu on hover (for mods+) */}
                       {['OWNER', 'ADMIN', 'MODERATOR'].includes(userRole) && (
                         <button
                           onClick={(e) => handleContextMenu(e, room)}
-                          className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 text-gray-500 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
                         >
-                          <FiMoreVertical size={14} />
+                          <FiMoreVertical size={12} />
                         </button>
                       )}
                     </div>

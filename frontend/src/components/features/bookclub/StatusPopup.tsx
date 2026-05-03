@@ -5,19 +5,24 @@ import { userAPI } from '@api/user.api';
 import { STATUS_OPTIONS, getStatusColor } from './statusUtils';
 import logger from '@utils/logger';
 
-const StatusPopup = ({ user, onClose, onStatusChange, wsRef, onLogout }) => {
+const StatusPopup = ({ user, onClose, onStatusChange, wsRef, onLogout, anchorRef }: any) => {
   const popupRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (e) => {
+      // Ignore clicks on the trigger element — it manages its own toggle.
+      // Without this, mousedown closes the popup just before the trigger's
+      // onClick re-opens it, making the close-by-clicking-the-trigger gesture
+      // appear to do nothing.
+      if (anchorRef?.current && anchorRef.current.contains(e.target)) return;
       if (popupRef.current && !popupRef.current.contains(e.target)) {
         onClose();
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [onClose]);
+  }, [onClose, anchorRef]);
 
   const handleStatusSelect = async (status) => {
     try {

@@ -137,140 +137,135 @@ const InviteModal = ({ bookClubId, bookClubName, bookClubMembers = [], currentUs
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div
+        className="bg-gray-800 rounded-lg shadow-xl w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col border border-gray-700"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">Invite to {bookClubName}</h2>
+        <div className="px-4 py-3 border-b border-gray-700 flex items-center justify-between flex-shrink-0">
+          <h2 className="text-sm font-semibold text-white truncate">Invite to {bookClubName}</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="p-1 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors flex-shrink-0 ml-2"
           >
-            <FiX size={24} />
+            <FiX size={14} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(80vh - 100px)' }}>
+        <div className="p-4 overflow-y-auto">
           {loading ? (
-            <div className="text-center py-8 text-gray-500">Loading invite link...</div>
+            <div className="text-center py-6 text-gray-400 text-xs">Loading invite link...</div>
           ) : (
             <>
               {/* Invite Link Section */}
               {invite ? (
-                <div className="mb-6 p-5 bg-stone-50 rounded-lg border-2 border-stone-200">
-                  <div className="flex items-center gap-2 mb-3">
-                    <FiLink className="text-stone-700" size={20} />
-                    <h3 className="font-semibold text-gray-900">Permanent Invite Link</h3>
+                <div className="mb-4">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <FiLink className="text-indigo-500" size={12} />
+                    <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Permanent Invite Link</h3>
                   </div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="flex-1 bg-white px-4 py-3 rounded-lg border border-gray-300 font-mono text-sm text-stone-700 break-all">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <div className="flex-1 bg-gray-900 px-2.5 py-1.5 rounded border border-gray-600 font-mono text-xs text-gray-300 break-all min-w-0">
                       {window.location.origin}/invite/{invite.code || invite.inviteCode}
                     </div>
                     <button
                       onClick={copyInviteLink}
-                      className="px-4 py-3 bg-stone-700 hover:bg-stone-800 text-white rounded-lg transition-colors flex items-center gap-2"
+                      className="px-2.5 py-1.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded transition-colors flex items-center gap-1 text-xs flex-shrink-0"
                     >
                       {copied ? (
                         <>
-                          <FiCheck size={18} />
-                          Copied!
+                          <FiCheck size={12} />
+                          Copied
                         </>
                       ) : (
                         <>
-                          <FiCopy size={18} />
+                          <FiCopy size={12} />
                           Copy
                         </>
                       )}
                     </button>
                   </div>
-                  <p className="text-sm text-gray-600">
-                    Uses: {invite.currentUses} • Never expires • Share with anyone!
+                  <p className="text-[11px] text-gray-500">
+                    Uses: {invite.currentUses} • Never expires
                   </p>
                 </div>
               ) : (
-                <div className="mb-6 p-5 bg-yellow-50 rounded-lg border-2 border-yellow-200">
-                  <p className="text-yellow-800 font-semibold">No Invite Link Available</p>
-                  <p className="text-sm text-yellow-700 mt-1">
-                    This bookclub doesn't have an invite link. Contact the bookclub owner if you think this is an error.
+                <div className="mb-4 p-2.5 bg-yellow-500/10 rounded border border-yellow-500/30">
+                  <p className="text-yellow-400 text-xs font-semibold">No Invite Link Available</p>
+                  <p className="text-[11px] text-yellow-300/80 mt-0.5">
+                    This bookclub doesn't have an invite link. Contact the owner if this is unexpected.
                   </p>
                 </div>
               )}
 
               {/* Friends Section */}
               <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <FiUsers className="text-gray-600" size={20} />
-                  <h3 className="font-semibold text-gray-900">Send to Friends</h3>
+                <div className="flex items-center gap-1.5 mb-2">
+                  <FiUsers className="text-gray-500" size={12} />
+                  <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Send to Friends</h3>
                   {!invite && (
-                    <span className="text-xs text-gray-500">(Invite link required)</span>
+                    <span className="text-[11px] text-gray-500">(Invite link required)</span>
                   )}
                 </div>
 
                 {/* Friend Search */}
-                <div className="mb-4">
+                <div className="mb-2">
                   <div className="relative">
-                    <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                    <FiSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500" size={12} />
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => handleSearch(e.target.value)}
                       placeholder="Search friends..."
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent"
+                      className="w-full pl-8 pr-3 py-1.5 bg-gray-900 border border-gray-600 rounded text-white text-xs placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                   </div>
                 </div>
 
                 {/* Friends List */}
                 {searchResults.length === 0 ? (
-                  <p className="text-center text-gray-500 py-8">
-                    {searchQuery ? 'No friends found' : 'No friends yet. Add some friends to invite them!'}
+                  <p className="text-center text-gray-500 text-xs py-6">
+                    {searchQuery ? 'No friends found' : 'No friends yet. Add some friends to invite them.'}
                   </p>
                 ) : (
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                  <div className="space-y-1 max-h-56 overflow-y-auto">
                     {searchResults.map(friend => {
-                      logger.debug('Friend from searchResults:', friend);
                       const isAlreadyMember = isMember(friend.id);
                       const friendName = friend.username || friend.name || 'Unknown User';
                       const friendImage = getProfileImageUrl(friend.profileImage) || '/images/default.webp';
-                      
-                      logger.debug('Rendering friend:', { 
-                        friendId: friend.id,
-                        friendUsername: friend.username,
-                        friendName: friend.name,
-                        friendEmail: friend.email,
-                        friendProfileImage: friend.profileImage,
-                        computed: { friendName, friendImage, isAlreadyMember }
-                      });
-                      
+
                       return (
                         <div
                           key={friend.id}
-                          className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                          className="flex items-center justify-between px-2 py-1.5 rounded hover:bg-gray-700/60 transition-colors"
                         >
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2 min-w-0">
                             <img
                               src={friendImage}
                               alt={friendName}
-                              className="w-10 h-10 rounded-full object-cover border-2 border-stone-200"
+                              className="w-7 h-7 rounded-full object-cover flex-shrink-0"
                               onError={(e) => { (e.target as HTMLImageElement).src = '/images/default.webp'; }}
                             />
-                            <div>
-                              <div className="font-semibold text-gray-900">{friendName}</div>
-                              <div className="text-sm text-gray-500">{friend.email}</div>
+                            <div className="min-w-0">
+                              <div className="text-[13px] text-gray-200 truncate">{friendName}</div>
+                              {friend.email && (
+                                <div className="text-[11px] text-gray-500 truncate">{friend.email}</div>
+                              )}
                             </div>
                           </div>
                           {isAlreadyMember ? (
-                            <span className="px-4 py-2 bg-green-100 text-green-700 border-2 border-green-300 rounded-lg font-semibold text-sm">
+                            <span className="px-2 py-0.5 bg-green-500/15 text-green-400 border border-green-500/30 rounded text-[11px] font-medium flex-shrink-0 ml-2">
                               Member
                             </span>
                           ) : (
                             <button
                               onClick={() => sendDMInvite(friend.id, friendName)}
-                              disabled={sendingInvites.has(friend.id)}
-                              className="px-4 py-2 bg-stone-700 text-white rounded-lg hover:bg-stone-800 transition-colors disabled:bg-gray-400 font-semibold"
+                              disabled={sendingInvites.has(friend.id) || !invite}
+                              className="px-2.5 py-1 bg-indigo-700 text-white rounded hover:bg-indigo-800 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed text-xs flex-shrink-0 ml-2"
                             >
-                              {sendingInvites.has(friend.id) ? 'Sending...' : 'Send Invite'}
+                              {sendingInvites.has(friend.id) ? 'Sending…' : 'Invite'}
                             </button>
                           )}
                         </div>

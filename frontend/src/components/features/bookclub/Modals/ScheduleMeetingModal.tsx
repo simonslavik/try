@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { FiX, FiLink, FiClock, FiCalendar, FiAlignLeft } from 'react-icons/fi';
+import { FiX, FiLink, FiClock, FiCalendar, FiAlignLeft, FiExternalLink } from 'react-icons/fi';
+import { SiZoom, SiGooglemeet, SiJitsi } from 'react-icons/si';
 import { bookclubAPI } from '@api/bookclub.api';
 import logger from '@utils/logger';
 
@@ -10,6 +11,32 @@ const PLATFORMS = [
   { value: 'teams', label: 'Teams', icon: '🟣', color: 'bg-indigo-500/20 text-indigo-500 border-indigo-500/30' },
   { value: 'discord', label: 'Discord', icon: '🎮', color: 'bg-violet-500/20 text-violet-400 border-violet-500/30' },
   { value: 'custom', label: 'Other', icon: '🔗', color: 'bg-gray-500/20 text-gray-400 border-gray-500/30' },
+];
+
+// Quick-create shortcuts: open the provider in a new tab, user creates a
+// meeting there, then comes back and pastes the link.
+const QUICK_CREATE = [
+  {
+    label: 'Google Meet',
+    icon: SiGooglemeet,
+    url: 'https://meet.new',
+    iconClass: 'text-green-400',
+    hint: 'Instant meeting',
+  },
+  {
+    label: 'Zoom',
+    icon: SiZoom,
+    url: 'https://zoom.us/start/videomeeting',
+    iconClass: 'text-blue-400',
+    hint: 'Sign-in required',
+  },
+  {
+    label: 'Jitsi',
+    icon: SiJitsi,
+    url: 'https://meet.jit.si',
+    iconClass: 'text-cyan-400',
+    hint: 'No account needed',
+  },
 ];
 
 const DURATION_OPTIONS = [
@@ -139,22 +166,20 @@ const ScheduleMeetingModal = ({ isOpen, onClose, bookClubId, meeting = null, onM
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-700">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-700/20 rounded-lg">
-              <FiCalendar className="text-indigo-500" size={20} />
-            </div>
-            <h2 className="text-lg font-bold text-white">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+          <div className="flex items-center gap-2">
+            <FiCalendar className="text-indigo-500" size={14} />
+            <h2 className="text-sm font-semibold text-white">
               {isEditing ? 'Edit Meeting' : 'Schedule Meeting'}
             </h2>
           </div>
-          <button onClick={onClose} className="p-1.5 hover:bg-gray-700 rounded-lg transition-colors">
-            <FiX size={20} className="text-gray-400" />
+          <button onClick={onClose} className="p-1 hover:bg-gray-700 rounded transition-colors">
+            <FiX size={14} className="text-gray-400" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-5 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 space-y-3">
           {error && (
             <div className="bg-red-500/20 text-red-400 text-sm p-3 rounded-lg border border-red-500/30">
               {error}
@@ -188,6 +213,30 @@ const ScheduleMeetingModal = ({ isOpen, onClose, bookClubId, meeting = null, onM
               placeholder="https://zoom.us/j/123456789 or https://meet.google.com/abc-defg-hij"
               className="w-full bg-gray-900 text-white px-3 py-2.5 rounded-lg border border-gray-600 focus:border-indigo-500 focus:outline-none text-sm"
             />
+
+            {/* Quick-create shortcuts: open provider in a new tab, paste link back */}
+            {!form.meetingUrl.trim() && (
+              <div className="mt-2">
+                <p className="text-xs text-gray-500 mb-1.5">Don't have a link yet? Create one:</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {QUICK_CREATE.map(({ label, icon: Icon, url, iconClass, hint }) => (
+                    <a
+                      key={label}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={hint}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-gray-700 hover:bg-gray-600 border border-gray-600 hover:border-indigo-500 text-gray-200 text-xs transition-colors"
+                    >
+                      <Icon className={iconClass} size={14} />
+                      <span>{label}</span>
+                      <FiExternalLink size={10} className="text-gray-500" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {form.meetingUrl.trim() && activePlatform && (
               <div className={`mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border ${activePlatform.color}`}>
                 <span>{activePlatform.icon}</span>
@@ -244,18 +293,18 @@ const ScheduleMeetingModal = ({ isOpen, onClose, bookClubId, meeting = null, onM
           </div>
 
           {/* Submit */}
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-2 pt-1">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium"
+              className="flex-1 py-1.5 bg-gray-700 text-gray-300 rounded hover:bg-gray-600 transition-colors text-xs"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 py-2.5 bg-indigo-700 text-white rounded-lg hover:bg-indigo-500 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 py-1.5 bg-indigo-700 text-white rounded hover:bg-indigo-800 transition-colors text-xs disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? 'Saving...' : isEditing ? 'Save Changes' : 'Schedule Meeting'}
             </button>

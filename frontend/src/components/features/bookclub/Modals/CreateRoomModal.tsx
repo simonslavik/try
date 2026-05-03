@@ -109,10 +109,10 @@ const CreateRoomModal = ({ isOpen, onClose, onCreateRoom, members, currentUserId
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
-          <h2 className="text-white font-semibold text-lg">Create Room</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
-            <FiX size={20} />
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+          <h2 className="text-white font-semibold text-sm">Create Room</h2>
+          <button onClick={onClose} className="p-1 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors">
+            <FiX size={14} />
           </button>
         </div>
 
@@ -237,18 +237,18 @@ const CreateRoomModal = ({ isOpen, onClose, onCreateRoom, members, currentUserId
           )}
 
           {/* Submit */}
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-2 pt-1">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+              className="px-3 py-1.5 text-xs text-gray-400 hover:text-white transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading || !name.trim()}
-              className="px-4 py-2 text-sm bg-indigo-700 hover:bg-indigo-800 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded transition-colors"
+              className="px-3 py-1.5 text-xs bg-indigo-700 hover:bg-indigo-800 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded transition-colors"
             >
               {loading ? 'Creating...' : 'Create Room'}
             </button>
