@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { createPortal } from 'react-dom';
 import { AuthContext } from '@context/index';
-import { FiX, FiCalendar, FiBook, FiStar, FiTrash2 } from 'react-icons/fi';
+import { FiX, FiCalendar, FiBook, FiStar, FiTrash2, FiTrendingUp } from 'react-icons/fi';
 import apiClient from '@api/axios';
 import logger from '@utils/logger';
 import { useConfirm, useToast } from '@hooks/useUIFeedback';
@@ -9,9 +9,11 @@ import { useConfirm, useToast } from '@hooks/useUIFeedback';
 import DetailsTab from './CurrentBookDetails/DetailsTab';
 import ScheduleTab from './CurrentBookDetails/ScheduleTab';
 import ReviewsTab from './CurrentBookDetails/ReviewsTab';
+import ProgressTab from './CurrentBookDetails/ProgressTab';
 
 const TABS = [
   { key: 'details', label: 'Details', icon: FiBook },
+  { key: 'progress', label: 'Progress', icon: FiTrendingUp },
   { key: 'schedule', label: 'Schedule', icon: FiCalendar },
   { key: 'reviews', label: 'Reviews', icon: FiStar },
 ];
@@ -121,6 +123,9 @@ const CurrentBookDetailsModal = ({
         <div className="flex-1 overflow-y-auto p-4">
           {activeTab === 'details' && (
             <DetailsTab book={book} currentBookData={currentBookData} />
+          )}
+          {activeTab === 'progress' && (
+            <ProgressTab currentBookData={currentBookData} book={book} members={members} />
           )}
           {activeTab === 'schedule' && (
             <ScheduleTab
