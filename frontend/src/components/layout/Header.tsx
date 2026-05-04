@@ -42,12 +42,15 @@ const HomePageHeader = () => {
 
   const handleFriendAction = useCallback(async (requestId, action) => {
     try {
-      await apiClient.post(`/v1/friends/${action}`, { requestId });
-      setFriendRequests((prev) => prev.filter((r) => (r.friendshipId || r.id) !== requestId));
+      await apiClient.post(`/v1/friends/${action}`, { friendshipId: requestId });
+      // Refresh friend requests after action
+      const { data } = await apiClient.get('/v1/friends/requests');
+      const incomingRequests = (data.data || []).filter(r => r.friendId === auth?.user?.id);
+      setFriendRequests(incomingRequests);
     } catch (err) {
       logger.error(`Error ${action}ing friend request:`, err);
     }
-  }, []);
+  }, [auth?.user?.id]);
 
   // ─── Effects ────────────────────────────────────────────
 
@@ -57,7 +60,9 @@ const HomePageHeader = () => {
     const fetchFriendRequests = async () => {
       try {
         const { data } = await apiClient.get('/v1/friends/requests');
-        setFriendRequests(data.data || []);
+        // Filter to only show incoming requests (requests sent TO this user)
+        const incomingRequests = (data.data || []).filter(r => r.friendId === auth.user.id);
+        setFriendRequests(incomingRequests);
       } catch (err) {
         logger.error('Error fetching friend requests:', err);
       }

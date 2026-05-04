@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { FiUsers, FiStar, FiShield, FiAward, FiHeart, FiSearch, FiX } from 'react-icons/fi';
+import { FiUsers, FiStar, FiShield, FiAward, FiSearch, FiX } from 'react-icons/fi';
 import { getProfileImageUrl } from '@config/constants';
 import { getStatusColor } from './statusUtils';
 import UserHoverCard from './UserHoverCard';
@@ -162,7 +162,7 @@ const ConnectedUsersSidebar = ({
                         <span className="text-white text-sm font-medium truncate">{user.username}</span>
                         {isCurrentUser && <span className="text-xs text-gray-500">(you)</span>}
                         <RoleBadge role={user.role} />
-                        {isFriend && <FiHeart className="text-pink-500 fill-pink-500" size={14} />}
+                        {isFriend && <FiUsers className="text-blue-400" size={14} />}
                       </div>
                       <span className={`text-xs ${isOnline ? 'text-green-400' : 'text-gray-500'}`}>{isOnline ? (user.status ? user.status.charAt(0) + user.status.slice(1).toLowerCase() : 'Online') : 'Offline'}</span>
                     </div>
@@ -234,7 +234,7 @@ const ConnectedUsersSidebar = ({
                   <RoleBadge role={user.role} />
                 </div>
                 {isFriend && (
-                  <FiHeart className="text-pink-500 fill-pink-500" size={16} title="Friend" />
+                  <FiUsers className="text-blue-400" size={16} title="Friend" />
                 )}
               </div>
               
