@@ -124,9 +124,9 @@ const HomePageHeader = () => {
         className={`cursor-pointer flex items-center gap-2`}
       >
         <img
-          src="/images/logo3.png"
+          src="/images/Group 1 (Traced).png"
           alt="MyBookClubs"
-          className="h-12 w-32 dark:invert"
+          className="h-12 w-auto dark:invert"
         />
       </button>
 
